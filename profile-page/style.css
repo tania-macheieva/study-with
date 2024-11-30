@@ -4,9 +4,6 @@ body {
     padding: 0;
     background-color: #fff; 
 }
-/* #endregion  */
-
-/* #region Header*/
 header {
     display: flex;    
     align-items: center;
@@ -236,14 +233,11 @@ header .logo span {
     transform: translateY(-2px);
 } 
 
-
 .profile-container .container-my {
     text-align: center;
     padding-left: 10%;
     justify-content: flex-end;
 }
-
-
 
 .my-courses { 
     padding: 0px 15px 15px 15px; 
@@ -254,27 +248,51 @@ header .logo span {
     margin-top: 0px;
     
 }
-.my-courses .p-1 {
-    font-weight: 580;
-    font-size: 19px;
-    margin-bottom: 20px;
-    text-align: left;
-}
-
-.courses-list {
-    display: flex;
-    gap: 40px; 
-    
-}
 
 .course {
-    background-color: #e0e0e0;
-    border-radius: 12px;
+    background-color: #e0e0e0; 
     padding: 2px 15px;
+    border-radius: 12px; 
+    text-align: center; 
     margin-bottom: 10px;
     width: 250px;
 }
+.course .percent {
+    font-size: 14px;
+    font-weight: 400;
+    margin-bottom: 10px;
+    margin-top: 0;
+    padding-top: 0;
+    text-align: right;
+}
 
+.course img {
+    width: 250px;
+    border-radius: 12px;
+}
+.courses-list {
+    display: grid;  
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 40px; 
+    overflow: hidden;
+    transition: height 0.5s ease-in-out; 
+}
+.btn-resume { 
+    width: 100%;
+    font-family: "Montserrat";
+    padding: 12px 10px;
+    background: #ffffff;
+    color: #000000;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 640;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    margin-top: 10px;
+    margin-bottom: 12px;
+}
+    
 .course h3 {
     font-size: 16px;
     margin-bottom: 5px;
@@ -300,42 +318,65 @@ header .logo span {
     border-radius: 5px;
 }
 
-.course .percent {
-    font-size: 14px;
-    font-weight: 400;
-    margin-bottom: 10px;
-    margin-top: 0;
-    padding-top: 0;
-    text-align: right;
-}
-
-.course img {
-    width: 250px;
-    border-radius: 12px;
-}
-
-.btn-resume { 
-    width: 100%;
-    font-family: "Montserrat";
-    padding: 12px 10px;
-    background: #ffffff;
-    color: #000000;
-    border: none;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 640;
-    cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
-    margin-top: 10px;
-    margin-bottom: 12px;
-}
-    
 .btn-resume:hover {
     background-color: #4a8cc1;
     color: #ffffff;
     transform: translateY(-2px);
-} 
+}
 
+.courses-list.expanded {
+    height: auto; 
+}
+
+.courses-list .course:nth-child(n+4) {
+    display: none;
+}
+
+.courses-list.expanded .course:nth-child(n+4) {
+    display: block;
+}
+.my-courses .p-1 {
+    font-weight: 580;
+    font-size: 19px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+@media (max-width: 1360px) {
+    .courses-list {
+        grid-template-columns: repeat(2, 1fr); 
+    }
+    
+    .courses-list .course:nth-child(n+3) {
+        display: none;
+        justify-content: center;
+
+    }
+
+    .courses-list.expanded .course:nth-child(n+3) {
+        display: block;
+    } 
+}
+
+
+@media (max-width: 1010px) {
+    .courses-list {
+        grid-template-columns: 2fr; 
+        height: 275px;  
+    }
+
+    .course {
+        max-width: 100%;
+    }
+    
+    .courses-list .course:nth-child(n+2) {
+        display: none;
+    }
+    
+    .courses-list.expanded .course:nth-child(n+2) {
+        display: block;
+    }
+}
 
 .my-groups { 
     padding: 0px 15px 15px 15px; 
@@ -343,34 +384,27 @@ header .logo span {
 }
 .my-groups h2 { 
     text-align: left; 
+    margin-top: 0px;
     
-}
-.my-groups .p-1 {
-    font-weight: 580;
-    font-size: 19px;
-    margin-bottom: 20px;
-    text-align: left;
 }
 
-.groups-list {
-    display: flex;
-    gap: 40px; 
-    
-}
 
 .group {
-    background-color: #e0e0e0;
-    border-radius: 12px;
+    background-color: #e0e0e0; 
     padding: 2px 15px;
+    border-radius: 12px; 
+    text-align: center; 
     margin-bottom: 10px;
     width: 250px;
 }
 
-.group h3 {
-    font-size: 16px;
-    margin-bottom: 5px;
-}   
-
+.groups-list {
+    display: grid;  
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 40px; 
+    overflow: hidden;
+    transition: height 0.5s ease-in-out; 
+}
 .btn-go { 
     width: 100%;
     font-family: "Montserrat";
@@ -387,12 +421,70 @@ header .logo span {
     margin-bottom: 12px;
 }
     
+.group h3 {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
 .btn-go:hover {
     background-color: #4a8cc1;
     color: #ffffff;
     transform: translateY(-2px);
-} 
+}
 
+.groups-list.expanded {
+    height: auto;
+}
+
+.groups-list .group:nth-child(n+4) {
+    display: none;
+}
+
+.groups-list.expanded .group:nth-child(n+4) {
+    display: block;
+}
+.my-groups .p-1 {
+    font-weight: 580;
+    font-size: 19px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+@media (max-width: 1360px) {
+    .groups-list {
+        grid-template-columns: repeat(2, 1fr);   
+        height: 135px;  
+    }
+    
+    .groups-list .course:nth-child(n+3) {
+        display: none;
+        justify-content: center;
+
+    }
+
+    .groups-list.expanded .course:nth-child(n+3) {
+        display: block;
+    } 
+}
+
+@media (max-width: 1010px) {
+    .groups-list {
+        grid-template-columns: 2fr; 
+        height: 135px;  
+    }
+
+    .group {
+        max-width: 100%;
+    }
+    
+    .groups-list .group:nth-child(n+2) {
+        display: none
+    }
+    
+    .groups-list.expanded .group:nth-child(n+2) {
+        display: block;
+    }
+}
 
 .my-certificates { 
     padding: 0px 15px 15px 15px; 
@@ -401,6 +493,14 @@ header .logo span {
 .my-certificates h2 { 
     text-align: left; 
     
+}
+
+.certificate {
+    background-color: #e0e0e0;
+    border-radius: 12px;
+    padding: 2px 15px;
+    margin-bottom: 10px;
+    width: 250px;
 }
 
 .my-certificates .p-1 {
@@ -419,23 +519,17 @@ header .logo span {
 }
 
 .certificates-list {
-    display: flex;
+    display: grid;  
+    grid-template-columns: repeat(3, 1fr); 
     gap: 40px; 
-    
-}
-
-.certificate {
-    background-color: #e0e0e0;
-    border-radius: 12px;
-    padding: 2px 15px;
-    margin-bottom: 10px;
-    width: 250px;
+    overflow: hidden;
+    transition: height 0.5s ease-in-out; 
 }
 
 .certificate h3 {
     font-size: 16px;
     margin-bottom: 5px;
-}   
+}
 
 .btn-download { 
     width: 60px;
@@ -467,8 +561,63 @@ header .logo span {
 
 .btn-download:hover img { 
     color: #ffffff; 
-    content: url('images/download-hover.png'); 
+    content: url('images/download-certificate-hover.png'); 
 } 
+
+
+.certificates-list.expanded {
+    height: auto;
+}
+
+.certificates-list .certificate:nth-child(n+4) {
+    display: none;
+}
+
+.certificates-list.expanded .certificate:nth-child(n+4) {
+    display: block;
+}
+.my-certificates .p-1 {
+    font-weight: 580;
+    font-size: 19px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+@media (max-width: 1360px) {
+    .certificates-list {
+        grid-template-columns: repeat(2, 1fr);   
+    }
+    
+    .certificates-list .certificate:nth-child(n+3) {
+        display: none;
+        justify-content: center;
+
+    }
+
+    .certificates-list.expanded .certificate:nth-child(n+3) {
+        display: block;
+    } 
+}
+
+@media (max-width: 1010px) {
+    .certificates-list {
+        grid-template-columns: 2fr; 
+        height: 190px;  
+    }
+
+    .certificate {
+        max-width: 100%;
+    }
+    
+    .certificates-list .certificate:nth-child(n+2) {
+        display: none
+    }
+    
+    .certificates-list.expanded .certificate:nth-child(n+2) {
+        display: block;
+    }
+}
+
 
 .my-bookmarks { 
     padding: 0px 15px 15px 15px; 
@@ -479,37 +628,27 @@ header .logo span {
     margin-top: 0px;
     
 }
-.my-bookmarks .p-1 {
-    font-weight: 580;
-    font-size: 19px;
-    margin-bottom: 20px;
-    text-align: left;
-}
-
-.bookmarks-list {
-    display: flex;
-    gap: 40px; 
-    
-}
 
 .bookmark {
-    background-color: #e0e0e0;
-    border-radius: 12px;
+    background-color: #e0e0e0; 
     padding: 2px 15px;
+    border-radius: 12px; 
+    text-align: center; 
     margin-bottom: 10px;
     width: 250px;
 }
-
-.bookmark h3 {
-    font-size: 16px;
-    margin-bottom: 5px;
-}  
 
 .bookmark img {
     width: 250px;
     border-radius: 12px;
 }
-
+.bookmarks-list {
+    display: grid;  
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 40px; 
+    overflow: hidden;
+    transition: height 0.5s ease-in-out; 
+}
 .btn-open { 
     width: 100%;
     font-family: "Montserrat";
@@ -526,17 +665,75 @@ header .logo span {
     margin-bottom: 12px;
 }
     
+.bookmark h3 {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
 .btn-open:hover {
     background-color: #4a8cc1;
     color: #ffffff;
     transform: translateY(-2px);
-} 
+}
+
+.bookmarks-list.expanded {
+    height: auto; 
+}
+
+.bookmarks-list .bookmark:nth-child(n+4) {
+    display: none;
+}
+
+.bookmarks-list.expanded .bookmark:nth-child(n+4) {
+    display: block;
+}
+.my-bookmarks .p-1 {
+    font-weight: 580;
+    font-size: 19px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+@media (max-width: 1360px) {
+    .bookmarks-list {
+        grid-template-columns: repeat(2, 1fr); 
+    }
+    
+    .bookmarks-list .bookmark:nth-child(n+3) {
+        display: none;
+        justify-content: center;
+
+    }
+
+    .bookmarks-list.expanded .bookmark:nth-child(n+3) {
+        display: block;
+    } 
+}
 
 
-.btn-view-all { 
-    width: 120px;
+@media (max-width: 1010px) {
+    .bookmarks-list {
+        grid-template-columns: 2fr; 
+        height: 235px;  
+    }
+
+    .bookmarks {
+        max-width: 100%;
+    }
+    
+    .bookmarks-list .bookmark:nth-child(n+2) {
+        display: none;
+    }
+    
+    .bookmarks-list.expanded .bookmark:nth-child(n+2) {
+        display: block;
+    }
+}
+
+.btn-view-all-1 { 
+    width: 150px;
     font-family: "Montserrat";
-    padding: 12px 10px;
+    padding: 10px 20px;
     background: #283044;
     color: #ffffff;
     border: none;
@@ -548,13 +745,78 @@ header .logo span {
     margin-top: 10px;
     margin-bottom: 12px;
 }
-        
-.btn-view-all:hover {
+
+.btn-view-all-1:hover {
     background-color: #4a8cc1;
     color: #ffffff;
     transform: translateY(-2px);
 }  
 
+.btn-view-all-2 { 
+    width: 150px;
+    font-family: "Montserrat";
+    padding: 10px 20px;
+    background: #283044;
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 640;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    margin-top: 10px;
+    margin-bottom: 12px;
+}
+
+.btn-view-all-2:hover {
+    background-color: #4a8cc1;
+    color: #ffffff;
+    transform: translateY(-2px);
+}  
+
+.btn-view-all-3 { 
+    width: 150px;
+    font-family: "Montserrat";
+    padding: 10px 20px;
+    background: #283044;
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 640;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    margin-top: 10px;
+    margin-bottom: 12px;
+}
+
+.btn-view-all-3:hover {
+    background-color: #4a8cc1;
+    color: #ffffff;
+    transform: translateY(-2px);
+}  
+
+.btn-view-all-4 { 
+    width: 150px;
+    font-family: "Montserrat";
+    padding: 10px 20px;
+    background: #283044;
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 640;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    margin-top: 10px;
+    margin-bottom: 12px;
+}
+
+.btn-view-all-4:hover {
+    background-color: #4a8cc1;
+    color: #ffffff;
+    transform: translateY(-2px);
+}  
 /* Footer */
 .footer {
     background-color: #283044;
@@ -564,7 +826,7 @@ header .logo span {
 }
 
 footer .logo { 
-    border-right: 1px solid #b3b8c4a8; /* Increased the thickness of the separator */
+    border-right: 1px solid #b3b8c4a8;
     padding-right: 100px;  
     height: 100px;
 }
@@ -593,7 +855,7 @@ footer .logo span {
 .footer-right {
     display: flex;
     align-items: center;
-    border-right: 1px solid #b3b8c4a8; /* Increased the thickness of the separator */
+    border-right: 1px solid #b3b8c4a8;
     padding-right: 70px;  
     border-left: 1px solid #b3b8c4a8; 
     padding-left: 80px;
