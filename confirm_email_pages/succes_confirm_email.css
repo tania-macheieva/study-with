@@ -1,0 +1,165 @@
+body {
+    font-family: "Jost", sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+    color: #333;
+  }
+  
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: "Jost", sans-serif;
+    font-weight: 00;
+    font-size: 20px;
+    margin-right: 20px;
+  }
+  
+  .logo img {
+    width: 35px;
+    height: auto;
+  }
+  
+  header .logo span {
+    font-family: "Jost", sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    gap: 20px;
+  }
+   .menu {
+    display: flex; /* Встановлюємо flex для меню */
+    justify-content: space-between; /* Розподіляємо ліву і праву частини */
+    align-items: center;
+    flex: 1;
+    
+  }
+  
+  .menu-left {
+    display: flex;
+    gap: 10px; /* Відстань між посиланнями ліворуч */
+    margin-left: 15;
+  }
+  .menu-left a {
+    text-decoration: none;
+    font-family: "Jost", sans-serif;
+    font-size: 16px;
+    color: #333;
+    padding: 5px 10px;
+    transition: background-color 0.3s ease;
+  }
+  .menu-left a:hover {
+    background-color: #f0f0f0;
+    border-radius: 5px;
+  }
+  
+  .menu-right {
+    display: flex;
+    gap: 15px; /* Відстань між кнопками праворуч */
+  }
+  .menu-right a {
+    text-decoration: none;
+    font-family: "Jost", sans-serif;
+    font-size: 16px;
+    color: #333;
+    padding: 5px 10px;
+    transition: background-color 0.3s ease;
+  }
+  .menu-right .btn {
+    background-color: #283044;
+    color: white;
+    font-family: "Jost", sans-serif;
+    font-weight: 300;
+    padding: 5px 15px;
+    border-radius: 8px;
+  }
+  
+  .menu-right .btn:hover {
+    background-color: #0c101a;
+  }
+  
+  
+  .menu .sign-in {
+    background-color: #283044;
+    color: #fff;
+    font-family: "Jost", sans-serif;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .menu .sign-in:hover {
+    background-color: #0c101a;
+  }
+
+  .success-confirmation-page {
+    display: flex;
+    flex-direction: column; /* Елементи будуть розташовані вертикально */
+    align-items: center; /* Вирівнювання по центру горизонтально */
+    gap: 20px; /* Відступ між елементами */
+    margin: 20px auto; /* Центрування сторінки */
+    max-width: 600px; /* Максимальна ширина сторінки */
+  }
+  
+  .illustration img {
+    max-width: 800px;
+    height: auto;
+  }
+  .arrow {
+    width: 160px;
+    /* Розмір стрілки */
+    height: auto;
+    position: absolute;
+    top: -96px;
+    transform: translateX(10%);
+    z-index: 10;
+  }
+  
+  .succes-conf-form{
+    background-color: #fff;
+    border-radius: 12px; 
+    padding: 20px 60px; 
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.232);
+    text-align: center;
+    max-width: 500px; 
+    max-height: 200px;
+    margin: 0 auto; 
+  }
+  
+  .succes-conf-form h2 {
+    font-size: 32px; 
+    font-weight: 600; 
+    margin-bottom: 25px; 
+  }
+
+  .success-button {
+    background-color: #283044; /* Темніша кнопка */
+    color: #fff;
+    border: none;
+    padding:  12px 0; 
+    width: 80%;
+    border-radius: 12px; 
+    cursor: pointer;
+    font-size: 16px; /* Збільшуємо текст кнопки */
+    font-weight: 100;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-bottom: 15px;
+  }
+  
+  .success-button:hover {
+    background-color: #0c101a;
+    transform: scale(1.05); /* Невелике збільшення при наведенні */
+  }
