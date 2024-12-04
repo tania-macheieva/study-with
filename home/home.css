@@ -1,0 +1,304 @@
+body {
+  font-family: 'Jost', sans-serif;
+  cursor: crosshair;
+}
+
+/*Home*/
+
+.container {
+  display: flex;
+  align-items: center; 
+  justify-content: space-between; 
+}
+
+.text {
+  max-width: 50%;
+}
+
+body h1 {
+  font-weight: 500;
+  font-size: 60px;
+  text-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+  font-family: 'Jost', Medium;
+  margin-left: 64px;
+  color: #283044;
+}
+
+body h3 {
+  text-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+  font-weight: 300;
+  font-size: 18px;
+  color: #283044;
+  font-family: 'Jost', ExtraLight;
+  line-height: 1.6; 
+  margin-left: 64px;
+}
+
+.home_button {
+  border-radius: 12px;
+  width: 200px;
+  height: 40px;
+  background: #283044;
+  font-size: 18px;
+  font-weight: 400;
+  color: #fff;
+  font-family: 'Jost', Regular;
+  border: none;
+  margin-left: 64px;
+  cursor: pointer;
+  margin-top: 32px;
+}
+
+.img_home {
+  width: 65%; 
+  height: auto; 
+  margin-top: 22px;
+}
+
+/* Popular courses */
+
+.courses {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 64px; 
+  margin-left: 54px;
+  margin-top: 48px;
+  overflow-x: auto;
+  padding: 10px;
+  justify-content: flex-start;
+}
+
+.popular_text{
+  color: #283044;
+  font-weight: 500;
+  font-size: 32px;
+}
+
+.course_group,
+.course_group * {
+  box-sizing: border-box;
+  
+}
+
+.course_group {
+  width: 240px;
+  height: 398px;
+  position: relative;
+  flex-shrink: 0; 
+}
+
+.rectangle-1 {
+  width: 240px;
+  height: 360px;
+  position: absolute;
+  left: 0px;
+  top: 38px;
+  overflow: visible;
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+}
+
+.rectangle-2 {
+  background: #d9d9d9;
+  border-radius: 12px;
+  width: 208px;
+  height: 124px;
+  position: absolute;
+  left: 15px;
+  top: 142px;
+  
+}
+
+.course_name {
+  color: #283044;
+  text-align: left;
+  font-family: "Jost", Regular;
+  font-weight: 500;
+  font-size: 20px;
+  position: absolute;
+  left: 15px;
+  top: 0px;
+  width: 208px;
+  height: 21px;
+  
+}
+
+.description {
+  color: #283044;
+  text-align: left;
+  font-family: "Jost", SemiBold;
+  font-size: 16px;
+  font-weight: 400;
+  position: absolute;
+  left: 15px;
+  top: 45px;
+  width: 208px;
+  height: 69px;
+}
+
+.group-27 {
+  width: 59.17px;
+  height: 22px;
+  position: static;
+  
+}
+
+.price {
+  color: #000000;
+  text-align: left;
+  font-family: "Jost", SemiBold;
+  font-size: 20px;
+  font-weight: 600;
+  position: absolute;
+  left: 15px;
+  top: 294px;
+  width: 47px;
+  height: 22px;
+  margin-left: 4px;
+}
+
+.arrow {
+  width: 12.17px;
+  height: 0px;
+  position: absolute;
+  left: 62px;
+  top: 310px;
+  overflow: visible;
+}
+
+.rectangle-23 {
+  background: #d9d9d9;
+  border-radius: 12px;
+  width: 208px;
+  height: 124px;
+  position: absolute;
+  left: 15px;
+  top: 142px;
+}
+
+.Categories_text {
+  margin-top: 48px;
+  font-weight: 500;
+  font-size: 32px;
+  margin-bottom: 48px;
+  color: #283044;
+}
+
+.Category {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 48px; 
+  margin-left: 54px;
+  margin-top: 48px;
+  padding: 10px;
+  justify-content: flex-start;
+}
+
+.category_box {
+  box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.25);
+  border-radius: 12px;
+  width: 300px;
+  height: 70px;
+  background: #DCECFC;
+  gap: 32px;
+  text-align: center;
+  font-family: 'Jost', ExtraLight;
+  font-weight: 200;
+  font-size: 20px;
+  color: #283044;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+/*Feedback*/
+.Fedback_text {
+  color: #283044;
+  font-weight: 500;
+  font-size: 32px;
+  font-family: 'Jost', Medium;
+  margin-top: 48px;
+}
+
+.Feedback {
+  display: flex;
+  flex-direction: row;
+  overflow: hidden; 
+  position: relative;
+  width: 100%;
+}
+
+.Feedback_list {
+  width: 300px;
+  height: 100px;
+  box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.25);
+  background: #DCECFC;
+  align-items: center;
+  padding: 10px;
+  justify-content: flex-start;
+  border-radius: 12px;
+  margin-right: 20px;
+  margin-left: 64px;
+  display: flex;
+  flex-direction: row;
+}
+
+@keyframes slide-left {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-25%);
+  }
+  50% {
+    transform: translateX(-50%);
+  }
+  75% {
+    transform: translateX(-75%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.Feedback_inner {
+  display: flex;
+  animation: slide-left 40s linear infinite; /* Задаємо тривалість анімації */
+}
+
+.Feedback_inner .Feedback_list {
+  flex-shrink: 0; 
+}
+
+.Feed_photo {
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 20px;
+}
+
+.Feed_name_container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.Feed_name {
+  font-weight: 400;
+  font-size: 18px;
+  color: #000;
+  margin: 0;
+}
+
+.Feed_comm {
+  font-weight: 300;
+  font-size: 16px;
+  color: #000;
+  margin: 0;
+}
+
+
+
+
+
