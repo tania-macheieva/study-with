@@ -20,7 +20,7 @@ body {
     position: sticky;
     top: 0;
     z-index: 1000;
-    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0px  2px 5px rgba(0, 0, 0, 0.15);
 }
 
 .container {
@@ -69,15 +69,24 @@ body {
     gap: 24px;
     font-size: 18px;
 } 
+.right-section {
+    display: flex;
+    gap: 24px;
+    font-family: 'Jost', sans-serif;
+    font-size: 18px;
+}
+
+.right-section a {
+    text-decoration: none;
+    color: #000;
+}
 
 .search {
     position: relative; /* Дозволяє позиціювати іконку відносно контейнера */
-    display: inline-block;
-    max-width: 300px; /* Максимальна ширина поля пошуку */
+    display: inline-block; 
 }
   /* Поле для вводу */
-.search input[type="text"]  {
-    width: 100%; /* Поле займає всю ширину контейнера */
+.search input[type="text"]  { 
     padding: 5px; /* Відступ справа для іконки + текст зліва */
     border-radius: 4px;
     font-family: 'Jost', sans-serif;
@@ -85,7 +94,7 @@ body {
     font-size: 16px;
     box-sizing: border-box; /* Увімкнення врахування padding */
     border-radius: 12px;
-    width: 300px;
+    width: 15vw;
     
 }
 
