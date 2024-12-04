@@ -8,16 +8,16 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-
+    <script src="header.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <header>
+    <!-- <header>
         <div class="logo">
             <img src="images/menu-logo.png" alt="logo">
             <span>StudyWith</span>
@@ -39,161 +39,193 @@
                 </button>
             </div>
         </nav>
-    </header>
-
-    <main class="profile-container">
-        <div class="user-info">
-            <label for="upload-image">
-                <img id="profile-image" class="profile-image" src="images/profile-picture.png" alt="user image">
-            </label>
-            <input type="file" id="upload-image" accept="image/*" style="display: none;">
-            <div class="action-buttons">
-                <button id="confirm-image" style="display: none;" title="Confirm">
-                    <i class="fas fa-check"></i>
-                </button>
-                <button id="remove-image" style="display: none;" title="Remove">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <p>username</p>
-            <button class="btn-teacher">Become a teacher</button>
-        </div>
-
-        <div class="container-my">
-            <div class="my-courses">
-                <h2>My courses</h2>
-                <div class="courses-list">
-                    <div class="course">
-                        <p class="p-1">Course name 1</p>
-                        <div class="progress-bar">
-                            <span style="width: 70%;"></span>
-                        </div>
-                        <p class="percent">70%</p>
-                        <img src="images/250x100.png" alt="image">
-                        <button class="btn-resume">Resume</button>
-                    </div>
-                    <div class="course">
-                        <p class="p-1">Course name 2</p>
-                        <div class="progress-bar">
-                            <span style="width: 40%;"></span>
-                        </div>
-                        <p class="percent">40%</p>
-                        <img src="images/250x100.png" alt="image">
-                        <button class="btn-resume">Resume</button>
-                    </div>
-                    <div class="course">
-                        <p class="p-1">Course name 3</p>
-                        <div class="progress-bar">
-                            <span style="width: 50%;"></span>
-                        </div>
-                        <p class="percent">50%</p>
-                        <img src="images/250x100.png" alt="image">
-                        <button class="btn-resume">Resume</button>
-                    </div>
-                </div>
-                <button class="btn-view-all-1">View all</button>
-            </div>
-            <div>
-                <div class="my-groups">
-                    <h2>My groups</h2>
-                    <div class="groups-list">
-                        <div class="group">
-                            <p class="p-1">Group name 1</p>
-                            <button class="btn-go">Go</button>
-                        </div>
-                        <div class="group">
-                            <p class="p-1">Group name 2</p>
-                            <button class="btn-go">Go</button>
-                        </div>
-                        <div class="group">
-                            <p class="p-1">Group name 3</p>
-                            <button class="btn-go">Go</button>
-                        </div>
-                    </div>
-                    <button class="btn-view-all-2">View all</button>
-                </div>
-            </div>
-            <div>
-                <div class="my-certificates">
-                    <h2>My certificates</h2>
-                    <div class="certificates-list">
-                        <div class="certificate">
-                            <p class="p-1">Certificate name 1</p>
-                            <p class="p-2">Completed on dd/mm/yyyy</p>
-                            <button class="btn-download">
-                                <img src="images/download-certificate.png" alt="">
-                            </button>
-                        </div>
-                        <div class="certificate">
-                            <p class="p-1">Certificate name 2</p>
-                            <p class="p-2">Completed on dd/mm/yyyy</p>
-                            <button class="btn-download">
-                                <img src="images/download-certificate.png" alt="">
-                            </button>
-                        </div>
-                        <div class="certificate">
-                            <p class="p-1">Certificate name 3</p>
-                            <p class="p-2">Completed on dd/mm/yyyy</p>
-                            <button class="btn-download">
-                                <img src="images/download-certificate.png" alt="">
-                            </button>
-                        </div>
-                    </div>
-                    <button class="btn-view-all-3">View all</button>
-                </div>
-            </div>
-            <div class="my-bookmarks">
-                <h2>My bookmarks</h2>
-                <div class="bookmarks-list">
-                    <div class="bookmark">
-                        <p class="p-1">Bookmark name 1</p>
-                        <img src="images/250x100.png" alt="image">
-                        <button class="btn-open">Open</button>
-                    </div>
-                    <div class="bookmark">
-                        <p class="p-1">Bookmark name 2</p>
-                        <img src="images/250x100.png" alt="image">
-                        <button class="btn-open">Open</button>
-                    </div>
-                    <div class="bookmark">
-                        <p class="p-1">Bookmark name 3</p>
-                        <img src="images/250x100.png" alt="image">
-                        <button class="btn-open">Open</button>
-                    </div>
-                </div>
-                <button class="btn-view-all-4">View all</button>
-            </div>
-    </main>
-
-
-
-    <footer class="footer">
-        <div class="footer-content">
+    </header> -->
+    <header class="site-header">
+        <div class="container">
+          <div class="left-section">
             <div class="logo">
-                <img src="images/menu-logo.png" alt="logo">
-                <span>StudyWith</span>
+              <img src="images/menu-logo.png" alt="StudyWith Logo" />
+              <span>StudyWith</span>
             </div>
-            <div class="footer-links">
-                <div class="footer-links-a">
-                    <a href="#">About</a>
-                    <a href="#">Contact</a>
-                    <a href="#">FAQ</a>
-                </div>
-                <div class="footer-copyright">
-                    <span>&#169; 2024 All Rights Reserved StudyWith</span>
-                </div>
+            <nav class="nav-menu">
+              <a href="#" data-lang="all-courses">All courses</a>
+              <a href="#" data-lang="about">About</a>
+              <a href="#" data-lang="contact">Contact</a>
+              <a href="#" data-lang="faq">FAQ</a>
+            </nav>
+          </div>
+          <div class="right-section">
+            <input type="text" placeholder="Search..." />
+            <div class="lang-switcher">
+              <a href="#" class="lang-btn" data-lang="en">EN</a> |
+              <a href="#" class="lang-btn" data-lang="ua">UA</a>
             </div>
-            <div class="footer-right">
-                <a href="#">Terms & conditions</a>
-                <a href="#">Privacy policy</a>
-            </div>
-            <div class="footer-address">
-                <span><i class="fas fa-map-marker-alt"></i> Dragomanova 50 St., Lviv, Ukraine</span>
-                <span><a href="mailto:studywith.connect@gmail.com"><i class="fas fa-envelope"></i>
-                        studywith.connect@gmail.com</a></span>
-            </div>
+            <button class="btn">
+                <a id="user" href="#">
+                    <img src="images/user-avatar.png" alt="user image">
+                    <span>username</span>
+                </a>
+            </button>
+          </div>
         </div>
-    </footer>
+      </header>
+  
+    <div class="page-container">
+        <div class="content">
+            <main class="profile-container">
+                <div class="user-info">
+                    <label for="upload-image">
+                        <img id="profile-image" class="profile-image" src="images/profile-picture.png" alt="user image">
+                    </label>
+                    <input type="file" id="upload-image" accept="image/*" style="display: none;">
+                    <div class="action-buttons">
+                        <button id="confirm-image" style="display: none;" title="Confirm">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        <button id="remove-image" style="display: none;" title="Remove">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <p>username</p>
+                    <button class="btn-teacher">Become a teacher</button>
+                </div>
+        
+                <div class="container-my">
+                    <div class="my-courses">
+                        <h2>My courses</h2>
+                        <div class="courses-list">
+                            <div class="course">
+                                <p class="p-1">Course name 1</p>
+                                <div class="progress-bar">
+                                    <span style="width: 70%;"></span>
+                                </div>
+                                <p class="percent">70%</p>
+                                <img src="images/250x100.png" alt="image">
+                                <button class="btn-resume">Resume</button>
+                            </div>
+                            <div class="course">
+                                <p class="p-1">Course name 2</p>
+                                <div class="progress-bar">
+                                    <span style="width: 40%;"></span>
+                                </div>
+                                <p class="percent">40%</p>
+                                <img src="images/250x100.png" alt="image">
+                                <button class="btn-resume">Resume</button>
+                            </div>
+                            <div class="course">
+                                <p class="p-1">Course name 3</p>
+                                <div class="progress-bar">
+                                    <span style="width: 50%;"></span>
+                                </div>
+                                <p class="percent">50%</p>
+                                <img src="images/250x100.png" alt="image">
+                                <button class="btn-resume">Resume</button>
+                            </div>
+                        </div>
+                        <button class="btn-view-all-1">View all</button>
+                    </div>
+                    <div>
+                        <div class="my-groups">
+                            <h2>My groups</h2>
+                            <div class="groups-list">
+                                <div class="group">
+                                    <p class="p-1">Group name 1</p>
+                                    <button class="btn-go">Go</button>
+                                </div>
+                                <div class="group">
+                                    <p class="p-1">Group name 2</p>
+                                    <button class="btn-go">Go</button>
+                                </div>
+                                <div class="group">
+                                    <p class="p-1">Group name 3</p>
+                                    <button class="btn-go">Go</button>
+                                </div>
+                            </div>
+                            <button class="btn-view-all-2">View all</button>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="my-certificates">
+                            <h2>My certificates</h2>
+                            <div class="certificates-list">
+                                <div class="certificate">
+                                    <p class="p-1">Certificate name 1</p>
+                                    <p class="p-2">Completed on dd/mm/yyyy</p>
+                                    <button class="btn-download">
+                                        <img src="images/download-certificate.png" alt="">
+                                    </button>
+                                </div>
+                                <div class="certificate">
+                                    <p class="p-1">Certificate name 2</p>
+                                    <p class="p-2">Completed on dd/mm/yyyy</p>
+                                    <button class="btn-download">
+                                        <img src="images/download-certificate.png" alt="">
+                                    </button>
+                                </div>
+                                <div class="certificate">
+                                    <p class="p-1">Certificate name 3</p>
+                                    <p class="p-2">Completed on dd/mm/yyyy</p>
+                                    <button class="btn-download">
+                                        <img src="images/download-certificate.png" alt="">
+                                    </button>
+                                </div>
+                            </div>
+                            <button class="btn-view-all-3">View all</button>
+                        </div>
+                    </div>
+                    <div class="my-bookmarks">
+                        <h2>My bookmarks</h2>
+                        <div class="bookmarks-list">
+                            <div class="bookmark">
+                                <p class="p-1">Bookmark name 1</p>
+                                <img src="images/250x100.png" alt="image">
+                                <button class="btn-open">Open</button>
+                            </div>
+                            <div class="bookmark">
+                                <p class="p-1">Bookmark name 2</p>
+                                <img src="images/250x100.png" alt="image">
+                                <button class="btn-open">Open</button>
+                            </div>
+                            <div class="bookmark">
+                                <p class="p-1">Bookmark name 3</p>
+                                <img src="images/250x100.png" alt="image">
+                                <button class="btn-open">Open</button>
+                            </div>
+                        </div>
+                        <button class="btn-view-all-4">View all</button>
+                    </div>
+            </main>    
+        </div>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="logo">
+                    <img src="images/menu-logo.png" alt="logo">
+                    <span>StudyWith</span>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-links-a">
+                        <a href="#">About</a>
+                        <a href="#">Contact</a>
+                        <a href="#">FAQ</a>
+                    </div>
+                    <div class="footer-copyright">
+                        <span>&#169; 2024 All Rights Reserved StudyWith</span>
+                    </div>
+                </div>
+                <div class="footer-right">
+                    <a href="#">Terms & conditions</a>
+                    <a href="#">Privacy policy</a>
+                </div>
+                <div class="footer-address">
+                    <span><i class="fas fa-map-marker-alt"></i> Dragomanova 50 St., Lviv, Ukraine</span>
+                    <span><a href="mailto:studywith.connect@gmail.com"><i class="fas fa-envelope"></i>
+                            studywith.connect@gmail.com</a></span>
+                </div>
+            </div>
+        </footer>
+    
+    </div>
 
 </body>
 <script>

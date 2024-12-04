@@ -1,10 +1,14 @@
-
 body { 
     margin: 0;
     padding: 0;
     background-color: #fff; 
 }
-header {
+.page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; 
+}
+/* header {
     display: flex;    
     align-items: center;
     padding: 10px 20px;
@@ -13,7 +17,9 @@ header {
     position: sticky;
     top: 0;
     z-index: 1000;
+    width: 100%;
 }
+ 
 
 
 .logo {
@@ -24,6 +30,7 @@ header {
     font-weight: 00;
     font-size: 20px;
     margin-right: 40px; 
+    user-select: none;
 }
 
 .logo img {
@@ -44,27 +51,29 @@ header .logo span {
     justify-content: space-between; 
     align-items: center;
     flex: 1;
-
+    user-select: none;
 }
 
 .menu-left {
     display: flex;
     gap: 10px; 
     margin-left: 15;
+    cursor: pointer;
 }
 
 .menu-left a {
-    font-family: "Montserrat";
+    font-family: "Jost", sans-serif;
     font-weight: 470;
     text-decoration: none; 
     font-size: 16px;
     color: #283044;
     padding: 5px 10px;
-    transition: background-color 0.3s ease;
+    transition: color 0.6s ease;
+    
 }
 
 .menu-left a:hover {
-    background-color: #f0f0f0;
+    color: #4a8cc1;
     border-radius: 5px;
 }
 
@@ -76,7 +85,7 @@ header .logo span {
 
 .menu-right a {
     text-decoration: none;
-    font-family: "Montserrat";     
+    font-family: "Jost", sans-serif;     
     color: #283044;
     padding: 10px; 
 }
@@ -125,7 +134,124 @@ header .logo span {
     content: url('images/user-avatar-hover.png');  
     transform: scale(1.01);
     box-shadow: 0 10px 20px rgba(112, 112, 112, 0.2); 
-} 
+}  */
+
+.site-header {
+    background-color: #fff;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    background-color: #fff;
+}
+
+.container {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between; 
+    margin: 0;
+    padding: 0;
+}
+
+.left-section {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    font-weight: 550;
+    font-family: 'Jost', sans-serif;
+}
+
+.logo img {
+    height: 30px;
+    margin-right: 8px;
+}
+
+.nav-menu {
+    display: flex;
+    gap: 24px;
+    font-family: 'Jost', sans-serif;
+}
+
+.nav-menu a {
+    text-decoration: none;
+    color: #000;
+}
+
+.right-section {
+    display: flex;
+    align-items: center;
+    gap: 24px; 
+}
+
+input[type="text"] {
+    padding: 5px;
+    border-radius: 4px;
+    font-family: 'Jost', sans-serif;
+    border: 2px solid #c7c7c7;
+    border-radius: 12px;
+    width: 15vw;
+}
+
+.search-btn img {
+    height: 16px;
+}
+
+.lang-switcher a {
+    text-decoration: none;
+    color: #000;
+    font-size: 14px;
+    font-family: 'Jost', sans-serif;
+}
+
+.right-section .btn {
+    background-color: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 5px; 
+    cursor: pointer;
+    padding: 0;
+}
+
+.right-section .btn a {
+    display: flex;
+    align-items: center;  
+    gap: 7px;  
+    transition: color 0.3s ease, transform 0.3s ease; 
+    text-decoration: none;
+    font-family: "Jost", sans-serif; 
+    color: #283044;  
+}
+
+.right-section .btn img {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%; 
+    transition: transform 0.3s ease, box-shadow 0.3s ease;  
+}  
+
+.right-section .btn:hover a {
+    color: #4a8cc1; 
+    transform: scale(1.04); 
+}
+
+.right-section .btn:hover img { 
+    content: url('images/user-avatar-hover.png');  
+    transform: scale(1.01);
+    box-shadow: 0 10px 20px rgba(112, 112, 112, 0.2); 
+}  
 
 /* Profile Container */
 .profile-container {
@@ -134,7 +260,7 @@ header .logo span {
     justify-content: space-between; 
     align-items: flex-start; 
     margin-top: 50px;
-    font-family: "Montserrat";
+    font-family: "Jost", sans-serif;
 }
 
 /* User Info Section */
@@ -155,7 +281,7 @@ header .logo span {
     justify-content: flex-start;  
     align-items: flex-start;
     padding-right: 100px;
-    font-family: "Montserrat";
+    font-family: "Jost", sans-serif;
     font-weight: 100;
 }
 
@@ -192,7 +318,7 @@ header .logo span {
     border: none;
     cursor: pointer; 
     color: #4caf50;  
-    font-size: 20px;
+    font-size: 16px;
 }
 
 .action-buttons button#remove-image {
@@ -205,22 +331,22 @@ header .logo span {
 }
 
 .profile-container .user-info p {
-    font-family: "Montserrat", sans-serif;
+    font-family: "Jost", sans-serif;
     font-weight: 600;
-    font-size: 18px;
+    font-size: 14px;
     color: #283044;               
     margin-bottom: 10px;    
 } 
 
 .profile-container .user-info  .btn-teacher {
     width: 70%;
-    font-family: "Montserrat";
+    font-family: "Jost", sans-serif;
     padding: 12px 10px;
     background: #283044;
     color: #ffffff;
     border: none;
     border-radius: 12px;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 640;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
@@ -259,7 +385,7 @@ header .logo span {
 }
 .course .percent {
     font-size: 14px;
-    font-weight: 400;
+    font-weight: 550;
     margin-bottom: 10px;
     margin-top: 0;
     padding-top: 0;
@@ -279,13 +405,13 @@ header .logo span {
 }
 .btn-resume { 
     width: 100%;
-    font-family: "Montserrat";
+    font-family: "Jost", sans-serif;
     padding: 12px 10px;
     background: #ffffff;
     color: #000000;
     border: none;
     border-radius: 12px;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 640;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
@@ -337,7 +463,7 @@ header .logo span {
 }
 .my-courses .p-1 {
     font-weight: 580;
-    font-size: 19px;
+    font-size: 17px;
     margin-bottom: 20px;
     text-align: left;
 }
@@ -407,13 +533,13 @@ header .logo span {
 }
 .btn-go { 
     width: 100%;
-    font-family: "Montserrat";
+    font-family: "Jost", sans-serif;
     padding: 12px 10px;
     background: #ffffff;
     color: #000000;
     border: none;
     border-radius: 12px;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 640;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
@@ -422,7 +548,7 @@ header .logo span {
 }
     
 .group h3 {
-    font-size: 16px;
+    font-size: 17px;
     margin-bottom: 5px;
 }
 
@@ -505,7 +631,7 @@ header .logo span {
 
 .my-certificates .p-1 {
     font-weight: 580;
-    font-size: 19px; 
+    font-size: 17px; 
     text-align: left;
     margin-bottom: 0px;
 }
@@ -527,7 +653,7 @@ header .logo span {
 }
 
 .certificate h3 {
-    font-size: 16px;
+    font-size: 17px;
     margin-bottom: 5px;
 }
 
@@ -538,7 +664,7 @@ header .logo span {
     color: #000000;
     border: none;
     border-radius: 100px;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 640;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
@@ -578,7 +704,7 @@ header .logo span {
 }
 .my-certificates .p-1 {
     font-weight: 580;
-    font-size: 19px;
+    font-size: 17px;
     margin-bottom: 20px;
     text-align: left;
 }
@@ -651,13 +777,13 @@ header .logo span {
 }
 .btn-open { 
     width: 100%;
-    font-family: "Montserrat";
+    font-family: "Jost", sans-serif;
     padding: 12px 10px;
     background: #ffffff;
     color: #000000;
     border: none;
     border-radius: 12px;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 640;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
@@ -689,7 +815,7 @@ header .logo span {
 }
 .my-bookmarks .p-1 {
     font-weight: 580;
-    font-size: 19px;
+    font-size: 17px;
     margin-bottom: 20px;
     text-align: left;
 }
@@ -732,13 +858,13 @@ header .logo span {
 
 .btn-view-all-1 { 
     width: 150px;
-    font-family: "Montserrat";
+    font-family: "Jost", sans-serif;
     padding: 10px 20px;
     background: #283044;
     color: #ffffff;
     border: none;
     border-radius: 12px;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 640;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
@@ -754,13 +880,13 @@ header .logo span {
 
 .btn-view-all-2 { 
     width: 150px;
-    font-family: "Montserrat";
+    font-family: "Jost", sans-serif;
     padding: 10px 20px;
     background: #283044;
     color: #ffffff;
     border: none;
     border-radius: 12px;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 640;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
@@ -776,13 +902,13 @@ header .logo span {
 
 .btn-view-all-3 { 
     width: 150px;
-    font-family: "Montserrat";
+    font-family: "Jost", sans-serif;
     padding: 10px 20px;
     background: #283044;
     color: #ffffff;
     border: none;
     border-radius: 12px;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 640;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
@@ -798,13 +924,13 @@ header .logo span {
 
 .btn-view-all-4 { 
     width: 150px;
-    font-family: "Montserrat";
+    font-family: "Jost", sans-serif;
     padding: 10px 20px;
     background: #283044;
     color: #ffffff;
     border: none;
     border-radius: 12px;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 640;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
@@ -822,7 +948,8 @@ header .logo span {
     background-color: #283044;
     color: #fff;
     padding: 50px 0;
-    font-family: "Montserrat";
+    font-family: "Jost", sans-serif;
+    
 }
 
 footer .logo { 
@@ -833,8 +960,8 @@ footer .logo {
 
 footer .logo span {
     font-family: "Jost", sans-serif;
-    font-size: 32px;
-    font-weight: 510;
+    font-size: 26px;
+    font-weight: 600;
     color: #ffffff;
     gap: 20px;
 }
@@ -865,7 +992,6 @@ footer .logo span {
 .footer-links {
     display: flex;
     flex-direction: column; 
-    
 }
 
 .footer-logo {
@@ -884,8 +1010,7 @@ footer .logo span {
     color: #fff;
     text-decoration: none;
     margin-right: 20px;
-    font-size: 16px;
-}
+    font-size: 16px;}
 
 .footer-right a {
     color: #fff;
