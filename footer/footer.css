@@ -28,34 +28,25 @@ body {
     bottom: 0;
     left: 0;
     width: 100%;
-    z-index: 10;
-    
-}
-body, html {
-    height: 100%;
-    margin: 0;
+    z-index: 10;  
 }
 
 .page-container {
     display: flex;
     flex-direction: column;
     min-height: 100vh; 
-}
+} 
 
-.content {
-    flex: 1; 
-}
 footer .logo { 
     border-right: 1px solid #b3b8c4a8;
     padding-right: 100px;  
     height: 100px;
-    
 }
 
 footer .logo span {
     font-family: "Jost", sans-serif;
-    font-size: 32px;
-    font-weight: 550;
+    font-size: 26px;
+    font-weight: 600;
     color: #ffffff;
     gap: 20px;
 }
@@ -95,7 +86,7 @@ footer .logo span {
 }  
 
 .footer-copyright {
-    font-size: 14px;
+    font-size: 16px;
     color: #fff;
     margin-top: 10px;
 }
@@ -104,13 +95,14 @@ footer .logo span {
     color: #fff;
     text-decoration: none;
     margin-right: 20px;
-    font-size: 16px;}
+    font-size: 18px;
+}
 
 .footer-right a {
     color: #fff;
     text-decoration: underline;
     margin-right: 20px;
-    font-size: 16px;
+    font-size: 18px;
 }
 
 .footer-links a:hover { 
@@ -124,7 +116,7 @@ footer .logo span {
 
 .footer-address span {
     display: block;
-    font-size: 16px;
+    font-size: 18px;
     margin-top: 10px;
 }
 
