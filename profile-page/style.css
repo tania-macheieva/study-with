@@ -4,140 +4,12 @@ body {
     background-color: #fff; 
     
 }
+
 .page-container {
     display: flex;
     flex-direction: column;
     min-height: 100vh; 
-    margin-top: 40px; 
-    
-}
-/* header {
-    display: flex;    
-    align-items: center;
-    padding: 10px 20px;
-    background-color: #fff;
-    box-shadow: 0 6px 4px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    width: 100%;
-}
- 
-
-
-.logo {
-    display: flex;
-    align-items: center;    
-    gap: 10px;
-    font-family: "Jost", sans-serif;
-    font-weight: 00;
-    font-size: 20px;
-    margin-right: 40px; 
-    user-select: none;
-}
-
-.logo img {
-    width: 35px;
-    height: auto;
-}
-
-header .logo span {
-    font-family: "Jost", sans-serif;
-    font-size: 25px;
-    font-weight: 510;
-    color: #283044;
-    gap: 20px;
-}
-
-.menu {
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center;
-    flex: 1;
-    user-select: none;
-}
-
-.menu-left {
-    display: flex;
-    gap: 10px; 
-    margin-left: 15;
-    cursor: pointer;
-}
-
-.menu-left a {
-    font-family: "Jost", sans-serif;
-    font-weight: 470;
-    text-decoration: none; 
-    font-size: 16px;
-    color: #283044;
-    padding: 5px 10px;
-    transition: color 0.6s ease;
-    
-}
-
-.menu-left a:hover {
-    color: #4a8cc1;
-    border-radius: 5px;
-}
-
-.menu-right {
-    display: flex; 
-    align-items: center;
-    gap: 15px;  
-}
-
-.menu-right a {
-    text-decoration: none;
-    font-family: "Jost", sans-serif;     
-    color: #283044;
-    padding: 10px; 
-}
-
-.menu-right a#l { 
-    font-weight: 550;
-    font-size: 18px;
-    padding-right: 5px;
-}
-
-.menu-right a#user { 
-    font-weight: 500;
-    font-size: 16px;
-    padding-left: 5px; 
 } 
-.menu-right .btn {
-    background-color: transparent;
-    border: none;
-    display: flex;
-    align-items: center;
-    gap: 5px; 
-    cursor: pointer;
-    padding: 0;
-}
-
-.menu-right .btn a {
-    display: flex;
-    align-items: center;  
-    gap: 2px;  
-    transition: color 0.3s ease, transform 0.3s ease;
-}
-
-.menu-right .btn img {
-    width: 25px;
-    height: 25px;
-    border-radius: 50%; 
-    transition: transform 0.3s ease, box-shadow 0.3s ease;  
-}  
-
-.menu-right .btn:hover a {
-    color: #4a8cc1; 
-    transform: scale(1.04); 
-}
-
-.menu-right .btn:hover img { 
-    content: url('images/user-avatar-hover.png');  
-    transform: scale(1.01);
-    box-shadow: 0 10px 20px rgba(112, 112, 112, 0.2); 
-}  */
 
 .site-header {
     background-color: #fff;
@@ -145,13 +17,10 @@ header .logo span {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    position: fixed;
+    position: sticky;
     top: 0;
-    left: 0;
     z-index: 1000;
-    background-color: #fff;
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .container {
@@ -172,19 +41,21 @@ header .logo span {
 .logo {
     display: flex;
     align-items: center;
-    font-weight: 550; 
+    font-weight: 600;
+    font-size: 24px;
     font-family: 'Jost', sans-serif;
+    color: #283044;
 }
 
 .logo img {
     height: 30px;
     margin-right: 8px;
 }
-
 .nav-menu {
     display: flex;
     gap: 24px;
     font-family: 'Jost', sans-serif;
+    font-size: 18px;
 }
 
 .nav-menu a {
@@ -195,27 +66,45 @@ header .logo span {
 .right-section {
     display: flex;
     align-items: center;
-    gap: 24px; 
-}
+    gap: 24px;
+    font-size: 18px;
+} 
 
-input[type="text"] {
-    padding: 5px;
+.search {
+    position: relative; /* Дозволяє позиціювати іконку відносно контейнера */
+    display: inline-block;
+    max-width: 300px; /* Максимальна ширина поля пошуку */
+}
+  /* Поле для вводу */
+.search input[type="text"]  {
+    width: 100%; /* Поле займає всю ширину контейнера */
+    padding: 5px; /* Відступ справа для іконки + текст зліва */
     border-radius: 4px;
     font-family: 'Jost', sans-serif;
     border: 2px solid #c7c7c7;
+    font-size: 16px;
+    box-sizing: border-box; /* Увімкнення врахування padding */
     border-radius: 12px;
-    width: 15vw;
+    width: 300px;
+    
 }
 
-.search-btn img {
-    height: 16px;
+/* Іконка пошуку */
+.search .search-btn {
+    position: absolute; /* Позиціонування всередині контейнера */
+    top: 50%; /* Центрування по вертикалі */
+    right: 10px; /* Відступ від правого краю */
+    transform: translateY(-50%); /* Вирівнювання по центру */
+    width: 20px; /* Розмір іконки */
+    height: 20px; /* Висота іконки */
+    cursor: pointer; /* Курсор у вигляді руки при наведенні */
 }
 
 .lang-switcher a {
     text-decoration: none;
     color: #000;
-    font-size: 14px;
     font-family: 'Jost', sans-serif;
+    font-size: 16px;
 }
 
 .right-section .btn {
@@ -236,6 +125,8 @@ input[type="text"] {
     transition: color 0.3s ease, transform 0.3s ease; 
     text-decoration: none;
     font-family: "Jost", sans-serif; 
+    font-size: 18px;
+    font-weight: 450;
     color: #283044;  
 }
 
@@ -273,8 +164,7 @@ input[type="text"] {
     flex-direction: column; 
     align-items: center; 
     width: 20%;    
-    padding-left: 100px; 
-   
+    padding-left: 100px;  
 }
 
 /* Container My Section */
@@ -338,8 +228,9 @@ input[type="text"] {
 
 .profile-container .user-info p {
     font-family: "Jost", sans-serif;
-    font-weight: 600;
-    font-size: 14px;
+    font-weight: 500;
+    margin-top: 5px;
+    font-size: 18px;
     color: #283044;               
     margin-bottom: 8px;    
 } 
@@ -352,7 +243,7 @@ input[type="text"] {
     color: #ffffff;
     border: none;
     border-radius: 12px;
-    font-size: 15px;
+    font-size: 18px;
     font-weight: 640;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
@@ -395,7 +286,7 @@ input[type="text"] {
     margin-top: 0;
     padding-top: 0;
     text-align: right; 
-    font-weight: 550;
+    font-weight: 560;
 }
 
 .course img {
@@ -417,7 +308,7 @@ input[type="text"] {
     color: #000000;
     border: none;
     border-radius: 12px;
-    font-size: 15px;
+    font-size: 18px;
     font-weight: 640;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
@@ -468,7 +359,7 @@ input[type="text"] {
 }
 .my-courses .p-1 {
     font-weight: 580;
-    font-size: 16px;
+    font-size: 18px;
     margin-bottom: 8px;
     text-align: left;
 }
@@ -544,7 +435,7 @@ input[type="text"] {
     color: #000000;
     border: none;
     border-radius: 12px;
-    font-size: 15px;
+    font-size: 18px;
     font-weight: 640;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease; 
@@ -574,13 +465,13 @@ input[type="text"] {
 }
 .my-groups .p-1 {
     font-weight: 580;
-    font-size: 16px;
+    font-size: 18px;
     margin-bottom: 8px;
     text-align: left;
 }
 .my-groups .p-2{ 
     font-weight: 400;
-    font-size: 14px;
+    font-size: 16px;
     margin-bottom: 20px;
     text-align: left;
     margin-top: 8px;
@@ -641,14 +532,14 @@ input[type="text"] {
 
 .my-certificates .p-1 {
     font-weight: 580;
-    font-size: 16px;
+    font-size: 18px;
     margin-bottom: 8px;
     text-align: left;
 }
 
 .my-certificates .p-2 {
     font-weight: 400;
-    font-size: 14px;
+    font-size: 16px;
     margin-bottom: 20px;
     text-align: left;
     margin-top: 8px;
@@ -662,8 +553,7 @@ input[type="text"] {
     transition: height 0.5s ease-in-out; 
 }
 
-.certificate h3 {
-    font-size: 16px;
+.certificate h3 { 
     margin-bottom: 5px;
 }
 
@@ -673,8 +563,7 @@ input[type="text"] {
     background: #ffffff;
     color: #000000;
     border: none;
-    border-radius: 100px;
-    font-size: 15px;
+    border-radius: 100px;    
     font-weight: 640;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
@@ -711,13 +600,7 @@ input[type="text"] {
 
 .certificates-list.expanded .certificate:nth-child(n+4) {
     display: block;
-}
-.my-certificates .p-1 {
-    font-weight: 580;
-    font-size: 16px;
-    margin-bottom: 8px;
-    text-align: left;
-}
+} 
 
 @media (max-width: 1360px) {
     .certificates-list {
@@ -793,7 +676,7 @@ input[type="text"] {
     color: #000000;
     border: none;
     border-radius: 12px;
-    font-size: 15px;
+    font-size: 18px;
     font-weight: 640;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
@@ -824,7 +707,7 @@ input[type="text"] {
 }
 .my-bookmarks .p-1 {
     font-weight: 580;
-    font-size: 16px;
+    font-size: 18px;
     margin-bottom: 15px;
     text-align: left;
 }
@@ -868,7 +751,7 @@ input[type="text"] {
 .btn-view-all-1 { 
     width: 130px;
     padding: 8px 10px;
-    font-size: 15px;
+    font-size: 18px;
     font-family: "Jost", sans-serif;
     font-weight: 640;
     background: #283044;
@@ -890,7 +773,7 @@ input[type="text"] {
 .btn-view-all-2 { 
     width: 130px;
     padding: 8px 10px;
-    font-size: 15px;
+    font-size: 18px;
     font-family: "Jost", sans-serif; 
     background: #283044;
     color: #ffffff;
@@ -912,7 +795,7 @@ input[type="text"] {
 .btn-view-all-3 { 
     width: 130px;
     padding: 8px 10px;
-    font-size: 15px;
+    font-size: 18px;  
     font-family: "Jost", sans-serif; 
     background: #283044;
     color: #ffffff;
@@ -934,7 +817,7 @@ input[type="text"] {
 .btn-view-all-4 { 
     width: 130px;
     padding: 8px 10px;
-    font-size: 15px;
+    font-size: 18px;
     font-family: "Jost", sans-serif; 
     background: #283044;
     color: #ffffff;
@@ -957,8 +840,11 @@ input[type="text"] {
     background-color: #283044;
     color: #fff;
     padding: 50px 0;
-    font-family: "Jost", sans-serif;
-    
+    font-family: "Jost", sans-serif;; 
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;  
 }
 
 footer .logo { 
@@ -1010,7 +896,7 @@ footer .logo span {
 }  
 
 .footer-copyright {
-    font-size: 14px;
+    font-size: 16px;
     color: #fff;
     margin-top: 10px;
 }
@@ -1019,13 +905,14 @@ footer .logo span {
     color: #fff;
     text-decoration: none;
     margin-right: 20px;
-    font-size: 16px;}
+    font-size: 18px;
+}
 
 .footer-right a {
     color: #fff;
     text-decoration: underline;
     margin-right: 20px;
-    font-size: 16px;
+    font-size: 18px;
 }
 
 .footer-links a:hover { 
@@ -1039,7 +926,7 @@ footer .logo span {
 
 .footer-address span {
     display: block;
-    font-size: 16px;
+    font-size: 18px;
     margin-top: 10px;
 }
 
