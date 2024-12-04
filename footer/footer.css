@@ -9,7 +9,7 @@ body {
     align-items: center;    
     gap: 10px;
     font-family: "Jost", sans-serif;
-    font-weight: 00;
+    font-weight: bold;
     font-size: 20px;
     margin-right: 40px; 
     user-select: none;
@@ -29,6 +29,7 @@ body {
     left: 0;
     width: 100%;
     z-index: 10;
+    
 }
 body, html {
     height: 100%;
@@ -48,12 +49,13 @@ footer .logo {
     border-right: 1px solid #b3b8c4a8;
     padding-right: 100px;  
     height: 100px;
+    
 }
 
 footer .logo span {
     font-family: "Jost", sans-serif;
     font-size: 32px;
-    font-weight: 510;
+    font-weight: 550;
     color: #ffffff;
     gap: 20px;
 }
