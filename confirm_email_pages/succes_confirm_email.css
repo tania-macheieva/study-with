@@ -118,15 +118,32 @@ body {
     max-width: 800px;
     height: auto;
   }
-  .arrow {
-    width: 160px;
-    /* Розмір стрілки */
-    height: auto;
+/* Контейнер для стрілки та підпису */
+.arrow-container {
+  display: flex;
+    flex-direction: column;
+    align-items:center;
     position: absolute;
-    top: -96px;
-    transform: translateX(10%);
-    z-index: 10;
-  }
+    left: 24%; /* Розташування ближче до форми */
+    top: 50%;
+    transform: translateY(-100%); 
+}
+
+/* Зображення стрілки */
+.curved-arrow {
+  width: 150px; 
+  height: auto; 
+  transform: rotate(270deg);
+}
+
+/* Підпис під стрілкою */
+.arrow-caption {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  margin-top: 40px; /* Відступ між стрілкою і текстом */
+  text-align: center;
+}
   
   .succes-conf-form{
     background-color: #fff;
