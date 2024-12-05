@@ -1,4 +1,4 @@
-Для підключення хедеру потрібно добавити файли header.css/.html/.js у папку з сторінкою. У html коді сторінки де повинен з'явитись хедер добавити *<script src="header.js"></script>*
+Для підключення хедеру потрібно добавити файли header-*.html і header.css/.js у папку з сторінкою. У html коді сторінки де повинен з'явитись хедер добавити *<script src="header.js"></script>*
 Якщо виникаютть проблеми:
 Опціонально:
 *На початок коду (після body): <name>.html добавити: <div id="header-container"></div>
@@ -11,3 +11,12 @@
     z-index: 1000;
     background-color: #fff;
 }
+
+
+***
+
+header-noauth.html - для гостя, тобто для неавторизованого користувача;
+header-teacher.html - для вчителя;
+header-noauth.html - для студента.
+
+***
