@@ -83,7 +83,7 @@ body {
 
 .right-section a {
     text-decoration: none;
-    color: #000;
+    color: #283044;
 }
 
 .search {
@@ -114,9 +114,13 @@ body {
     cursor: pointer; /* Курсор у вигляді руки при наведенні */
 }
 
+.lang-switcher {
+    user-select: none;
+}
+
 .lang-switcher a {
     text-decoration: none;
-    color: #000;
+    color: #283044;
     font-family: 'Jost', sans-serif;
     font-size: 16px;
 }
@@ -153,6 +157,10 @@ body {
 .right-section .btn:hover a {
     color: #545F7A; 
     transform: scale(1.04); 
+}
+
+.right-section a:hover  {
+    color: #545F7A;  
 }
 
 .right-section .btn:hover img { 
