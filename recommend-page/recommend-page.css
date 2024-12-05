@@ -2,6 +2,7 @@ body {
     font-family: "Jost", sans-serif;
     margin: 0;
     padding: 0;
+    margin-bottom: 0;
     color: #333;
 }
 
@@ -182,7 +183,7 @@ body {
     font-size: 3rem;
     cursor: pointer;
     position: absolute;
-    top: 45%;
+    top: 40%;
     transform: translateY(-50%);
     z-index: 10;
     width: 40px;
