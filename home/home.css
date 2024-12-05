@@ -66,6 +66,7 @@ body h3 {
   overflow-x: auto;
   padding: 10px;
   justify-content: flex-start;
+  overflow: auto;
 }
 
 .popular_text{
@@ -188,9 +189,9 @@ body h3 {
   flex-wrap: wrap;
   gap: 48px; 
   margin-left: 54px;
-  margin-top: 48px;
   padding: 10px;
   justify-content: flex-start;
+  margin-bottom: 48px;
 }
 
 .category_box {
@@ -202,13 +203,14 @@ body h3 {
   gap: 32px;
   text-align: center;
   font-family: 'Jost', ExtraLight;
-  font-weight: 200;
+  font-weight: 300;
   font-size: 20px;
   color: #283044;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  
 }
 
 /*Feedback*/
@@ -223,15 +225,14 @@ body h3 {
 .Feedback {
   display: flex;
   flex-direction: row;
-  overflow: hidden; 
   position: relative;
   width: 100%;
+  overflow: hidden;
 }
 
 .Feedback_list {
   width: 300px;
   height: 100px;
-  box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.25);
   background: #DCECFC;
   align-items: center;
   padding: 10px;
@@ -241,6 +242,8 @@ body h3 {
   margin-left: 64px;
   display: flex;
   flex-direction: row;
+  position: relative;
+  box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.25);
 }
 
 @keyframes slide-left {
@@ -263,7 +266,8 @@ body h3 {
 
 .Feedback_inner {
   display: flex;
-  animation: slide-left 40s linear infinite; /* Задаємо тривалість анімації */
+  animation: slide-left 120s;
+  animation-fill-mode: forwards;
 }
 
 .Feedback_inner .Feedback_list {
@@ -296,6 +300,139 @@ body h3 {
   font-size: 16px;
   color: #000;
   margin: 0;
+}
+
+/*Footer*/
+
+div.Footer {
+  margin-bottom: 0;
+  margin-top: auto;
+}
+
+.page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; 
+}
+
+.logo {
+  display: flex;
+  align-items: center;    
+  gap: 10px;
+  font-family: "Jost", sans-serif;
+  font-weight: bold;
+  font-size: 20px;
+  margin-right: 40px; 
+  user-select: none;
+}
+
+.logo img {
+  width: 35px;
+  height: auto;
+}
+
+.footer {
+  background-color: #283044;
+  color: #fff;
+  padding: 50px 0;
+  font-family: "Jost", sans-serif;
+  margin-top: 48px; 
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+}
+
+footer .logo { 
+  border-right: 1px solid #b3b8c4a8;
+  padding-right: 100px;  
+  height: 100px;
+}
+
+footer .logo span {
+  font-family: "Jost", sans-serif;
+  font-size: 26px;
+  font-weight: 600;
+  color: #ffffff;
+  gap: 20px;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%; 
+  margin: 0 auto;
+}
+
+.footer-left {
+  display: flex;
+  flex-direction: column; 
+}
+
+.footer-right {
+  display: flex;
+  align-items: center;
+  border-right: 1px solid #b3b8c4a8;
+  padding-right: 70px;  
+  border-left: 1px solid #b3b8c4a8; 
+  padding-left: 80px;
+  height: 100px;
+}
+
+.footer-links {
+  display: flex;
+  flex-direction: column; 
+}
+
+.footer-logo {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+}  
+
+.footer-copyright {
+  font-size: 16px;
+  color: #fff;
+  margin-top: 10px;
+}
+
+.footer-links-a a {
+  color: #fff;
+  text-decoration: none;
+  margin-right: 20px;
+  font-size: 18px;
+}
+
+.footer-right a {
+  color: #fff;
+  text-decoration: underline;
+  margin-right: 20px;
+  font-size: 18px;
+}
+
+.footer-links a:hover { 
+  color: #B3B8C4;
+}
+
+.footer-right a:hover {
+  text-decoration: underline;
+  color: #B3B8C4;
+}
+
+.footer-address span {
+  display: block;
+  font-size: 18px;
+  margin-top: 10px;
+}
+
+.footer-address i {
+  margin-right: 5px;
+}
+
+.footer-address a {
+  text-decoration: none;
+  color: white;
 }
 
 
