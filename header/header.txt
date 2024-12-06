@@ -1,7 +1,7 @@
 Для підключення хедеру потрібно добавити файли header-*.html/.js і header.css у папку з сторінкою. У html коді сторінки де повинен з'явитись хедер добавити *<script src="header.js"></script>*
 Якщо виникаютть проблеми:
 Опціонально:
-*На початок коду (після body): <name>.html добавити: <div id="header-container"></div>
+*На початок коду (після body): <name>.html добавити: 
 *У файл css: 
 #header-container {
     width: 100%;
