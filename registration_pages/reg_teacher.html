@@ -11,23 +11,33 @@
     <link rel="stylesheet" href="reg_teacher.css">
 </head>
 <body>
-    <header>
+  <header class="site-header">
+    <div class="container">
+      <div class="left-section">
         <div class="logo">
-            <img src="images\ebook_12743761.png" alt="StudyWith logo">
-            <span>StudyWith</span>
+          <img src="images/menu-logo.png" alt="StudyWith Logo" />
+          <span>StudyWith</span>
         </div>
-        <nav class="menu">
-            <div class="menu-left">
-                <a href="#">All courses</a>
-                <a href="#">About</a>
-                <a href="#">Contact</a>
-            </div>
-            <div class="menu-right">
-                <a href="#">UA</a>
-                <a href="#" class="btn">Sign In</a>
-            </div>
+        <nav class="nav-menu">
+          <a href="#" data-lang="all-courses">All courses</a>
+          <a href="#" data-lang="about">About</a>
+          <a href="#" data-lang="contact">Contact</a>
+          <a href="#" data-lang="faq">FAQ</a>
         </nav>
-    </header>
+      </div>
+      <div class="right-section"> 
+        <div class="search">
+          <input type="text" placeholder="Search..." />
+          <img class="search-btn" src="images/icons8-search-50.png" alt="search-btn" />
+        </div>
+        <div class="lang-switcher">
+          <a href="#" class="lang-btn" data-lang="en">EN</a> |
+          <a href="#" class="lang-btn" data-lang="ua">UA</a>
+        </div>
+        <button class="sign-in-btn" src="sreg_student.html">Sign In</button>
+      </div>
+    </div>
+  </header>
 
     <div class="content">
         <div class="illustration">
