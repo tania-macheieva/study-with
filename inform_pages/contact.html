@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - StudyWith</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="contact.css">
+</head>
+<body>
+      <main class="main">
+        <section class="contact-section">
+            <div class="illustration">
+                <img  src="images/20943705.jpg" alt="Contact Illustration">
+            </div>
+            <div class="contact-info">
+                <h1>Contact</h1>
+                <div class="contact-line"></div> 
+                <div class="email-box">
+                    <p>Do you have any questions?<br>We would be glad to receive your message.</p>
+                    <a href="mailto:studywith.connect@gmail.com" class="email-button">studywith.connect@gmail.com</a>
+                </div>
+                <div class="small-boxes">
+                  <form id="phone-form">
+                    <div class="small-box">
+                        <p>We call you back</p>
+                        <input type="email" class="email-input" class="email-input" placeholder="Your email"  id="from-email"required>
+                        <div class="phone-container">
+                            <input type="tel" class="phone-input" placeholder="+38(0__) ___-___-____" id="phone" required>
+                            <button type="button"  id="send-button"  class="submit-button">
+                                <span>&#62;</span>
+                            </button>
+                        </div>
+                    </div>
+                  </form>
+                    <div class="small-box">
+                        <p>Meet in person</p>
+                        <span>Dragomanova 50 St.,<br> Lviv, Ukraine</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+    const sendButton = document.getElementById('send-button');
+    sendButton.addEventListener('click', async () => {
+        const emailInput = document.getElementById('from-email');
+        const phoneInput = document.getElementById('phone');
+
+        if (!emailInput || !phoneInput) {
+            alert("Email or phone input fields not found.");
+            return;
+        }
+
+        const email = emailInput.value;
+        const phone = phoneInput.value;
+
+        if (!email || !phone) {
+            alert("Please enter both your email and phone number.");
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:8000/auth/send-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, phone }),
+            });
+
+            if (response.ok) {
+                alert("Your details have been submitted successfully.");
+            } else {
+                alert("There was an error. Please try again.");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("There was a network error. Please try again.");
+        }
+    });
+});
+
+  </script>
+   <script src="footer.js"></script>
+   <script src="header.js"></script>
+</body>
+</html>
