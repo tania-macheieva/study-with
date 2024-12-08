@@ -5,10 +5,11 @@ const path = require("path");
 const fs = require('fs'); 
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const authRoutes = require('./routes/auth'); 
+const authRoutes = require('./routes/auth.js'); 
 require('dotenv').config({ path: './secret.env' });
 const passport = require('passport');
 const session = require('express-session');
+
 
 app.get("/", (req, res) => { 
     res.send ("Server runing");
@@ -37,6 +38,10 @@ app.get('/log-in/', (req, res) => {
 app.get('/log-in/fogot-password', (req, res) => {
     res.sendFile(path.join(__dirname, 'log-in-page/forgot-password.html'));
 });
+app.use(express.static(path.join(__dirname, 'inform_pages')));
+app.get("/contact", (req, res) => { 
+    res.sendFile(path.join(__dirname, 'inform_pages/contact.html')); 
+});
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -64,6 +69,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const HOST = process.env.HOST || "localhost";
 const PORT = process.env.PORT || 8000;
+
 
 app.listen(PORT, HOST, () => {
     console.log(`Server running on http://${HOST}:${PORT}`);
