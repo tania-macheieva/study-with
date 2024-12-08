@@ -1,0 +1,33 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #fff; 
+    font-family: 'Jost', sans-serif;
+    min-height: 100vh;    
+}
+
+.page-container {
+    display: flex;
+    flex-direction: column; 
+}
+
+.main {
+    flex-grow: 1; 
+    flex-direction: column; 
+}
+
+.title1 {
+    font-size: 26px;
+    font-weight: 550;
+    text-align: center;
+    margin-bottom: 0px;
+}
+
+.divider {
+    width: 50%; 
+    height: 3px;  
+    background-color: #283044;  
+    margin: 20px auto;  
+    border: none;
+    border-radius: 2px;
+}

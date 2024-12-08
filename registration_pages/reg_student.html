@@ -8,22 +8,52 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="reg_student.css">
+    <link rel="stylesheet" href="reg_teacher.css">
 </head>
 <body>
+<<<<<<< HEAD
 
+=======
+  <header class="site-header">
+    <div class="container">
+      <div class="left-section">
+        <div class="logo">
+          <img src="images/menu-logo.png" alt="StudyWith Logo" />
+          <span>StudyWith</span>
+        </div>
+        <nav class="nav-menu">
+          <a href="#" data-lang="all-courses">All courses</a>
+          <a href="#" data-lang="about">About</a>
+          <a href="#" data-lang="contact">Contact</a>
+          <a href="#" data-lang="faq">FAQ</a>
+        </nav>
+      </div>
+      <div class="right-section"> 
+        <div class="search">
+          <input type="text" placeholder="Search..." />
+          <img class="search-btn" src="images/icons8-search-50.png" alt="search-btn" />
+        </div>
+        <div class="lang-switcher">
+          <a href="#" class="lang-btn" data-lang="en">EN</a> |
+          <a href="#" class="lang-btn" data-lang="ua">UA</a>
+        </div>
+        <button class="sign-in-btn" src="sreg_student.html">Sign In</button>
+      </div>
+    </div>
+  </header>
+>>>>>>> c3fc1e1ab815b0151760389729839cabf29f32b8
 
     <div class="content">
         <div class="illustration">
-            <img src="images\na_feb_36.jpg" alt="Student Illustration">
+            <img src="images/na_feb_36.jpg" alt="Coach Illustration">
         </div>
         <div class="form-container">
             <h1>Create an account <br>as a student</h1>
-            <form id="student-register-form">
+            <form id="teacher-register-form">
                 <input type="text" name="name" placeholder="Name" required>
                 <input type="email" name="email" placeholder="Email" required>
                 <input type="password" name="password" placeholder="Password" required>
-                <input type="hidden" name="role" value="student">
+                <input type="hidden" name="role" value="teacher">
                 <button type="submit">Sign Up</button>
                 <h3>or</h3>
                 <div class="google-auth">

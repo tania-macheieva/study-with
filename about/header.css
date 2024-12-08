@@ -38,16 +38,16 @@ body {
     gap: 24px;
 }
 
-.logo {
+.logo-header {
     display: flex;
     align-items: center;
-    font-weight: 600;
+    font-weight: 600; 
     font-size: 24px;
     font-family: 'Jost', sans-serif;
     color: #283044;
 }
 
-.logo img {
+.logo-header img {
     height: 30px;
     margin-right: 8px;
 }
@@ -91,18 +91,17 @@ body {
     display: inline-block; 
 }
   /* Поле для вводу */
- input[type="text"]  { 
+.search input[type="text"]  { 
     padding: 5px; /* Відступ справа для іконки + текст зліва */
     border-radius: 4px;
     font-family: 'Jost', sans-serif;
     border: 2px solid #c7c7c7;
     font-size: 16px;
     box-sizing: border-box; /* Увімкнення врахування padding */
-    border-radius: 12px;
+    border-radius: 10px;
     width: 15vw;
     
 }
-
 
 /* Іконка пошуку */
 .search .search-btn {
