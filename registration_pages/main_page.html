@@ -31,96 +31,12 @@
         }
 
         .container {
-            max-width: 1280px;
+            max-width: 2000px;
             margin: 0 auto;
             width: 100%;
         }
 
-        /* Header */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .header .container {
-            height: 100%;
-            display: flex;
-            align-items: center;
-            gap: 48px;
-            padding: 0 20px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-family: "Jost", sans-serif;
-            font-weight: 00;
-            font-size: 20px;
-         margin-right: 20px;
-        }
-
-        .logo img {
-            width: 35px;
-            height: auto;
-        }
-
-        span.logo-text    {
-            font-family: "Jost", sans-serif;
-            font-size: 20px;
-            font-weight: 600;
-            color: #333;
-            gap: 20px;
-            text-decoration-line: none;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 32px;
-            margin-right: auto;
-        }
-
-        .nav-links a {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 400;
-            font-size: 18px;
-            line-height: 22px;
-            text-decoration: none;
-            color: #000000;
-            text-decoration: none; 
-        }
-
-        .language {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 500;
-            font-size: 20px;
-            line-height: 24px;
-            color: #000000;
-            margin-right: 24px;
-        }
-
-        .sign-in {
-            width: 124px;
-            height: 40px;
-            background: #283044;
-            border-radius: 12px;
-            border: none;
-            color: #EBF5EE;
-            font-family: 'Inter', sans-serif;
-            font-weight: 400;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .sign-in:hover {
-    background-color: #0c101a;
-  }
+  
 
         /* Main Content */
         .main-content {
@@ -128,6 +44,7 @@
             padding: 0;
             display: flex;
             align-items: center;
+            height: 540px;
         }
 
         .main-content .container {
@@ -144,8 +61,9 @@
         }
 
         .hero-image img {
-            width: 100%;
+            width: 110%;
             height: auto;
+            transform: translateX(5%);
         }
 
         .content-right {
@@ -160,7 +78,7 @@
             font-family: 'Jost', sans-serif;
             font-style: italic;
             font-weight: 600;
-            font-size: 32px;
+            font-size: 36px;
             line-height: 46px;
             color: #000000;
             text-align: center;
@@ -177,15 +95,15 @@
         }
 
         .btn {
-        width: 100%;
-        height: 85px;
+        width: 400px;
+        height: 120px;
         display: inline-block;
         padding:  20px;
         background-color: #283044; 
         color: #EBF5EE; 
         text-decoration: none; 
         font-family:'Jost', sans-serif;
-        font-size: 20px;
+        font-size: 28px;
         font-weight: 500;
         line-height: 1.2;
         border-radius: 12px;
@@ -214,149 +132,11 @@
             font-size: 20px;
         }
 
-        /* Footer */
-        .footer {
-            background: #283044;
-            height: 179px;
-            width: 100%;
-        }
-
-        .footer-content {
-            height: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 80px;
-        }
-
-        .footer-logo {
-            font-family: 'Jost', sans-serif;
-            font-weight: 500;
-            font-size: 30px;
-            color: #FFFFFF;
-            text-decoration: none;
-            margin-right: 60px;
-            margin-left: 61px;
-        }
-
-        .footer-nav {
-            display: flex;
-            gap: 40px;
-            align-items: center;
-            position: relative;
-        }
-
-        .footer-nav::before,
-        .footer-nav::after {
-            content: '';
-            width: 1px;
-            height: 80px;
-            background: rgba(255, 255, 255, 0.1);
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .footer-nav::before {
-            left: -40px;
-        }
-
-        .footer-nav::after {
-            right: -40px;
-        }
-
-        .footer-links {
-            display: flex;
-            align-items: center;
-            gap: 22px;
-        }
-
-        .footer-links a {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 400;
-            font-size: 14px;
-            color: #FFFFFF;
-            text-decoration: none;
-        }
-
-        .footer-legal {
-            margin-left: 40px;
-            display: flex;
-            gap: 22px;
-            position: relative;
-            align-items: center;
-        }
-
-        .footer-legal::before {
-            content: '';
-            width: 1px;
-            height: 80px;
-            background: rgba(255, 255, 255, 0.1);
-            position: absolute;
-            left: -20px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .footer-legal a {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 400;
-            font-size: 15px;
-            color: #FFFFFF;
-            text-decoration: underline;
-        }
-
-        .footer-copyright {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 400;
-            font-size: 13px;
-            color: #FFFFFF;
-            margin-top: 10px;
-        }
-
-        .footer-contact {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            margin-left: 40px;
-        }
-
-        .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .contact-item img {
-            width: 20px;
-            height: 20px;
-        }
-
-        .contact-item a {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 400;
-            font-size: 15px;
-            color: #FFFFFF;
-            text-decoration: none;
-        }
+        
     </style>
 </head>
 <body>
-    <header class="header">
-        <div class="container">
-            <a href="#" class="logo">
-                <img src="images/ebook_12743761.png" alt="Logo">
-                <span class="logo-text">StudyWith</span>
-            </a>
-            <nav class="nav-links">
-                <a href="#">All courses</a>
-                <a href="#">About</a>
-                <a href="#">Contact</a>
-            </nav>
-            <span class="language">UA</span>
-            <button class="sign-in">Sign In</button>
-        </div>
-    </header>
+ 
 
     <main class="main-content">
         <div class="container">
@@ -370,41 +150,14 @@
                 </div>
                 <div class="buttons">
                     <a href="reg_student.html" class="btn">Create an account as a student</a>
-                    <a href="reg_teacher.html" class="btn">Create an account as a coach</a>
+                    <a href="reg_teacher.html" class="btn">Create an account as a teacher</a>
                     </button>
                 </div>
             </div>
         </div>
     </main>
 
-    <footer class="footer">
-        <div class="footer-content">
-            <a href="#" class="footer-logo">StudyWith</a>
-            <div class="footer-nav">
-                <div>
-                    <div class="footer-links">
-                        <a href="#">About</a>
-                        <a href="#">Contact</a>
-                        <a href="#">FAQ</a>
-                    </div>
-                    <div class="footer-copyright">© 2024 All Rights Reserved StudyWith</div>
-                </div>
-                <div class="footer-legal">
-                    <a href="#">Terms & conditions</a>
-                    <a href="#">Privacy policy</a>
-                </div>
-            </div>
-            <div class="footer-contact">
-                <div class="contact-item">
-                    <img src="images/619.png" alt="Location">
-                    <a href="#">Dragomanova 50 St., Lviv, Ukraine</a>
-                </div>
-                <div class="contact-item">
-                    <img src="images/931-9311379_email-icons-white-color-white-email-icon-png.png" alt="Email">
-                    <a href="mailto:studywith.connect@gmail.com">studywith.connect@gmail.com</a>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <script src="footer.js"></script>
+<script src="header.js"></script>
 </body>
 </html>

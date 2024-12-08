@@ -5,129 +5,13 @@ body {
   background-color: #DCECFC;
   color: #333;
 }
-  
-.site-header {
-  background-color: #fff;
-  padding: 10px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
-}
 
-.container {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.left-section {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  font-weight: 600;
-  font-size: 24px;
-  font-family: 'Jost', sans-serif;
-}
-
-.logo img {
-  height: 30px;
-  margin-right: 8px;
-}
-
-.nav-menu {
-  display: flex;
-  gap: 24px;
-  font-family: 'Jost', sans-serif;
-  font-size: 18px;
-}
-
-.nav-menu a {
-  text-decoration: none;
-  color: #000;
-}
-
-.right-section {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  font-size: 18px;
-}
-
-.search {
-  position: relative; /* Дозволяє позиціювати іконку відносно контейнера */
-  display: inline-block;
-  max-width: 300px; /* Максимальна ширина поля пошуку */
-}
-/* Поле для вводу */
-.search input[type="text"]  {
-  width: 100%; /* Поле займає всю ширину контейнера */
-  padding: 5px; /* Відступ справа для іконки + текст зліва */
-  border-radius: 4px;
-  font-family: 'Jost', sans-serif;
-  border: 2px solid #c7c7c7;
-  font-size: 16px;
-  box-sizing: border-box; /* Увімкнення врахування padding */
-  border-radius: 12px;
-  width: 300px;
-  
-}
-
-/* Іконка пошуку */
-.search .search-btn {
-  position: absolute; /* Позиціонування всередині контейнера */
-  top: 50%; /* Центрування по вертикалі */
-  right: 10px; /* Відступ від правого краю */
-  transform: translateY(-50%); /* Вирівнювання по центру */
-  width: 20px; /* Розмір іконки */
-  height: 20px; /* Висота іконки */
-  cursor: pointer; /* Курсор у вигляді руки при наведенні */
-}
-
-
-
-.lang-switcher a {
-  text-decoration: none;
-  color: #000;
-  font-family: 'Jost', sans-serif;
-  font-size: 16px;
-}
-
-.sign-in-btn {
-  background-color: #283044;
-  color: #fff;
-  padding: 5px 16px;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  font-family: 'Jost', sans-serif;
-  font-size: 18px;
-  font-weight: 300;
-}
-
-.sign-in-btn:hover {
-  background-color: #545F7A;
-  color: #fff;
-  transform: scale(1.05);
-  transition: all 0.1s ease;
-}
 /* Main Content Section */
-.main-content {
-  padding-bottom: 80px;
-  padding-left: 20px;
-  padding-right: 20px;
-  background-color: #DCECFC;
-  position: relative;
-  flex-grow: 1;
+
+
+main {
+  background: #DCECFC;
+  padding-bottom: 120px;
 }
 .discription {
   display: flex;
@@ -136,18 +20,18 @@ body {
   background: url('images/photo_2024-12-03_00-29-53.jpg') no-repeat center;
   max-width: 1150px;
   padding: 120px 60px 0px 60px;
-  flex-grow: 1;
 }
 
+
 .discription h2 {
-  font-size: 40px;
+  font-size: 36px;
   width: 600px;
   margin-top: -20px;
   margin-bottom: 20px;
 }
 
 .discription p {
-  font-size: 24px;
+  font-size: 20px;
   width: 400px;
   margin: 0;
 }
@@ -173,7 +57,7 @@ body {
 .course-cards {
   margin-top: 0;
   background: #DCECFC;
-  margin-bottom: 60px;
+  margin-bottom: 0px;
   flex-grow: 1;
   
 }

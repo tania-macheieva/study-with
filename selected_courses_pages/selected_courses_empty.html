@@ -10,36 +10,6 @@
   <link rel="stylesheet" href="selected_courses_empty.css">
 </head>
 <body>
-    <header class="site-header">
-        <div class="container">
-          <div class="left-section">
-            <div class="logo">
-              <img src="images/ebook_12743761.png" alt="StudyWith Logo" />
-              <span>StudyWith</span>
-            </div>
-            <nav class="nav-menu">
-              <a href="#" data-lang="all-courses">All courses</a>
-              <a href="#" data-lang="about">About</a>
-              <a href="#" data-lang="contact">Contact</a>
-              <a href="#" data-lang="faq">FAQ</a>
-            </nav>
-          </div>
-          <div class="right-section">
-            <div class="search">
-              <input type="text" placeholder="Search..."  /> 
-            <img class="search-btn " src="images/icons8-search-50.png" alt="search-btn" />
-            </div>
-            <div class="lang-switcher">
-              <a href="#" class="lang-btn" data-lang="en">EN</a> |
-              <a href="#" class="lang-btn" data-lang="ua">UA</a>
-            </div>
-            <button class="sign-in-btn"  id="profile-btn">Profile</button>
-          </div>
-        </div>
-      </header>
-
-  
-
   <main>
     <section class="discription">
         <div class="text-container">
@@ -52,47 +22,18 @@
       
   </main>
   
-  <footer class="footer">
-    <div class="footer-content">
-      <div class="logo">
-        <img src="images/ebook_12743761.png" alt="logo">
-        <span>StudyWith</span>
-      </div>
-        <div class="footer-links">
-          <div class="footer-links-a">
-             <a href="#">About</a>
-             <a href="#">Contact</a>
-             <a href="#">FAQ</a>
-          </div>
-          <div class="footer-copyright">
-            <span>&#169; 2024 All Rights Reserved StudyWith</span>
-          </div>
-        </div>
-        <div class="footer-right">
-            <a href="#">Terms & conditions</a>
-            <a href="#">Privacy policy</a>
-        </div>
-        <div class="footer-contact">
-            <div class="contact-item">
-                <img src="images/619.png" alt="Location">
-                <a href="#">Dragomanova 50 St., Lviv, Ukraine</a>
-            </div>
-            <div class="contact-item">
-                <img src="images/931-9311379_email-icons-white-color-white-email-icon-png.png" alt="Email">
-                <a href="mailto:studywith.connect@gmail.com">studywith.connect@gmail.com</a>
-            </div>
-        </div>
-    </div>
-</footer>
+ 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
   const profileBtn = document.getElementById("profile-btn");
   
   profileBtn.addEventListener("click", () => {
     // Перенаправлення на сторінку профілю
-    window.location.href = "/profile-page/index.html";
+    window.location.href = "/profile-page/student-profile.html";
   });
 });
 </script>
+<script src="footer.js"></script>
+<script src="header.js"></script>
 </body>
 </html>
