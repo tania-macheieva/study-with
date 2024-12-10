@@ -26,11 +26,7 @@ app.use(passport.session());
 //Статичні файли
 app.use(express.static(path.join(__dirname, 'privatpolicy')));
 app.use(express.static(path.join(__dirname, 'registration_pages')));
-app.use(express.static(path.join(__dirname, 'home'), {
-    cacheControl: false,
-    etag: false,
-    maxAge: 0,
-  }));
+app.use(express.static(path.join(__dirname, 'home')));
 app.use(express.static(path.join(__dirname, 'log-in-page')));
 app.use(express.static(path.join(__dirname, 'confirm_email_pages')));
 
