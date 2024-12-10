@@ -1,6 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const pool = require('../db.js'); 
+const pool = require('./db.js'); 
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
@@ -98,48 +98,48 @@ router.get('/google/callback',
 
 
 
-// Маршрут для реєстрації
-router.post('/register', async (req, res) => {
-    const { name, email, password, phone_number, role } = req.body;
+// // Маршрут для реєстрації
+// router.post('/register', async (req, res) => {
+//     const { name, email, password, phone_number, role } = req.body;
 
-    if (!name || !email || !password || !['student', 'teacher'].includes(role)) {
-        return res.status(400).json({ error: 'Invalid input' });
-    }
+//     if (!name || !email || !password || !['student', 'teacher'].includes(role)) {
+//         return res.status(400).json({ error: 'Invalid input' });
+//     }
 
-    try {
-        const passwordHash = await bcrypt.hash(password, 10);
-        const result = await pool.query(
-            `INSERT INTO users (name, email, user_password, phone_number, role)
-             VALUES ($1, $2, $3, $4, $5)
-             RETURNING id, name, email, role, created_at`,
-            [name, email, passwordHash, phone_number, role]
-        );
+//     try {
+//         const passwordHash = await bcrypt.hash(password, 10);
+//         const result = await pool.query(
+//             `INSERT INTO users (name, email, user_password, phone_number, role)
+//              VALUES ($1, $2, $3, $4, $5)
+//              RETURNING id, name, email, role, created_at`,
+//             [name, email, passwordHash, phone_number, role]
+//         );
 
-        const newUser = result.rows[0];
+//         const newUser = result.rows[0];
 
-        // Генерація токену
-        const token = jwt.sign({ id: newUser.id, role: newUser.role }, SECRET_KEY, { expiresIn: '1h' });
-        res.status(201).json({
-            message: 'User registered successfully!',
-            user: {
-                id: newUser.id,
-                name: newUser.name,
-                email: newUser.email,
-                role: newUser.role,
-                created_at: newUser.created_at,
-            },
-            token: token,
-        });
-    } catch (err) {
-        console.error(err.message);
+//         // Генерація токену
+//         const token = jwt.sign({ id: newUser.id, role: newUser.role }, SECRET_KEY, { expiresIn: '1h' });
+//         res.status(201).json({
+//             message: 'User registered successfully!',
+//             user: {
+//                 id: newUser.id,
+//                 name: newUser.name,
+//                 email: newUser.email,
+//                 role: newUser.role,
+//                 created_at: newUser.created_at,
+//             },
+//             token: token,
+//         });
+//     } catch (err) {
+//         console.error(err.message);
 
-        if (err.code === '23505') { 
-            res.status(400).json({ error: 'Email already exists' });
-        } else {
-            res.status(500).json({ error: 'Internal server error' });
-        }
-    }
-});
+//         if (err.code === '23505') { 
+//             res.status(400).json({ error: 'Email already exists' });
+//         } else {
+//             res.status(500).json({ error: 'Internal server error' });
+//         }
+//     }
+// });
 // Маршрут для авторизації
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
@@ -244,6 +244,146 @@ router.post('/reset-password', async (req, res) => {
         } else {
             res.status(500).json({ error: 'Internal server error' });
         }
+    }
+});
+
+// Зберігання кодів верифікації в пам'яті
+const verificationCodes = new Map(); // email -> { code, expires, userData }
+
+// Генерація 6-значного коду
+function generateVerificationCode() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// Оновлений маршрут реєстрації з верифікацією email
+router.post('/register', async (req, res) => {
+    const { name, email, password, phone_number, role } = req.body;
+
+    if (!name || !email || !password || !['student', 'teacher'].includes(role)) {
+        return res.status(400).json({ error: 'Invalid input' });
+    }
+
+    try {
+        // Перевірка чи email вже існує
+        const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+        if (existingUser.rows.length > 0) {
+            return res.status(400).json({ error: 'Email already exists' });
+        }
+
+        // Генерація коду верифікації
+        const verificationCode = generateVerificationCode();
+        
+        // Зберігання даних для верифікації
+        verificationCodes.set(email, {
+            code: verificationCode,
+            expires: Date.now() + 60 * 60 * 1000, // 1 година
+            userData: { name, password, phone_number, role }
+        });
+
+        // Відправка коду на email
+        await transporter.sendMail({
+            from: EMAIL_USER,
+            to: email,
+            subject: 'Підтвердження email',
+            text: `Ваш код підтвердження: ${verificationCode}`
+        });
+
+        res.status(201).json({ 
+            message: 'Verification code sent to your email',
+            redirectUrl: '/confirm-email'
+        });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Новий маршрут для верифікації email
+router.post('/verify-email', async (req, res) => {
+    const { email, code } = req.body;
+
+    try {
+        const verification = verificationCodes.get(email);
+        
+        if (!verification || 
+            verification.code !== code || 
+            verification.expires < Date.now()) {
+            return res.status(400).json({ 
+                error: 'Invalid or expired verification code' 
+            });
+        }
+
+        const { userData } = verification;
+        const passwordHash = await bcrypt.hash(userData.password, 10);
+
+        // Створення користувача після успішної верифікації
+        const result = await pool.query(
+            `INSERT INTO users (name, email, user_password, phone_number, role)
+             VALUES ($1, $2, $3, $4, $5)
+             RETURNING id, name, email, role, created_at`,
+            [userData.name, email, passwordHash, userData.phone_number, userData.role]
+        );
+
+        const newUser = result.rows[0];
+        
+        // Видалення коду верифікації
+        verificationCodes.delete(email);
+
+        // Генерація токену
+        const token = jwt.sign(
+            { id: newUser.id, role: newUser.role }, 
+            SECRET_KEY, 
+            { expiresIn: '1h' }
+        );
+
+        res.status(201).json({
+            message: 'User registered successfully!',
+            user: {
+                id: newUser.id,
+                name: newUser.name,
+                email: newUser.email,
+                role: newUser.role,
+                created_at: newUser.created_at,
+            },
+            token: token,
+        });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Новий маршрут для повторної відправки коду
+router.post('/resend-code', async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const verification = verificationCodes.get(email);
+        if (!verification) {
+            return res.status(404).json({ error: 'Registration not found' });
+        }
+
+        const newCode = generateVerificationCode();
+        
+        // Оновлення коду верифікації
+        verificationCodes.set(email, {
+            ...verification,
+            code: newCode,
+            expires: Date.now() + 60 * 60 * 1000
+        });
+
+        // Відправка нового коду
+        await transporter.sendMail({
+            from: EMAIL_USER,
+            to: email,
+            subject: 'Новий код підтвердження',
+            text: `Ваш новий код підтвердження: ${newCode}`
+        });
+
+        res.json({ message: 'New verification code sent' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
