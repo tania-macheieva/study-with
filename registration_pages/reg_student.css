@@ -132,4 +132,28 @@ body {
   border-color: #ccc;
 }
 
-  
+.privacy-policy {
+  margin: 15px 0;
+  font-family: 'Jost', sans-serif;
+}
+
+.privacy-policy label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.privacy-policy input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+}
+
+.privacy-policy a {
+  color: #0066cc;
+  text-decoration: underline;
+}
+
+.privacy-policy a:hover {
+  text-decoration: none;
+}

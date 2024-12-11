@@ -43,7 +43,7 @@ app.use(express.static(path.join(__dirname)));
 app.get("/", (req, res) => { 
     res.sendFile(path.join(__dirname, 'home/home.html')); 
 });
-app.get("/privatepolicy", (req, res) => { 
+app.get("/privacypolicy", (req, res) => { 
     res.sendFile(path.join(__dirname, 'private-policy/PrivatePolicy.html')); 
 });
 app.get("/courses", (req, res) => { 
