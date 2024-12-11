@@ -19,12 +19,13 @@ body {
 .illustration img {
   width: 70%;
   height: auto;
-  transform: translateX(80px);
+  transform: translateX(80px) translateY(-70px);
 }
 
 /* Форма */
 .form-container {
-  max-width: 360px;
+  max-width: 340px;
+  height: 440px;
   width: 100%;
   text-align: center;
   flex-direction: column;
@@ -33,7 +34,7 @@ body {
   padding: 30px;
   border-radius: 15px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  transform: translateX(-70px);
+  transform: translateX(-70px) translateY(-40px);
 }
 
 .form-container h1 {
@@ -46,6 +47,7 @@ body {
   font-family: "Jost", sans-serif;
   font-size: 16px;
   font-weight: 400;
+  margin: 0px;
 }
 .form-container form {
   display: flex;
@@ -86,7 +88,7 @@ body {
   font-size: 16px;
   transition: background-color 0.3s ease;
   box-sizing: border-box; 
-  margin-bottom: 15px;
+  margin-bottom: 0px;
 }
 
 .form-container form button:hover {

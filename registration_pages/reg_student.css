@@ -19,20 +19,22 @@ body {
 .illustration img {
   max-width: 100%;
   height: auto;
-  transform: translateX(-60px);
+  transform: translateX(-60px) translateY(-70px);
 }
 
 /* Форма */
 .form-container {
-  max-width: 400px;
+  max-width: 340px;
+  height: 440px;
   width: 100%;
   text-align: center;
   background: #fff;
   padding: 30px;
   border-radius: 15px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  transform: translateX(-60px);
+  transform: translateX(-70px) translateY(-40px);
 }
+ 
 
 .form-container h1 {
   font-family: "Jost", sans-serif;
@@ -45,6 +47,7 @@ body {
   font-family: "Jost", sans-serif;
   font-size: 16px;
   font-weight: 400;
+  margin: 0px;
 }
 
 .form-container form {
@@ -86,7 +89,7 @@ body {
   font-size: 16px;
   transition: background-color 0.3s ease;
   box-sizing: border-box; 
-  margin-bottom: 15px;
+  margin: 0px;
 }
 
 .form-container form button:hover {
@@ -96,6 +99,7 @@ body {
 .google-auth {
   text-align: center;
 }
+
 
 .form-container .google-btn {
   display: flex;
