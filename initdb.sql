@@ -19,10 +19,10 @@ CREATE TABLE categories (
 
 CREATE TABLE all_courses (
     id SERIAL PRIMARY KEY,              
-    name VARCHAR(255) NOT NULL,         
+    name VARCHAR(100) NOT NULL,         
     author_id INT NOT NULL,             
     price NUMERIC(10, 2),               
-    description TEXT,                   
+    description TEXT NOT NULL,                   
     category_id INT NOT NULL, 
     image_url VARCHAR(1024),           
     CONSTRAINT fk_author
