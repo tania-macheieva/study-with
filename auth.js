@@ -11,6 +11,7 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const SECRET_KEY = process.env.JWT_SECRET;
 const EMAIL_USER = process.env.EMAIL_USER;
 const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:8000';
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -79,20 +80,17 @@ router.get('/google',
 
 // Маршрут для обробки callback після авторизації через Google
 router.get('/google/callback',
-    passport.authenticate('google', { session: false }),
+    passport.authenticate('google', { 
+        session: false, 
+        failureRedirect: `${FRONTEND_URL}/login` // Додано обробку помилок
+    }),
     (req, res) => {
-        // Після успішної авторизації, видаємо JWT
         const { user, token } = req.user;
-        res.json({
-            message: 'Google authorization successful',
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-            },
-            token: token,
-        });
+        
+        // Замість JSON відповіді тепер редирект
+        res.redirect(
+            `${FRONTEND_URL}?token=${token}&userId=${user.id}&role=${user.role}&name=${encodeURIComponent(user.name)}`
+        );
     }
 );
 
@@ -142,6 +140,7 @@ router.get('/google/callback',
 // });
 // Маршрут для авторизації
 router.post('/login', async (req, res) => {
+    console.log('Отримані дані:', req.body);
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -149,7 +148,6 @@ router.post('/login', async (req, res) => {
     }
 
     try {
-        // Перевірка, чи користувач існує в базі даних
         const result = await pool.query(
             `SELECT id, name, email, user_password, role FROM users WHERE email = $1`,
             [email]
@@ -160,26 +158,23 @@ router.post('/login', async (req, res) => {
         }
 
         const user = result.rows[0];
-
-        // Перевірка пароля
         const isMatch = await bcrypt.compare(password, user.user_password);
+        
         if (!isMatch) {
             return res.status(401).json({ error: 'Неправильний email або пароль' });
         }
 
-        // Генерація JWT-токену
         const token = jwt.sign({ id: user.id, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
 
-        res.status(200).json({
-            message: 'Авторизація пройшла успішно!',
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-            },
-            token: token,
+        // Зберігаємо токен у cookie
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 3600000 // 1 година
         });
+
+        // Перенаправляємо на головну сторінку
+        res.redirect('/');
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ error: 'Внутрішня помилка сервера' });
