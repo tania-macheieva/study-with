@@ -79,6 +79,13 @@ app.get('/fail-confirm-email', (req, res) => {
 app.get('/succes-confirm-email', (req, res) => {
     res.sendFile(path.join(__dirname, 'confirm_email_pages/succes_confsrm_email.html'));
 });
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'login/login.html'));
+});
+
+
+
+
 app.get('/log-in/', (req, res) => {
     res.sendFile(path.join(__dirname, 'log-in-page'));
 });
