@@ -47,7 +47,7 @@ app.get("/privatepolicy", (req, res) => {
     res.sendFile(path.join(__dirname, 'private-policy/PrivatePolicy.html')); 
 });
 app.get("/courses", (req, res) => { 
-    res.send ("Сторінка в розробці"); //---
+    res.send ("Сторінка в розробці"); //-------
 });
 app.get("/about", (req, res) => { 
     res.sendFile(path.join(__dirname, '/about/about.html'));
@@ -82,15 +82,11 @@ app.get('/succes-confirm-email', (req, res) => {
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'login/login.html'));
 });
-
-
-
-
-app.get('/log-in/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'log-in-page'));
-});
-app.get('/log-in/fogot-password', (req, res) => {
+app.get('/forgot-password', (req, res) => {
     res.sendFile(path.join(__dirname, 'log-in-page/forgot-password.html'));
+});
+app.get('/reset-password', (req, res) => {
+    res.sendFile(path.join(__dirname, 'log-in-page/reset-password.html'));
 });
 
 app.use((err, req, res, next) => {
