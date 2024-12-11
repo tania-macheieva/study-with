@@ -20,7 +20,7 @@ body {
     position: sticky;
     top: 0;
     z-index: 1000;
-    box-shadow: 0px  2px 5px rgba(0, 0, 0, 0.15);
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.15);
 }
 
 .container {
@@ -38,19 +38,31 @@ body {
     gap: 24px;
 }
 
-.logo-header {
+.logo {
     display: flex;
     align-items: center;
-    font-weight: 600; 
+    font-weight: 600;
     font-size: 24px;
     font-family: 'Jost', sans-serif;
     color: #283044;
 }
 
-.logo-header img {
+.logo a {
+    text-decoration: none; 
+    color: inherit; 
+    display: flex; 
+    align-items: center;
+}
+
+.logo a:hover {
+    opacity: 0.8;
+}
+
+.logo img {
     height: 30px;
     margin-right: 8px;
 }
+
 .nav-menu {
     display: flex;
     gap: 24px;
@@ -72,11 +84,6 @@ body {
     display: flex;
     align-items: center;
     gap: 24px;
-    font-size: 18px;
-} 
-.right-section {
-    display: flex;
-    gap: 24px;
     font-family: 'Jost', sans-serif;
     font-size: 18px;
 }
@@ -87,31 +94,32 @@ body {
 }
 
 .search {
-    position: relative; /* Дозволяє позиціювати іконку відносно контейнера */
+    position: relative;
     display: inline-block; 
 }
-  /* Поле для вводу */
-.search input[type="text"]  { 
-    padding: 5px; /* Відступ справа для іконки + текст зліва */
+
+.search input[type="text"] { 
+    padding: 5px;
     border-radius: 4px;
     font-family: 'Jost', sans-serif;
     border: 2px solid #c7c7c7;
     font-size: 16px;
-    box-sizing: border-box; /* Увімкнення врахування padding */
+    box-sizing: border-box;
     border-radius: 10px;
     width: 15vw;
-    
+    color: #fff;
+    transform: scale(1.05);
+    transition: all 0.1s ease;
 }
 
-/* Іконка пошуку */
 .search .search-btn {
-    position: absolute; /* Позиціонування всередині контейнера */
-    top: 50%; /* Центрування по вертикалі */
-    right: 10px; /* Відступ від правого краю */
-    transform: translateY(-50%); /* Вирівнювання по центру */
-    width: 20px; /* Розмір іконки */
-    height: 20px; /* Висота іконки */
-    cursor: pointer; /* Курсор у вигляді руки при наведенні */
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
 }
 
 .lang-switcher {
@@ -159,7 +167,7 @@ body {
     transform: scale(1.04); 
 }
 
-.right-section a:hover  {
+.right-section a:hover {
     color: #545F7A;  
 }
 
@@ -182,6 +190,24 @@ body {
 
 .sign-in-btn:hover {
     background-color: #545F7A;
+    color: #fff;
+    transform: scale(1.05);
+    transition: all 0.1s ease;
+}
+
+.sign-up-btn {
+    background-color: #78A1BB;
+    color: #fff;
+    padding: 5px 15px;
+    border: none;
+    font-size: 16px;
+    border-radius: 9px;
+    cursor: pointer;
+    font-family: 'Jost', sans-serif;
+}
+
+.sign-up-btn:hover {
+    background-color: rgb(145, 193, 223);
     color: #fff;
     transform: scale(1.05);
     transition: all 0.1s ease;

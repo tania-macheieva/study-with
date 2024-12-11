@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
-  fetch("/footer/footer.html")
+    fetch("/header/header-login.html")
       .then((response) => response.text())
       .then((data) => {
-          document.body.insertAdjacentHTML("beforeend", data);
+        document.body.insertAdjacentHTML("afterbegin", data);
       });
-});
+  });

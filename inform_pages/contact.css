@@ -1,0 +1,198 @@
+body {
+    font-family: "Jost", sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+    color: #333;
+    min-height: 100vh; 
+  }
+    
+ 
+  .main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    background-color: #fff;
+}
+
+.contact-section {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    padding: 40px;
+}
+
+.illustration img {
+    max-width: 600px;
+    display: block; /* Зображення займає всю ширину контейнера */
+    margin-left: 0; 
+    transform: translateX(-10%);
+}
+
+
+.contact-info {
+    max-width: 700px;
+}
+
+.contact-info h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.contact-line {
+    width: 100%; /* Лінія займатиме всю ширину контейнера */
+    height: 3px; /* Товщина лінії */
+    background-color: #333; /* Колір лінії */
+    margin: 0 auto 40px auto; /* Центрування лінії + відступ знизу */
+  }
+  
+
+/* Email box */
+.email-box {
+    background-color: #fff;
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    width: 600px;
+}
+
+.email-box p {
+    margin-bottom: 10px;
+    font-size: 24px;
+    line-height: 1.4;
+}
+
+
+/* Email button */
+.email-button {
+    display: inline-block; /* Дозволяє кнопці виглядати як блок */
+    background-color: #283044;
+    color: #fff;
+    text-decoration: none; /* Забирає підкреслення */
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: 400px;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.email-button:hover {
+    background-color: #101318; /* Темніший синій для ефекту наведення */
+}
+/* Small boxes */
+.small-boxes {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    width: 640px;
+}
+
+.small-box {
+    background-color: #fff;
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
+    padding: 15px 20px;
+    flex: 1;
+    min-width: 200px;
+    text-align: center;
+   
+}
+
+.small-box p {
+    font-size: 24px;
+    font-weight:600;
+    margin-bottom: 10px;
+    font-family: "Jost", sans-serif;
+}
+
+/* Контейнер для поля вводу і кнопки */
+.phone-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Поле для вводу номеру */
+.phone-input {
+    flex: 1;
+    width: 200px;
+    padding: 10px 12px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    color: #333;
+    outline: none;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-family: "Jost", sans-serif;
+}
+
+.phone-input::placeholder {
+    color: #bbb;
+}
+/* Зміна кольору обрамлення під час фокусу */
+.phone-input:focus {
+  border-color: #101318;;
+  box-shadow: 0 0 5px rgba(8, 10, 11, 0.5);
+}
+.email-input {
+  flex: 1;
+  width: 250px;
+  padding: 10px 12px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  color: #333;
+  outline: none;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-family: "Jost", sans-serif;
+  align-items: flex-start;
+}
+.email-input::placeholder {
+  color: #bbb;
+}
+/* Зміна кольору обрамлення під час фокусу */
+.email-input:focus {
+    border-color: #101318;;
+    box-shadow: 0 0 5px rgba(8, 10, 11, 0.5);
+}
+
+/* Кнопка для надсилання */
+.submit-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #283044; 
+    color: #fff; 
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 12px; 
+    cursor: pointer;
+    font-size: 18px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+    background-color: #1A1D26; /* Трохи світліший чорний */
+}
+
+.submit-button span {
+    display: inline-block;
+    transform: translateX(0);
+    transition: transform 0.2s ease;
+    transform: scale(1.1, 2.0);
+}
+
+
+/* Анімація стрілки на наведенні */
+.submit-button:hover span {
+    transform: translateX(3px); /* Зсуваємо стрілку трохи праворуч */
+}
+
+ 

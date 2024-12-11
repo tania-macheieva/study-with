@@ -5,6 +5,17 @@ body {
     font-family: 'Jost', sans-serif;
 }
 
+.logo a {
+    text-decoration: none; 
+    color: inherit; 
+    display: flex; 
+    align-items: center;
+}
+
+.logo a:hover {
+    opacity: 0.8;
+}
+
 .page-container {
     display: flex;
     flex-direction: column;
@@ -182,6 +193,24 @@ body {
 
 .sign-in-btn:hover {
     background-color: #545F7A;
+    color: #fff;
+    transform: scale(1.05);
+    transition: all 0.1s ease;
+}
+
+.sign-up-btn {
+    background-color: #78A1BB;
+    color: #fff;
+    padding: 5px 15px;
+    border: none;
+    font-size: 16px;
+    border-radius: 9px;
+    cursor: pointer;
+    font-family: 'Jost', sans-serif;
+}
+
+.sign-up-btn:hover {
+    background-color: rgb(145, 193, 223);
     color: #fff;
     transform: scale(1.05);
     transition: all 0.1s ease;
