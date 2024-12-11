@@ -1,96 +1,129 @@
 body {
-    font-family: "Jost", sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #fff;
-    color: #333;
-  }
-  
-  
-  .menu .sign-in {
-    background-color: #283044;
-    color: #fff;
-    font-family: "Jost", sans-serif;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .menu .sign-in:hover {
-    background-color: #0c101a;
-  }
-
-  .success-confirmation-page {
-    display: flex;
-    flex-direction: column; /* Елементи будуть розташовані вертикально */
-    align-items: center; /* Вирівнювання по центру горизонтально */
-    gap: 20px; /* Відступ між елементами */
-    margin: 20px auto; /* Центрування сторінки */
-    max-width: 600px; /* Максимальна ширина сторінки */
-  }
-  
-  .illustration img {
-    max-width: 800px;
-    height: auto;
-  }
-/* Контейнер для стрілки та підпису */
-.arrow-container {
+  font-family: "Jost", sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #fff;
+  color: #333;
+}
+.success-confirmation-page {
   display: flex;
-    flex-direction: column;
-    align-items:center;
-    position: absolute;
-    left: 24%; /* Розташування ближче до форми */
-    top: 50%;
-    transform: translateY(-100%); 
+  flex-direction: column; /* Елементи будуть розташовані вертикально */
+  align-items: center; /* Вирівнювання по центру горизонтально */
+  gap: 20px; /* Відступ між елементами */
+  margin: 20px auto; /* Центрування сторінки */
+  max-width: 600px; /* Максимальна ширина сторінки */
+  min-height: 90vh;
+}
+.div,
+.div * {
+  box-sizing: border-box;
+}
+.div {
+  background: #ffffff;
+  height: 720px;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Зображення стрілки */
-.curved-arrow {
-  width: 150px; 
-  height: auto; 
-  transform: rotate(270deg);
+
+.succes-conf-form {
+  background: #ffffff;
+  border-radius: 12px;
+  border-style: solid;
+  border-color: #c7c7c7;
+  border-width: 1px;
+  padding: var(--var-sds-size-space-600, 24px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--var-sds-size-space-600, 24px);
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 500px;
+  height: 130px;
+  min-width: 320px;
+  position: absolute;
+  left: 50%;
+  top: 110px;
+  transform: translateX(-50%);
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+}
+.button-group2 {
+  display: flex;
+  flex-direction: row;
+  gap: var(--var-sds-size-space-400, 16px);
+  align-items: center;
+  justify-content: flex-start;
+  align-self: stretch;
+  flex-shrink: 0;
+  position: relative;
 }
 
-/* Підпис під стрілкою */
-.arrow-caption {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 20px;
-  font-weight: 600;
-  margin-top: 40px; /* Відступ між стрілкою і текстом */
+.email-successfully-verified {
+  color: #000000;
   text-align: center;
+  font-family: "Jost", sans-serif;
+  font-size: 32px;
+  font-weight: 600;
+  position: absolute;
+  left: 50%;
+  top: 140px;
+  width: 481px;
+  height: 45px;
+  transform: translateX(-50%);
 }
-  
-  .succes-conf-form{
-    background-color: #fff;
-    border-radius: 12px; 
-    padding: 20px 60px; 
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.232);
-    text-align: center;
-    max-width: 500px; 
-    max-height: 200px;
-    margin: 0 auto; 
-  }
-  
-  .succes-conf-form h2 {
-    font-size: 32px; 
-    font-weight: 600; 
-    margin-bottom: 25px; 
-  }
+.success-button {
+  background-color: #283044; /* Темніша кнопка */
+  color: #fff;
+  border: none;
+  padding:  12px 0; 
+  width: 50%;
+  border-radius: 12px; 
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 100;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  position: absolute;
+  right: 110px;
+  top: 70px;
+}
 
-  .success-button {
-    background-color: #283044; /* Темніша кнопка */
-    color: #fff;
-    border: none;
-    padding:  12px 0; 
-    width: 80%;
-    border-radius: 12px; 
-    cursor: pointer;
-    font-size: 16px; /* Збільшуємо текст кнопки */
-    font-weight: 100;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    margin-bottom: 15px;
-  }
-  
-  .success-button:hover {
-    background-color: #0c101a;
-    transform: scale(1.05); /* Невелике збільшення при наведенні */
-  }
+.success-button:hover {
+  background-color: #0c101a;
+  transform: scale(1.05); /* Невелике збільшення при наведенні */
+}
+.arrow-1 {
+  position: absolute;
+    left: 34%;
+    top: 185px;
+    transform: rotate(4deg) scale(1.1) translateX(-50%);
+    z-index: 1;
+}
+.line-7 {
+  position: absolute;
+    left: 30%;
+    top: 290px;
+    transform: scale(1.2) translateX(-50%);
+    z-index: 1;
+}
+.so-let-s-study {
+  color: #000000;
+  text-align: center;
+  font-family: "Jost", sans-serif;
+  font-size: 28px;
+  font-weight: 400;
+  position: absolute;
+  left: 20%;
+  top: 241px;
+  width: 170px;
+  height: 45px;
+}
+.mar-business-18-1 {
+  width: 796px;
+  height: 468px;
+  position: absolute;
+  left: 50%;
+  top: 274px;
+  bottom: 0;
+  transform: translateX(-50%);
+  object-fit: cover;
+}
