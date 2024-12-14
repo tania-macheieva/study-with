@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Study With</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="all.css" />
+    <script src="/header/header-noauth.js"></script>
+  </head>
+  <body>    
+    <h1 class="h1-courses">Course catalog</h1>
+    <h2 class="h2-find">Find everything you need</h2>
+    <div class="search-container">
+      <input type="text" class="Search" placeholder="Search courses...">
+      <button class="search-btnn">Search</button>
+    </div> 
+    <div class="container">
+        <div class="left-container">
+          <div class="filters">
+            <h4 class="filters-clear">Clear filters</h4>
+            <h4 class="filters-themes">Themes</h4>
+            <label class="checkbox">
+              <input type="checkbox" name="theme-option-1" class="checkbox" />
+              Option 1
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" name="theme-option-2" class="checkbox" />
+              Option 2
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" name="theme-option-3" class="checkbox" />
+              Option 3
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" name="theme-option-4" class="checkbox" />
+              Option 4
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" name="theme-option-5" class="checkbox" />
+              Option 5
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" name="theme-option-6" class="checkbox" />
+              Option 6
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" name="theme-option-7" class="checkbox" />
+              Option 7
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" name="theme-option-8" class="checkbox" />
+              Option 8
+            </label>
+            <h4 class="filters-themes">Price</h4>
+            <label class="checkbox">
+              <input type="checkbox" name="price-free" class="checkbox" />
+              Free
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" name="price-paid" class="checkbox" />
+              Paid
+            </label>
+            <h4 class="filters-themes">Educational level</h4>
+            <label class="checkbox">
+              <input type="checkbox" name="level-none" class="checkbox" />
+              No level
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" name="level-basic" class="checkbox" />
+              Basic level
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" name="level-intermediate" class="checkbox" />
+              Intermediate level
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" name="level-advanced" class="checkbox" />
+              Advanced level
+            </label>
+          </div>
+        </div>
+        <div class="right-container">
+          <div class="container-text">
+            <h2 class="Result">Results</h2>
+            <div class="Sort">
+                <span>Sort</span>
+                <select class="dropdown">
+                    <option value="option1">Sort By Price</option>
+                    <option value="option2">Sort By Date</option>
+                </select>
+            </div>
+          </div>   
+          <div class="courses">
+            <!-- Courses will go here -->
+          </div>
+        </div>
+    </div>
+  </body>
+  <script src="all.js"></script>
+  <script src="/footer/footer.js"></script>
+</html>
