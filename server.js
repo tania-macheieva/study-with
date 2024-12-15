@@ -31,15 +31,8 @@ app.use((req, res, next) => {
     next();
 });
 
-//Статичні файли
 app.use(express.static(path.join(__dirname)));
  
-// // app.use(express.static(path.join(__dirname, 'privatpolicy')));
-// // app.use(express.static(path.join(__dirname, 'registration_pages')));
-// app.use(express.static(path.join(__dirname, 'home')));
-// // app.use(express.static(path.join(__dirname, 'log-in-page')));
-// // app.use(express.static(path.join(__dirname, 'confirm_email_pages')));
-
 app.get("/", (req, res) => { 
     res.sendFile(path.join(__dirname, 'home/home.html')); 
 });
@@ -47,10 +40,10 @@ app.get("/privacypolicy", (req, res) => {
     res.sendFile(path.join(__dirname, 'private-policy/PrivatePolicy.html')); 
 });
 app.get("/courses", (req, res) => { 
-    res.send ("Сторінка в розробці"); //-------
+    res.sendFile(path.join(__dirname, 'all_courses/all.html')); 
 });
 app.get("/about", (req, res) => { 
-    res.sendFile(path.join(__dirname, '/about/about.html'));
+    res.sendFile(path.join(__dirname, 'about/about.html'));
 });
 app.get("/contact", (req, res) => { 
     res.sendFile(path.join(__dirname, 'inform_pages/contact.html')); 
@@ -88,6 +81,13 @@ app.get('/forgot-password', (req, res) => {
 app.get('/reset-password', (req, res) => {
     res.sendFile(path.join(__dirname, 'log-in-page/reset-password.html'));
 });
+app.get('/reset-password', (req, res) => {
+    res.sendFile(path.join(__dirname, 'log-in-page/sending_email.html'));
+});
+app.get('/profile', (req, res) => {
+    res.sendFile(path.join(__dirname, 'profile-page/student-profile.html'));//---------
+});
+
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
