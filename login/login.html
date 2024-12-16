@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/login/login.css">
 </head>
 <body>
-  <script src="/header/header-login.js"></script>
+    <script src="../auth-header.js"></script>
 
     <div class="main-container">
         <div class="illustration">
@@ -31,36 +31,6 @@
         </div>
     </div>
 
-    <script>
-        async function handleLogin() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            try {
-                const response = await fetch('/auth/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email, password })
-                });
-
-                if (response.redirected) {
-                    window.location.href = response.url;
-                    return;
-                }
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    window.location.href = '/';
-                } else {
-                    document.getElementById('error-message').textContent = data.error;
-                }
-            } catch (error) {
-                document.getElementById('error-message').textContent = 'Помилка сервера';
-            }
-        }
-    </script>
+    <script src="/login/login.js"></script>
 </body>
 </html>

@@ -166,15 +166,17 @@ router.post('/login', async (req, res) => {
 
         const token = jwt.sign({ id: user.id, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
 
-        // Зберігаємо токен у cookie
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 3600000 // 1 година
+        // Повертаємо дані користувача та токен
+        res.status(200).json({
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            },
+            token: token
         });
-
-        // Перенаправляємо на головну сторінку
-        res.redirect('/');
+        
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ error: 'Внутрішня помилка сервера' });
