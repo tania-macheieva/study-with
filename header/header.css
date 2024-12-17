@@ -175,7 +175,7 @@ body {
 }
 
 .right-section .btn:hover img { 
-    content: url('images/user-avatar-hover.png');  
+    content: url('../images/user-avatar-hover.png');  
     transform: scale(1.01);
     box-shadow: 0 10px 20px rgba(112, 112, 112, 0.2); 
 }  

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyWith - Create course</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/course-creation/course-creation.css"> 
+</head>
+
+<body>
+  <main>
+    <div class="create-course-form"> 
+      <form id="create-course"> 
+          <label class="title-1" for="course-title">Course Title</label>
+          <input type="text" id="course-title" placeholder="Enter course title" required>
+        
+          <label class="title-1" for="course-title">Course Title</label>
+          <input type="text" id="course-title" placeholder="Enter course title" required>
+        
+          <label class="title-1" for="course-description">Description</label>
+          <textarea id="course-description" placeholder="Enter course description" rows="5" required></textarea>
+          <label class="title-1" for="course-thumbnail">Thumbnail</label>
+          <div class="input-container">
+            <label class="custom-file-upload">
+              Choose File
+              <input type="file" id="course-thumbnail" accept="image/*" onchange="updateFileName()" />
+            </label>
+            <span id="file-name" class="file-name">No file chosen</span>
+          </div> 
+          
+          <label class="title-1" for="course-price">Price (USD)</label>
+          <div class="price-input">
+              <input type="number" id="course-price" placeholder="Enter price" min="0" required>
+              <span class="currency-symbol">$</span>
+          </div>
+          <!-- Category Dropdown -->
+          <label class="title-1" for="course-category">Category</label>
+          <div class="custom-select-wrapper">
+            <div class="custom-select">
+              <div class="select-trigger">
+                <span>Select a category</span>
+                <div class="arrow"></div>
+              </div>
+              <ul class="options">
+                <li class="option" data-value="programming">Programming</li>
+                <li class="option" data-value="design">Design</li>
+                <li class="option" data-value="marketing">Marketing</li>
+                <li class="option" data-value="business">Business</li>
+                <li class="option" data-value="languages">Languages</li>
+                <li class="option" data-value="finance">Finance</li>
+                <li class="option" data-value="personal-development">Personal Development</li>
+                <li class="option" data-value="art">Art</li>
+                <li class="option" data-value="psychology">Psychology</li>
+                <li class="option" data-value="healthcare">Health</li>
+                <li class="option" data-value="cooking">Cooking</li>
+                <li class="option" data-value="science">Science</li>
+                <li class="option" data-value="game-development">Game Development</li>
+                <li class="option" data-value="childcare">Childcare</li> 
+              </ul>
+            </div>
+          </div>
+          <br>
+          <label class="title-1" for="course-category">Education level</label>
+          <div class="custom-select-wrapper">
+            <div class="custom-select">
+              <div class="select-trigger">
+                <span>Select an education level</span>
+                <div class="arrow"></div>
+              </div>
+              <ul class="options">
+                <li class="option" data-value="no-level">No level</li>
+                <li class="option" data-value="basic-level">Basic level</li>
+                <li class="option" data-value="intermediate-level">Intermediate level</li>
+                <li class="option" data-value="advanced-level">Advanced level</li> 
+              </ul>
+            </div>
+          </div>
+          
+  
+          <!-- Modules Section First -->
+          <div class="modules-container">
+              <p class="title-1">Modules</p>
+              <div id="modules-list">
+                  <!-- List of modules will be added here -->
+              </div>
+              <button class="add-module-btn" type="button" id="add-module-btn">Add Module</button>
+          </div>
+          <div class="btns">
+            <button type="сreate" class="btn-сreate">Create Course</button>
+            <button type="save" class="btn-draft">Save as draft</button>
+          </div>
+          
+      </form>
+  </div>
+</main>
+  
+  <script src="/course-creation/course-creation.js"></script>
+  <script src="/header/header-teacher.js"></script>
+  <script src="/footer/footer.js"></script>
+</body>
+
+</html>
