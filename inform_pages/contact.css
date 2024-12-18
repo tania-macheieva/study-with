@@ -33,6 +33,7 @@ body {
 
 .contact-info {
     max-width: 700px;
+    height: auto;
 }
 
 .contact-info h1 {
@@ -40,11 +41,11 @@ body {
     margin-bottom: 20px;
     text-align: center;
 }
+
 .contact-line {
     width: 100%; /* Лінія займатиме всю ширину контейнера */
     height: 3px; /* Товщина лінії */
     background-color: #333; /* Колір лінії */
-    margin: 0 auto 40px auto; /* Центрування лінії + відступ знизу */
   }
   
 
@@ -53,10 +54,10 @@ body {
     background-color: #fff;
     box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
     border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
     text-align: center;
-    width: 600px;
+    width: 640px;
+    height: 150px;
+    margin-bottom: 20px;
 }
 
 .email-box p {
@@ -85,10 +86,12 @@ body {
 /* Small boxes */
 .small-boxes {
     display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+    flex-direction: column; /* Змінюємо напрямок на вертикальний */
+    gap: 20px; /* Задаємо відступи між елементами */
     width: 640px;
+    margin: 0 auto; /* Центруємо бокс */
 }
+
 
 .small-box {
     background-color: #fff;
@@ -141,7 +144,7 @@ body {
 }
 .email-input {
   flex: 1;
-  width: 250px;
+  width: 525px;
   padding: 10px 12px;
   font-size: 16px;
   border: 1px solid #ddd;
