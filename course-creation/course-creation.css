@@ -31,7 +31,7 @@ main {
   font-size: 20px;
   color: #545F7A;
 }
- 
+
 .create-course-form .title-2 {
   display: block;
   font-weight: bold;
@@ -56,6 +56,18 @@ main {
   padding: 13px ;
   margin-bottom: 20px;
   transition: all 0.3s ease;
+}
+
+.custom-file-container {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Відстань між кнопкою і списком файлів */
+}
+
+.file-names-list {
+  font-size: 16px;
+  color: #333;
+  padding-top: 10px;
 }
 
 .custom-file-upload {
