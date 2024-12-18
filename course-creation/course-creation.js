@@ -47,46 +47,6 @@ document.addEventListener('click', e => {
   }
 });
 
-
-document
-.getElementById("create-course")
-.addEventListener("submit", function (event) {
-  event.preventDefault();
-
-  const courseTitle = document.getElementById("course-title").value;
-  const courseDescription =
-    document.getElementById("course-description").value;
-
-  const modules = [];
-  document.querySelectorAll(".module").forEach((moduleDiv) => {
-    const module = {
-      title: moduleDiv.querySelector(".title-2").innerText,
-      lectures: [],
-    };
-    moduleDiv.querySelectorAll(".lecture").forEach((lectureDiv) => {
-      const lectureTitle = lectureDiv.querySelector("input").value;
-      const materials = lectureDiv.querySelector(".lecture-materials").files;
-      module.lectures.push({
-        title: lectureTitle,
-        materials: Array.from(materials).map((file) => file.name),
-      });
-    });
-    modules.push(module);
-  });
-
-  const courseData = {
-    title: courseTitle,
-    description: courseDescription,
-    modules: modules,
-  };
-
-  console.log(courseData);
-  alert("Course created successfully!");
-  this.reset();
-  modulesList.innerHTML = "";
-});
-
-
 document.addEventListener('DOMContentLoaded', () => {
   const addModuleBtn = document.getElementById("add-module-btn");
   const modulesList = document.getElementById("modules-list");
@@ -205,4 +165,42 @@ document.addEventListener('DOMContentLoaded', () => {
       moduleTitle.innerText = `Module ${index + 1}`; // Оновлюємо номер модуля
     });
   }
+});
+
+document
+.getElementById("create-course")
+.addEventListener("submit", function (event) {
+  event.preventDefault();
+
+  const courseTitle = document.getElementById("course-title").value;
+  const courseDescription =
+    document.getElementById("course-description").value;
+
+  const modules = [];
+  document.querySelectorAll(".module").forEach((moduleDiv) => {
+    const module = {
+      title: moduleDiv.querySelector(".title-2").innerText,
+      lectures: [],
+    };
+    moduleDiv.querySelectorAll(".lecture").forEach((lectureDiv) => {
+      const lectureTitle = lectureDiv.querySelector("input").value;
+      const materials = lectureDiv.querySelector(".lecture-materials").files;
+      module.lectures.push({
+        title: lectureTitle,
+        materials: Array.from(materials).map((file) => file.name),
+      });
+    });
+    modules.push(module);
+  });
+
+  const courseData = {
+    title: courseTitle,
+    description: courseDescription,
+    modules: modules,
+  };
+
+  console.log(courseData);
+  alert("Course created successfully!");
+  this.reset();
+  modulesList.innerHTML = "";
 });
