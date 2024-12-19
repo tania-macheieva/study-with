@@ -9,7 +9,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="all.css" />
-    <script src="../auth-header.js"></script>
+    <script src="/header/header-noauth.js"></script>
   </head>
   <body>    
     <h1 class="h1-courses">Course catalog</h1>
@@ -25,35 +25,35 @@
             <h4 class="filters-themes">Themes</h4>
             <label class="checkbox">
               <input type="checkbox" name="theme-option-1" class="checkbox" />
-              Option 1
+              Programming
             </label>
             <label class="checkbox">
               <input type="checkbox" name="theme-option-2" class="checkbox" />
-              Option 2
+              Design
             </label>
             <label class="checkbox">
               <input type="checkbox" name="theme-option-3" class="checkbox" />
-              Option 3
+              Marketing
             </label>
             <label class="checkbox">
               <input type="checkbox" name="theme-option-4" class="checkbox" />
-              Option 4
+              Bussines
             </label>
             <label class="checkbox">
               <input type="checkbox" name="theme-option-5" class="checkbox" />
-              Option 5
+              Languages
             </label>
             <label class="checkbox">
               <input type="checkbox" name="theme-option-6" class="checkbox" />
-              Option 6
+              Finance
             </label>
             <label class="checkbox">
               <input type="checkbox" name="theme-option-7" class="checkbox" />
-              Option 7
+              Personal Development
             </label>
             <label class="checkbox">
               <input type="checkbox" name="theme-option-8" class="checkbox" />
-              Option 8
+              Art
             </label>
             <h4 class="filters-themes">Price</h4>
             <label class="checkbox">
@@ -81,6 +81,7 @@
               <input type="checkbox" name="level-advanced" class="checkbox" />
               Advanced level
             </label>
+            <h4 class="filters-apply">Apply filters</h4>
           </div>
         </div>
         <div class="right-container">
@@ -89,16 +90,19 @@
             <div class="Sort">
                 <span>Sort</span>
                 <select class="dropdown">
+                    <option value="option0">Default</option>
                     <option value="option1">Sort By Price</option>
-                    <option value="option2">Sort By Date</option>
+                    <option value="option2">Sort By Popularity</option>
                 </select>
             </div>
-          </div>   
-          <div class="courses">
-            <!-- Courses will go here -->
+          </div>  
+            <div class="courses">
           </div>
         </div>
     </div>
+  </div>
+  <button class="more-btn">Load More
+  </button>
   </body>
   <script src="all.js"></script>
   <script src="/footer/footer.js"></script>
