@@ -93,7 +93,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 window.location.href = '/succes-confirm-email';
             } else {
-                window.location.href = '/fail-confirm-email';
+                inputs.forEach(input => {
+                    input.style.borderColor = 'red';
+                });
+                errorMessage.style.display = 'block';
             }
         } catch (error) {
             console.error('Error:', error);
