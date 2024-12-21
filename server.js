@@ -32,7 +32,7 @@ app.use((req, res, next) => {
 });
 
 app.use(express.static(path.join(__dirname)));
- 
+
 app.get("/", (req, res) => { 
     res.sendFile(path.join(__dirname, 'home/home.html')); 
 });
@@ -84,8 +84,14 @@ app.get('/reset-password', (req, res) => {
 app.get('/reset-password', (req, res) => {
     res.sendFile(path.join(__dirname, 'log-in-page/sending_email.html'));
 });
-app.get('/profile', (req, res) => {
-    res.sendFile(path.join(__dirname, 'profile-page/student-profile.html'));//---------
+app.get('/profile-student', (req, res) => {
+    res.sendFile(path.join(__dirname, 'profile-page/student-profile.html')); 
+});
+app.get('/profile-teacher', (req, res) => {
+    res.sendFile(path.join(__dirname, 'profile-page/teacher-profile.html')); 
+});
+app.get('/course-creation', (req, res) => {
+    res.sendFile(path.join(__dirname, 'course-creation/course-creation.html')); 
 });
 
 
@@ -100,4 +106,3 @@ const PORT = process.env.PORT || 8000;
 app.listen(PORT, HOST, () => {
     console.log(`Server running on http://${HOST}:${PORT}`);
 });
- 

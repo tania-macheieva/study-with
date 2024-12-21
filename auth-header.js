@@ -95,11 +95,12 @@ async function loadHeader() {
                     existingDropdown.remove();
                     return;
                 }
-
                 const dropdown = document.createElement('div');
                 dropdown.className = 'user-dropdown';
+                const profileLink = authData.role === 'teacher' ? '/profile-teacher' : '/profile-student';
+                
                 dropdown.innerHTML = `
-                    <a href="/profile" class="dropdown-item">
+                    <a href="${profileLink}" class="dropdown-item">
                         <i class="fas fa-user"></i>
                         Profile
                     </a>
@@ -109,7 +110,7 @@ async function loadHeader() {
                         Logout
                     </a>
                 `;
-
+                
                 // Позиціонуємо дропдаун
                 const rect = userButton.getBoundingClientRect();
                 dropdown.style.position = 'absolute';
