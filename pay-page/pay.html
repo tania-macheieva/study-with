@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyWith</title>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet" />
+    <script src="https://js.stripe.com/v3/"></script>
+    <link rel="stylesheet" href="/pay-page/style.css">
+
+</head>
+
+<body>
+    <div class="course-details">
+        <h2>Course download...</h2>
+        <div id="course-info"></div>
+    </div>
+
+    <script>
+        const courseId = new URLSearchParams(window.location.search).get('id');
+        if (!courseId) {
+            alert('Course ID not found!');
+            window.location.href = '/';
+        }
+
+        fetch(`/pay-page/course/${courseId}`)
+            .then(res => res.json())
+            .then(course => {
+                const courseInfo = document.getElementById('course-info');
+                courseInfo.innerHTML = `
+                    <h3>${course.name}</h3>
+                    <p>${course.description}</p>
+                    <p>Ціна: $${course.price}</p>
+                    <button id="checkout-button">Pay</button>
+                `;
+
+                fetch('/get-stripe-key')
+                    .then(response => response.json())
+                    .then(data => {
+                        const stripe = Stripe(data.publicKey);
+
+                        document.getElementById('checkout-button').addEventListener('click', () => {
+                            fetch('/create-checkout-session', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ courseId }),
+                            })
+                                .then(response => response.json())
+                                .then(session => {
+                                    window.location.href = session.url;
+                                })
+                                .catch(error => console.error('Error:', error));
+                        });
+                    })
+                    .catch(error => console.error('Error fetching public key:', error));
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error loading the course');
+            });
+    </script>
+    
+</body>
+
+
+</html>
