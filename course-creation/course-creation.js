@@ -9,7 +9,7 @@ function updateFileName() {
     fileName.textContent = "No file chosen"
     fileName.classList.remove("selected");
   }
-}// Закриваємо всі відкриті селекти
+}
 function closeAllSelects() {
   document.querySelectorAll('.custom-select').forEach(select => {
     select.classList.remove('open');
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let moduleCounter = 1;
 
-  // Додавання модуля
+  
   addModuleBtn.addEventListener("click", () => {
     const moduleId = `module-${moduleCounter++}`;
     const moduleDiv = document.createElement("div");
@@ -62,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     moduleDiv.innerHTML = `
       <p class="title-2">Module ${moduleCounter - 1}</p>
+      <input type="text" placeholder="Module Title"> 
       <div class="lectures">
         <!-- List of lectures will be added here -->
       </div>
@@ -71,14 +72,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     modulesList.appendChild(moduleDiv);
 
-    // Додавання лекції в модуль
+
     const addLectureBtn = moduleDiv.querySelector(".add-lecture-btn");
     const deleteModuleBtn = moduleDiv.querySelector(".delete-module-btn");
 
     let lectureCounter = 1;
 
     addLectureBtn.addEventListener("click", (event) => {
-      event.preventDefault(); // Запобігаємо оновленню сторінки
+      event.preventDefault(); 
 
       const lecturesDiv = moduleDiv.querySelector(".lectures");
       const lectureDiv = document.createElement("div");
@@ -89,6 +90,8 @@ document.addEventListener('DOMContentLoaded', () => {
           <button class="delete-lecture-btn"><img src="../images/delete.png" alt=""></button>
         </div>
         <input type="text" placeholder="Lecture Title">
+        <label class="title-3" for="lecture-description">Description</label>
+          <textarea placeholder="Enter lecture  description" rows="5"></textarea>
         <label class="upload">Upload Materials (Video, PDF, etc.)</label>
         <div class="custom-file-container">
           <label class="custom-file-upload">
@@ -100,10 +103,9 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
       lecturesDiv.appendChild(lectureDiv);
 
-      // Оновлюємо нумерацію лекцій після додавання
       updateLectureNumbers(moduleDiv);
 
-      // Обробка вибору файлів
+      
       const fileInput = lectureDiv.querySelector(".lecture-materials");
       const fileNamesList = lectureDiv.querySelector(".file-names-list");
 
@@ -128,79 +130,170 @@ document.addEventListener('DOMContentLoaded', () => {
         fileInput.value = "";
       });
 
-      // Видалення лекції
+      
       const deleteLectureBtn = lectureDiv.querySelector(".delete-lecture-btn");
       deleteLectureBtn.addEventListener("click", () => {
         lectureDiv.remove();
-        updateLectureNumbers(moduleDiv); // Оновлюємо нумерацію лекцій після видалення
+        updateLectureNumbers(moduleDiv);  
       });
     });
 
-    // Видалення модуля
+    
     deleteModuleBtn.addEventListener("click", () => {
-      const moduleTitle = moduleDiv.querySelector(".title-2").innerText; // Отримуємо правильний номер модуля
+      const moduleTitle = moduleDiv.querySelector(".title-2").innerText;  
       if (confirm(`Are you sure you want to delete ${moduleTitle}?`)) {
         moduleDiv.remove();
-        updateModuleNumbers(); // Оновлюємо нумерацію модулів після видалення
+        updateModuleNumbers(); 
       }
-    });
-
-    // Оновлюємо нумерацію модулів після додавання
+    }); 
     updateModuleNumbers();
   });
 
-  // Оновлюємо номери лекцій в модулі
+  
   function updateLectureNumbers(moduleDiv) {
     const lecturesDiv = moduleDiv.querySelector(".lectures");
     lecturesDiv.querySelectorAll(".lecture").forEach((lectureDiv, index) => {
       const lectureTitle = lectureDiv.querySelector(".title-3");
-      lectureTitle.innerText = `Lecture ${index + 1}`; // Оновлюємо номер лекції
+      lectureTitle.innerText = `Lecture ${index + 1}`; 
     });
   }
 
-  // Оновлюємо номери всіх модулів
+  
   function updateModuleNumbers() {
     document.querySelectorAll(".module").forEach((moduleDiv, index) => {
       const moduleTitle = moduleDiv.querySelector(".title-2");
-      moduleTitle.innerText = `Module ${index + 1}`; // Оновлюємо номер модуля
+      moduleTitle.innerText = `Module ${index + 1}`; 
     });
   }
 });
 
-document
-.getElementById("create-course")
-.addEventListener("submit", function (event) {
-  event.preventDefault();
+document.addEventListener('DOMContentLoaded', () => {
+  const categoryWrapper = document.querySelector('.custom-select-wrapper#category-wrapper');
+  const educationWrapper = document.querySelector('.custom-select-wrapper#education-wrapper');
 
-  const courseTitle = document.getElementById("course-title").value;
-  const courseDescription =
-    document.getElementById("course-description").value;
+  
+  const categoryTrigger = categoryWrapper.querySelector('.select-trigger');
+  const categoryOptions = categoryWrapper.querySelector('.options');
+  const categorySpan = categoryTrigger.querySelector('span');
 
-  const modules = [];
-  document.querySelectorAll(".module").forEach((moduleDiv) => {
-    const module = {
-      title: moduleDiv.querySelector(".title-2").innerText,
-      lectures: [],
-    };
-    moduleDiv.querySelectorAll(".lecture").forEach((lectureDiv) => {
-      const lectureTitle = lectureDiv.querySelector("input").value;
-      const materials = lectureDiv.querySelector(".lecture-materials").files;
-      module.lectures.push({
-        title: lectureTitle,
-        materials: Array.from(materials).map((file) => file.name),
-      });
-    });
-    modules.push(module);
+  
+  const educationTrigger = educationWrapper.querySelector('.select-trigger');
+  const educationOptions = educationWrapper.querySelector('.options');
+  const educationSpan = educationTrigger.querySelector('span');
+
+  
+  categoryTrigger.addEventListener('click', (event) => {
+    event.preventDefault(); 
+    categoryWrapper.classList.toggle('open');
+    educationWrapper.classList.remove('open'); 
   });
 
-  const courseData = {
-    title: courseTitle,
-    description: courseDescription,
-    modules: modules,
-  };
+  
+  educationTrigger.addEventListener('click', (event) => {
+    event.preventDefault(); 
+    educationWrapper.classList.toggle('open');
+    categoryWrapper.classList.remove('open'); 
+  });
 
-  console.log(courseData);
-  alert("Course created successfully!");
-  this.reset();
-  modulesList.innerHTML = "";
+  
+  categoryOptions.querySelectorAll('.option').forEach(option => {
+    option.addEventListener('click', (event) => {
+      event.preventDefault(); 
+      categorySpan.textContent = option.textContent;
+      categoryTrigger.dataset.value = option.dataset.value; 
+      categoryWrapper.classList.remove('open'); 
+    });
+  });
+
+  
+  educationOptions.querySelectorAll('.option').forEach(option => {
+    option.addEventListener('click', (event) => {
+      event.preventDefault(); 
+      educationSpan.textContent = option.textContent;
+      educationTrigger.dataset.value = option.dataset.value; 
+      educationWrapper.classList.remove('open'); 
+    });
+  });
+
+  
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('.custom-select-wrapper')) {
+      categoryWrapper.classList.remove('open');
+      educationWrapper.classList.remove('open');
+    }
+  });
+
+  
+  document.getElementById("create-course").addEventListener("submit", function (event) {
+    event.preventDefault(); 
+
+    const categorySelected = categoryTrigger.dataset.value;
+    const educationSelected = educationTrigger.dataset.value;
+    const categoryError = document.querySelector(".category-error");
+    const educationError = document.querySelector(".education-error");
+
+    let isValid = true;
+
+    
+    if (!categorySelected || categorySelected === "Select a category") {
+      if (categoryError) {
+        categoryError.style.display = "block";  
+      }
+      isValid = false;
+    } else {
+      if (categoryError) {
+        categoryError.style.display = "none"; 
+      }
+    }
+
+    
+    if (!educationSelected || educationSelected === "Select an education level") {
+      if (educationError) {
+        educationError.style.display = "block";  
+      }
+      isValid = false;
+    } else {
+      if (educationError) {
+        educationError.style.display = "none"; 
+      }
+    }
+
+    if (!isValid) {
+      return;
+    }
+
+    const courseTitle = document.getElementById("course-title").value;
+    const courseDescription = document.getElementById("course-description").value;
+
+    const modules = [];
+    document.querySelectorAll(".module").forEach((moduleDiv) => {
+      const module = {
+        title: moduleDiv.querySelector(".title-2").innerText,
+        lectures: [],
+      };
+      moduleDiv.querySelectorAll(".lecture").forEach((lectureDiv) => {
+        const lectureTitle = lectureDiv.querySelector("input").value;
+        const materials = lectureDiv.querySelector(".lecture-materials").files;
+        module.lectures.push({
+          title: lectureTitle,
+          materials: Array.from(materials).map((file) => file.name),
+        });
+      });
+      modules.push(module);
+    });
+
+    const courseData = {
+      title: courseTitle,
+      description: courseDescription,
+      category: categorySelected, 
+      educationLevel: educationSelected,
+      modules: modules,
+    };
+
+    console.log(courseData);
+    alert("Course created successfully!");
+    this.reset(); 
+    document.getElementById("modules-list").innerHTML = ""; 
+  
+  });
 });
