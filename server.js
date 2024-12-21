@@ -8,6 +8,8 @@ const authRoutes = require('./auth');
 require('dotenv').config({ path: './secret.env' });
 const passport = require('passport');
 const session = require('express-session');
+const stripeRoutes = require("./pay-page/stripe");
+
 
 app.use(cors());
 app.use(express.json());
@@ -86,6 +88,10 @@ app.get('/reset-password', (req, res) => {
 });
 app.get('/profile', (req, res) => {
     res.sendFile(path.join(__dirname, 'profile-page/student-profile.html'));//---------
+});
+app.use("/pay-page", stripeRoutes);
+app.get('/get-stripe-key', (req, res) => {
+    res.json({ publicKey: process.env.STRIPE_PUBLIC_KEY });
 });
 
 
