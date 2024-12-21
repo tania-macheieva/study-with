@@ -12,7 +12,7 @@
 <body>
   <main class="confirmation-page">
     <div class="illustration">
-      <img src="/images/2989096.jpg" alt="Envelope illustration">
+      <img src="/confirm_email_pages/images/2989096.jpg" alt="Envelope illustration">
     </div>
     <div class="confirmation-form">
       <h2>Please enter the 6-digit code from the email.</h2>
@@ -27,11 +27,12 @@
       </div>
       <button class="confirm-button">Confirm</button>
     </form>
+      <p id="errorMessage" style="color: red; display: none;">The verification code is incorrect. Please try again.</p>
       <a class="resend-link">Resend email in <span id="timer">60</span> seconds</a>
     </div>
   </main>
   <script src="/footer/footer.js"></script>
-  <script src="../auth-header.js"></script>
+  <script src="/header/header-noauth.js"></script>
 <script src="/confirm_email_pages/confirm-email.js"></script>
 </body>
 </html>

@@ -61,7 +61,7 @@ main {
 .custom-file-container {
   display: flex;
   align-items: center;
-  gap: 10px; /* Відстань між кнопкою і списком файлів */
+  gap: 10px;
 }
 
 .file-names-list {
@@ -109,7 +109,7 @@ main {
 }
 
 .create-course-form input[type="text"],
-.create-course-form textarea,
+.create-course-form #course-description,
 .create-course-form input[type="file"],
 .create-course-form input[type="number"] {
   width: 97%;
@@ -125,6 +125,7 @@ main {
 
 .create-course-form input[type="text"]:hover,
 .create-course-form textarea:hover,
+.create-course-form #course-description:hover,
 .create-course-form input[type="file"]:hover,
 .input-container:hover,
 .price-input input:hover,
@@ -136,7 +137,10 @@ main {
 }
 
 .create-course-form textarea {
-  resize: vertical;
+  resize: vertical; 
+  overflow: auto;
+  min-height: 26px;
+  height: 116px; 
 }
 
 textarea::-webkit-scrollbar { 
@@ -256,6 +260,14 @@ textarea::-webkit-scrollbar-thumb:hover {
   transform: rotate(137deg);
 }
 
+.category-error,
+.education-error {
+  color: red; 
+  display: none;
+  margin-left: 5px;
+  margin-top: 3px;
+}
+
 .options {
   list-style: none;
   padding: 0;
@@ -373,6 +385,18 @@ margin-bottom: 10px;
 
 }
   
+.lecture textarea {
+  width: 97%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #DCECFC;
+  box-shadow: 0 0px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  font-size: 16px;
+  font-family: 'Jost', sans-serif;
+  transition: all 0.3s ease;
+}
+
 .add-module-btn, 
 .delete-module-btn {
   background-color: #545F7A;
@@ -419,7 +443,6 @@ margin-bottom: 10px;
   font-weight: normal;
   transition: color 0.3s ease;
   margin-right: 0px;
-  
 }
 .file-names-list .delete-file-btn {
   color: red;

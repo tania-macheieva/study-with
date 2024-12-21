@@ -1,153 +1,285 @@
 body {
-    background: linear-gradient(270deg, #fff 0%, #f5faff 58.57%);
-    width: 100%;
-    margin: 0;
+  background: linear-gradient(270deg, #fff 0%, #f5faff 58.57%);
+  width: 100%;
+  margin: 0;
+  font-size: 16px;
+  flex-direction: row; 
+}
+
+.h1-courses, .h2-find {
+  font-family: 'Jost', Medium;
+  color: #000;
 }
 
 .h1-courses {
-    font-family: 'Jost', Medium;
-    font-weight: 500;
-    font-size: 80px;
-    color: #000;
-    margin-left: 64px;
+  font-size: 5rem; 
+  margin-left: 4rem; 
 }
 
 .h2-find {
-    margin-top: 48px;
-    font-weight: 300;
-    font-size: 34px;
-    color: #000;
-    margin-left: 64px;
+  font-weight: 300;
+  font-size: 2.125rem; 
+  margin-left: 4rem;
+  margin-top: 3rem; 
 }
 
 .search-container {
-    margin-top: 24px;
-    position: relative;
-    width: 75%; 
-    margin-left: 64px;
+  margin-top: 1.5rem;
+  position: relative;
+  width: 75%;
+  margin-left: 4rem;
 }
 
 .Search {
-    border-radius: 24px;
-    width: 100%;
-    height: 75px;
-    background: #e3e8ed;
-    border: none;
-    color: #000000;
-    padding-right: 160px; 
-    box-sizing: border-box; 
-    font-size: 24px;
-    font-family: 'Jost', Regular;
-    font-weight: 200;
-    padding-left: 20px;
+  border-radius: 24px;
+  width: 100%;
+  height: 75px;
+  background: #e3e8ed;
+  border: none;
+  color: #000;
+  padding-right: 160px;
+  box-sizing: border-box;
+  font-size: 1.5rem;
+  font-family: 'Jost', Regular;
+  font-weight: 200;
+  padding-left: 20px;
 }
 
 .search-btnn {
-    border-radius: 0 24px 24px 0;
-    width: 157px;
-    height: 100%; 
-    background: #DCECFC;
-    color: #000000;
-    font-weight: 200;
-    font-size: 18px;
-    position: absolute;
-    top: 0;
-    right: 0;
-    border: none;
-    cursor: pointer;
+  border-radius: 0 24px 24px 0;
+  width: 157px;
+  height: 100%;
+  background: #DCECFC;
+  color: #000;
+  font-weight: 200;
+  font-size: 1.125rem; /* 18px */
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: none;
+  cursor: pointer;
 }
 
 .filters {
-    position: sticky;
-    margin-top: 64px;
-    margin-left: 64px;
-    border-radius: 24px;
-    width: 400px;
-    height: 900px;
-    background: #DCECFC;
-    margin-bottom: 32px;
+  padding-bottom: 18px;
+  position: relative;
+  width: 400px;
+  height: auto; /* Автоматична висота */
+  background: rgba(220, 236, 252, 0.8);
+  border-radius: 24px;
+  margin-left: 2rem; /* Відступ від правого краю фільтрів */
+
 }
 
 h4.filters-clear {
-    font-weight: 200;
-    font-size: 24px;
-    text-decoration: underline;
-    text-decoration-skip-ink: none;
-    color: #000;
-    margin-left: 32px;
-    cursor: pointer;
-    margin-top: 32px;
-    padding-top: 22px;
+  font-weight: 200;
+  font-size: 1.5rem; /* 24px */
+  text-decoration: underline;
+  text-decoration-skip-ink: none;
+  color: #000;
+  margin-left: 2rem; /* 32px */
+  cursor: pointer;
+  margin-top: 2rem;
+  padding-top: 22px;
+}
+
+h4.filters-apply {
+  font-weight: 200;
+  font-size: 1.5rem; /* 24px */
+  text-decoration: underline;
+  text-decoration-skip-ink: none;
+  color: #000;
+  margin-left: 2rem; /* 32px */
+  cursor: pointer;
+  margin-top: 2rem;
+  padding-top: 22px;
 }
 
 .filters-themes {
-    font-weight: 400;
-    font-size: 24px;
-    color: #000;
-    margin-left: 32px;
+  font-weight: 400;
+  font-size: 1.5rem; /* 24px */
+  color: #000;
+  margin-left: 2rem; /* 32px */
 }
 
 .checkbox {
-    display: flex; 
-    font-weight: 300;
-    font-size: 20px;
-    color: #000;
-    margin-right: 20px; 
-    margin-bottom: 10px; 
-    margin-left: 32px;
+  display: flex;
+  font-weight: 300;
+  font-size: 1.25rem; /* 20px */
+  color: #000;
+  margin-right: 1.25rem; /* 20px */
+  margin-bottom: 0.625rem; /* 10px */
+  margin-left: 2rem; /* 32px */
 }
 
 .checkbox input {
-    margin-right: 6px; 
-    margin-bottom: 2px;
+  margin-right: 0.375rem; /* 6px */
+  margin-bottom: 0.125rem; /* 2px */
 }
 
 .filter-cleared-message {
-    background-color: #28a745;
-    color: #fff;
-    padding: 10px;
-    position: fixed;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-radius: 5px;
-    font-size: 18px;
+  background-color: #28a745;
+  color: #fff;
+  padding: 10px;
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 5px;
+  font-size: 1.125rem; /* 18px */
 }
 
 .container-text {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-right: 4rem; /* 64px */
+  position: relative;
+  margin-bottom: 12px;
 }
 
 .right-container {
-    width: 80%; 
-    box-sizing: border-box;
-}
+    margin-left: 20px;
+    align-items: flex-start; /* Гарантуємо вирівнювання по верху */
+    position: relative; /* Відносна позиція для потомків */
+    margin-bottom: 32px;
+    flex-grow: 1; /* Контейнер займає весь доступний простір */
+    margin-top: 2rem; /* Відступ зверху */
+  }
 
-.Result {
-    font-weight: 500; 
-    font-size: 22px; 
-    color: #000; 
-    margin-bottom: 750px;
-    margin-left: 48px;
-}
-
-.Sort {
-    font-weight: 500; 
-    font-size: 22px; 
-    color: #000; 
-    margin-right: 64px; 
-    margin-top: 18.7px;
+.Result, .Sort {
+  font-weight: 500;
+  font-size: 1.375rem; 
+  color: #000;
+  display: flex;
+  flex-direction: column;
 }
 
 .dropdown {
-    font-size: 16px;
-    padding: 5px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    background-color: #fff;
-    cursor: pointer;
-    font-family: 'Jost', sans-serif;
+  font-size: 1rem; 
+  padding: 5px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+  font-family: 'Jost', sans-serif;
+}
+
+.courses {
+  position: relative;
+  display: flex;
+  gap: 40px;
+  justify-content: flex-start; 
+  align-items: flex-start; 
+  flex-wrap: wrap; 
+}
+
+.course_group {
+  width: 240px;
+  height: auto; 
+  position: relative; 
+  margin: 0; 
+}
+
+.course_group:hover {
+  cursor: pointer;
+}
+
+.rectangle-1 {
+  width: 240px;
+  height: 360px;
+  position: relative;
+  left: 0px;
+  top: 38px;
+  overflow: visible;
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+}
+
+.rectangle-2 {
+  background: #d9d9d9;
+  border-radius: 12px;
+  width: 208px;
+  height: 124px;
+  position: absolute;
+  left: 15px;
+  top: 142px;
+}
+
+.course_name {
+  color: #283044;
+  text-align: left;
+  font-family: "Jost", Regular;
+  font-weight: 400;
+  font-size: 1.25rem; 
+  position: absolute;
+  top: 0px;
+  width: 208px;
+  height: 21px;
+}
+
+.description {
+  color: #283044;
+  text-align: left;
+  font-family: "Jost", SemiBold;
+  font-size: 1rem; 
+  font-weight: 300;
+  position: absolute;
+  left: 15px;
+  top: 45px;
+  width: 208px;
+  height: 69px;
+}
+
+.group-27 {
+  width: 59.17px;
+  height: 22px;
+  position: static;
+}
+
+.price {
+  color: #000000;
+  text-align: left;
+  font-family: "Jost", SemiBold;
+  font-size: 1.25rem; 
+  font-weight: 600;
+  position: absolute;
+  left: 15px;
+  top: 294px;
+  width: 47px;
+  height: 22px;
+  margin-left: 0.25rem; 
+}
+
+.arrow {
+  width: 12.17px;
+  height: 0px;
+  position: absolute;
+  left: 62px;
+  top: 310px;
+  overflow: visible;
+}
+
+.more-btn {
+  background-color: #283044;
+  color: #fff;
+  border-radius: 30px;
+  width: 220px;
+  height: 60px;
+  font-weight: 600;
+  font-size: 20px;
+  font-family: "Jost", sans-serif;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease-in-out;
+  position: relative; 
+  left: 60%; 
+  transform: translate(-50%, -50%); 
+  margin-bottom: 32px;
+  margin-top: 32px;
+}
+
+.more-btn:hover {
+  background-color: #3c4a63; 
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); 
 }

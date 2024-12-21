@@ -17,16 +17,15 @@
 <body>
   <main>
     <div class="create-course-form"> 
-      <form id="create-course"> 
-          <label class="title-1" for="course-title">Course Title</label>
+      <form id="create-course">  
+          <label class="title-1">Course Title</label>
           <input type="text" id="course-title" placeholder="Enter course title" required>
         
-          <label class="title-1" for="course-title">Course Title</label>
-          <input type="text" id="course-title" placeholder="Enter course title" required>
-        
-          <label class="title-1" for="course-description">Description</label>
+          <label class="title-1">Description</label>
           <textarea id="course-description" placeholder="Enter course description" rows="5" required></textarea>
-          <label class="title-1" for="course-thumbnail">Thumbnail</label>
+          
+          <label class="title-1">Thumbnail</label>
+          
           <div class="input-container">
             <label class="custom-file-upload">
               Choose File
@@ -35,14 +34,14 @@
             <span id="file-name" class="file-name">No file chosen</span>
           </div> 
           
-          <label class="title-1" for="course-price">Price (USD)</label>
+          <label class="title-1">Price (USD)</label>
           <div class="price-input">
               <input type="number" id="course-price" placeholder="Enter price" min="0" required>
               <span class="currency-symbol">$</span>
           </div>
           <!-- Category Dropdown -->
-          <label class="title-1" for="course-category">Category</label>
-          <div class="custom-select-wrapper">
+          <label class="title-1">Category</label>
+          <div class="custom-select-wrapper" data-required="true" id="category-wrapper" id="category-wrapper">
             <div class="custom-select">
               <div class="select-trigger">
                 <span>Select a category</span>
@@ -66,9 +65,12 @@
               </ul>
             </div>
           </div>
+          <div class="category-error">Category is required.</div>
+
           <br>
-          <label class="title-1" for="course-category">Education level</label>
-          <div class="custom-select-wrapper">
+
+          <label class="title-1"  >Education level</label>
+          <div class="custom-select-wrapper" data-required="true" id="education-wrapper">
             <div class="custom-select">
               <div class="select-trigger">
                 <span>Select an education level</span>
@@ -78,12 +80,12 @@
                 <li class="option" data-value="no-level">No level</li>
                 <li class="option" data-value="basic-level">Basic level</li>
                 <li class="option" data-value="intermediate-level">Intermediate level</li>
-                <li class="option" data-value="advanced-level">Advanced level</li> 
+                <li class="option" data-value="advanced-level">Advanced level</li>
               </ul>
             </div>
           </div>
-          
-  
+          <div class="education-error">Education level is required.</div>
+
           <!-- Modules Section First -->
           <div class="modules-container">
               <p class="title-1">Modules</p>
