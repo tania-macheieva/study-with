@@ -20,7 +20,7 @@ body {
   font-weight: 300;
   font-size: 2.125rem; 
   margin-left: 4rem;
-  margin-top: 3rem; 
+  margin-top: 2rem; 
 }
 
 .search-container {
@@ -43,11 +43,13 @@ body {
   font-family: 'Jost', Regular;
   font-weight: 200;
   padding-left: 20px;
+  box-sizing: border-box;
 }
 
 .search-btnn {
   border-radius: 0 24px 24px 0;
   width: 157px;
+  padding: 0 16px;
   height: 100%;
   background: #DCECFC;
   color: #000;
@@ -67,7 +69,7 @@ body {
   height: auto; /* Автоматична висота */
   background: rgba(220, 236, 252, 0.8);
   border-radius: 24px;
-  margin-left: 2rem; /* Відступ від правого краю фільтрів */
+  margin-left: 80px; /* Відступ від правого краю фільтрів */
 
 }
 
@@ -131,34 +133,58 @@ h4.filters-apply {
 
 .container-text {
   display: flex;
-  justify-content: space-between;
+  margin-top: 60px;
   align-items: center;
   margin-right: 4rem; /* 64px */
   position: relative;
   margin-bottom: 12px;
+  gap:440px;
+}
+.container {
+  display: flex; /* Розташування елементів у рядок */
+  flex-direction: row; /* Елементи будуть в один рядок */
+  justify-content: flex-start;  /* Простір між елементами */
+  align-items: flex-start; /* Вирівнювання по верхньому краю */
+  width: 100%; /* Контейнер займає всю ширину */
+  margin: 0 auto; /* Центруємо контейнер */
+  gap: 300px; /* Проміжок між колонками */
+  padding: 0 16px; /* Відступи з боків */
+  box-sizing: border-box; /* Урахування padding у ширину */
 }
 
+.left-container {
+  position: sticky;
+  align-self: flex-start; /* Не дає контейнеру змінювати своє положення */
+  margin-top: 60px;
+  width: 30%; /* Ліва колонка займає 30% ширини */
+  min-width: 300px; /* Мінімальна ширина, щоб виглядало коректно */
+}і
 .right-container {
-    margin-left: 20px;
-    align-items: flex-start; /* Гарантуємо вирівнювання по верху */
-    position: relative; /* Відносна позиція для потомків */
-    margin-bottom: 32px;
-    flex-grow: 1; /* Контейнер займає весь доступний простір */
-    margin-top: 2rem; /* Відступ зверху */
+  position: fixed;
+  margin-top: 60px;
+  margin-left: 20px;
+  align-items: flex-start; /* Гарантуємо вирівнювання по верху */
+  position: relative; /* Відносна позиція для потомків */
+  margin-bottom: 32px;
+  min-width: 800px; /* Мінімальна ширина */
+  width: 70%;
+    
   }
 
+
 .Result, .Sort {
-  font-weight: 500;
-  font-size: 1.375rem; 
+  font-weight: 700;
+  font-size: 36px; 
   color: #000;
   display: flex;
-  flex-direction: column;
+  flex-direction: block;
+  gap:20px;
 }
 
 .dropdown {
   font-size: 1rem; 
   padding: 5px;
-  border-radius: 4px;
+  border-radius: 8px;
   border: 1px solid #ccc;
   background-color: #fff;
   cursor: pointer;
@@ -251,11 +277,11 @@ h4.filters-apply {
 }
 
 .arrow {
-  width: 12.17px;
-  height: 0px;
+  width: 16px;
+  height: 16px;
   position: absolute;
-  left: 62px;
-  top: 310px;
+  left: 70px;
+  top: 301px;
   overflow: visible;
 }
 
@@ -274,12 +300,29 @@ h4.filters-apply {
   transition: all 0.3s ease-in-out;
   position: relative; 
   left: 60%; 
-  transform: translate(-50%, -50%); 
+  transform: translate(-12%, -50%); 
   margin-bottom: 32px;
-  margin-top: 32px;
+  margin-top: 60px;
 }
 
 .more-btn:hover {
   background-color: #3c4a63; 
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); 
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column; /* Елементи в колонку */
+    gap: 16px; /* Зменшуємо відстань між елементами */
+  }
+
+  .left-container, .right-container {
+    width: 100%; /* Контейнери займають всю ширину */
+    min-width: auto; /* Прибираємо обмеження */
+  }
+
+  .search-container {
+    width: 100%; /* Пошук теж адаптується */
+    margin-left: 0; /* Скидаємо відступи */
+  }
 }
