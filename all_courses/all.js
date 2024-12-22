@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function() {
           <div class="description">${course.description}</div>
           <div class="group-27">
             <div class="price">$${course.price}</div>
-            <img class="arrow" src="/home/right-arrow.png" alt="Arrow Icon" />
+            <img class="arrow" src="/images/right-arrow.png" alt="Arrow Icon" />
           </div>
         </div>
       `;
