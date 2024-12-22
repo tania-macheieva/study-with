@@ -9,7 +9,7 @@ require('dotenv').config({ path: './secret.env' });
 const passport = require('passport');
 const session = require('express-session');
 const stripeRoutes = require("./pay-page/stripe");
-
+const coursesRouter = require('./courses'); 
 
 app.use(cors());
 app.use(express.json());
@@ -92,6 +92,7 @@ app.get('/profile-student', (req, res) => {
 app.get('/profile-teacher', (req, res) => {
     res.sendFile(path.join(__dirname, 'profile-page/teacher-profile.html')); 
 });
+app.use('/api/courses', coursesRouter);
 app.get('/course-creation', (req, res) => {
     res.sendFile(path.join(__dirname, 'course-creation/course-creation.html')); 
 });
