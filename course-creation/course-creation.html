@@ -25,7 +25,6 @@
           <textarea id="course-description" placeholder="Enter course description" rows="5" required></textarea>
           
           <label class="title-1">Thumbnail</label>
-          
           <div class="input-container">
             <label class="custom-file-upload">
               Choose File
@@ -39,9 +38,10 @@
               <input type="number" id="course-price" placeholder="Enter price" min="0" required>
               <span class="currency-symbol">$</span>
           </div>
+          
           <!-- Category Dropdown -->
           <label class="title-1">Category</label>
-          <div class="custom-select-wrapper" data-required="true" id="category-wrapper" id="category-wrapper">
+          <div class="custom-select-wrapper" id="category-wrapper">
             <div class="custom-select">
               <div class="select-trigger">
                 <span>Select a category</span>
@@ -69,8 +69,8 @@
 
           <br>
 
-          <label class="title-1"  >Education level</label>
-          <div class="custom-select-wrapper" data-required="true" id="education-wrapper">
+          <label class="title-1">Education level</label>
+          <div class="custom-select-wrapper" id="education-wrapper">
             <div class="custom-select">
               <div class="select-trigger">
                 <span>Select an education level</span>
@@ -86,7 +86,7 @@
           </div>
           <div class="education-error">Education level is required.</div>
 
-          <!-- Modules Section First -->
+          <!-- Modules Section -->
           <div class="modules-container">
               <p class="title-1">Modules</p>
               <div id="modules-list">
@@ -95,10 +95,9 @@
               <button class="add-module-btn" type="button" id="add-module-btn">Add Module</button>
           </div>
           <div class="btns">
-            <button type="сreate" class="btn-сreate">Create Course</button>
-            <button type="save" class="btn-draft">Save as draft</button>
+            <button  id="create-course-btn" type="submit" class="btn-сreate">Create Course</button>
+            <button type="button" class="btn-draft">Save as draft</button>
           </div>
-          
       </form>
   </div>
 </main>
