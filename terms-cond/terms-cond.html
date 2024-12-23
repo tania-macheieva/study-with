@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudyWith</title>
+    <title data-lang="title">StudyWith | Умови та положення</title>
     <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="lang.js"></script>
     <style>
         * {
             margin: 0;
@@ -22,7 +23,6 @@
             flex-direction: column;
         }
 
-        /* Стилі для контенту */
         main.content-area {
             flex: 1;
             width: 100%;
@@ -32,22 +32,22 @@
             background: white;
         }
 
-        /* Заголовки */
-        h2 {
+        h2, h3 {
             color: #283044;
+        }
+
+        h2 {
             font-size: 32px;
             margin-bottom: 24px;
             font-weight: 600;
         }
 
         h3 {
-            color: #283044;
             font-size: 24px;
             margin: 32px 0 16px;
             font-weight: 500;
         }
 
-        /* Параграфи та списки */
         p, li {
             color: #4a4a4a;
             line-height: 1.6;
@@ -64,14 +64,12 @@
             margin-bottom: 12px;
         }
 
-        /* Контактна інформація */
         .contact-section {
             margin-top: 48px;
             padding-top: 24px;
             border-top: 1px solid #e1e4e8;
         }
 
-        /* Посилання */
         a {
             color: #2563eb;
             text-decoration: none;
@@ -83,7 +81,6 @@
             text-decoration: underline;
         }
 
-        /* Адаптивність */
         @media (max-width: 768px) {
             main.content-area {
                 padding: 24px 16px;
@@ -100,70 +97,70 @@
     </style>
 </head>
 <body>
-    <script src="../auth-header.js"></script>
+    <script src="/header/header-noauth.js"></script>
     
     <main class="content-area">
-        <h2>Terms and Conditions</h2>
-        <p>Welcome to StudyWith! By accessing or using our platform, you agree to the following terms and conditions. Please read them carefully.</p>
+        <h2 data-lang="termsTitle">Умови та положення</h2>
+        <p data-lang="welcomeMsg">Ласкаво просимо до StudyWith! Використовуючи нашу платформу, ви погоджуєтесь з наступними умовами та положеннями. Будь ласка, уважно прочитайте їх.</p>
 
-        <h3>1. Acceptance of Terms</h3>
-        <p>By registering or using our website, you agree to comply with these Terms and Conditions. If you do not agree, please do not use the platform.</p>
+        <h3 data-lang="sectionAcceptance">1. Прийняття умов</h3>
+        <p data-lang="acceptanceMsg">Реєструючись або користуючись нашим вебсайтом, ви погоджуєтесь з цими Умовами та Положеннями. Якщо ви не згодні, будь ласка, не використовуйте платформу.</p>
 
-        <h3>2. Eligibility</h3>
-        <p>You must be at least 18 years old or have parental/guardian consent to use our services.</p>
+        <h3 data-lang="sectionEligibility">2. Право на використання</h3>
+        <p data-lang="eligibilityMsg">Ви повинні бути не молодші 18 років або мати згоду батьків/опікунів для використання наших послуг.</p>
 
-        <h3>3. User Accounts</h3>
+        <h3 data-lang="sectionAccounts">3. Облікові записи користувачів</h3>
         <ul>
-            <li>You are responsible for maintaining the confidentiality of your account credentials.</li>
-            <li>You agree to provide accurate and up-to-date information during registration.</li>
+            <li data-lang="accountsPoint1">Ви несете відповідальність за збереження конфіденційності своїх облікових даних.</li>
+            <li data-lang="accountsPoint2">Ви погоджуєтесь надавати точну та актуальну інформацію під час реєстрації.</li>
         </ul>
 
-        <h3>4. Course Content</h3>
+        <h3 data-lang="sectionContent">4. Контент курсу</h3>
         <ul>
-            <li>The content on this platform is for educational purposes only.</li>
-            <li>We do not guarantee that completing a course will result in specific career opportunities.</li>
-            <li>Instructors retain ownership of their content, but grant us a license to display it on our platform.</li>
+            <li data-lang="contentPoint1">Контент на платформі є лише для освітніх цілей.</li>
+            <li data-lang="contentPoint2">Ми не гарантуємо, що завершення курсу призведе до конкретних кар'єрних можливостей.</li>
+            <li data-lang="contentPoint3">Інструктори зберігають авторські права на свої матеріали, але надають нам ліцензію на їх публікацію на нашій платформі.</li>
         </ul>
 
-        <h3>5. Payments & Refunds</h3>
+        <h3 data-lang="sectionPayments">5. Платежі та повернення</h3>
         <ul>
-            <li>Payments for courses are non-refundable unless stated otherwise in our refund policy.</li>
-            <li>Subscription fees (if applicable) will be charged automatically unless canceled prior to renewal.</li>
+            <li data-lang="paymentsPoint1">Платежі за курси не підлягають поверненню, якщо не зазначено інше в нашій політиці повернення коштів.</li>
+            <li data-lang="paymentsPoint2">Плата за підписку (якщо застосовується) буде автоматично списана, якщо не скасувати її до поновлення.</li>
         </ul>
 
-        <h3>6. Intellectual Property</h3>
+        <h3 data-lang="sectionIp">6. Інтелектуальна власність</h3>
         <ul>
-            <li>All materials on this platform, including but not limited to text, images, and videos, are protected by copyright laws.</li>
-            <li>You may not reproduce, distribute, or share course content without explicit permission.</li>
+            <li data-lang="ipPoint1">Всі матеріали на платформі, включаючи тексти, зображення та відео, захищені авторським правом.</li>
+            <li data-lang="ipPoint2">Ви не маєте права відтворювати, розповсюджувати чи ділитися контентом без явного дозволу.</li>
         </ul>
 
-        <h3>7. User Conduct</h3>
+        <h3 data-lang="sectionConduct">7. Поведінка користувачів</h3>
         <ul>
-            <li>You agree not to use the platform for any illegal or unauthorized purposes.</li>
-            <li>Harassment, hate speech, or inappropriate behavior towards instructors, staff, or other users will result in account termination.</li>
+            <li data-lang="conductPoint1">Ви погоджуєтесь не використовувати платформу для незаконних або несанкціонованих цілей.</li>
+            <li data-lang="conductPoint2">Насильство, мова ненависті або неприпустима поведінка щодо інструкторів, співробітників чи інших користувачів призведе до припинення облікового запису.</li>
         </ul>
 
-        <h3>8. Third-Party Links</h3>
-        <p>Our platform may contain links to third-party websites. We are not responsible for the content or practices of these external sites.</p>
+        <h3 data-lang="sectionThirdParty">8. Посилання на сторонні сайти</h3>
+        <p data-lang="thirdPartyMsg">Наша платформа може містити посилання на сторонні вебсайти. Ми не несемо відповідальності за їхній контент або практики.</p>
 
-        <h3>9. Modifications</h3>
-        <p>We reserve the right to modify these Terms and Conditions at any time. Continued use of the platform after updates signifies your acceptance of the revised terms.</p>
+        <h3 data-lang="sectionModifications">9. Модифікації</h3>
+        <p data-lang="modificationsMsg">Ми залишаємо за собою право змінювати ці Умови та Положення в будь-який час. Продовження використання платформи після оновлення означає вашу згоду з оновленими умовами.</p>
 
-        <h3>10. Termination</h3>
-        <p>We reserve the right to suspend or terminate your account for violations of these Terms and Conditions.</p>
+        <h3 data-lang="sectionTermination">10. Припинення</h3>
+        <p data-lang="terminationMsg">Ми залишаємо за собою право призупинити або припинити ваш акаунт за порушення цих Умов та Положень.</p>
 
-        <h3>11. Disclaimer</h3>
-        <p>The platform and its content are provided "as is" without any warranties. We do not guarantee uninterrupted or error-free operation.</p>
+        <h3 data-lang="sectionDisclaimer">11. Відмова від відповідальності</h3>
+        <p data-lang="disclaimerMsg">Платформа та її контент надаються "як є" без жодних гарантій. Ми не гарантуємо безперервну або безпомилкову роботу.</p>
 
-        <h3>12. Governing Law</h3>
-        <p>These Terms and Conditions shall be governed by the laws of Ukraine.</p>
+        <h3 data-lang="sectionLaw">12. Законодавство</h3>
+        <p data-lang="lawMsg">Ці Умови та Положення регулюються законами України.</p>
 
         <div class="contact-section">
-            <p>For any questions or concerns, please contact us at <a href="mailto:studywith.connect@gmail.com">studywith.connect@gmail.com</a></p>
-            <p><strong>Last Updated:</strong> 03.12.2024</p>
+            <p data-lang="contactMsg">Якщо у вас є питання або зауваження, будь ласка, звертайтесь до нас на адресу <a href="mailto:studywith.connect@gmail.com">studywith.connect@gmail.com</a></p>
+            <p><strong data-lang="lastUpdated">Останнє оновлення:</strong> 03.12.2024</p>
         </div>
     </main>
 
-    <script src="/footer/footer.js"></script>
+    <script src="footer/footer.js"></script>
 </body>
 </html>
