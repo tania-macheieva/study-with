@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudyWith</title>
+    <title data-lang="pageTitle">StudyWith</title>
     <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=Montserrat:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <style>
         html, body {
@@ -93,7 +93,7 @@
         .btn {
         width: 400px;
         height: 120px;
-        display: inline-block;
+        display: flex;
         padding:  20px;
         background-color: #283044; 
         color: #EBF5EE; 
@@ -137,19 +137,20 @@
                 <img src="/images/10088.jpg" alt="Hero Image">
             </div>
             <div class="content-right">
-                <div class="welcome-text">
+                <div class="welcome-text" data-lang="welcomeText">
                     Welcome to StudyWith!<br>
                     Learn, connect, succeed together!
                 </div>
                 <div class="buttons">
-                    <a href="/reg-student" class="btn">Create an account as a student</a>
-                    <a href="/reg-teacher" class="btn">Create an account as a teacher</a>
+                    <a href="/reg-student" class="btn" data-lang="studentAccount">Create an account as a student</a>
+                    <a href="/reg-teacher" class="btn" data-lang="teacherAccount">Create an account as a teacher</a>
                     </button>
                 </div>
             </div>
         </div>
     </main>
     <script src="/footer/footer.js"></script>
-    <script src="../auth-header.js"></script>
+    <script src="/header/header-noauth.js"></script>
+    <script src="main-lang.js"></script>
 </body>
 </html>
