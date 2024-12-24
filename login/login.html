@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/login/login.css">
 </head>
 <body>
-    <script src="../auth-header.js"></script>
+    <script src="/header/header-noauth.js"></script>
 
     <div class="main-container">
         <div class="illustration">
@@ -15,14 +15,14 @@
         </div>
 
         <div class="login-container">
-            <h2>Log In</h2>
+            <h2 data-lang="LogIn">Log In</h2>
 
             <div class="login-form">
-                <input type="email" id="email" placeholder="Email" required>
-                <input type="password" id="password" placeholder="Password" required>
+                <input type="email" id="email" placeholder="Email" required data-lang="emailPlaceholder">
+                <input type="password" id="password" placeholder="Password" required data-lang="passwordPlaceholder">
                 <div id="error-message" style="color: red; margin-bottom: 10px;"></div>
-                <button type="button" onclick="handleLogin()">Sign In</button>
-                <a href="/forgot-password">Forgot password?</a>
+                <button type="button" onclick="handleLogin()" data-lang="signInButton">Sign In</button>
+                <a href="/forgot-password" data-lang="forgotPasswordLink">Forgot password?</a>
             </div>
 
             <a href="/auth/google">
@@ -32,5 +32,6 @@
     </div>
 
     <script src="/login/login.js"></script>
+    <script src="login-lang.js"></script>
 </body>
 </html>
