@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Selected Courses(empty page)</title>
+  <title data-lang="pageTitle"></title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
@@ -13,9 +13,9 @@
   <main>
     <section class="discription">
         <div class="text-container">
-          <h2>Your selected courses</h2>
-          <p>This is where you can view the courses you've marked as interesting, or start learning.</p>
-          <a href="#" class="btn">Go to courses</a>
+          <h2 data-lang="descriptionTitle">Your selected courses</h2>
+          <p data-lang="descriptionText">This is where you can view the courses you've marked as interesting, or start learning.</p>
+          <a href="#" class="btn" data-lang="GoTo">Go to courses</a>
         </div>
     <img src="/images/gradient-social-media-group-cover-illustration.png" alt="illustration">
   </section>
@@ -33,7 +33,8 @@
   });
 });
 </script>
+<script src="lang-em.js"></script>
 <script src="/footer/footer.js"></script>
-<script src="../auth-header.js"></script>
+<script src="/header/header-noauth.js"></script>
 </body>
 </html>
