@@ -12,27 +12,78 @@
 <body>
   <main class="confirmation-page">
     <div class="illustration">
-      <img src="/confirm_email_pages/images/2989096.jpg" alt="Envelope illustration">
+      <img src="/images/2989096.jpg" alt="Envelope illustration">
     </div>
     <div class="confirmation-form">
-      <h2>Please enter the 6-digit code from the email.</h2>
+      <h2 data-lang="digit">Please enter the 6-digit code from the email.</h2>
       <form id="verificationForm">
-      <div class="code-inputs">
-        <input class="inputs" type="text" maxlength="1">
-        <input class="inputs" type="text" maxlength="1">
-        <input class="inputs" type="text" maxlength="1">
-        <input class="inputs" type="text" maxlength="1">
-        <input class="inputs" type="text" maxlength="1">
-        <input class="inputs"  type="text" maxlength="1">
-      </div>
-      <button class="confirm-button">Confirm</button>
-    </form>
-      <p id="errorMessage" style="color: red; display: none;">The verification code is incorrect. Please try again.</p>
-      <a class="resend-link">Resend email in <span id="timer">60</span> seconds</a>
+        <div class="code-inputs">
+          <input class="inputs" type="text" maxlength="1">
+          <input class="inputs" type="text" maxlength="1">
+          <input class="inputs" type="text" maxlength="1">
+          <input class="inputs" type="text" maxlength="1">
+          <input class="inputs" type="text" maxlength="1">
+          <input class="inputs" type="text" maxlength="1">
+        </div>
+        <button class="confirm-button" data-lang="conf">Confirm</button>
+      </form>
+      <p id="errorMessage" style="color: red; display: none;" data-lang="incorrect">The verification code is incorrect. Please try again.</p>
+      <a class="resend-link" data-lang="resend">Resend email in <span id="timer">60</span> seconds</a>
     </div>
   </main>
   <script src="/footer/footer.js"></script>
   <script src="/header/header-noauth.js"></script>
-<script src="/confirm_email_pages/confirm-email.js"></script>
+  <script src="/confirm_email_pages/confirm-email.js"></script>
+
+  <script>
+    const translations = {
+      en: {
+        digit: 'Please enter the 6-digit code from the email.',
+        conf: 'Confirm',
+        incorrect: 'The verification code is incorrect. Please try again.',
+        resend: 'Resend email in <span id="timer">60</span> seconds'
+      },
+      ua: {
+        digit: 'Будь ласка, введіть 6-значний код з листа.',
+        conf: 'Продовжити',
+        incorrect: 'Код підтвердження невірний. Будь ласка, спробуйте ще раз.',
+        resend: 'Надіслати лист знову через <span id="timer">60</span> секунд'
+      }
+    };
+
+    function applyLanguage(lang) {
+      const langData = translations[lang] || translations.en;
+
+      document.title = langData.pageTitle;
+
+      document.querySelectorAll('[data-lang]').forEach(element => {
+        const langKey = element.getAttribute('data-lang');
+        if (langData[langKey]) {
+          if (element.tagName === 'BUTTON' || element.tagName === 'DIV' || element.tagName === 'SPAN') {
+            element.textContent = langData[langKey];
+          } else {
+            element.innerHTML = langData[langKey];
+          }
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const userLang = localStorage.getItem('language');
+      applyLanguage(userLang);
+
+      let countdown = 60; 
+      const timerElement = document.getElementById('timer');
+
+      const countdownInterval = setInterval(() => {
+        if (countdown > 0) {
+          countdown--;
+          timerElement.textContent = countdown;
+        } else {
+          clearInterval(countdownInterval);
+        }
+      }, 1000); 
+    });
+  </script>
 </body>
 </html>
