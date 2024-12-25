@@ -11,13 +11,13 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="course_group">
             <img class="rectangle-1" src="" alt="" />
             <div class="rectangle-2"></div>
-            <div class="course_name">Course name</div>
-            <div class="description">
-              Here should be the course description here should be the course description
+            <div class="course_name" data-lang="Name">Course name</div>
+            <div class="description" data-lang="desc">
+              Here should be the course description
             </div>
             <div class="group-27">
               <div class="price">$</div>
-              <img class="arrow" src="right-arrow.png" alt="Arrow Icon" />
+              <img class="arrow" src="right-arrow.png" alt="" />
             </div>
             <div class="rectangle-23"></div>
           </div>
@@ -35,10 +35,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const newComment = document.createElement('div');
       newComment.classList.add('Feedback_list');
       newComment.innerHTML = `
-        <img src="user-avatar.png" alt="user-photo" class="Feed_photo">
+        <img src="/images/user-avatar.png" alt="user-photo" class="Feed_photo">
         <div class="Feed_name_container">
-          <h2 class="Feed_name">New Name ${i + 1}</h2>
-          <h3 class="Feed_comm">New Comment ${i + 1}</h3>
+          <h2 class="Feed_name" data-lang="commname">New Name ${i + 1}</h2>
+          <h3 class="Feed_comm" data-lang="commtext">New Comment ${i + 1}</h3>
         </div>
       `;
       feedbackContainer.appendChild(newComment);

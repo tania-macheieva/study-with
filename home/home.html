@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Study With</title>
+    <title data-lang="pageTitle">StudyWith | Home Page</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -16,87 +16,169 @@
   <body>
     <div class="container">
       <div class="text">
-        <h1>Begin your study <br> here!</h1>
-        <h3>
+        <h1 data-lang="heading">Begin your study <br> here!</h1>
+        <h3 data-lang="description">
           Study in a convenient format, get certificates and build your <br>
           career of dream. <br>
           Are you an expert in your industry? Join as a tutor and share <br>
           your knowledge with thousands of students!
         </h3>
         <a href="/login">
-        <button class="home_button">Start now</button>
-      </a>
+          <button class="home_button" data-lang="startButton">Start now</button>
+        </a>
       </div>
       <img src="/images/rb_1258.png" alt="Icon" class="img_home" />
     </div>
     <div class="popular">
-      <h1 class="popular_text">Popular courses</h1>
-      <div class="courses">
-      </div>   
+      <h1 class="popular_text" data-lang="popularText">Popular courses</h1>
+      <div class="courses"></div>
     </div>
-  <div class="Categories">
-  <h1 class="Categories_text">Сategories of courses</h1>
-  <div class="Category">
-    <div class="category_box">Programming</div>
-    <div class="category_box">Design</div>
-    <div class="category_box">Marketing</div>
-    <div class="category_box">Bussines</div>
-    <div class="category_box">Languages</div>
-    <div class="category_box">Finance</div>
-    <div class="category_box">Personal Development</div>
-    <div class="category_box">Art</div>
-    <div class="category_box">Photography</div>
-    <div class="category_box">Psychology</div>
-    <div class="category_box">Health</div>
-    <div class="category_box">Cooking</div>
-    <div class="category_box">Science</div>
-    <div class="category_box">Game Development</div>
-    <div class="category_box">Childcare</div>
-  </div>
-  </div>
-
-  <h1 class="Fedback_text">Feedback</h1>
-<div class="Feedback">
-  <div class="Feedback_inner">
-    <div class="Feedback_list">
-      <img src="/images/user-avatar.png" alt="user-photo" class="Feed_photo">
-      <div class="Feed_name_container">
-        <h2 class="Feed_name">Name </h2>
-        <h3 class="Feed_comm">Comment </h3>
-  </div>
-</div>
-</div>
-</div>
-<div class="Footer">
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="logo">
-                <img src="/images/ebook_12743761.png" alt="logo">
-                <span>StudyWith</span>
-            </div>
-            <div class="footer-links">
-                <div class="footer-links-a">
-                  <a href="/about">About</a>
-                  <a href="/contact">Contact</a>
-                  <a href="/faq">FAQ</a>
-                </div>
-                <div class="footer-copyright">
-                    <span>&#169; 2024 All Rights Reserved StudyWith</span>
-                </div>
-            </div>
-            <div class="footer-right">
-              <a href="/terms-conditions">Terms & conditions</a>
-              <a href="/privacypolicy">Privacy policy</a>
-            </div>
-            <div class="footer-address">
-                <span><i class="fas fa-map-marker-alt"></i> Dragomanova 50 St., Lviv, Ukraine</span>
-                <span><a href="mailto:studywith.connect@gmail.com"><i class="fas fa-envelope"></i>
-                        studywith.connect@gmail.com</a></span>
-            </div>
+    <div class="Categories">
+      <h1 class="Categories_text" data-lang="categoriesText">Categories of courses</h1>
+      <div class="Category">
+        <div class="category_box" data-lang="categoryBoxProgramming">Programming</div>
+        <div class="category_box" data-lang="categoryBoxDesign">Design</div>
+        <div class="category_box" data-lang="categoryBoxMarketing">Marketing</div>
+        <div class="category_box" data-lang="categoryBoxBusiness">Business</div>
+        <div class="category_box" data-lang="categoryBoxLanguages">Languages</div>
+        <div class="category_box" data-lang="categoryBoxFinance">Finance</div>
+        <div class="category_box" data-lang="categoryBoxPersonalDevelopment">Personal Development</div>
+        <div class="category_box" data-lang="categoryBoxArt">Art</div>
+        <div class="category_box" data-lang="categoryBoxPhotography">Photography</div>
+        <div class="category_box" data-lang="categoryBoxPsychology">Psychology</div>
+        <div class="category_box" data-lang="categoryBoxHealth">Health</div>
+        <div class="category_box" data-lang="categoryBoxCooking">Cooking</div>
+        <div class="category_box" data-lang="categoryBoxScience">Science</div>
+        <div class="category_box" data-lang="categoryBoxGameDevelopment">Game Development</div>
+        <div class="category_box" data-lang="categoryBoxChildcare">Childcare</div>
+      </div>
+    </div>
+    <h1 class="Fedback_text" data-lang="feedbackText">Feedback</h1>
+    <div class="Feedback">
+      <div class="Feedback_inner">
+        <div class="Feedback_list">
+          <img src="/images/user-avatar.png" alt="user-photo" class="Feed_photo">
+          <div class="Feed_name_container">
+            <h2 class="Feed_name" data-lang="commname">Name</h2>
+            <h3 class="Feed_comm" data-lang="commtext">Comment</h3>
+          </div>
         </div>
-    </footer>
-</div>
-    <script src="../auth-header.js"></script>
-    <script src="home.js"></script> 
+      </div>
+    </div>
+    <div class="Footer">
+      <footer class="footer">
+        <div class="footer-content">
+          <div class="logo">
+            <img src="/images/ebook_12743761.png" alt="logo">
+            <span>StudyWith</span>
+          </div>
+          <div class="footer-links">
+            <div class="footer-links-a">
+              <a href="/about">About</a>
+              <a href="/contact">Contact</a>
+              <a href="/faq">FAQ</a>
+            </div>
+            <div class="footer-copyright">
+              <span>&#169; 2024 All Rights Reserved StudyWith</span>
+            </div>
+          </div>
+          <div class="footer-right">
+            <a href="/terms-conditions">Terms & conditions</a>
+            <a href="/privacypolicy">Privacy policy</a>
+          </div>
+          <div class="footer-address">
+            <span><i class="fas fa-map-marker-alt"></i> Dragomanova 50 St., Lviv, Ukraine</span>
+            <span><a href="mailto:studywith.connect@gmail.com"><i class="fas fa-envelope"></i>
+                studywith.connect@gmail.com</a></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    <script src="/header/header-login.js"></script>
+    <script src="home.js"></script>
+    <script>
+      const translations = {
+        en: {
+          pageTitle: 'StudyWith | Home Page',
+          heading: 'Begin your study <br> here!',
+          description: 'Study in a convenient format, get certificates and build your career of dream. Are you an expert in your industry? Join as a tutor and share your knowledge with thousands of students!',
+          popularText: 'Popular courses',
+          categoriesText: 'Categories of courses',
+          feedbackText: 'Feedback',
+          categoryBoxProgramming: 'Programming',
+          categoryBoxDesign: 'Design',
+          categoryBoxMarketing: 'Marketing',
+          categoryBoxBusiness: 'Business',
+          categoryBoxLanguages: 'Languages',
+          categoryBoxFinance: 'Finance',
+          categoryBoxPersonalDevelopment: 'Personal Development',
+          categoryBoxArt: 'Art',
+          categoryBoxPhotography: 'Photography',
+          categoryBoxPsychology: 'Psychology',
+          categoryBoxHealth: 'Health',
+          categoryBoxCooking: 'Cooking',
+          categoryBoxScience: 'Science',
+          categoryBoxGameDevelopment: 'Game Development',
+          categoryBoxChildcare: 'Childcare',
+          feedName: 'Name',
+          feedComment: 'Comment',
+          startButton: 'Start now',
+          commname: 'Name',
+          commtext: 'Comment',
+        },
+        ua: {
+          pageTitle: 'StudyWith | Домашня сторiнка',
+          heading: 'Почнiть своє навчання <br> зараз!',
+          description: 'Навчайтеся у зручному форматi, отримуйте сертифiкати та будуйте кар’єру мрiї. Ви експерт у своїй галузi? Ставайте частиною нашої команди як виколадач та дiлiться своїми знаннями з тисячами студентiв!',
+          popularText: 'Популярнi курси',
+          categoriesText: 'Категорiї курсiв',
+          feedbackText: 'Вiдгуки',
+          categoryBoxProgramming: 'Програмування',
+          categoryBoxDesign: 'Дизайн',
+          categoryBoxMarketing: 'Маркетинг',
+          categoryBoxBusiness: 'Бiзнес',
+          categoryBoxLanguages: 'Мови',
+          categoryBoxFinance: 'Фiнанси',
+          categoryBoxPersonalDevelopment: 'Особистий розвиток',
+          categoryBoxArt: 'Мистецтво',
+          categoryBoxPhotography: 'Фотографiя',
+          categoryBoxPsychology: 'Психологiя',
+          categoryBoxHealth: 'Здоров’я',
+          categoryBoxCooking: 'Кулiнарiя',
+          categoryBoxScience: 'Наука',
+          categoryBoxGameDevelopment: 'Розробка iгор',
+          categoryBoxChildcare: 'Догляд за дiтьми',
+          feedName: 'Iм’я',
+          feedComment: 'Коментар',
+          startButton: 'Розпочати',
+          Name: 'Назва курсу',
+          desc: 'Тут має бути опис курсу',
+          commname: 'Ім’я',
+          commtext: 'Коментар',
+        }
+      };
+
+      function applyLanguage(lang) {
+        const langData = translations[lang] || translations.en;
+
+        document.title = langData.pageTitle;
+
+        document.querySelectorAll('[data-lang]').forEach(element => {
+          const langKey = element.getAttribute('data-lang');
+          if (langData[langKey]) {
+            if (element.tagName === 'BUTTON' || element.tagName === 'DIV' || element.tagName === 'SPAN') {
+              element.textContent = langData[langKey];
+            } else {
+              element.innerHTML = langData[langKey];
+            }
+          }
+        });
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const userLang = localStorage.getItem('language');
+        applyLanguage(userLang);
+      });
+    </script>
   </body>
 </html>
