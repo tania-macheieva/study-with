@@ -95,10 +95,12 @@ async function loadHeader() {
                     existingDropdown.remove();
                     return;
                 }
+
+                // Створюємо новий дропдаун
                 const dropdown = document.createElement('div');
                 dropdown.className = 'user-dropdown';
+
                 const profileLink = authData.role === 'teacher' ? '/profile-teacher' : '/profile-student';
-                
                 dropdown.innerHTML = `
                     <a href="${profileLink}" class="dropdown-item">
                         <i class="fas fa-user"></i>
@@ -110,12 +112,11 @@ async function loadHeader() {
                         Logout
                     </a>
                 `;
-                
-                // Позиціонуємо дропдаун
-                const rect = userButton.getBoundingClientRect();
-                dropdown.style.position = 'absolute';
-                dropdown.style.top = `${rect.bottom + 5}px`;
-                dropdown.style.right = `20px`;
+
+                // Позиціонуємо дропдаун в правому верхньому куті
+                dropdown.style.position = 'fixed';
+                dropdown.style.top = '60px';  // Відступ зверху
+                dropdown.style.right = '10px'; // Відступ праворуч
 
                 document.body.appendChild(dropdown);
 
@@ -135,6 +136,7 @@ async function loadHeader() {
                 });
             });
         }
+
     } catch (error) {
         console.error('Error loading header:', error);
     }
@@ -154,15 +156,18 @@ dropdownStyles.textContent = `
         z-index: 1000;
         min-width: 180px;
         font-family: 'Jost', sans-serif;
+        position: fixed; /* Закріплене положення */
+        top: 20px; /* Відступ зверху */
+        right: 20px; /* Відступ праворуч */
+        max-width: 200px; /* Максимальна ширина */
     }
 
     .user-dropdown .dropdown-item {
         display: flex;
         align-items: center;
-        padding: 10px 16px;
+        padding: 8px 16px;
         color: #333;
         text-decoration: none;
-        transition: background-color 0.2s;
         font-size: 14px;
     }
 
@@ -181,6 +186,7 @@ dropdownStyles.textContent = `
         background-color: #e9ecef;
         margin: 4px 0;
     }
+
 
     /* Анімація появи дропдауну */
     .user-dropdown {
