@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Study With - Profile</title>
+    <title data-lang="pageTitle">Study With - Profile</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -15,13 +15,52 @@
 </head>
 
 <body> 
-    <script src="../auth-header.js"></script>
+    <script src="/header/header-student.js"></script>
     <div class="page-container">
         <div class="main">
-            <p class="title1">About us</p>
+            <p class="title1" data-lang="about">About us</p>
             <hr class="divider">    
         </div>
+        <script>
+    const translations = {
+    en: {
+        pageTitle: 'StudyWith | About us',
+        about: 'About us',
+    },
+    ua: {
+        pageTitle: 'StudyWith | Про нас',
+        about: 'Про нас'
+    }
+};
 
+function applyLanguage(lang) {
+    const langData = translations[lang];
+
+    document.title = langData.pageTitle;
+
+    document.querySelectorAll('[data-lang]').forEach(element => {
+        const langKey = element.getAttribute('data-lang');
+        if (langData[langKey]) {
+            if (element.tagName === 'INPUT') {
+                element.setAttribute('placeholder', langData[langKey]);
+            } else if (element.tagName === 'BUTTON') {
+                element.textContent = langData[langKey];
+            } else if (element.tagName === 'H2') {
+                element.textContent = langData[langKey];
+            } else if (element.tagName === 'P') {
+                element.textContent = langData[langKey];
+            } else {
+                element.innerHTML = langData[langKey];
+            }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const userLang = localStorage.getItem('language');
+    applyLanguage(userLang);
+});
+        </script>
         <script src="/footer/footer.js"></script> 
     </div>
 
