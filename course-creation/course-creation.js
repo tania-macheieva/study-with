@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
   document.getElementById('create-course').addEventListener('submit', function(e) {
     e.preventDefault();
-
+  
     // Збір даних з форми
     const courseTitle = document.getElementById('course-title').value;
     const courseDescription = document.getElementById('course-description').value;
@@ -234,17 +234,50 @@ document.addEventListener('DOMContentLoaded', () => {
     const courseCategory = document.querySelector('.custom-select .select-trigger span').textContent;
     const educationLevel = document.querySelector('#education-wrapper .select-trigger span').textContent;
     const courseThumbnail = document.getElementById('course-thumbnail').files[0];  // файл мініатюри
-
+    const categoryError = document.querySelector(".category-error");
+    const educationError = document.querySelector(".education-error");
+  
     // Отримання даних про авторизацію
     const authData = getAuthDataFromStorage();  // Якщо немає токену в URL, беремо з локального сховища
     const authorId = authData ? authData.userId : null;
-
+  
+    // Перевірка значень категорії та рівня освіти
+    const categorySelected = courseCategory && courseCategory !== "Select a category";
+    const educationSelected = educationLevel && educationLevel !== "Select an education level";
+  
+    let isValid = true;
+    
+    if (!categorySelected) {
+      if (categoryError) {
+        categoryError.style.display = "block";  
+      }
+      isValid = false;
+    } else {
+      if (categoryError) {
+        categoryError.style.display = "none"; 
+      }
+    }
+    
+    if (!educationSelected) {
+      if (educationError) {
+        educationError.style.display = "block";  
+      }
+      isValid = false;
+    } else {
+      if (educationError) {
+        educationError.style.display = "none"; 
+      }
+    }
+    if (!isValid) {
+      return;
+    }
+  
     // Валідація даних
     if (!courseTitle || !courseDescription || !coursePrice || !courseCategory || !educationLevel || !authorId) {
-        alert('Please fill all required fields!');
-        return;
+      alert('Please fill all required fields!');
+      return;
     }
-
+  
     const formData = new FormData();
     formData.append('course_title', courseTitle);
     formData.append('course_description', courseDescription);
@@ -253,26 +286,27 @@ document.addEventListener('DOMContentLoaded', () => {
     formData.append('education_level', educationLevel);
     formData.append('course_thumbnail', courseThumbnail);
     formData.append('author_id', authorId); // Додаємо author_id
-
+  
     // Відправка запиту на сервер
     fetch('/api/courses/create', {
-        method: 'POST',
-        body: formData
+      method: 'POST',
+      body: formData
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
-            alert('Course created successfully!');
-            // Направити користувача на сторінку курсу або очистити форму
-        } else {
-            alert('Error creating course: ' + data.message);
-        }
+      if (data.success) {
+        alert('Course created successfully!');
+        // Направити користувача на сторінку курсу або очистити форму
+      } else {
+        alert('Error creating course: ' + data.message);
+      }
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('Error creating course!');
+      console.error('Error:', error);
+      alert('Error creating course!');
     });
-});
+  });
+  
 
 
     });
