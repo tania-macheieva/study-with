@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>StudyWith - Create course</title>
+  <title data-lang="pageTitle">StudyWith - Create course</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -16,96 +16,211 @@
 
 <body>
   <main>
-    <div id="toast-container"></div>
-
     <div class="create-course-form"> 
       <form id="create-course">  
-          <label class="title-1">Course Title</label>
-          <input type="text" id="course-title" placeholder="Enter course title" required>
+          <label class="title-1" data-lang="courseTitle">Course Title</label>
+          <input type="text" id="course-title" data-lang="enterCourseTitle" placeholder="Enter course title" required>
         
-          <label class="title-1">Description</label>
-          <textarea id="course-description" placeholder="Enter course description" rows="5" required></textarea>
+          <label class="title-1" data-lang="description">Description</label>
+          <textarea id="course-description" data-lang="enterDescription" placeholder="Enter course description" rows="5" required></textarea>
           
-          <label class="title-1">Thumbnail</label>
+          <label class="title-1" data-lang="thumbnail">Thumbnail</label>
+          
           <div class="input-container">
-            <label class="custom-file-upload">
+            <label class="custom-file-upload" data-lang="chooseFile">
               Choose File
               <input type="file" id="course-thumbnail" accept="image/*" onchange="updateFileName()" />
             </label>
-            <span id="file-name" class="file-name">No file chosen</span>
+            <span id="file-name" class="file-name" data-lang="noFileChosen">No file chosen</span>
           </div> 
           
-          <label class="title-1">Price (USD)</label>
+          <label class="title-1" data-lang="price">Price (USD)</label>
           <div class="price-input">
-              <input type="number" id="course-price" placeholder="Enter price" min="0" required>
+              <input type="number" id="course-price" data-lang="enterPrice" placeholder="Enter price" min="0" required>
               <span class="currency-symbol">$</span>
           </div>
-          
           <!-- Category Dropdown -->
-          <label class="title-1">Category</label>
-          <div class="custom-select-wrapper" id="category-wrapper">
+          <label class="title-1" data-lang="category">Category</label>
+          <div class="custom-select-wrapper" data-required="true" id="category-wrapper" id="category-wrapper">
             <div class="custom-select">
               <div class="select-trigger">
-                <span>Select a category</span>
+                <span data-lang="selectCategory">Select a category</span>
                 <div class="arrow"></div>
               </div>
               <ul class="options">
-                <li class="option" data-value="programming">Programming</li>
-                <li class="option" data-value="design">Design</li>
-                <li class="option" data-value="marketing">Marketing</li>
-                <li class="option" data-value="business">Business</li>
-                <li class="option" data-value="languages">Languages</li>
-                <li class="option" data-value="finance">Finance</li>
-                <li class="option" data-value="personal-development">Personal Development</li>
-                <li class="option" data-value="art">Art</li>
-                <li class="option" data-value="psychology">Psychology</li>
-                <li class="option" data-value="healthcare">Health</li>
-                <li class="option" data-value="cooking">Cooking</li>
-                <li class="option" data-value="science">Science</li>
-                <li class="option" data-value="game-development">Game Development</li>
-                <li class="option" data-value="childcare">Childcare</li> 
+                <li class="option" data-value="programming" data-lang="programming">Programming</li>
+                <li class="option" data-value="design" data-lang="design">Design</li>
+                <li class="option" data-value="marketing" data-lang="marketing">Marketing</li>
+                <li class="option" data-value="business" data-lang="business">Business</li>
+                <li class="option" data-value="languages" data-lang="languages">Languages</li>
+                <li class="option" data-value="finance" data-lang="finance">Finance</li>
+                <li class="option" data-value="personal-development" data-lang="personalDevelopment">Personal Development</li>
+                <li class="option" data-value="art" data-lang="art">Art</li>
+                <li class="option" data-value="psychology" data-lang="psychology">Psychology</li>
+                <li class="option" data-value="healthcare" data-lang="healthcare">Health</li>
+                <li class="option" data-value="cooking" data-lang="cooking">Cooking</li>
+                <li class="option" data-value="science" data-lang="science">Science</li>
+                <li class="option" data-value="game-development" data-lang="gameDevelopment">Game Development</li>
+                <li class="option" data-value="childcare" data-lang="childcare">Childcare</li> 
               </ul>
             </div>
           </div>
-          <div class="category-error">Category is required.</div>
+          <div class="category-error" data-lang="categoryError">Category is required.</div>
 
           <br>
 
-          <label class="title-1">Education level</label>
-          <div class="custom-select-wrapper" id="education-wrapper">
+          <label class="title-1" data-lang="educationLevel">Education level</label>
+          <div class="custom-select-wrapper" data-required="true" id="education-wrapper">
             <div class="custom-select">
               <div class="select-trigger">
-                <span>Select an education level</span>
+                <span data-lang="selectEducationLevel">Select an education level</span>
                 <div class="arrow"></div>
               </div>
               <ul class="options">
-                <li class="option" data-value="no-level">No level</li>
-                <li class="option" data-value="basic-level">Basic level</li>
-                <li class="option" data-value="intermediate-level">Intermediate level</li>
-                <li class="option" data-value="advanced-level">Advanced level</li>
+                <li class="option" data-value="no-level" data-lang="noLevel">No level</li>
+                <li class="option" data-value="basic-level" data-lang="basicLevel">Basic level</li>
+                <li class="option" data-value="intermediate-level" data-lang="intermediateLevel">Intermediate level</li>
+                <li class="option" data-value="advanced-level" data-lang="advancedLevel">Advanced level</li>
               </ul>
             </div>
           </div>
-          <div class="education-error">Education level is required.</div>
+          <div class="education-error" data-lang="educationError">Education level is required.</div>
 
-          <!-- Modules Section -->
+          <!-- Modules Section First -->
           <div class="modules-container">
-              <p class="title-1">Modules</p>
+              <p class="title-1" data-lang="modules">Modules</p>
               <div id="modules-list">
                   <!-- List of modules will be added here -->
               </div>
-              <button class="add-module-btn" type="button" id="add-module-btn">Add Module</button>
+              <button class="add-module-btn" type="button" id="add-module-btn" data-lang="addModule">Add Module</button>
           </div>
           <div class="btns">
-            <button  id="create-course-btn" type="submit" class="btn-сreate">Create Course</button>
-            <button type="button" class="btn-draft">Save as draft</button>
+            <button type="сreate" class="btn-сreate" data-lang="createCourse">Create Course</button>
+            <button type="save" class="btn-draft" data-lang="saveAsDraft" >Save as draft</button>
           </div>
+          
       </form>
   </div>
 </main>
   <script src="../auth-header.js"></script>
   <script src="/course-creation/course-creation.js"></script> 
   <script src="/footer/footer.js"></script>
+  <script>
+    const translations = {
+    en: {
+        pageTitle: 'StudyWith | Course Creation',
+        courseTitle: 'Course Title',
+        enterCourseTitle: 'Enter course title',
+        description: 'Description',
+        enterDescription: 'Enter course description',
+        thumbnail: 'Thumbnail',
+        chooseFile: 'Choose File',
+        noFileChosen: 'No file chosen',
+        price: 'Price (USD)',
+        enterPrice: 'Enter price',
+        category: 'Category',
+        selectCategory: 'Select a category',
+        categoryError: 'Category is required.',
+        educationLevel: 'Education Level',
+        selectEducationLevel: 'Select an education level',
+        educationError: 'Education level is required.',
+        modules: 'Modules',
+        addModule: 'Add Module',
+        createCourse: 'Create Course',
+        saveAsDraft: 'Save as Draft',
+        programming: 'Programming',
+        design: 'Design',
+        marketing: 'Marketing',
+        business: 'Business',
+        languages: 'Languages',
+        finance: 'Finance',
+        personalDevelopment: 'Personal Development',
+        art: 'Art',
+        psychology: 'Psychology',
+        healthcare: 'Health',
+        cooking: 'Cooking',
+        science: 'Science',
+        gameDevelopment: 'Game Development',
+        childcare: 'Childcare',
+        noLevel: 'No Level',
+        basicLevel: 'Basic Level',
+        intermediateLevel: 'Intermediate Level',
+        advancedLevel: 'Advanced Level',
+        addLecture: 'Add Lecture',
+        deleteModule: 'Delete Module',
+    },
+    ua: {
+        pageTitle: 'StudyWith | Створення курсу',
+        courseTitle: 'Назва курсу',
+        enterCourseTitle: 'Введіть назву курсу',
+        description: 'Опис',
+        enterDescription: 'Введіть опис курсу',
+        thumbnail: 'Мініатюра',
+        chooseFile: 'Обрати файл',
+        noFileChosen: 'Файл не обрано',
+        price: 'Ціна (USD)',
+        enterPrice: 'Введіть ціну',
+        category: 'Категорія',
+        selectCategory: 'Оберіть категорію',
+        categoryError: 'Категорія є обов’язковою.',
+        educationLevel: 'Рівень освіти',
+        selectEducationLevel: 'Оберіть рівень освіти',
+        educationError: 'Рівень освіти є обов’язковим.',
+        modules: 'Модулі',
+        addModule: 'Додати модуль',
+        createCourse: 'Створити курс',
+        saveAsDraft: 'Зберегти як чернетку',
+        programming: 'Програмування',
+        design: 'Дизайн',
+        marketing: 'Маркетинг',
+        business: 'Бізнес',
+        languages: 'Мови',
+        finance: 'Фінанси',
+        personalDevelopment: 'Особистий розвиток',
+        art: 'Мистецтво',
+        psychology: 'Психологія',
+        healthcare: 'Охорона здоров’я',
+        cooking: 'Кулінарія',
+        science: 'Наука',
+        gameDevelopment: 'Розробка ігор',
+        childcare: 'Догляд за дітьми',
+        noLevel: 'Без рівня',
+        basicLevel: 'Базовий рівень',
+        intermediateLevel: 'Середній рівень',
+        advancedLevel: 'Високий рівень',
+        addLecture: 'Додати розділ',
+        deleteModule: 'Видалити модуль',
+    },
+};
+
+function applyLanguage(lang) {
+    const langData = translations[lang];
+
+    document.title = langData.pageTitle;
+
+    document.querySelectorAll('[data-lang]').forEach(element => {
+        const langKey = element.getAttribute('data-lang');
+        if (langData[langKey]) {
+            if (element.tagName === 'INPUT') {
+                element.setAttribute('placeholder', langData[langKey]);
+            } else if (element.tagName === 'BUTTON') {
+                element.textContent = langData[langKey];
+            } else if (element.tagName === 'H2') {
+                element.textContent = langData[langKey];
+            } else if (element.tagName === 'P') {
+                element.textContent = langData[langKey];
+            } else {
+                element.innerHTML = langData[langKey];
+            }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const userLang = localStorage.getItem('language');
+    applyLanguage(userLang);
+});
+  </script>
 </body>
 
 </html>
