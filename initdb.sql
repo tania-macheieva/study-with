@@ -46,8 +46,7 @@ CREATE TABLE saved_courses (
 CREATE TABLE modules (
     id SERIAL PRIMARY KEY,
     course_id INT NOT NULL,
-    title VARCHAR(100) NOT NULL,
-    description TEXT,
+    title VARCHAR(100) NOT NULL, 
     order_num INT NOT NULL,  -- порядок модуля в курсі
     CONSTRAINT fk_course FOREIGN KEY (course_id) REFERENCES all_courses (id) ON DELETE CASCADE
 );
