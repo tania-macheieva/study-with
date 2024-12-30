@@ -1,21 +1,162 @@
-function updateFileName() {
-  const fileInput = document.getElementById("course-thumbnail");
-  const fileName = document.getElementById("file-name");
+const translations = {
+  en: {
+    pageTitle: 'StudyWith | Course Creation',
+    courseTitle: 'Course Title',
+    enterCourseTitle: 'Enter course title',
+    description: 'Description',
+    enterDescription: 'Enter course description',
+    thumbnail: 'Thumbnail',
+    chooseFile: 'Choose File',
+    noFileChosen: 'No file chosen',
+    price: 'Price (USD)',
+    enterPrice: 'Enter price',
+    category: 'Category',
+    selectCategory: 'Select a category',
+    categoryError: 'Category is required.',
+    educationLevel: 'Education Level',
+    selectEducationLevel: 'Select an education level',
+    educationError: 'Education level is required.',
+    modules: 'Modules',
+    addModule: 'Add Module',
+    createCourse: 'Create Course',
+    saveAsDraft: 'Save as Draft',
+    programming: 'Programming',
+    design: 'Design',
+    marketing: 'Marketing',
+    business: 'Business',
+    languages: 'Languages',
+    finance: 'Finance',
+    personalDevelopment: 'Personal Development',
+    art: 'Art',
+    psychology: 'Psychology',
+    healthcare: 'Health',
+    cooking: 'Cooking',
+    science: 'Science',
+    gameDevelopment: 'Game Development',
+    childcare: 'Childcare',
+    noLevel: 'No Level',
+    basicLevel: 'Basic Level',
+    intermediateLevel: 'Intermediate Level',
+    advancedLevel: 'Advanced Level',
+    addLecture: 'Add Lecture',
+    deleteModule: 'Delete Module',
+    moduleTitle: "Module",
+    enterModuleTitle: "Enter module title",
+    lecture: "Lecture",
+    lectureTitle: "Enter lecture title",
+    enterLectureDescription: "Enter lecture description",
+    chooseFiles: "Upload Materials (Video, PDF, etc.)",
+    fillRequiredFields: "Please fill all required fields!",
+  },
+  ua: {
+    pageTitle: 'StudyWith | Створення курсу',
+    courseTitle: 'Назва курсу',
+    enterCourseTitle: 'Введіть назву курсу',
+    description: 'Опис',
+    enterDescription: 'Введіть опис курсу',
+    thumbnail: 'Мініатюра',
+    chooseFile: 'Обрати файл',
+    noFileChosen: 'Файл не обрано',
+    price: 'Ціна (USD)',
+    enterPrice: 'Введіть ціну',
+    category: 'Категорія',
+    selectCategory: 'Оберіть категорію',
+    categoryError: 'Категорія є обов’язковою.',
+    educationLevel: 'Рівень освіти',
+    selectEducationLevel: 'Оберіть рівень освіти',
+    educationError: 'Рівень освіти є обов’язковим.',
+    modules: 'Модулі',
+    addModule: 'Додати модуль',
+    createCourse: 'Створити курс',
+    saveAsDraft: 'Зберегти як чернетку',
+    programming: 'Програмування',
+    design: 'Дизайн',
+    marketing: 'Маркетинг',
+    business: 'Бізнес',
+    languages: 'Мови',
+    finance: 'Фінанси',
+    personalDevelopment: 'Особистий розвиток',
+    art: 'Мистецтво',
+    psychology: 'Психологія',
+    healthcare: 'Охорона здоров’я',
+    cooking: 'Кулінарія',
+    science: 'Наука',
+    gameDevelopment: 'Розробка ігор',
+    childcare: 'Догляд за дітьми',
+    noLevel: 'Без рівня',
+    basicLevel: 'Базовий рівень',
+    intermediateLevel: 'Середній рівень',
+    advancedLevel: 'Високий рівень',
+    addLecture: 'Додати лекцію',
+    deleteModule: 'Видалити модуль',
+    moduleTitle: "Модуль",
+    enterModuleTitle: "Введіть назву модуля",
+    lecture: "Лекція",
+    lectureTitle: "Введіть назву лекції",
+    enterLectureDescription: "Введіть опис лекції",
+    chooseFiles: "Завантажити матеріали (відео, PDF тощо)",
+    fillRequiredFields: "Будь ласка, заповніть усі обов'язкові поля!",
+  },
+};
 
-  if (fileInput.files.length > 0) {
-    fileName.textContent = fileInput.files[0].name;
-    fileName.classList.add("selected");
-  } else {
-    fileName.textContent = "No file chosen"
-    fileName.classList.remove("selected");
-  }
-}
-function closeAllSelects() {
-  document.querySelectorAll('.custom-select').forEach(select => {
-    select.classList.remove('open');
+function applyLanguage(lang) {
+  const langData = translations[lang];
+  document.title = langData.pageTitle;
+
+  document.querySelectorAll('[data-lang]').forEach(element => {
+    const langKey = element.getAttribute('data-lang');
+    const translation = langData[langKey];
+    if (translation !== undefined) {
+      if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+        element.setAttribute('placeholder', translation);
+      } else {
+        element.textContent = translation;
+      }
+    }
   });
-}
 
+  localStorage.setItem('language', lang);  // Save language preference
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const userLang = localStorage.getItem('language') || 'en';
+  applyLanguage(userLang);
+
+  // Language Switcher
+  const languageEnButton = document.getElementById("language-en");
+  const languageUaButton = document.getElementById("language-ua");
+
+  if (languageEnButton) {
+    languageEnButton.addEventListener("click", () => {
+      applyLanguage('en');
+      localStorage.setItem('language', 'en');
+    });
+  }
+
+  if (languageUaButton) {
+    languageUaButton.addEventListener("click", () => {
+      applyLanguage('ua');
+      localStorage.setItem('language', 'ua');
+    });
+  }
+
+  function updateFileName() {
+    const fileInput = document.getElementById("course-thumbnail");
+    const fileName = document.getElementById("file-name");
+
+    if (fileInput.files.length > 0) {
+      fileName.textContent = fileInput.files[0].name;
+      fileName.classList.add("selected");
+    } else {
+      fileName.textContent = "No file chosen"
+      fileName.classList.remove("selected");
+    }
+  }
+
+  function closeAllSelects() {
+    document.querySelectorAll('.custom-select').forEach(select => {
+      select.classList.remove('open');
+    });
+  }
 
 document.querySelectorAll('.custom-select').forEach(select => {
   const trigger = select.querySelector('.select-trigger'); 
@@ -223,6 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+});
   
   document.getElementById('create-course').addEventListener('submit', function(e) {
     e.preventDefault();

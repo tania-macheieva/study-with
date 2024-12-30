@@ -17,74 +17,74 @@
 <body>
   <main>
     <div class="create-course-form"> 
-      <form id="create-course">  
-          <label class="title-1" data-lang="courseTitle">Course Title</label>
-          <input type="text" id="course-title" data-lang="enterCourseTitle" placeholder="Enter course title" required>
-        
-          <label class="title-1" data-lang="description">Description</label>
-          <textarea id="course-description" data-lang="enterDescription" placeholder="Enter course description" rows="5" required></textarea>
+      <form id="create-course"> 
           
-          <label class="title-1" data-lang="thumbnail">Thumbnail</label>
+          <label class="title-1" data-lang="courseTitle" for="course-title">Course Title</label>
+          <input type="text" id="course-title" name="course-title" data-lang="enterCourseTitle" placeholder="Enter course title" required>
+        
+          <label class="title-1" data-lang="description" for="course-description">Description</label>
+          <textarea id="course-description" name="course-description" data-lang="enterDescription" placeholder="Enter course description" rows="5" required></textarea>
           
           <div class="input-container">
-            <label class="custom-file-upload" data-lang="chooseFile">
+            <label class="custom-file-upload" for="course-thumbnail" data-lang="chooseFile">
               Choose File
-              <input type="file" id="course-thumbnail" accept="image/*" onchange="updateFileName()" />
             </label>
+            <input type="file" id="course-thumbnail" name="course-thumbnail" accept="image/*"/>
             <span id="file-name" class="file-name" data-lang="noFileChosen">No file chosen</span>
-          </div> 
+          </div>
           
-          <label class="title-1" data-lang="price">Price (USD)</label>
+          <label class="title-1" data-lang="price" for="course-price">Price (USD)</label>
           <div class="price-input">
-              <input type="number" id="course-price" data-lang="enterPrice" placeholder="Enter price" min="0" required>
+              <input type="number" id="course-price" name="course-price" data-lang="enterPrice" placeholder="Enter price" min="0" required>
               <span class="currency-symbol">$</span>
           </div>
+          
           <!-- Category Dropdown -->
           <label class="title-1" data-lang="category">Category</label>
-          <div class="custom-select-wrapper" data-required="true" id="category-wrapper" id="category-wrapper">
-            <div class="custom-select">
-              <div class="select-trigger">
+          <div class="custom-select-wrapper" data-required="true" id="category-wrapper">
+            <div class="custom-select" role="combobox" aria-labelledby="category-wrapper">
+              <div class="select-trigger" tabindex="0" aria-haspopup="listbox">
                 <span data-lang="selectCategory">Select a category</span>
                 <div class="arrow"></div>
               </div>
-              <ul class="options">
-                <li class="option" data-value="programming" data-lang="programming">Programming</li>
-                <li class="option" data-value="design" data-lang="design">Design</li>
-                <li class="option" data-value="marketing" data-lang="marketing">Marketing</li>
-                <li class="option" data-value="business" data-lang="business">Business</li>
-                <li class="option" data-value="languages" data-lang="languages">Languages</li>
-                <li class="option" data-value="finance" data-lang="finance">Finance</li>
-                <li class="option" data-value="personal-development" data-lang="personalDevelopment">Personal Development</li>
-                <li class="option" data-value="art" data-lang="art">Art</li>
-                <li class="option" data-value="psychology" data-lang="psychology">Psychology</li>
-                <li class="option" data-value="healthcare" data-lang="healthcare">Health</li>
-                <li class="option" data-value="cooking" data-lang="cooking">Cooking</li>
-                <li class="option" data-value="science" data-lang="science">Science</li>
-                <li class="option" data-value="game-development" data-lang="gameDevelopment">Game Development</li>
-                <li class="option" data-value="childcare" data-lang="childcare">Childcare</li> 
+              <ul class="options" role="listbox">
+                <li class="option" data-value="programming" role="option" data-lang="programming">Programming</li>
+                <li class="option" data-value="design" role="option" data-lang="design">Design</li>
+                <li class="option" data-value="marketing" role="option" data-lang="marketing">Marketing</li>
+                <li class="option" data-value="business" role="option" data-lang="business">Business</li>
+                <li class="option" data-value="languages" role="option" data-lang="languages">Languages</li>
+                <li class="option" data-value="finance" role="option" data-lang="finance">Finance</li>
+                <li class="option" data-value="personal-development" role="option" data-lang="personalDevelopment">Personal Development</li>
+                <li class="option" data-value="art" role="option" data-lang="art">Art</li>
+                <li class="option" data-value="psychology" role="option" data-lang="psychology">Psychology</li>
+                <li class="option" data-value="healthcare" role="option" data-lang="healthcare">Health</li>
+                <li class="option" data-value="cooking" role="option" data-lang="cooking">Cooking</li>
+                <li class="option" data-value="science" role="option" data-lang="science">Science</li>
+                <li class="option" data-value="game-development" role="option" data-lang="gameDevelopment">Game Development</li>
+                <li class="option" data-value="childcare" role="option" data-lang="childcare">Childcare</li> 
               </ul>
             </div>
           </div>
-          <div class="category-error" data-lang="categoryError">Category is required.</div>
+          <div class="category-error" data-lang="categoryError">Please select a category</div>
 
           <br>
 
-          <label class="title-1" data-lang="educationLevel">Education level</label>
-          <div class="custom-select-wrapper" data-required="true" id="education-wrapper">
-            <div class="custom-select">
-              <div class="select-trigger">
+          <label class="title-1" data-lang="educationLevel" >Education level</label>
+          <div i class="custom-select-wrapper" data-required="true" id="education-wrapper">
+            <div class="custom-select" role="combobox" aria-labelledby="education-wrapper">
+              <div class="select-trigger" tabindex="0" aria-haspopup="listbox">
                 <span data-lang="selectEducationLevel">Select an education level</span>
                 <div class="arrow"></div>
               </div>
-              <ul class="options">
-                <li class="option" data-value="no-level" data-lang="noLevel">No level</li>
-                <li class="option" data-value="basic-level" data-lang="basicLevel">Basic level</li>
-                <li class="option" data-value="intermediate-level" data-lang="intermediateLevel">Intermediate level</li>
-                <li class="option" data-value="advanced-level" data-lang="advancedLevel">Advanced level</li>
+              <ul class="options" role="listbox">
+                <li class="option" data-value="no-level" role="option" data-lang="noLevel">No level</li>
+                <li class="option" data-value="basic-level" role="option" data-lang="basicLevel">Basic level</li>
+                <li class="option" data-value="intermediate-level" role="option" data-lang="intermediateLevel">Intermediate level</li>
+                <li class="option" data-value="advanced-level" role="option" data-lang="advancedLevel">Advanced level</li>
               </ul>
             </div>
           </div>
-          <div class="education-error" data-lang="educationError">Education level is required.</div>
+          <div class="education-error" data-lang="educationError">Please select an education level</div>
 
           <!-- Modules Section First -->
           <div class="modules-container">
@@ -95,8 +95,8 @@
               <button class="add-module-btn" type="button" id="add-module-btn" data-lang="addModule">Add Module</button>
           </div>
           <div class="btns">
-            <button type="сreate" class="btn-сreate" data-lang="createCourse">Create Course</button>
-            <button type="save" class="btn-draft" data-lang="saveAsDraft" >Save as draft</button>
+            <button type="submit" class="btn-сreate" data-lang="createCourse">Create Course</button>
+            <button type="button" class="btn-draft" data-lang="saveAsDraft">Save as draft</button>
           </div>
           
       </form>
@@ -105,121 +105,6 @@
   <script src="../header/auth-header.js"></script>
   <script src="../course-creation/course-creation.js"></script> 
   <script src="../footer/footer.js"></script>
-  <script>
-    
-    
-    const translations = {
-    en: {
-        pageTitle: 'StudyWith | Course Creation',
-        courseTitle: 'Course Title',
-        enterCourseTitle: 'Enter course title',
-        description: 'Description',
-        enterDescription: 'Enter course description',
-        thumbnail: 'Thumbnail',
-        chooseFile: 'Choose File',
-        noFileChosen: 'No file chosen',
-        price: 'Price (USD)',
-        enterPrice: 'Enter price',
-        category: 'Category',
-        selectCategory: 'Select a category',
-        categoryError: 'Category is required.',
-        educationLevel: 'Education Level',
-        selectEducationLevel: 'Select an education level',
-        educationError: 'Education level is required.',
-        modules: 'Modules',
-        addModule: 'Add Module',
-        createCourse: 'Create Course',
-        saveAsDraft: 'Save as Draft',
-        programming: 'Programming',
-        design: 'Design',
-        marketing: 'Marketing',
-        business: 'Business',
-        languages: 'Languages',
-        finance: 'Finance',
-        personalDevelopment: 'Personal Development',
-        art: 'Art',
-        psychology: 'Psychology',
-        healthcare: 'Health',
-        cooking: 'Cooking',
-        science: 'Science',
-        gameDevelopment: 'Game Development',
-        childcare: 'Childcare',
-        noLevel: 'No Level',
-        basicLevel: 'Basic Level',
-        intermediateLevel: 'Intermediate Level',
-        advancedLevel: 'Advanced Level',
-        addLecture: 'Add Lecture',
-        deleteModule: 'Delete Module',
-    },
-    ua: {
-        pageTitle: 'StudyWith | Створення курсу',
-        courseTitle: 'Назва курсу',
-        enterCourseTitle: 'Введіть назву курсу',
-        description: 'Опис',
-        enterDescription: 'Введіть опис курсу',
-        thumbnail: 'Мініатюра',
-        chooseFile: 'Обрати файл',
-        noFileChosen: 'Файл не обрано',
-        price: 'Ціна (USD)',
-        enterPrice: 'Введіть ціну',
-        category: 'Категорія',
-        selectCategory: 'Оберіть категорію',
-        categoryError: 'Категорія є обов’язковою.',
-        educationLevel: 'Рівень освіти',
-        selectEducationLevel: 'Оберіть рівень освіти',
-        educationError: 'Рівень освіти є обов’язковим.',
-        modules: 'Модулі',
-        addModule: 'Додати модуль',
-        createCourse: 'Створити курс',
-        saveAsDraft: 'Зберегти як чернетку',
-        programming: 'Програмування',
-        design: 'Дизайн',
-        marketing: 'Маркетинг',
-        business: 'Бізнес',
-        languages: 'Мови',
-        finance: 'Фінанси',
-        personalDevelopment: 'Особистий розвиток',
-        art: 'Мистецтво',
-        psychology: 'Психологія',
-        healthcare: 'Охорона здоров’я',
-        cooking: 'Кулінарія',
-        science: 'Наука',
-        gameDevelopment: 'Розробка ігор',
-        childcare: 'Догляд за дітьми',
-        noLevel: 'Без рівня',
-        basicLevel: 'Базовий рівень',
-        intermediateLevel: 'Середній рівень',
-        advancedLevel: 'Високий рівень',
-        addLecture: 'Додати розділ',
-        deleteModule: 'Видалити модуль',
-    },
-};
-
-function applyLanguage(lang) {
-    const langData = translations[lang];
-
-    document.title = langData.pageTitle;
-
-    document.querySelectorAll('[data-lang]').forEach(element => {
-        const langKey = element.getAttribute('data-lang');
-        if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-          element.setAttribute('placeholder', langData[langKey]);
-      } else if (element.tagName === 'BUTTON' || element.tagName === 'H2' || element.tagName === 'P') {
-          element.textContent = langData[langKey];
-      } else {
-          element.innerHTML = langData[langKey];
-      }
-      
-    });
-}
-document.addEventListener('DOMContentLoaded', () => {
-  const userLang = localStorage.getItem('language');
-  console.log('Loaded language:', userLang);
-  console.log('Translations:', translations[userLang]);
-  applyLanguage(userLang);
-});
-
-  </script>
 </body>
 
 </html>
