@@ -42,105 +42,139 @@ function clearAuthData() {
 }
 
 // Функція для завантаження відповідного хедера
-async function loadHeader() {
-    // Спочатку перевіряємо URL на наявність даних автентифікації (після Google auth)
-    let authData = getAuthDataFromURL();
-    
-    // Якщо немає даних в URL, перевіряємо локальне сховище
-    if (!authData) {
-        authData = getAuthDataFromStorage();
-    } else {
-        // Якщо дані є в URL, зберігаємо їх
-        saveAuthData(authData);
-        // Очищаємо URL
-        window.history.replaceState({}, document.title, window.location.pathname);
-    }
+document.addEventListener("DOMContentLoaded", () => {
+    loadHeader();
 
-    // Визначаємо, який хедер завантажувати
-    let headerPath = '/header/header-login.html';
-    
-    if (authData) {
-        if (authData.role === 'teacher') {
-            headerPath = '/header/header-teacher.html';
-        } else if (authData.role === 'student') {
-            headerPath = '/header/header-student.html';
-        }
-    }
-
-    try {
-        const response = await fetch(headerPath);
-        const headerHtml = await response.text();
+    async function loadHeader() {
+        // Спочатку перевіряємо URL на наявність даних автентифікації (після Google auth)
+        let authData = getAuthDataFromURL();
         
-        // Вставляємо хедер в початок body
-        document.body.insertAdjacentHTML('afterbegin', headerHtml);
-
-        // Якщо користувач авторизований, оновлюємо ім'я користувача
-        if (authData && authData.name) {
-            const usernameElement = document.querySelector('#user span');
-            if (usernameElement) {
-                usernameElement.textContent = authData.name;
+        // Якщо немає даних в URL, перевіряємо локальне сховище
+        if (!authData) {
+            authData = getAuthDataFromStorage();
+        } else {
+            // Якщо дані є в URL, зберігаємо їх
+            saveAuthData(authData);
+            // Очищаємо URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    
+        // Визначаємо, який хедер завантажувати
+        let headerPath = '/header/header-login.html';  // Переконайтесь, що це правильний шлях для загального хедера
+        
+        if (authData) {
+            if (authData.role === 'teacher') {
+                headerPath = '/header/header-teacher.html';  // Хедер для викладача
+            } else if (authData.role === 'student') {
+                headerPath = '/header/header-student.html';  // Хедер для студента
             }
         }
-
-        // Додаємо обробник для кнопки виходу
-        const userButton = document.querySelector('#user');
-        if (userButton) {
-            userButton.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-
-                // Видаляємо існуючий дропдаун, якщо він вже відкритий
-                const existingDropdown = document.querySelector('.user-dropdown');
-                if (existingDropdown) {
-                    existingDropdown.remove();
-                    return;
-                }
-
-                // Створюємо новий дропдаун
-                const dropdown = document.createElement('div');
-                dropdown.className = 'user-dropdown';
-
-                const profileLink = authData.role === 'teacher' ? '/profile-teacher' : '/profile-student';
-                dropdown.innerHTML = `
-                    <a href="${profileLink}" class="dropdown-item">
-                        <i class="fas fa-user"></i>
-                        Profile
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item" id="logout">
-                        <i class="fas fa-sign-out-alt"></i>
-                        Logout
-                    </a>
-                `;
-
-                // Позиціонуємо дропдаун в правому верхньому куті
-                dropdown.style.position = 'fixed';
-                dropdown.style.top = '60px';  // Відступ зверху
-                dropdown.style.right = '10px'; // Відступ праворуч
-
-                document.body.appendChild(dropdown);
-
-                // Обробник для виходу
-                dropdown.querySelector('#logout').addEventListener('click', (e) => {
-                    e.preventDefault();
-                    clearAuthData();
-                    window.location.href = '/';
-                });
-
-                // Закриваємо дропдаун при кліку поза ним
-                document.addEventListener('click', function closeDropdown(e) {
-                    if (!dropdown.contains(e.target) && !userButton.contains(e.target)) {
-                        dropdown.remove();
-                        document.removeEventListener('click', closeDropdown);
+    
+        try {
+            const response = await fetch(headerPath);
+            const headerHtml = await response.text();
+            
+            // Вставляємо хедер в початок body
+            document.body.insertAdjacentHTML('afterbegin', headerHtml);
+    
+            // Мовний перемикач
+            const langSwitcher = document.querySelector('.lang-switcher');
+            if (langSwitcher) {
+                const currentLang = localStorage.getItem('language') || 'en';
+                document.documentElement.lang = currentLang;
+    
+                const changeLanguage = (lang) => {
+                    localStorage.setItem('language', lang);
+                    document.documentElement.lang = lang;
+    
+                    // Завантажити локалізовані тексти, якщо потрібно
+                    console.log(`Language changed to: ${lang}`);
+    
+                    // Перезавантажити сторінку для застосування змін
+                    window.location.reload();  // Перезавантажуємо сторінку після зміни мови
+                };
+    
+                langSwitcher.addEventListener('click', (event) => {
+                    if (event.target.classList.contains('lang-btn')) {
+                        event.preventDefault();
+                        const selectedLang = event.target.dataset.lang;
+                        changeLanguage(selectedLang);
                     }
                 });
-            });
+            }
+    
+            // Якщо користувач авторизований, оновлюємо ім'я користувача
+            if (authData && authData.name) {
+                const usernameElement = document.querySelector('#user span');
+                if (usernameElement) {
+                    usernameElement.textContent = authData.name;
+                }
+            }
+    
+            // Додаємо обробник для кнопки виходу
+            const userButton = document.querySelector('#user');
+            if (userButton) {
+                userButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+    
+                    // Видаляємо існуючий дропдаун, якщо він вже відкритий
+                    const existingDropdown = document.querySelector('.user-dropdown');
+                    if (existingDropdown) {
+                        existingDropdown.remove();
+                        return;
+                    }
+    
+                    // Створюємо новий дропдаун
+                    const dropdown = document.createElement('div');
+                    dropdown.className = 'user-dropdown';
+    
+                    const profileLink = authData.role === 'teacher' ? '/profile-teacher' : '/profile-student';
+                    dropdown.innerHTML = `
+                        <a href="${profileLink}" class="dropdown-item">
+                            <i class="fas fa-user"></i>
+                            Profile
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item" id="logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Logout
+                        </a>
+                    `;
+    
+                    // Позиціонуємо дропдаун в правому верхньому куті
+                    dropdown.style.position = 'fixed';
+                    dropdown.style.top = '60px';  // Відступ зверху
+                    dropdown.style.right = '10px'; // Відступ праворуч
+    
+                    document.body.appendChild(dropdown);
+    
+                    // Обробник для виходу
+                    dropdown.querySelector('#logout').addEventListener('click', (e) => {
+                        e.preventDefault();
+                        clearAuthData();
+                        window.location.href = '/';
+                    });
+    
+                    // Закриваємо дропдаун при кліку поза ним
+                    document.addEventListener('click', function closeDropdown(e) {
+                        if (!dropdown.contains(e.target) && !userButton.contains(e.target)) {
+                            dropdown.remove();
+                            document.removeEventListener('click', closeDropdown);
+                        }
+                    });
+                });
+            }
+    
+        } catch (error) {
+            console.error('Error loading header:', error);
         }
-
-    } catch (error) {
-        console.error('Error loading header:', error);
     }
-}
+    
+    
+});
+
+  
 
 // Запускаємо завантаження хедера при завантаженні сторінки
 document.addEventListener('DOMContentLoaded', loadHeader);
