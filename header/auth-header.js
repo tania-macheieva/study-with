@@ -77,23 +77,24 @@ document.addEventListener("DOMContentLoaded", () => {
             // Вставляємо хедер в початок body
             document.body.insertAdjacentHTML('afterbegin', headerHtml);
     
-            // Мовний перемикач
+            // Мовний перемикач (не змінює мову в хедері)
             const langSwitcher = document.querySelector('.lang-switcher');
             if (langSwitcher) {
                 const currentLang = localStorage.getItem('language') || 'en';
                 document.documentElement.lang = currentLang;
-    
+
+                // Перемикач мови на сторінці
                 const changeLanguage = (lang) => {
                     localStorage.setItem('language', lang);
                     document.documentElement.lang = lang;
-    
+
                     // Завантажити локалізовані тексти, якщо потрібно
                     console.log(`Language changed to: ${lang}`);
-    
+
                     // Перезавантажити сторінку для застосування змін
                     window.location.reload();  // Перезавантажуємо сторінку після зміни мови
                 };
-    
+
                 langSwitcher.addEventListener('click', (event) => {
                     if (event.target.classList.contains('lang-btn')) {
                         event.preventDefault();
@@ -102,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 });
             }
-    
+
             // Якщо користувач авторизований, оновлюємо ім'я користувача
             if (authData && authData.name) {
                 const usernameElement = document.querySelector('#user span');
@@ -110,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     usernameElement.textContent = authData.name;
                 }
             }
-    
+
             // Додаємо обробник для кнопки виходу
             const userButton = document.querySelector('#user');
             if (userButton) {
@@ -170,9 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error('Error loading header:', error);
         }
     }
-    
-    
-});
+}); 
 
 // Додаємо стилі для дропдауна
 const dropdownStyles = document.createElement('style');
@@ -243,5 +242,3 @@ dropdownStyles.textContent = `
 `;
 
 document.head.appendChild(dropdownStyles);
-// Запускаємо завантаження хедера при завантаженні сторінки
-document.addEventListener('DOMContentLoaded', loadHeader);
