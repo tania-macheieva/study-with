@@ -174,11 +174,6 @@ document.addEventListener("DOMContentLoaded", () => {
     
 });
 
-  
-
-// Запускаємо завантаження хедера при завантаженні сторінки
-document.addEventListener('DOMContentLoaded', loadHeader);
-
 // Додаємо стилі для дропдауна
 const dropdownStyles = document.createElement('style');
 dropdownStyles.textContent = `
@@ -248,3 +243,5 @@ dropdownStyles.textContent = `
 `;
 
 document.head.appendChild(dropdownStyles);
+// Запускаємо завантаження хедера при завантаженні сторінки
+document.addEventListener('DOMContentLoaded', loadHeader);
