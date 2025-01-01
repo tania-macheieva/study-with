@@ -7,6 +7,31 @@ CREATE TABLE users (
     role VARCHAR(50) CHECK (role IN ('student', 'teacher')) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE teachers (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE, -- Зв'язок із таблицею users
+    dob DATE,                          -- Дата народження
+    gender VARCHAR(50),                -- Стать
+    country VARCHAR(100),              -- Країна
+    city VARCHAR(100),                 -- Місто
+    phone_number VARCHAR(15),
+    zip_code VARCHAR(20),              -- Поштовий індекс
+    specialty VARCHAR(255),            -- Спеціалізація
+    professional_experience DATE,      -- Дата початку професійної діяльності
+    about TEXT,                        -- Коротка інформація
+    certificates BYTEA,                -- Сертифікати у форматі BLOB
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE students (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE, -- Зв'язок із таблицею users
+    date_of_birth DATE,
+    phone_number VARCHAR(15),
+    additional_info TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 
 INSERT INTO users (name, email, user_password, phone_number, role) VALUES
     ('John Doe', 'john@example.com', 'test1234', '+380685671890', 'teacher'),

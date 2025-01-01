@@ -4,9 +4,14 @@ const pool = require('./db.js');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
-require('dotenv').config({ path: './secret.env' });
+require('dotenv').config({ path: '../secret.env' });
 const passport = require('passport');
+const multer = require("multer");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+
+
+// Налаштування Multer для обробки файлів
+const upload = multer({ storage: multer.memoryStorage() });
 
 const SECRET_KEY = process.env.JWT_SECRET;
 const EMAIL_USER = process.env.EMAIL_USER;
@@ -93,6 +98,34 @@ router.get('/google/callback',
         );
     }
 );
+
+
+router.post('/send-email', async (req, res) => {
+       const { email, phone } = req.body;
+    
+      // Перевірка валідності даних
+     if (!email || !phone) {
+     return res.status(400).json({ error: 'Email and phone are required' });
+     }
+    
+     // Формування повідомлення
+     const mailOptions = {
+     from: email, // Пошта відправника (взята з форми)
+     to: 'studywith.connect@gmail.com', // Пошта, куди надсилати повідомлення
+     subject: 'New Contact Submission',
+    text: `User email: ${email}\nUser phone: ${phone}`,
+    };
+    
+    try {
+    // Надсилання email
+    await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully');
+    res.status(200).json({ message: 'Email sent successfully' });
+    } catch (error) {
+    console.error('Error sending email:', error);
+    res.status(500).json({ error: 'Failed to send email' });
+       }
+     });
 
 
 
@@ -381,6 +414,115 @@ router.post('/resend-code', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.post("/register/teacher/full-registration", upload.array("certificates"), async (req, res) => {
+    const {
+        name,
+        email,
+        password,
+        phone_number,
+        dob,
+        gender,
+        country,
+        city,
+        zip_code,
+        specialty,
+        professional_experience,
+        about,
+    } = req.body;
+
+    if (!name || !email || !password || !phone_number || !dob || !gender || !country || !city || !specialty) {
+        return res.status(400).json({ error: "All required fields must be provided" });
+    }
+    try {
+     
+        // Логування отриманих даних
+        console.log("Received body:", req.body);
+        console.log("Received files:", req.files);
+      
+        // Перевіряємо, чи користувач вже існує
+        const existingUser = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+        if (existingUser.rows.length > 0) {
+            return res.status(400).json({ error: "Email already exists" });
+        }
+
+        // Хешуємо пароль
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Створюємо запис у таблиці `users`
+        const userResult = await  pool.query(
+            `INSERT INTO users (name, email, user_password, phone_number, role)
+             VALUES ($1, $2, $3, $4, 'teacher')
+             RETURNING id`,
+            [name, email, hashedPassword, phone_number]
+        );
+
+        const userId = userResult.rows[0].id;
+
+        // Зберігаємо сертифікати
+        const certificates = req.files.map((file) => file.buffer);
+       
+
+        // Створюємо запис у таблиці `teachers` 
+        await  pool.query(
+            `INSERT INTO teachers (user_id, dob, gender, country, city, phone_number, zip_code, specialty, professional_experience, about, certificates)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11 )`,
+            [userId, dob, gender, country, city, phone_number, zip_code, specialty, professional_experience, about, certificates]
+        );
+
+        // Відправляємо email адміністратору
+        const mailOptions2 = {
+            from: email,
+            to: "studywith.connect@gmail.com",
+            subject: "New Teacher Registration",
+            text: `
+                A new teacher registration request has been received:
+               Name: ${name}
+                Email: ${email}
+                Date of Birth: ${dob}
+                Gender: ${gender || "Not specified"}
+                Country: ${country}
+                Phone: ${phone_number}
+                City: ${city}
+                Zip Code: ${zip_code || "Not provided"}
+                Specialty: ${specialty}
+                Experience Start Date: ${ professional_experience}
+                About: ${about || "No additional information provided"}
+            `,
+            attachments: req.files.map((file) => ({
+                filename: file.originalname,
+                content: file.buffer,
+            })),
+        };
+
+        await transporter.sendMail(mailOptions2);
+      
+
+        res.status(200).json({ message: "Teacher registration completed successfully!" });
+    } catch (error) {
+        console.error("Error during full teacher registration:", error);
+        res.status(500).json({ error: error.message || "Internal server error" });
+    } 
+});
+
+
+// 3. Підтвердження даних адміністраторами
+router.post("/confirm-teacher/:id", async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const user = await pool.query("SELECT * FROM users WHERE id = $1 AND role = 'teacher'", [id]);
+        if (user.rows.length === 0) {
+            return res.status(404).json({ error: "Teacher not found" });
+        }
+
+        await pool.query("UPDATE users SET is_verified = TRUE WHERE id = $1", [id]);
+        res.status(200).json({ message: "Teacher registration confirmed successfully" });
+    } catch (error) {
+        console.error("Error confirming teacher:", error);
+        res.status(500).json({ error: "Internal server error" });
     }
 });
 

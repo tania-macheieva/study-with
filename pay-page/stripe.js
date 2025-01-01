@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Stripe = require('stripe');
 const pool = require('../db'); 
-require('dotenv').config();
+require('dotenv').config({ path: '../secret.env' });
 
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
