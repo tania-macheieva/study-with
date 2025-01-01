@@ -1,16 +1,16 @@
 CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  user_password TEXT NOT NULL,
-  phone_number VARCHAR(15),
-  role VARCHAR(50) CHECK (role IN ('student', 'teacher')) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    user_password TEXT NOT NULL,
+    phone_number VARCHAR(15),
+    role VARCHAR(50) CHECK (role IN ('student', 'teacher')) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 INSERT INTO users (name, email, user_password, phone_number, role) VALUES
-  ('John Doe', 'john@example.com', 'test1234', '+380685671890', 'teacher'),
-  ('Jane Smith', 'jane@example.com', 'test5678', '+380976544121', 'student');
+    ('John Doe', 'john@example.com', 'test1234', '+380685671890', 'teacher'),
+    ('Jane Smith', 'jane@example.com', 'test5678', '+380976544121', 'student');
 
 CREATE TABLE categories (
     id SERIAL PRIMARY KEY,        
@@ -24,11 +24,16 @@ CREATE TABLE all_courses (
     price NUMERIC(10, 2),
     description TEXT NOT NULL,
     category_id INT NOT NULL,
-    image_url VARCHAR(1024), --прев'ю курсу
+    image_url VARCHAR(1024), -- прев'ю курсу
+    education_level_id INT,  -- нове поле!
     CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES users (id) ON DELETE CASCADE,
-    CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE SET NULL
+    CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE SET NULL,
+    CONSTRAINT fk_education_level FOREIGN KEY (education_level_id) REFERENCES education_levels (id) ON DELETE SET NULL
 );
-
+-- !!!! якщо немає education_level_id у вже створеній таблиці all_courses
+ALTER TABLE all_courses
+ADD COLUMN education_level_id INT,
+ADD CONSTRAINT fk_education_level FOREIGN KEY (education_level_id) REFERENCES education_levels (id) ON DELETE SET NULL;
 
 
 CREATE TABLE saved_courses (

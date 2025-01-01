@@ -115,7 +115,7 @@ function applyLanguage(lang) {
     }
   });
 
-  localStorage.setItem('language', lang);  // Save language preference
+  localStorage.setItem('language', lang);  
 }
 document.addEventListener('DOMContentLoaded', () => {
   const userLang = localStorage.getItem('language') || 'en';
@@ -139,7 +139,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // File input update
   function updateFileName() {
     const fileInput = document.getElementById("course-thumbnail");
     const fileName = document.getElementById("file-name");
@@ -153,7 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Custom Select handling
   function closeAllSelects() {
     document.querySelectorAll('.custom-select').forEach(select => {
       select.classList.remove('open');
@@ -188,7 +186,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Module and Lecture handling
   const addModuleBtn = document.getElementById("add-module-btn");
   const modulesList = document.getElementById("modules-list");
   let moduleCounter = 1;
@@ -277,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Category and Education level dropdowns
+
   const categoryWrapper = document.querySelector('.custom-select-wrapper#category-wrapper');
   const educationWrapper = document.querySelector('.custom-select-wrapper#education-wrapper');
 
@@ -289,69 +286,61 @@ document.addEventListener('DOMContentLoaded', () => {
   const educationOptions = educationWrapper.querySelector('.options');
   const educationSpan = educationTrigger.querySelector('span');
 
-  categoryTrigger.addEventListener('click', (event) => {
-    event.preventDefault();
-    categoryWrapper.classList.toggle('open');
-    educationWrapper.classList.remove('open');
-  });
+  // Обробка вибору категорії
+categoryTrigger.addEventListener('click', (event) => {
+  event.preventDefault();
+  categoryWrapper.classList.toggle('open');
+  educationWrapper.classList.remove('open');
+});
 
-  educationTrigger.addEventListener('click', (event) => {
+categoryOptions.querySelectorAll('.option').forEach(option => {
+  option.addEventListener('click', (event) => {
     event.preventDefault();
-    educationWrapper.classList.toggle('open');
+    categorySpan.textContent = option.textContent;
+    categoryTrigger.dataset.value = option.dataset.value;
     categoryWrapper.classList.remove('open');
-  });
-
-  categoryOptions.querySelectorAll('.option').forEach(option => {
-    option.addEventListener('click', (event) => {
-      event.preventDefault();
-      categorySpan.textContent = option.textContent;
-      categoryTrigger.dataset.value = option.dataset.value;
-      categoryWrapper.classList.remove('open');
-    });
-  });
-
-  educationOptions.querySelectorAll('.option').forEach(option => {
-    option.addEventListener('click', (event) => {
-      event.preventDefault();
-      educationSpan.textContent = option.textContent;
-      educationTrigger.dataset.value = option.dataset.value;
-      educationWrapper.classList.remove('open');
-    });
-  });
-
-  document.addEventListener('click', (event) => {
-    if (!event.target.closest('.custom-select-wrapper')) {
-      categoryWrapper.classList.remove('open');
-      educationWrapper.classList.remove('open');
-    }
-  });
-
-  // Course creation form submission
-// Оновлення категорії при виборі опції
-document.querySelectorAll('.custom-select .option').forEach(option => {
-  option.addEventListener('click', function() {
-    const selectedValue = this.getAttribute('data-value');
-    const selectedText = this.textContent;
-
-    // Оновлення відображення вибраної категорії
-    const selectTrigger = document.querySelector('.custom-select .select-trigger span');
-    selectTrigger.textContent = selectedText;
-    selectTrigger.setAttribute('data-value', selectedValue);
   });
 });
 
-// Перевірка значення категорії
+// Обробка вибору рівня освіти
+educationTrigger.addEventListener('click', (event) => {
+  event.preventDefault();
+  educationWrapper.classList.toggle('open');
+  categoryWrapper.classList.remove('open');
+});
+
+educationOptions.querySelectorAll('.option').forEach(option => {
+  option.addEventListener('click', (event) => {
+    event.preventDefault();
+    educationSpan.textContent = option.textContent;
+    educationTrigger.dataset.value = option.dataset.value;
+    educationWrapper.classList.remove('open');
+  });
+});
+
+// Закриття списків при кліку поза межами
+document.addEventListener('click', (event) => {
+  if (!event.target.closest('.custom-select-wrapper')) {
+    categoryWrapper.classList.remove('open');
+    educationWrapper.classList.remove('open');
+  }
+});
+
+
+
+
+// Перевірка значення категорії та рівня освіти перед відправкою
 document.getElementById('create-course').addEventListener('submit', function(e) {
   e.preventDefault();
 
   const courseTitle = document.getElementById('course-title').value;
   const courseDescription = document.getElementById('course-description').value;
   const coursePrice = document.getElementById('course-price').value;
-  const categorySelect = document.querySelector('.custom-select');
-  const categoryId = categorySelect.querySelector('.select-trigger span').getAttribute('data-value'); // Отримуємо ID категорії
-
-  const educationLevel = document.querySelector('#education-wrapper .select-trigger span').textContent;
+  
+  const categoryId = categoryTrigger.dataset.value; // Отримуємо ID категорії
+  const educationLevel = educationTrigger.dataset.value; // Отримуємо ID рівня освіти
   const courseThumbnail = document.getElementById('course-thumbnail').files[0];
+
   const categoryError = document.querySelector(".category-error");
   const educationError = document.querySelector(".education-error");
 
@@ -359,11 +348,11 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
   const authorId = authData ? authData.userId : null;
 
   const categorySelected = categoryId && categoryId !== "Select a category"; // Перевірка вибору категорії
-  const educationSelected = educationLevel && educationLevel !== "Select an education level"; 
+  const educationSelected = educationLevel && educationLevel !== "Select an education level"; // Перевірка вибору рівня освіти
 
   let isValid = true;
 
- 
+  // Перевірка на вибір категорії
   if (!categorySelected) {
     if (categoryError) {
       categoryError.style.display = "block";
@@ -375,6 +364,7 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
     }
   }
 
+  // Перевірка на вибір рівня освіти
   if (!educationSelected) {
     if (educationError) {
       educationError.style.display = "block";
@@ -390,19 +380,13 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
     return;
   }
 
-  // Перевірка на порожні обов'язкові поля
-  if (!courseTitle || !courseDescription || !coursePrice || !categoryId || !educationLevel || !authorId) {
-    alert('Please fill all required fields!');
-    return;
-  }
-
   // Створення FormData для відправки даних на сервер
   const formData = new FormData();
   formData.append('course_title', courseTitle);
   formData.append('course_description', courseDescription);
   formData.append('course_price', coursePrice);
   formData.append('course_category', categoryId); // Передача ID категорії
-  formData.append('education_level', educationLevel);
+  formData.append('education_level', educationLevel); // Передача ID рівня освіти
   formData.append('course_thumbnail', courseThumbnail);
   formData.append('author_id', authorId);
 
@@ -424,6 +408,4 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
     alert('Error creating course!');
   });
 });
-
-
 });
