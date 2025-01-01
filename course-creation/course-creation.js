@@ -189,67 +189,75 @@ document.addEventListener('DOMContentLoaded', () => {
   const addModuleBtn = document.getElementById("add-module-btn");
   const modulesList = document.getElementById("modules-list");
   let moduleCounter = 1;
-
+  
   addModuleBtn.addEventListener("click", () => {
     const moduleId = `module-${moduleCounter++}`;
     const moduleDiv = document.createElement("div");
     moduleDiv.classList.add("module");
     moduleDiv.id = moduleId;
-
+  
+    // Додаємо переклад для модуля
+    const moduleTitle = translations[userLang].moduleTitle;
+    const enterModuleTitle = translations[userLang].enterModuleTitle;
+  
     moduleDiv.innerHTML = `
-      <p class="title-2">Module ${moduleCounter - 1}</p>
-      <input type="text" placeholder="Module Title"> 
+      <p class="title-2">${moduleTitle} ${moduleCounter - 1}</p>
+      <input type="text" placeholder="${enterModuleTitle}">
       <div class="lectures"></div>
-      <button class="add-lecture-btn">Add Lecture</button>
-      <button class="delete-module-btn">Delete Module</button>
+      <button class="add-lecture-btn">${translations[userLang].addLecture}</button>
+      <button class="delete-module-btn">${translations[userLang].deleteModule}</button>
     `;
-
+  
     modulesList.appendChild(moduleDiv);
-
+  
     const addLectureBtn = moduleDiv.querySelector(".add-lecture-btn");
     const deleteModuleBtn = moduleDiv.querySelector(".delete-module-btn");
     let lectureCounter = 1;
-    
+  
     addLectureBtn.addEventListener("click", (event) => {
       event.preventDefault();
-    
+  
       const lecturesDiv = moduleDiv.querySelector(".lectures");
       const lectureDiv = document.createElement("div");
       lectureDiv.classList.add("lecture");
+  
+      // Додаємо переклад для лекції
+      const lectureTitle = translations[userLang].lectureTitle;
+      const enterLectureDescription = translations[userLang].enterLectureDescription;
+  
       lectureDiv.innerHTML = `
         <div class="container">
-          <p class="title-3">Lecture ${lectureCounter}</p>
+          <p class="title-3">${translations[userLang].lecture} ${lectureCounter}</p>
           <button class="delete-lecture-btn"><img src="../images/delete.png" alt=""></button>
         </div>
-        <input type="text" placeholder="Lecture Title">
-        <label class="title-3" for="lecture-description">Description</label>
-        <textarea placeholder="Enter lecture description" rows="5"></textarea>
-        <label class="upload">Upload Materials (Video, PDF, etc.)</label>
+        <input type="text" placeholder="${lectureTitle}">
+        <label class="title-3" for="lecture-description">${translations[userLang].enterLectureDescription}</label>
+        <textarea placeholder="${enterLectureDescription}" rows="5"></textarea>
+        <label class="upload">${translations[userLang].chooseFiles}</label>
         <div class="custom-file-container">
           <label class="custom-file-upload">
-            Choose Files
+            ${translations[userLang].chooseFile}
             <input class="lecture-materials" type="file" multiple />
           </label>
           <div class="file-names-list"></div>
         </div>
       `;
-      
+  
       lecturesDiv.appendChild(lectureDiv);
       lectureCounter++;
-    
+  
       const deleteLectureBtn = lectureDiv.querySelector(".delete-lecture-btn");
       deleteLectureBtn.addEventListener("click", () => {
         lectureDiv.remove();
         updateLectureNumbers(moduleDiv);
       });
-    
-      // Додайте функціональність для завантаження файлів
+  
       const lectureMaterialsInput = lectureDiv.querySelector(".lecture-materials");
       const fileNamesList = lectureDiv.querySelector(".file-names-list");
-    
+  
       lectureMaterialsInput.addEventListener("change", (event) => {
         const files = event.target.files;
-    
+  
         // Додайте файли до списку
         Array.from(files).forEach(file => {
           const fileNameItem = document.createElement("div");
@@ -258,38 +266,47 @@ document.addEventListener('DOMContentLoaded', () => {
             <span class="file-name">${file.name}</span>
             <button class="delete-file-btn">✖</button>
           `;
-    
+  
           const deleteFileBtn = fileNameItem.querySelector(".delete-file-btn");
           deleteFileBtn.addEventListener("click", () => {
             fileNameItem.remove();
           });
-    
+  
           fileNamesList.appendChild(fileNameItem);
         });
       });
-    
+  
       updateLectureNumbers(moduleDiv);
     });
-    
-
-// Функція для оновлення нумерації лекцій
-function updateLectureNumbers(moduleDiv) {
-  const lectures = moduleDiv.querySelectorAll(".lecture");
-  lectures.forEach((lecture, index) => {
-    const title = lecture.querySelector(".title-3");
-    title.textContent = `Lecture ${index + 1}`;
-  });
-}
-});
-
-  function updateModuleNumbers() {
-    const modules = document.querySelectorAll(".module");
-    modules.forEach((moduleDiv, index) => {
-      const moduleTitle = moduleDiv.querySelector(".title-2");
-      moduleTitle.innerText = `Module ${index + 1}`;
+  
+    // Функція для оновлення номерів лекцій
+    function updateLectureNumbers(moduleDiv) {
+      const lectures = moduleDiv.querySelectorAll(".lecture");
+      lectures.forEach((lecture, index) => {
+        const title = lecture.querySelector(".title-3");
+        title.textContent = `${translations[userLang].lecture} ${index + 1}`;
+      });
+    }
+  
+    deleteModuleBtn.addEventListener("click", () => {
+      if (confirm(translations[userLang].confirmDeleteModule)) {
+        moduleDiv.remove();
+        updateModuleNumbers();
+      }
     });
-  }
-
+  
+    // Функція для оновлення нумерації модулів
+    function updateModuleNumbers() {
+      const modules = document.querySelectorAll(".module");
+      modules.forEach((moduleDiv, index) => {
+        const moduleTitle = moduleDiv.querySelector(".title-2");
+        moduleTitle.innerText = `${translations[userLang].moduleTitle} ${index + 1}`;
+      });
+    }
+  
+    updateModuleNumbers();
+  });
+});
 
   const categoryWrapper = document.querySelector('.custom-select-wrapper#category-wrapper');
   const educationWrapper = document.querySelector('.custom-select-wrapper#education-wrapper');
@@ -429,4 +446,4 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
     alert('Error creating course!');
   });
 });
-});
+ 
