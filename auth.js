@@ -4,7 +4,7 @@ const pool = require('./db.js');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
-require('dotenv').config({ path: '../secret.env' });
+require('dotenv').config();
 const passport = require('passport');
 const multer = require("multer");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;

@@ -122,6 +122,10 @@ main {
   transition: all 0.3s ease;
 }
 
+.create-course-form input[type="file"] {
+  display: none;
+}
+
 .create-course-form #course-description,
 .create-course-form textarea {
   resize: vertical; 
@@ -463,7 +467,9 @@ margin-bottom: 10px;
   border: none;
   cursor: pointer;
   background-color: #F5F9FF;
-}
+  font-size: 20px;  
+  vertical-align: middle;   
+} 
 
 .file-name-item {
   font-size: 14px;

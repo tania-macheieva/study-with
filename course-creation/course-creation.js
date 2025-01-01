@@ -207,64 +207,95 @@ document.addEventListener('DOMContentLoaded', () => {
     modulesList.appendChild(moduleDiv);
 
     const addLectureBtn = moduleDiv.querySelector(".add-lecture-btn");
-    const deleteModuleBtn = moduleDiv.querySelector(".delete-module-btn");
-    let lectureCounter = 1;
+const deleteModuleBtn = moduleDiv.querySelector(".delete-module-btn");
+let lectureCounter = 1;
 
-    addLectureBtn.addEventListener("click", (event) => {
-      event.preventDefault();
+addLectureBtn.addEventListener("click", (event) => {
+  event.preventDefault();
 
-      const lecturesDiv = moduleDiv.querySelector(".lectures");
-      const lectureDiv = document.createElement("div");
-      lectureDiv.classList.add("lecture");
-      lectureDiv.innerHTML = `
-        <div class="container">
-          <p class="title-3">Lecture ${lectureCounter}</p>
-          <button class="delete-lecture-btn"><img src="../images/delete.png" alt=""></button>
-        </div>
-        <input type="text" placeholder="Lecture Title">
-        <label class="title-3" for="lecture-description">Description</label>
-        <textarea placeholder="Enter lecture description" rows="5"></textarea>
-        <label class="upload">Upload Materials (Video, PDF, etc.)</label>
-        <div class="custom-file-container">
-          <label class="custom-file-upload">
-            Choose Files
-            <input class="lecture-materials" type="file" multiple />
-          </label>
-          <div class="file-names-list"></div>
-        </div>
-      `;
-      lecturesDiv.appendChild(lectureDiv);
-      lectureCounter++;
+  const lecturesDiv = moduleDiv.querySelector(".lectures");
+  const lectureDiv = document.createElement("div");
+  lectureDiv.classList.add("lecture");
+  lectureDiv.innerHTML = `
+    <div class="container">
+      <p class="title-3">Lecture ${lectureCounter}</p>
+      <button class="delete-lecture-btn"><img src="../images/delete.png" alt="Delete"></button>
+    </div>
+    <input type="text" placeholder="Lecture Title">
+    <label class="title-3" for="lecture-description">Description</label>
+    <textarea placeholder="Enter lecture description" rows="5"></textarea>
+    <label class="upload">Upload Materials (Video, PDF, etc.)</label>
+    <div class="custom-file-container">
+      <label class="custom-file-upload">
+        Choose Files
+        <input class="lecture-materials" type="file" multiple />
+      </label>
+      <div class="file-names-list"></div>
+    </div>
+  `;
+  lecturesDiv.appendChild(lectureDiv);
+  lectureCounter++;
 
-      const deleteLectureBtn = lectureDiv.querySelector(".delete-lecture-btn");
-      deleteLectureBtn.addEventListener("click", () => {
-        lectureDiv.remove();
-        updateLectureNumbers(moduleDiv);
-      });
-
-      updateLectureNumbers(moduleDiv);
-    });
-
-    deleteModuleBtn.addEventListener("click", () => {
-      const moduleTitle = moduleDiv.querySelector(".title-2").innerText;
-      if (confirm(`Are you sure you want to delete ${moduleTitle}?`)) {
-        moduleDiv.remove();
-        updateModuleNumbers();
-      }
-    });
-
-    updateModuleNumbers();
+  const deleteLectureBtn = lectureDiv.querySelector(".delete-lecture-btn");
+  deleteLectureBtn.addEventListener("click", () => {
+    lectureDiv.remove();
+    updateLectureNumbers(moduleDiv);
   });
 
-  function updateLectureNumbers(moduleDiv) {
-    const lecturesDiv = moduleDiv.querySelector(".lectures");
-    const lectures = lecturesDiv.querySelectorAll(".lecture");
+  const fileInput = document.querySelector('.lecture-materials');
+const fileNamesList = document.querySelector('.file-names-list');
 
-    lectures.forEach((lectureDiv, index) => {
-      const lectureTitle = lectureDiv.querySelector(".title-3");
-      lectureTitle.innerText = `Lecture ${index + 1}`;
+fileInput.addEventListener('change', (event) => {
+  const files = event.target.files;
+
+
+  Array.from(files).forEach((file) => {
+    const fileNameItem = document.createElement('div');
+    fileNameItem.classList.add('file-name-item');
+
+    const fileNameText = document.createElement('span');
+    fileNameText.textContent = file.name;
+    fileNameItem.appendChild(fileNameText);
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.classList.add('delete-file-btn');
+    deleteBtn.textContent = '×';
+    deleteBtn.addEventListener('click', () => {
+      fileNameItem.remove();
+      // Додатково можна видалити файл з масиву, якщо потрібно
     });
+    fileNameItem.appendChild(deleteBtn);
+
+    fileNamesList.appendChild(fileNameItem);
+  });
+});
+
+
+  function removeFile(fileInput, index) {
+    const dataTransfer = new DataTransfer();
+    Array.from(fileInput.files).forEach((file, i) => {
+      if (i !== index) {
+        dataTransfer.items.add(file);
+      }
+    });
+    fileInput.files = dataTransfer.files;
+
+    const event = new Event('change');
+    fileInput.dispatchEvent(event); // Перезапускаємо подію змін
   }
+
+  updateLectureNumbers(moduleDiv);
+});
+
+// Функція для оновлення нумерації лекцій
+function updateLectureNumbers(moduleDiv) {
+  const lectures = moduleDiv.querySelectorAll(".lecture");
+  lectures.forEach((lecture, index) => {
+    const title = lecture.querySelector(".title-3");
+    title.textContent = `Lecture ${index + 1}`;
+  });
+}
+});
 
   function updateModuleNumbers() {
     const modules = document.querySelectorAll(".module");
@@ -326,6 +357,11 @@ document.addEventListener('click', (event) => {
   }
 });
 
+document.getElementById("course-thumbnail").addEventListener("change", function () {
+  const fileNameSpan = document.getElementById("file-name");
+  const fileName = this.files[0]?.name || "No file chosen";
+  fileNameSpan.textContent = fileName;
+});
 
 
 
