@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Page</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/registration_pages/full_reg_teacher.css">
+</head>
+<body>
+ 
+
+    <div class="main-container">
+               <!-- Прогресивна лінійка -->
+               <div class="progress-bar">
+                <div class="progress-bar__line">
+                    <div class="progress-bar__indicator"></div>
+                </div>
+                <div class="progress-bar__steps">
+                    <span >1</span>
+                    <span>2</span>
+                    <span>3</span>
+                    <span>4</span>
+                    <span>5</span>
+                </div>
+            </div>
+        <!-- Форма реєстрації -->
+        <form id="registrationForm" method="POST" enctype="multipart/form-data" onsubmit="return false;">
+            <!-- Крок 2 -->
+            <div class="form-step" id="step-2">
+                <h1> Personal Information</h1>
+                <div class="form-grid">
+                    <!-- Ліва колонка -->
+                    <div class="form-group">
+                        <label for="dob">Date of birth</label>
+                        <input type="date" id="dob" name="dob" placeholder="Date of your birth" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <div class="gender-options">
+                            <label><input type="radio" name="gender" value="men"> Men</label>
+                            <label><input type="radio" name="gender" value="women"> Women</label>
+                            <label><input type="radio" name="gender" value="other"> Other</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="country">Country</label>
+                        <input type="text" id="country" name="country" placeholder="Country" required>
+                    </div>
+                   
+                    <!-- Права колонка -->
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" id="city" name="city" placeholder="City" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone number</label>
+                        <input type="tel" id="phone_number" name="phone_number" placeholder="Phone" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="zip">Zip code</label>
+                        <input type="text" id="zip" name="zip" placeholder="Zip code"required>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="prev-btn">Previous</button>
+                    <button type="button" class="next-btn-1">Next</button>
+                </div>
+            </div>
+            <!-- Крок 3 -->
+            <div class="form-step" id="step-3">
+                <h1>Professional Information</h1>
+                <div class="form-grid-2">
+                    <!-- Поле для спеціалізації -->
+                    <div class="form-group-2">
+                        <label for="specialty">Specialty:</label>
+                        <input type="text" id="specialty" name="specialty" placeholder="Your speciality" required>
+                    </div>
+                    <!-- Поле для початку професійного досвіду -->
+                    <div class="form-group-2">
+                        <label for="experience">Beginning of Professional Experience:</label>
+                        <input type="date" id="experience" name="experience" required>
+                    </div>
+                </div>
+                <!-- Секція для завантаження сертифікатів -->
+                <div class="upload-section">
+                    <label for="certificates">Download certificates, diplomas, etc.</label>
+                    <p>(Upload any files that prove your qualifications)</p>
+                    <input type="file" id="certificates" name="certificates" accept=".pdf" multiple hidden>
+                    <button type="button" id="upload-btn">Choose File</button>
+                    <span id="file-names">No file chosen</span>
+                    <small class="file-info">(Only PDF format allowed)</small>
+                </div>
+                <!-- Кнопки навігації -->
+                <div class="button-group">
+                    <button type="button" class="prev-btn">Previous</button>
+                    <button type="button" class="next-btn-2">Next</button>
+                </div>
+            </div>
+            
+
+            <!-- Крок 4 -->
+            <div class="form-step" id="step-4">
+                <h1>Additional Information</h1>
+                <h2>Write a short information about yourself and your teaching experience.</h2>
+                <p class="specification">(Fill in this field as desired)</p>
+            
+                <!-- Поле для написання інформації -->
+                <textarea id="about" name="about" rows="8" placeholder="Write about yourself..."></textarea>
+            
+                <!-- Кнопки навігації -->
+                <div class="button-group">
+                    <button type="button" class="prev-btn">Previous</button>
+                    <button type="button" class="next-btn-3">Next</button>
+                </div>
+            </div>
+    
+
+            <!-- Крок 5 -->
+<div class="form-step" id="step-5">
+    <div class="step-5-container">
+        <!-- Зображення -->
+        <img src="/images/success_teacher_reg.jpg" alt="Success registering" class="step-5-image">
+        <!-- Текст -->
+        <div class="step-5-text">
+            <h2>Thank you for registering!</h2>
+            <p class="inf_about_reg">The documents you submitted to confirm your qualifications will be reviewed by our team. 
+                We will send a response to your email within a few hours or, at most, up to 2 days. 
+                Thank you for your trust and your interest in joining our platform!</p>
+            <div class="button-group-end">
+                <button type="button" class="prev-btn">Previous</button>
+                <button type="submit" class="finish-btn">Finish</button>
+            </div>
+        </div>
+    </div> <!-- Закриття step-5-container -->
+</div> 
+         
+        </form>
+    </div>
+    </script>
+    <script src="full_reg_teacher.js"></script>
+    <script src="/footer/footer.js"></script>
+    <script src="../auth-header.js"></script>
+</body>
+</html>
