@@ -11,6 +11,7 @@ const session = require('express-session');
 const stripeRoutes = require("./pay-page/stripe");
 const coursesRouter = require('./courses'); 
 
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

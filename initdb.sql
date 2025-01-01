@@ -27,7 +27,6 @@ CREATE TABLE students (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE, -- Зв'язок із таблицею users
     date_of_birth DATE,
-    class VARCHAR(50), -- Наприклад, "10A" або "11B"
     phone_number VARCHAR(15),
     additional_info TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
