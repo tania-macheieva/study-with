@@ -47,7 +47,7 @@
       .form-section {
         flex: 1;
         max-width: 520px;
-        height: 320px;
+        height: auto;
         background: white;
         padding: 30px;
         border-radius: 10px;
@@ -102,17 +102,63 @@
   
     <main class="main">
         <div class="image-section">
-          <img src="/images/2880031.jpg" alt="Email Sent" class="email-image">
+          <img src="../images/2880031.jpg" alt="Email Sent" class="email-image">
         </div>
         <div class="form-section">
-          <h2>Check Your Email</h2>
-          <p>We’ve sent a password reset link to your email. Don’t forget to check your spam folder if it’s not there.</p>
-          <p>We can’t wait to have you back on our platform!</p>
-          <a href="/" class="btn">Send again</a>
+          <h2 data-lang="heading">Check Your Email</h2>
+          <p data-lang="description">We’ve sent a password reset link to your email. Don’t forget to check your spam folder if it’s not there.</p>
+          <p data-lang="desc">We can’t wait to have you back on our platform!</p>
+          <a href="/" class="btn" data-lang="continueButton">Send again</a>
         </div>
       </main>
 
-  <script src="/footer/footer.js"></script>
-  <script src="../auth-header.js"></script>
+  <script src="../footer/footer.js"></script>
+  <script src="../header/auth-header.js"></script>
+  <script>
+    const translations = {
+en: {
+    pageTitle: 'StudyWith | Check Your Email',
+    heading: 'Check Your Email',
+    description: 'We’ve sent a password reset link to your email. Don’t forget to check your spam folder if it’s not there.',
+    desc: 'We can’t wait to have you back on our platform!',
+    continueButton: 'Send again'
+},
+ua: {
+    pageTitle: 'StudyWith | Перевiрьте Вашу Пошту',
+    heading: 'Перевірьте Вашу Пошту',
+    description: 'Ми надiслали посилання для зміни паролю на вашу електронну пошту. Не забудьте перевiрити папку «Спам», якщо її там немає.',
+    desc: 'Ми не можемо дочекатися, коли ви повернетеся на нашу платформу!',
+    continueButton: 'Надiслати знову'
+}
+};
+
+function applyLanguage(lang) {
+const langData = translations[lang];
+
+document.title = langData.pageTitle;
+
+document.querySelectorAll('[data-lang]').forEach(element => {
+    const langKey = element.getAttribute('data-lang');
+    if (langData[langKey]) {
+        if (element.tagName === 'INPUT') {
+            element.setAttribute('placeholder', langData[langKey]);
+        } else if (element.tagName === 'BUTTON') {
+            element.textContent = langData[langKey];
+        } else if (element.tagName === 'H2') {
+            element.textContent = langData[langKey];
+        } else if (element.tagName === 'P') {
+            element.textContent = langData[langKey];
+        } else {
+            element.innerHTML = langData[langKey];
+        }
+    }
+});
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+const userLang = localStorage.getItem('language'); // Default to English
+applyLanguage(userLang);
+});
+  </script>
 </body>
 </html>

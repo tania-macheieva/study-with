@@ -3,107 +3,212 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Study With</title>
+    <title data-lang="pageTitle">Study With</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="all.css" />
-    <script src="/header/header-noauth.js"></script>
+    <link rel="stylesheet" href="../all_courses/all.css" />
+     
   </head>
-  <body>    
-    <h1 class="h1-courses">Course catalog</h1>
-    <h2 class="h2-find">Find everything you need</h2>
+  <body>
+    <h1 class="h1-courses" data-lang="courseCatalog">Course catalog</h1>
+    <h2 class="h2-find" data-lang="find">Find everything you need</h2>
     <div class="search-container">
-      <input type="text" class="Search" placeholder="Search courses...">
-      <button class="search-btnn">Search</button>
-    </div> 
-    <div class="container">
-        <div class="left-container">
-          <div class="filters">
-            <h4 class="filters-clear">Clear filters</h4>
-            <h4 class="filters-themes">Themes</h4>
-            <label class="checkbox">
-              <input type="checkbox" name="theme-option-1" class="checkbox" />
-              Programming
-            </label>
-            <label class="checkbox">
-              <input type="checkbox" name="theme-option-2" class="checkbox" />
-              Design
-            </label>
-            <label class="checkbox">
-              <input type="checkbox" name="theme-option-3" class="checkbox" />
-              Marketing
-            </label>
-            <label class="checkbox">
-              <input type="checkbox" name="theme-option-4" class="checkbox" />
-              Bussines
-            </label>
-            <label class="checkbox">
-              <input type="checkbox" name="theme-option-5" class="checkbox" />
-              Languages
-            </label>
-            <label class="checkbox">
-              <input type="checkbox" name="theme-option-6" class="checkbox" />
-              Finance
-            </label>
-            <label class="checkbox">
-              <input type="checkbox" name="theme-option-7" class="checkbox" />
-              Personal Development
-            </label>
-            <label class="checkbox">
-              <input type="checkbox" name="theme-option-8" class="checkbox" />
-              Art
-            </label>
-            <h4 class="filters-themes">Price</h4>
-            <label class="checkbox">
-              <input type="checkbox" name="price-free" class="checkbox" />
-              Free
-            </label>
-            <label class="checkbox">
-              <input type="checkbox" name="price-paid" class="checkbox" />
-              Paid
-            </label>
-            <h4 class="filters-themes">Educational level</h4>
-            <label class="checkbox">
-              <input type="checkbox" name="level-none" class="checkbox" />
-              No level
-            </label>
-            <label class="checkbox">
-              <input type="checkbox" name="level-basic" class="checkbox" />
-              Basic level
-            </label>
-            <label class="checkbox">
-              <input type="checkbox" name="level-intermediate" class="checkbox" />
-              Intermediate level
-            </label>
-            <label class="checkbox">
-              <input type="checkbox" name="level-advanced" class="checkbox" />
-              Advanced level
-            </label>
-            <h4 class="filters-apply">Apply filters</h4>
-          </div>
-        </div>
-        <div class="right-container">
-          <div class="container-text">
-            <h2 class="Result">Results</h2>
-            <div class="Sort">
-                <span>Sort</span>
-                <select class="dropdown">
-                    <option value="option0">Default</option>
-                    <option value="option1">Sort By Price</option>
-                    <option value="option2">Sort By Popularity</option>
-                </select>
-            </div>
-          </div>  
-            <div class="courses">
-          </div>
-        </div>
+      <input type="text" class="Search" data-lang="searchPlaceholder" placeholder="Search courses..." />
+      <button class="search-btnn" data-lang="search">Search</button>
     </div>
-  </div>
-  <button class="more-btn">Load More
-  </button>
+    <div class="container">
+      <div class="left-container">
+        <div class="filters">
+          <h4 class="filters-clear" data-lang="clearFilters">Clear filters</h4>
+          <h4 class="filters-themes" data-lang="themes">Themes</h4>
+
+          <!-- Filter Options -->
+          <label class="checkbox">
+            <input type="checkbox" name="theme-option-1" class="checkbox"/>
+            <span data-lang="programming">Programming</span>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" name="theme-option-2" class="checkbox" />
+            <span data-lang="design">Design</span>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" name="theme-option-3" class="checkbox" />
+            <span data-lang="marketing">Marketing</span>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" name="theme-option-4" class="checkbox" />
+            <span data-lang="business">Business</span>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" name="theme-option-5" class="checkbox" />
+            <span data-lang="languages">Languages</span>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" name="theme-option-6" class="checkbox" />
+            <span data-lang="finance">Finance</span>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" name="theme-option-7" class="checkbox" />
+            <span data-lang="personal-development">Personal Development</span>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" name="theme-option-8" class="checkbox" />
+            <span data-lang="art">Art</span>
+          </label>
+          
+          <!-- Price Filter -->
+          <h4 class="filters-themes" data-lang="price">Price</h4>
+          <label class="checkbox">
+            <input type="checkbox" name="price-free" class="checkbox" />
+            <span data-lang="free">Free</span>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" name="price-paid" class="checkbox" />
+            <span data-lang="paid">Paid</span>
+          </label>
+          
+          <!-- Educational Level Filter -->
+          <h4 class="filters-themes" data-lang="educationalLevel">Educational level</h4>
+          <label class="checkbox">
+            <input type="checkbox" name="level-none" class="checkbox" />
+            <span data-lang="noLevel">No level</span>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" name="level-basic" class="checkbox" />
+            <span data-lang="basicLevel">Basic level</span>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" name="level-intermediate" class="checkbox" />
+            <span data-lang="intermediateLevel">Intermediate level</span>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" name="level-advanced" class="checkbox" />
+            <span data-lang="advancedLevel">Advanced level</span>
+          </label>
+          
+
+          <h4 class="filters-apply" data-lang="applyFilters">Apply filters</h4>
+        </div>
+      </div>
+
+      <div class="right-container">
+        <div class="container-text">
+          <h2 class="Result" data-lang="results">Results</h2>
+          <div class="Sort">
+            <span data-lang="sort">Sort</span>
+            <select class="dropdown">
+              <option value="option0" data-lang="defaultSort">Default</option>
+              <option value="option1" data-lang="sortByPrice">Sort By Price</option>
+              <option value="option2" data-lang="sortByPopularity">Sort By Popularity</option>
+            </select>
+          </div>
+        </div>
+        <div class="courses"></div>
+      </div>
+    </div>
+
+    <button class="more-btn" data-lang="loadMore">Load More</button>
+    
+    <script>
+          const translations = {
+      en: {
+        pageTitle: 'StudyWith | Course Catalog',
+        courseCatalog: 'Course catalog',
+        find: 'Find everything you need',
+        searchPlaceholder: 'Search courses...',
+        search: 'Search',
+        themes: 'Themes',
+        programming: 'Programming',
+        design: 'Design',
+        marketing: 'Marketing',
+        business: 'Business',
+        languages: 'Languages',
+        finance: 'Finance',
+        personalDevelopment: 'Personal Development',
+        art: 'Art',
+        price: 'Price',
+        free: 'Free',
+        paid: 'Paid',
+        educationalLevel: 'Educational level',
+        noLevel: 'No level',
+        basicLevel: 'Basic level',
+        intermediateLevel: 'Intermediate level',
+        advancedLevel: 'Advanced level',
+        applyFilters: 'Apply filters',
+        clearFilters: 'Clear filters',
+        results: 'Results',
+        sort: 'Sort',
+        defaultSort: 'Default',
+        sortByPrice: 'Sort By Price',
+        sortByPopularity: 'Sort By Popularity',
+        loadMore: 'Load More',
+      },
+      ua: {
+        pageTitle: 'StudyWith | Каталог курсів',
+        courseCatalog: 'Каталог курсiв',
+        find: 'Знайдiть все, що вам потрiбно',
+        searchPlaceholder: 'Пошук курсiв...',
+        search: 'Пошук',
+        themes: 'Теми',
+        programming: 'Програмування',
+        design: 'Дизайн',
+        marketing: 'Маркетинг',
+        business: 'Бiзнес',
+        languages: 'Мови',
+        finance: 'Фiнанси',
+        personalDevelopment: 'Особистiсний розвиток',
+        art: 'Мистецтво',
+        price: 'Цiна',
+        free: 'Безкоштовно',
+        paid: 'Платно',
+        educationalLevel: 'Освiтнiй рiвень',
+        noLevel: 'Без рiвня',
+        basicLevel: 'Базовий рiвень',
+        intermediateLevel: 'Середнiй рiвень',
+        advancedLevel: 'Високий рiвень',
+        applyFilters: 'Застосувати фiльтри',
+        clearFilters: 'Очистити фiльтри',
+        results: 'Результат',
+        sort: 'Сортування',
+        defaultSort: 'За замовчуванням',
+        sortByPrice: 'Сортувати за цiною',
+        sortByPopularity: 'Сортувати за популярнiстю',
+        loadMore: 'Завантажити ще',
+      },
+    };
+    
+function applyLanguage(lang) {
+    const langData = translations[lang];
+
+    document.title = langData.pageTitle;
+
+    document.querySelectorAll('[data-lang]').forEach(element => {
+        const langKey = element.getAttribute('data-lang');
+        if (langData[langKey]) {
+            if (element.tagName === 'INPUT') {
+                element.setAttribute('placeholder', langData[langKey]);
+            } else if (element.tagName === 'BUTTON') {
+                element.textContent = langData[langKey];
+            } else if (element.tagName === 'H2') {
+                element.textContent = langData[langKey];
+            } else if (element.tagName === 'P') {
+                element.textContent = langData[langKey];
+            } else {
+                element.innerHTML = langData[langKey];
+            }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const userLang = localStorage.getItem('language'); 
+    applyLanguage(userLang);
+});
+    </script>
+    <script src="../header/auth-header.js"></script>
+    <script src="../all_courses/all.js"></script>
+    <script src="../footer/footer.js"></script>
   </body>
-  <script src="all.js"></script>
-  <script src="/footer/footer.js"></script>
 </html>

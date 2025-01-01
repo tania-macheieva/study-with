@@ -3,35 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudyWith</title>
+    <title data-lang="pageTitle">StudyWith</title>
     <!-- Підключення шрифтів -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/registration_pages/reg_student.css">
 </head>
 <body>
     <div class="content">
         <div class="illustration">
-            <img src="/images\na_feb_36.jpg" alt="Student Illustration">
+            <img src="/images/na_feb_36.jpg" alt="Student Illustration">
         </div>
         <div class="form-container">
-            <h1>Create an account <br>as a student</h1>
+            <h1 data-lang="formTitle">Create an account <br>as a student</h1>
             <form id="student-register-form">
-                <input type="text" name="name" placeholder="Name" required>
-                <input type="email" name="email" placeholder="Email" required>
-                <input type="password" name="password" placeholder="Password" required>
+                <input type="text" name="name" placeholder="Name" required data-lang="namePlaceholder">
+                <input type="email" name="email" placeholder="Email" required data-lang="emailPlaceholder">
+                <input type="password" name="password" placeholder="Password" required data-lang="passwordPlaceholder">
                 <div class="privacy-policy">
                     <label>
                         <input type="checkbox" name="privacy-policy" required>
-                        I accept the <a href="/privacypolicy">Privacy Policy</a>
+                        <span data-lang="privacyPolicyText"></span> <a href="/privacypolicy" data-lang="privacyPolicyLinkText"></a>
                     </label>
                 </div>
                 <input type="hidden" name="role" value="student">
-                <button type="submit">Sign Up</button>
-                <h3>or</h3>
+                <button type="submit" data-lang="signUpButton">Sign Up</button>
+                <h3 data-lang="orText">or</h3>
                 <div class="google-auth">
-                    <a href="/auth/google" class="google-btn">
+                    <a href="/auth/google" class="google-btn" data-lang="googleAuthText">
                         <img src="/images/google_logo.png" alt="Google logo">
                         Continue with Google
                     </a>
@@ -39,9 +39,9 @@
             </form>
         </div>
     </div>
-    <script src="/registration_pages/register.js"></script>
-    <script src="/footer/footer.js"></script>
-    <script src="../auth-header.js"></script>
+    <script src="../registration_pages/register.js"></script>
+    <script src="../footer/footer.js"></script>
+    <script src="../header/auth-header.js"></script>
+    <script src="../registration_pages/reg-student-lang.js"></script>
 </body>
 </html>
- 

@@ -5,11 +5,11 @@ const fs = require('fs');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const authRoutes = require('./auth'); 
-require('dotenv').config({ path: './secret.env' });
+require('dotenv').config();
 const passport = require('passport');
 const session = require('express-session');
 const stripeRoutes = require("./pay-page/stripe");
-
+const coursesRouter = require('./courses'); 
 
 app.use(cors());
 app.use(express.json());
@@ -34,7 +34,7 @@ app.use((req, res, next) => {
 });
 
 app.use(express.static(path.join(__dirname)));
- 
+
 app.get("/", (req, res) => { 
     res.sendFile(path.join(__dirname, 'home/home.html')); 
 });
@@ -86,8 +86,15 @@ app.get('/reset-password', (req, res) => {
 app.get('/reset-password', (req, res) => {
     res.sendFile(path.join(__dirname, 'log-in-page/sending_email.html'));
 });
-app.get('/profile', (req, res) => {
-    res.sendFile(path.join(__dirname, 'profile-page/student-profile.html'));//---------
+app.get('/profile-student', (req, res) => {
+    res.sendFile(path.join(__dirname, 'profile-page/student-profile.html')); 
+});
+app.get('/profile-teacher', (req, res) => {
+    res.sendFile(path.join(__dirname, 'profile-page/teacher-profile.html')); 
+});
+app.use('/api/courses', coursesRouter);
+app.get('/course-creation', (req, res) => {
+    res.sendFile(path.join(__dirname, 'course-creation/course-creation.html')); 
 });
 app.use("/pay-page", stripeRoutes);
 app.get('/get-stripe-key', (req, res) => {
@@ -106,4 +113,3 @@ const PORT = process.env.PORT || 8000;
 app.listen(PORT, HOST, () => {
     console.log(`Server running on http://${HOST}:${PORT}`);
 });
- 

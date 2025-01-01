@@ -3,27 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Verification Fail</title>
+    <title data-lang="pageTitle">Email Verification Fail</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="succes_confirm_email.css">
-  <link rel="stylesheet" href="/confirm_email_pages/fail-confirm-email.css">
+  <link rel="stylesheet" href="../confirm_email_pages/fail-confirm-email.css">
 </head>
 <body>
     
   <main class="fail-confirmation-page">
     <div class="illustration">
-      <img src="/images/2953962.jpg" alt="No data icon">
+      <img src="../images/2953962.jpg" alt="No data icon">
   </div>
     <div class="fail-conf-form">
-          <h2>Oops! Something went wrong...</h2>
-          <h3>The codes do not match.</h3>
-          <button  class="fail-button">Go back</button>
+          <h2 data-lang="heading">Oops! Something went wrong...</h2>
+          <h3 data-lang="description">The codes do not match.</h3>
+          <button  class="fail-button" data-lang="continueButton">Go back</button>
     </div>
   </main>
-  <script src="/footer/footer.js"></script>
-  <script src="../auth-header.js"></script>
-  <script src="/confirm_email_pages/fail-confirm-email.js"></script>
+  <script src="../footer/footer.js"></script>
+  <script src="../header/header-student.js"></script>
+  <script src="../confirm_email_pages/fail-confirm-email.js"></script>
+  <script>
+            const translations = {
+    en: {
+        pageTitle: 'StudyWith | Fail',
+        heading: 'Oops! Something went wrong...',
+        description: 'The codes do not match.',
+        continueButton: 'Go back'
+    },
+    ua: {
+        pageTitle: 'StudyWith | Помилка',
+        heading: 'Упс! Щось пішло не так...',
+        description: 'Коди для підверження не співпадають',
+        continueButton: 'Повернутись назад'
+    }
+};
+
+function applyLanguage(lang) {
+    const langData = translations[lang];
+
+    document.title = langData.pageTitle;
+
+    document.querySelectorAll('[data-lang]').forEach(element => {
+        const langKey = element.getAttribute('data-lang');
+        if (langData[langKey]) {
+            if (element.tagName === 'INPUT') {
+                element.setAttribute('placeholder', langData[langKey]);
+            } else if (element.tagName === 'BUTTON') {
+                element.textContent = langData[langKey];
+            } else if (element.tagName === 'H2') {
+                element.textContent = langData[langKey];
+            } else if (element.tagName === 'P') {
+                element.textContent = langData[langKey];
+            } else {
+                element.innerHTML = langData[langKey];
+            }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const userLang = localStorage.getItem('language');
+    applyLanguage(userLang);
+});
+  </script>
 </body>
 </html>

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Study With - Profile</title>
+    <title>Study With</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -34,92 +34,92 @@
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
-                    <p>username</p> 
+                    <p data-lang="username">username</p> 
                 </div>
 
                 <div class="container-my">
                     <div class="my-courses">
-                        <h2>My courses</h2>
+                        <h2 data-lang="myCourses">My courses</h2>
                         <div class="courses-list">
                             <div class="course">
-                                <p class="p-1">Course name 1</p>
+                                <p class="p-1" data-lang="courseName">Course name 1</p>
                                 <div class="progress-bar">
                                     <span style="width: 70%;"></span>
                                 </div>
                                 <p class="percent">70%</p>
                                 <img src="/images/250x100.png" alt="image">
-                                <button class="btn-resume">Resume</button>
+                                <button class="btn-resume" data-lang="btnResume">Resume</button>
                             </div>
                             <div class="course">
-                                <p class="p-1">Course name 2</p>
+                                <p class="p-1" data-lang="courseName">Course name 2</p>
                                 <div class="progress-bar">
                                     <span style="width: 40%;"></span>
                                 </div>
                                 <p class="percent">40%</p>
                                 <img src="/images/250x100.png" alt="image">
-                                <button class="btn-resume">Resume</button>
+                                <button class="btn-resume" data-lang="btnResume">Resume</button>
                             </div>
                             <div class="course">
-                                <p class="p-1">Course name 3</p>
+                                <p class="p-1" data-lang="courseName">Course name 3</p>
                                 <div class="progress-bar">
                                     <span style="width: 50%;"></span>
                                 </div>
                                 <p class="percent">50%</p>
                                 <img src="/images/250x100.png" alt="image">
-                                <button class="btn-resume">Resume</button>
+                                <button class="btn-resume" data-lang="btnResume">Resume</button>
                             </div>
                         </div>
-                        <button class="btn-view-all-1">View all</button>
+                        <button class="btn-view-all-1" data-lang="btnViewAll">View all</button>
                     </div>
                     <div>
                         <div class="my-certificates">
                             <h2>My certificates</h2>
                             <div class="certificates-list">
                                 <div class="certificate">
-                                    <p class="p-1">Certificate name 1</p>
-                                    <p class="p-2">Completed on dd/mm/yyyy</p>
+                                    <p class="p-1" data-lang="myCertificates">Certificate name 1</p>
+                                    <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
                                     <button class="btn-download">
                                         <img src="/images/download-certificate.png" alt="">
                                     </button>
                                 </div>
                                 <div class="certificate">
-                                    <p class="p-1">Certificate name 2</p>
-                                    <p class="p-2">Completed on dd/mm/yyyy</p>
+                                    <p class="p-1" data-lang="myCertificates">Certificate name 2</p>
+                                    <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
                                     <button class="btn-download">
                                         <img src="/images/download-certificate.png" alt="">
                                     </button>
                                 </div>
                                 <div class="certificate">
-                                    <p class="p-1">Certificate name 3</p>
-                                    <p class="p-2">Completed on dd/mm/yyyy</p>
+                                    <p class="p-1" data-lang="myCertificates">Certificate name 3</p>
+                                    <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
                                     <button class="btn-download">
                                         <img src="/images/download-certificate.png" alt="">
                                     </button>
                                 </div>
                             </div>
-                            <button class="btn-view-all-3">View all</button>
+                            <button class="btn-view-all-3" data-lang="btnViewAll">View all</button>
                         </div>
                     </div>
                     <div class="my-bookmarks">
-                        <h2>My bookmarks</h2>
+                        <h2 data-lang="myBookmarks">My bookmarks</h2>
                         <div class="bookmarks-list">
                             <div class="bookmark">
-                                <p class="p-1">Bookmark name 1</p>
+                                <p class="p-1" data-lang="bookmarkName">Bookmark name 1</p>
                                 <img src="/images/250x100.png" alt="image">
-                                <button class="btn-open">Open</button>
+                                <button class="btn-open" data-lang="btnOpen">Open</button>
                             </div>
                             <div class="bookmark">
-                                <p class="p-1">Bookmark name 2</p>
+                                <p class="p-1" data-lang="bookmarkName">Bookmark name 2</p>
                                 <img src="/images/250x100.png" alt="image">
-                                <button class="btn-open">Open</button>
+                                <button class="btn-open" data-lang="btnOpen">Open</button>
                             </div>
                             <div class="bookmark">
-                                <p class="p-1">Bookmark name 3</p>
+                                <p class="p-1" data-lang="bookmarkName">Bookmark name 3</p>
                                 <img src="/images/250x100.png" alt="image">
-                                <button class="btn-open">Open</button>
+                                <button class="btn-open" data-lang="btnOpen">Open</button>
                             </div>
                         </div>
-                        <button class="btn-view-all-4">View all</button>
+                        <button class="btn-view-all-4" data-lang="btnViewAll">View all</button>
                     </div>
             </main>
         </div>
@@ -262,6 +262,7 @@
     });
 
 </script>
-<script src="../auth-header.js"></script>
-<script src="/footer/footer.js"></script>
+<script src="../header/auth-header.js"></script>
+<script src="../footer/footer.js"></script>
+<script src="teacher-lang.js"></script>
 </html>
