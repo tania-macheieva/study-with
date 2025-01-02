@@ -385,17 +385,22 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
 
   const modules = [];
   let moduleCounter = 1;
-document.querySelectorAll('.module').forEach(moduleDiv => {
-  const moduleTitle = moduleDiv.querySelector('input').value;
-  const lectures = [];
- 
-  moduleDiv.querySelectorAll('.lecture').forEach(lectureDiv => {
-    const lectureTitle = lectureDiv.querySelector('input').value;
-    const lectureDescription = lectureDiv.querySelector('textarea').value;
-    lectures.push({ title: lectureTitle, description: lectureDescription });
+  document.querySelectorAll('.module').forEach(moduleDiv => {
+    const moduleTitle = moduleDiv.querySelector('input').value;
+    const lectures = [];
+
+    moduleDiv.querySelectorAll('.lecture').forEach(lectureDiv => {
+      const lectureTitle = lectureDiv.querySelector('input').value;
+      const lectureDescription = lectureDiv.querySelector('textarea').value;
+      const lectureOrderNum = moduleCounter;  // or another unique identifier for lectures
+   
+      lectures.push({ title: lectureTitle, description: lectureDescription, order_num: lectureOrderNum });
   });
-  modules.push({ title: moduleTitle, order_num: moduleCounter, lectures: lectures });
-});
+  
+
+    modules.push({ title: moduleTitle, order_num: moduleCounter, lectures: lectures });
+    moduleCounter++;
+  });
 
 
 
@@ -456,7 +461,7 @@ document.querySelectorAll('.module').forEach(moduleDiv => {
     body: formData
   })
   .then(response => response.json())
-  .then(data => {
+  .then(data => {  
     if (data.success) {
       alert('Course created successfully!');
     } else {
@@ -467,4 +472,5 @@ document.querySelectorAll('.module').forEach(moduleDiv => {
     console.error('Error:', error);
     alert('Error creating course!');
   });
+  
 });
