@@ -5,16 +5,207 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StudyWith</title>
+    <link rel="preload" href="path/to/font.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet" />
     <script src="https://js.stripe.com/v3/"></script>
-    <link rel="stylesheet" href="/pay-page/style.css">
+    <script src="stripe.js"></script>
 
+    <style>
+        body {
+            font-family: "Jost", sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .course-card {
+            max-width: 500px;
+            width: 100%;
+            background-color: #fff;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px auto;
+        }
+
+        h2 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .donation-section {
+            margin: 25px 0;
+        }
+
+        .donation-section h3 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .donation-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .donation-button {
+            padding: 10px 20px;
+            border: 2px solid #283044;
+            border-radius: 8px;
+            background: #fff;
+            color: #283044;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: "Jost", sans-serif;
+            font-size: 16px;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .donation-button.selected {
+            background: #283044;
+            color: #fff;
+        }
+
+        .donation-button:hover {
+            background: #283044;
+            color: #fff;
+        }
+
+        .price-section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .total-price {
+            font-size: 24px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .price-breakdown {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .checkout-button {
+            display: inline-block;
+            width: 100%;
+            padding: 12px 20px;
+            background-color: #283044;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-family: "Jost", sans-serif;
+        }
+
+        .checkout-button:hover {
+            background-color: #1a1f2d;
+        }
+
+        @media (max-width: 600px) {
+            .course-card {
+                margin: 10px;
+                padding: 20px;
+            }
+
+            .donation-buttons {
+                gap: 8px;
+            }
+
+            .donation-button {
+                padding: 8px 15px;
+                font-size: 14px;
+                min-width: 80px;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding-top: 50px;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        .modal-button {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            background-color: #283044;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 8px;
+        }
+
+        .modal-button:hover {
+            background-color: #1a1f2d;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="course-details">
-        <h2>Course download...</h2>
-        <div id="course-info"></div>
+    <main>
+        <div class="course-card">
+            <h2>Course Details</h2>
+            <div id="course-info"></div>
+        </div>
+    </main>
+
+    <!-- Модальне вікно для вибору донату -->
+    <div id="donation-modal" class="modal">
+        <div class="modal-content">
+            <h3>Select Donation Amount</h3>
+            <button class="modal-button" onclick="selectDonation(0)">$0 (No donation)</button>
+            <button class="modal-button" onclick="selectDonation(5)">$5</button>
+            <button class="modal-button" onclick="selectDonation(10)">$10</button>
+            <button class="modal-button" onclick="selectDonation(20)">$20</button>
+            <button class="modal-button" onclick="closeModal()">Cancel</button>
+        </div>
     </div>
 
     <script>
@@ -24,46 +215,102 @@
             window.location.href = '/';
         }
 
+        let selectedDonation = 0;
+        const donationOptions = [0, 5, 10, 20];
+
+        function updateUI(course) {
+            const courseInfo = document.getElementById('course-info');
+            const basePrice = parseFloat(course.price);
+            const totalPrice = basePrice + selectedDonation;
+
+            courseInfo.innerHTML = `
+        <h3>${course.name}</h3>
+        <p>${course.description}</p>
+        
+        <div class="donation-section">
+            <h3>Support our platform</h3>
+            <p>Choose an amount to donate:</p>
+            <div class="donation-buttons">
+                ${donationOptions.map(amount =>
+                `<button 
+                        class="donation-button ${amount === selectedDonation ? 'selected' : ''}"
+                        onclick="openModal()"
+                    >
+                        ${amount === 0 ? 'No donation' : `$${amount}`}</button>`).join('')}
+            </div>
+        </div>
+
+        <div class="price-section">
+            <div class="total-price">Total: $${totalPrice.toFixed(2)}</div>
+            <div class="price-breakdown">
+                Course price: $${basePrice.toFixed(2)}<br>
+                ${selectedDonation > 0 ? `Donation: $${selectedDonation.toFixed(2)}` : ''}
+            </div>
+            <button id="checkout-button" class="checkout-button">
+                Proceed to Payment
+            </button>
+        </div>
+    `;
+
+            setupCheckoutButton(course);
+        }
+
+        function openModal() {
+            document.getElementById('donation-modal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('donation-modal').style.display = 'none';
+        }
+
+        function selectDonation(amount) {
+            selectedDonation = amount;
+            closeModal(); // Закриваємо модальне вікно
+            fetch(`/pay-page/course/${courseId}`)
+                .then(res => res.json())
+                .then(course => {
+                    updateUI(course); // Оновлюємо інформацію на сторінці
+                });
+        }
+
+        function setupCheckoutButton(course) {
+            fetch('/get-stripe-key')
+                .then(response => response.json())
+                .then(data => {
+                    const stripe = Stripe(data.publicKey);
+
+                    document.getElementById('checkout-button').addEventListener('click', () => {
+                        fetch('/pay-page/create-checkout-session', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                courseId,
+                                donationAmount: selectedDonation
+                            }),
+                        })
+                            .then(response => response.json())
+                            .then(session => {
+                                // Redirect the user to the Stripe checkout session URL
+                                window.location.href = session.url;
+                            })
+                            .catch(error => console.error('Error:', error));
+                    });
+                })
+                .catch(error => console.error('Error fetching public key:', error));
+        }
+
+        // Initial load
         fetch(`/pay-page/course/${courseId}`)
             .then(res => res.json())
-            .then(course => {
-                const courseInfo = document.getElementById('course-info');
-                courseInfo.innerHTML = `
-                    <h3>${course.name}</h3>
-                    <p>${course.description}</p>
-                    <p>Ціна: $${course.price}</p>
-                    <button id="checkout-button">Pay</button>
-                `;
-
-                fetch('/get-stripe-key')
-                    .then(response => response.json())
-                    .then(data => {
-                        const stripe = Stripe(data.publicKey);
-
-                        document.getElementById('checkout-button').addEventListener('click', () => {
-                            fetch('/create-checkout-session', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({ courseId }),
-                            })
-                                .then(response => response.json())
-                                .then(session => {
-                                    window.location.href = session.url;
-                                })
-                                .catch(error => console.error('Error:', error));
-                        });
-                    })
-                    .catch(error => console.error('Error fetching public key:', error));
-            })
+            .then(course => updateUI(course))
             .catch(error => {
                 console.error('Error:', error);
                 alert('Error loading the course');
             });
-    </script>
-    
-</body>
 
+    </script>
+</body>
 
 </html>
