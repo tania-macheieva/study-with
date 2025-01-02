@@ -12,6 +12,10 @@ body {
     align-items: center;
 }
 
+a.lang-btn {
+    cursor: pointer;
+}
+
 .logo a:hover {
     opacity: 0.8;
 }
