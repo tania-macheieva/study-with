@@ -47,6 +47,8 @@ const translations = {
     enterLectureDescription: "Enter lecture description",
     chooseFiles: "Upload Materials (Video, PDF, etc.)",
     fillRequiredFields: "Please fill all required fields!",
+    confirmDeleteModule: 'Are you sure you want to delete this module?',
+
   },
   ua: {
     pageTitle: 'StudyWith | Створення курсу',
@@ -96,6 +98,8 @@ const translations = {
     enterLectureDescription: "Введіть опис лекції",
     chooseFiles: "Завантажити матеріали (відео, PDF тощо)",
     fillRequiredFields: "Будь ласка, заповніть усі обов'язкові поля!",
+    confirmDeleteModule: 'Ви впевнені, що хочете видалити цей модуль?',
+
   },
 };
 
@@ -379,18 +383,34 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
   const educationLevel = educationTrigger.dataset.value; // Отримуємо ID рівня освіти
   const courseThumbnail = document.getElementById('course-thumbnail').files[0];
 
+  const modules = [];
+  let moduleCounter = 1;
+document.querySelectorAll('.module').forEach(moduleDiv => {
+  const moduleTitle = moduleDiv.querySelector('input').value;
+  const lectures = [];
+ 
+  moduleDiv.querySelectorAll('.lecture').forEach(lectureDiv => {
+    const lectureTitle = lectureDiv.querySelector('input').value;
+    const lectureDescription = lectureDiv.querySelector('textarea').value;
+    lectures.push({ title: lectureTitle, description: lectureDescription });
+  });
+  modules.push({ title: moduleTitle, order_num: moduleCounter, lectures: lectures });
+});
+
+
+
+  // Перевірка вибору категорії та рівня освіти
   const categoryError = document.querySelector(".category-error");
   const educationError = document.querySelector(".education-error");
 
   const authData = getAuthDataFromStorage();
   const authorId = authData ? authData.userId : null;
 
-  const categorySelected = categoryId && categoryId !== "Select a category"; // Перевірка вибору категорії
-  const educationSelected = educationLevel && educationLevel !== "Select an education level"; // Перевірка вибору рівня освіти
+  const categorySelected = categoryId && categoryId !== "Select a category"; 
+  const educationSelected = educationLevel && educationLevel !== "Select an education level";
 
   let isValid = true;
 
-  // Перевірка на вибір категорії
   if (!categorySelected) {
     if (categoryError) {
       categoryError.style.display = "block";
@@ -402,7 +422,6 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
     }
   }
 
-  // Перевірка на вибір рівня освіти
   if (!educationSelected) {
     if (educationError) {
       educationError.style.display = "block";
@@ -418,17 +437,20 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
     return;
   }
 
-  // Створення FormData для відправки даних на сервер
+  // Створення FormData
   const formData = new FormData();
   formData.append('course_title', courseTitle);
   formData.append('course_description', courseDescription);
   formData.append('course_price', coursePrice);
-  formData.append('course_category', categoryId); // Передача ID категорії
-  formData.append('education_level', educationLevel); // Передача ID рівня освіти
+  formData.append('course_category', categoryId);
+  formData.append('education_level', educationLevel);
   formData.append('course_thumbnail', courseThumbnail);
   formData.append('author_id', authorId);
 
-  // Відправка даних на сервер
+  // Додавання модулів до FormData
+  formData.append('modules', JSON.stringify(modules));
+
+  // Відправка на сервер
   fetch('/api/courses/create', {
     method: 'POST',
     body: formData
@@ -446,4 +468,3 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
     alert('Error creating course!');
   });
 });
- 
