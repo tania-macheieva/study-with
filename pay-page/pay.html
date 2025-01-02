@@ -90,11 +90,11 @@
 
         function selectDonation(amount) {
             selectedDonation = amount;
-            closeModal(); // Закриваємо модальне вікно
+            closeModal(); 
             fetch(`/pay-page/course/${courseId}`)
                 .then(res => res.json())
                 .then(course => {
-                    updateUI(course); // Оновлюємо інформацію на сторінці
+                    updateUI(course); 
                 });
         }
 
@@ -117,7 +117,6 @@
                         })
                             .then(response => response.json())
                             .then(session => {
-                                // Redirect the user to the Stripe checkout session URL
                                 window.location.href = session.url;
                             })
                             .catch(error => console.error('Error:', error));
@@ -126,7 +125,6 @@
                 .catch(error => console.error('Error fetching public key:', error));
         }
 
-        // Initial load
         fetch(`/pay-page/course/${courseId}`)
             .then(res => res.json())
             .then(course => updateUI(course))
