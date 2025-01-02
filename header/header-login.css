@@ -212,3 +212,7 @@ body {
     transform: scale(1.05);
     transition: all 0.1s ease;
 }
+
+a.lang-btn {
+    cursor: pointer;
+}

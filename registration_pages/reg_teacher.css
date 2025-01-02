@@ -6,6 +6,70 @@ body {
   background-color: #fff;
   color: #333;
 }
+.progress-bar {
+  display: flex;
+  flex-direction: column; /* Елементи лінійки зверху один над одним */
+  align-items: center;
+  width: 80%; /* Розтягнути на всю ширину */
+  margin-bottom: 60px; /* Простір між лінійкою та формою */
+  margin-top: 40px;
+  margin-left: 160px;
+  margin-right: 40px;
+}
+
+.progress-bar__line {
+  width: 100%; /* Лінійка розтягується на ширину контейнера */
+  height: 6px;
+  background: #ddd;
+  position: relative;
+  border-radius: 5px;
+}
+
+.progress-bar__indicator {
+  height: 5px;
+  width: 0%; /* Ширина прогресу (25% для 2-го кроку) */
+  background: #283044;
+  border-radius: 5px;
+  transition: width 0.3s ease-in-out;
+}
+
+.progress-bar__steps {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: -16px; /* Відступ між лінією прогресу та номерами кроків */
+  z-index: 2 ;
+}
+
+.progress-bar__steps span {
+  width: 28px;
+  height: 28px;
+  background: #ddd;
+  color: white;
+  text-align: center;
+  line-height: 28px;
+  border-radius: 50%;
+}
+
+.progress-bar__steps span.active {
+  background: #283044;
+}
+
+
+button {
+  padding: 10px 15px;
+  margin: 10px 5px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background: #283044;
+  color: white;
+}
+
+button.prev-btn {
+  background: #ccc;
+  color: black;
+}
 
 /* Контент */
 .content {
@@ -25,7 +89,7 @@ body {
 /* Форма */
 .form-container {
   max-width: 340px;
-  height: 440px;
+  height: 560px;
   width: 100%;
   text-align: center;
   flex-direction: column;

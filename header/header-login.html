@@ -3,15 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Study With</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500&display=swap"
       rel="stylesheet"
     />
     <link
-        href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+      href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
     <link rel="stylesheet" href="/header/header-login.css" />
   </head>
   <body>
@@ -20,28 +23,44 @@
         <div class="left-section">
           <div class="logo">
             <a href="/">
-                <img src="/images/menu-logo.png" alt="StudyWith Logo"> 
-                <span>StudyWith</span>
-              </a>
+              <img src="/images/menu-logo.png" alt="StudyWith Logo" />
+              <span>StudyWith</span>
+            </a>
           </div>
           <nav class="nav-menu">
-            <a href="/courses" data-lang="all-courses">All courses</a>
-            <a href="/about" data-lang="about">About</a>
-            <a href="/contact" data-lang="contact">Contact</a>
-            <a href="/faq" data-lang="faq">FAQ</a>
+            <a href="/courses" data-lang="headerAll">All courses</a>
+            <a href="/about" data-lang="headerAbout">About</a>
+            <a href="/contact" data-lang="headerContact">Contact</a>
+            <a href="/faq" data-lang="headerFAQ">FAQ</a>
           </nav>
         </div>
-        <div class="right-section"> 
+        <div class="right-section">
           <div class="search">
             <input type="text" placeholder="Search..." />
-            <img class="search-btn" src="../images/icons8-search-50.png" alt="search-btn" />
+            <img
+              class="search-btn"
+              src="../images/icons8-search-50.png"
+              alt="search-btn"
+            />
           </div>
           <div class="lang-switcher">
-            <a href="#" class="lang-btn" data-lang="en">EN</a> |
-            <a href="#" class="lang-btn" data-lang="ua">UA</a>
+            <a class="lang-btn" data-lang="en">EN</a> |
+            <a class="lang-btn" data-lang="ua">UA</a>
           </div>
-          <button class="sign-up-btn" onclick="window.location.href='/register'">Sign Up</button>
-          <button class="sign-in-btn" onclick="window.location.href='/login'">Sign In</button>        
+          <button
+            class="sign-up-btn"
+            onclick="window.location.href='/register'"
+            data-lang="headerSignUp"
+          >
+            Sign Up
+          </button>
+          <button
+            class="sign-in-btn"
+            onclick="window.location.href='/login'"
+            data-lang="headerSignIn"
+          >
+            Sign In
+          </button>
         </div>
       </div>
     </header>

@@ -1,18 +1,18 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const studentForm = document.getElementById('student-register-form');
+document.addEventListener("DOMContentLoaded", () => {
+    const studentForm = document.getElementById("student-register-form");
     if (studentForm) {
-        studentForm.addEventListener('submit', async (event) => {
+        studentForm.addEventListener("submit", async (event) => {
             event.preventDefault();
 
             const formData = new FormData(studentForm);
             const data = Object.fromEntries(formData.entries());
-            console.log('Form data:', data);
+            console.log("Student form data:", data);
 
             try {
-                const response = await fetch('http://localhost:8000/auth/register', {
-                    method: 'POST',
+                const response = await fetch("http://localhost:8000/auth/register", {
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                     },
                     body: JSON.stringify(data),
                 });
@@ -20,52 +20,59 @@ document.addEventListener('DOMContentLoaded', () => {
                 const result = await response.json();
 
                 if (response.ok) {
-                    // Зберігаємо email в localStorage перед переходом
-                    localStorage.setItem('userEmail', data.email);
-                    window.location.href = '/confirm-email';
+                    alert("Registration successful! Please confirm your email.");
+                    localStorage.setItem("userEmail", data.email);
+                    window.location.href = "/confirm-email";
                     studentForm.reset();
                 } else {
-                    alert(result.error || 'An error occurred during registration.');
+                    alert(result.error || "An error occurred during registration.");
                 }
             } catch (error) {
-                alert('Failed to connect to the server. Please try again later.');
-                console.error('Error during fetch:', error);
+                alert("Failed to connect to the server. Please try again later.");
+                console.error("Error during student registration:", error);
             }
         });
     }
 
-    const teacherForm = document.getElementById('teacher-register-form');
-    if (teacherForm) {
-        teacherForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
+    const teacherForm = document.getElementById("teacher-register-form");
 
-            const formData = new FormData(teacherForm);
-            const data = Object.fromEntries(formData.entries());
-            console.log('Form data:', data);
+if (teacherForm) {
+    teacherForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-            try {
-                const response = await fetch('http://localhost:8000/auth/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data),
-                });
+        // Отримуємо дані з форми
+        const formData = new FormData(teacherForm);
+        const name = formData.get("name").trim();
+        const email = formData.get("email").trim();
+        const password = formData.get("password").trim();
 
-                const result = await response.json();
+        // Перевіряємо, чи всі поля заповнені
+        if (!name || !email || !password) {
+            alert("Please fill in all required fields.");
+            return;
+        }
 
-                if (response.ok) {
-                    // Зберігаємо email в localStorage перед переходом
-                    localStorage.setItem('userEmail', data.email);
-                    window.location.href = '/confirm-email';
-                    teacherForm.reset();
-                } else {
-                    alert(result.error || 'An error occurred during registration.');
-                }
-            } catch (error) {
-                alert('Failed to connect to the server. Please try again later.');
-                console.error('Error during fetch:', error);
-            }
-        });
-    }
+        // Створюємо об'єкт для зберігання
+        const teacherData = {
+            name,
+            email,
+            password,
+        };
+
+        console.log("Teacher data to save:", teacherData);
+
+        try {
+            // Зберігаємо в sessionStorage
+            localStorage.setItem("userEmail", email); // Email окремо для подальшого використання
+            sessionStorage.setItem("teacherData", JSON.stringify(teacherData));
+            sessionStorage.setItem("currentStep", "0"); // Початковий крок
+
+            // Перенаправляємо на другу сторінку
+            window.location.href = "/registration_pages/full_reg_teacher.html";
+        } catch (error) {
+            console.error("Error during registration:", error);
+            alert("An error occurred. Please try again.");
+        }
+    });
+}
 });

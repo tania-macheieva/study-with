@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Stripe = require('stripe');
-const pool = require('../db');
-require('dotenv').config();
-
+const pool = require('../db'); 
+require('dotenv').config();  // Load the default .env file
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 // Отримуємо дані курсу за ID

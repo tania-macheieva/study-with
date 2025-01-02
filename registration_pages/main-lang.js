@@ -23,6 +23,8 @@ function applyLanguage(lang) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const userLang = localStorage.getItem('language'); // Default to 'en' if not set
+    const userLang = localStorage.getItem('language');
+    console.log('Loaded language:', userLang);
+    console.log('Translations:', translations[userLang]);
     applyLanguage(userLang);
-});
+  });
