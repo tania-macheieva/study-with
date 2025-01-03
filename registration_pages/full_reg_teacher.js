@@ -93,36 +93,33 @@ function validateStep(stepIndex) {
     const currentStepForm = steps[stepIndex];
     const inputs = currentStepForm.querySelectorAll("input[required], textarea[required]");
     let isValid = true;
+    const lang = localStorage.getItem('language') || 'en'; // Отримуємо поточну мову
 
     inputs.forEach((input) => {
         const errorMessage = input.nextElementSibling?.classList.contains("error-message") 
-        ? input.nextElementSibling 
-        : null;
+            ? input.nextElementSibling 
+            : null;
 
-    if (!input.value.trim()) {
-        isValid = false;
+        if (!input.value.trim()) {
+            isValid = false;
 
-        // Додаємо клас помилки
-        input.classList.add("error");
+            input.classList.add("error");
 
-        // Додаємо повідомлення, якщо його немає
-        if (!errorMessage) {
-            const errorText = document.createElement("span");
-            errorText.classList.add("error-message");
-            errorText.textContent = "This field is required";
-            input.parentNode.appendChild(errorText);
+            if (!errorMessage) {
+                const errorText = document.createElement("span");
+                errorText.classList.add("error-message");
+                // Використовуємо переклад для помилки
+                errorText.textContent = translations[lang].requiredFieldError;
+                input.parentNode.appendChild(errorText);
+            }
+        } else {
+            input.classList.remove("error");
+
+            if (errorMessage) {
+                errorMessage.remove();
+            }
         }
-    } else {
-        // Видаляємо клас помилки
-        input.classList.remove("error");
-
-        // Видаляємо повідомлення про помилку
-        if (errorMessage) {
-            errorMessage.remove();
-        }
-    }
-});
-
+    });
     return isValid;
 }
     
