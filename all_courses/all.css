@@ -156,17 +156,16 @@ h4.filters-apply {
   position: sticky;
   align-self: flex-start; /* Не дає контейнеру змінювати своє положення */
   margin-top: 60px;
-  width: 30%; /* Ліва колонка займає 30% ширини */
+ 
   min-width: 300px; /* Мінімальна ширина, щоб виглядало коректно */
 }
 .right-container {
-  margin-top: 60px;
-  margin-left: auto;
-  margin-right: auto;
+  margin-top: 1px;
   align-items: flex-start;
   position: relative; /* Виправлення */
   margin-bottom: 32px;
-  width: 70%; /* Ширина залишиться */
+  width: 100%; /* Ширина залишиться */
+  margin-right: 64px;
 }
 
 .Result, .Sort {
@@ -191,7 +190,7 @@ h4.filters-apply {
   background-color: #fff;
   cursor: pointer;
   font-family: 'Jost', sans-serif;
-  width: 130px;
+  width: 200px;
 }
 
 .courses {
