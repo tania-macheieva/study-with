@@ -17,7 +17,7 @@
 <body>
   <main>
     <div class="create-course-form"> 
-      <form id="create-course"> 
+      <form id="create-course"  action="/api/courses/create" method="POST" enctype="multipart/form-data"> 
           
           <label class="title-1" data-lang="courseTitle" for="course-title">Course Title</label>
           <input type="text" id="course-title" name="course-title" data-lang="enterCourseTitle" placeholder="Enter course title" required>

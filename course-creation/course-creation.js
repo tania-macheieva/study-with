@@ -220,15 +220,15 @@ document.addEventListener('DOMContentLoaded', () => {
   
     addLectureBtn.addEventListener("click", (event) => {
       event.preventDefault();
-  
+    
       const lecturesDiv = moduleDiv.querySelector(".lectures");
       const lectureDiv = document.createElement("div");
       lectureDiv.classList.add("lecture");
-  
+    
       // Додаємо переклад для лекції
       const lectureTitle = translations[userLang].lectureTitle;
       const enterLectureDescription = translations[userLang].enterLectureDescription;
-  
+    
       lectureDiv.innerHTML = `
         <div class="container">
           <p class="title-3">${translations[userLang].lecture} ${lectureCounter}</p>
@@ -241,47 +241,62 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="custom-file-container">
           <label class="custom-file-upload">
             ${translations[userLang].chooseFile}
-            <input class="lecture-materials" type="file" multiple />
+            <input class="lecture-materials" name="lecture_files" id="lecture-materials" type="file" multiple />
           </label>
           <div class="file-names-list"></div>
         </div>
       `;
-  
+    
       lecturesDiv.appendChild(lectureDiv);
       lectureCounter++;
-  
+    
       const deleteLectureBtn = lectureDiv.querySelector(".delete-lecture-btn");
       deleteLectureBtn.addEventListener("click", () => {
         lectureDiv.remove();
         updateLectureNumbers(moduleDiv);
       });
-  
-      const lectureMaterialsInput = lectureDiv.querySelector(".lecture-materials");
-      const fileNamesList = lectureDiv.querySelector(".file-names-list");
-  
-      lectureMaterialsInput.addEventListener("change", (event) => {
-        const files = event.target.files;
-  
-        // Додайте файли до списку
-        Array.from(files).forEach(file => {
-          const fileNameItem = document.createElement("div");
-          fileNameItem.classList.add("file-name-item");
-          fileNameItem.innerHTML = `
-            <span class="file-name">${file.name}</span>
-            <button class="delete-file-btn">✖</button>
-          `;
-  
-          const deleteFileBtn = fileNameItem.querySelector(".delete-file-btn");
-          deleteFileBtn.addEventListener("click", () => {
-            fileNameItem.remove();
+    
+      document.addEventListener('DOMContentLoaded', function () {
+        const lectureMaterialsInput = document.querySelector('#lecture-materials');
+      
+        if (lectureMaterialsInput) {
+          lectureMaterialsInput.addEventListener("change", function (event) {
+            const files = Array.from(event.target.files);
+            const fileNamesList = event.target.closest('.custom-file-container').querySelector('.file-names-list'); // коригуємо селектор
+            console.log(fileNamesList);  
+            if (!fileNamesList) {
+              console.error('File names list not found');
+              return;
+            }
+       
+      
+            files.forEach(file => {
+              const fileNameItem = document.createElement("div");
+              fileNameItem.classList.add("file-name-item");
+              fileNameItem.innerHTML = `
+                <span class="file-name">${file.name}</span>
+                <button class="delete-file-btn">✖</button>
+              `;
+              fileNamesList.appendChild(fileNameItem);
+      
+              const deleteFileBtn = fileNameItem.querySelector(".delete-file-btn");
+              deleteFileBtn.addEventListener("click", () => {
+                const index = files.indexOf(file);
+                if (index > -1) {
+                  files.splice(index, 1); // Видаляємо файл з масиву
+                }
+                fileNameItem.remove();
+              });
+            });
           });
-  
-          fileNamesList.appendChild(fileNameItem);
-        });
+        }
       });
-  
+      
+
+      
       updateLectureNumbers(moduleDiv);
     });
+    
   
     // Функція для оновлення номерів лекцій
     function updateLectureNumbers(moduleDiv) {
@@ -379,8 +394,8 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
   const courseDescription = document.getElementById('course-description').value;
   const coursePrice = document.getElementById('course-price').value;
   
-  const categoryId = categoryTrigger.dataset.value; // Отримуємо ID категорії
-  const educationLevel = educationTrigger.dataset.value; // Отримуємо ID рівня освіти
+  const categoryId = categoryTrigger.dataset.value;
+  const educationLevel = educationTrigger.dataset.value;
   const courseThumbnail = document.getElementById('course-thumbnail').files[0];
 
   const modules = [];
@@ -392,19 +407,41 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
     moduleDiv.querySelectorAll('.lecture').forEach(lectureDiv => {
       const lectureTitle = lectureDiv.querySelector('input').value;
       const lectureDescription = lectureDiv.querySelector('textarea').value;
-      const lectureOrderNum = moduleCounter;  // or another unique identifier for lectures
+      const lectureOrderNum = moduleCounter;
    
       lectures.push({ title: lectureTitle, description: lectureDescription, order_num: lectureOrderNum });
-  });
-  
+    });
 
     modules.push({ title: moduleTitle, order_num: moduleCounter, lectures: lectures });
     moduleCounter++;
   });
 
+  // Дочекаємось завантаження DOM, щоб гарантувати, що елементи доступні
+document.addEventListener('DOMContentLoaded', function() {
+  // Знайдемо елемент input за ID
+  const lectureMaterialsInput = document.getElementById('lecture-materials');
+  let submitButton = document.getElementById('submitLectureMaterials');
 
+  // Перевіримо, чи елемент існує
+  if (lectureMaterialsInput && submitButton) {
+    // Додаємо обробник події на кнопку
+    submitButton.addEventListener('click', function() {
+      // Перевіримо, чи є вибрані матеріали
+      if (lectureMaterialsInput.files.length > 0) {
+        // Отримуємо файл
+        let selectedFile = lectureMaterialsInput.files[0];
+        console.log('Selected file:', selectedFile.name);
 
-  // Перевірка вибору категорії та рівня освіти
+        // Тут можна виконати додаткові дії з файлом, наприклад, завантаження
+      } else {
+        console.log('No file selected');
+      }
+    });
+  } else {
+    console.log('Elements not found');
+  }
+});
+
   const categoryError = document.querySelector(".category-error");
   const educationError = document.querySelector(".education-error");
 
@@ -442,8 +479,7 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
     return;
   }
 
-  // Створення FormData
-  const formData = new FormData();
+  const formData = new FormData(); 
   formData.append('course_title', courseTitle);
   formData.append('course_description', courseDescription);
   formData.append('course_price', coursePrice);
@@ -451,26 +487,37 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
   formData.append('education_level', educationLevel);
   formData.append('course_thumbnail', courseThumbnail);
   formData.append('author_id', authorId);
-
-  // Додавання модулів до FormData
   formData.append('modules', JSON.stringify(modules));
+  
+  const lectureFiles = document.querySelectorAll('.lecture-materials');
+  lectureFiles.forEach(input => {
+    if (input.files.length > 0) {
+      Array.from(input.files).forEach(file => {
+        formData.append('lecture_files', file);
+      });
+    }
+  });
 
-  // Відправка на сервер
+  // Відправка даних на сервер
   fetch('/api/courses/create', {
     method: 'POST',
-    body: formData
+    body: formData,
   })
-  .then(response => response.json())
-  .then(data => {  
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Мережна помилка');
+    }
+    return response.json();
+  })
+  .then(data => {
     if (data.success) {
-      alert('Course created successfully!');
+      alert('Курс успішно створено!');
     } else {
-      alert('Error creating course: ' + data.message);
+      alert('Помилка при створенні курсу: ' + data.message);
     }
   })
   .catch(error => {
-    console.error('Error:', error);
-    alert('Error creating course!');
+    console.error('Помилка:', error);
+    alert('Помилка при створенні курсу! ' + error.message);
   });
-  
-});
+}); 
