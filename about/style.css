@@ -2,8 +2,9 @@ body {
     margin: 0;
     padding: 0;
     background-color: #fff; 
-    font-family: 'Jost', sans-serif;
+    font-family: "Carlito", serif;
     min-height: 100vh;    
+    width: 100%;
 }
 
 .page-container {
@@ -17,10 +18,12 @@ body {
 }
 
 .title1 {
-    font-size: 26px;
-    font-weight: 550;
+    font-size: 32px;
+    font-weight: 600;
     text-align: center;
     margin-bottom: 0px;
+    font-family: "Carlito", serif;
+    color: #283044;
 }
 
 .divider {
@@ -31,3 +34,131 @@ body {
     border: none;
     border-radius: 2px;
 }
+
+.container {
+    display: flex;
+    align-items: flex-start;
+    margin: 32px;
+}
+
+.img1 {
+    margin-right: 32px;
+    width: 50%;
+    height: auto;
+}
+
+.text-block {
+    max-width: 50%;
+    top: 32px;
+    margin-right: 48px;
+}
+
+.mission {
+    font-family: "Carlito", serif;
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    text-align: center;
+
+}
+
+.descr {
+    font-family: "Carlito";
+    font-size: 20px;
+    font-weight: 200;
+    text-align: center;
+}
+
+.title2 {
+    margin-top: 100px;
+    font-size: 32px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 0px;
+    font-family: "Carlito", serif;
+    margin-bottom: 64px;
+    color: #283044;
+}
+
+                .container2 {
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                    margin: 20px;
+                }
+        
+                .value-box {
+                    width: 22%;
+                    margin: 10px;
+                    padding: 20px;
+                    border: 1px solid #ccc;
+                    border-radius: 10px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                }
+        
+                .icon {
+                    width: 100px;
+                    height: 100px;
+                    background-color: #ccc;
+                    border-radius: 50%;
+                    margin: 0 auto 20px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 20px;
+                    color: #666;
+                }
+
+                 .valueslogo {
+                    margin-bottom: 12px;
+                    text-align: center;
+                    font-family: "Carlito", serif;
+                }
+                .valuesdescr {
+                    margin-bottom: 10px;
+                    text-align: center;
+                    font-family: "Carlito", serif;
+                }
+
+.title3 {
+    margin-top: 100px;
+    font-size: 32px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 0px;
+    font-family: "Carlito", serif;
+    margin-bottom: 64px;
+    color: #283044;
+}
+
+.container3 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 82px;
+    margin-bottom: 164px;
+}
+
+.card {
+    text-align: center;
+    width: 200px;
+    height: 300px;
+}
+
+.photo {
+    width: 200px;
+    height: 300px;
+    background-color: #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.25);
+}
+
+.caption {
+    margin-top: 32px;
+    font-family: "Carlito", serif;
+}
+
