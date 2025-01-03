@@ -313,6 +313,47 @@ h4.filters-apply {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); 
 }
 
+.search-container {
+  position: relative;
+}
+
+.search-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: calc(100% - 157px); /* Віднімаємо ширину кнопки */
+  background: white;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+}
+
+.search-suggestion-item {
+  padding: 12px 20px;
+  cursor: pointer;
+  font-family: 'Jost', sans-serif;
+  font-size: 1.1rem;
+  color: #283044;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.search-suggestion-item:hover {
+  background: #f5faff;
+}
+
+.search-suggestion-item .suggestion-name {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.search-suggestion-item .suggestion-description {
+  font-size: 0.9rem;
+  color: #666;
+}
+
 @media (max-width: 768px) {
   .container {
     flex-direction: column; /* Елементи в колонку */

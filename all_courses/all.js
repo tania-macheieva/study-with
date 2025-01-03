@@ -67,12 +67,17 @@ document.addEventListener("DOMContentLoaded", function() {
             <div class="course_group">
                 <div class="course_name">${course.name}</div>
                 <div class="description">${course.description}</div>
-                <img class="rectangle-1" 
-                     src="/images/courses/${course.name.toLowerCase().replace(/\s+/g, '-')}.jpg" 
-                     onerror="this.src='/images/course-placeholder.jpg'" 
-                     alt="${course.name}"
-                />
-                <div class="rectangle-2"></div>
+
+
+
+
+
+
+
+
+
+
+                
                 <div class="group-27">
                     <div class="price">${course.price === 0 ? 'Free' : '$' + course.price}</div>
                     <img class="arrow" src="/images/right-arrow.png" alt="Arrow Icon" />
