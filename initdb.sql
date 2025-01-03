@@ -55,11 +55,26 @@ CREATE TABLE all_courses (
     CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE SET NULL,
     CONSTRAINT fk_education_level FOREIGN KEY (education_level_id) REFERENCES education_levels (id) ON DELETE SET NULL
 );
+
 -- !!!! якщо немає education_level_id у вже створеній таблиці all_courses
 ALTER TABLE all_courses
 ADD COLUMN education_level_id INT,
 ADD CONSTRAINT fk_education_level FOREIGN KEY (education_level_id) REFERENCES education_levels (id) ON DELETE SET NULL;
 
+
+CREATE TABLE tags (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL
+);
+
+-- Проміжна таблиця для зв'язку курсів і тегів
+CREATE TABLE course_tags (
+    course_id INT NOT NULL,
+    tag_id INT NOT NULL,
+    PRIMARY KEY (course_id, tag_id),
+    CONSTRAINT fk_course FOREIGN KEY (course_id) REFERENCES all_courses (id) ON DELETE CASCADE,
+    CONSTRAINT fk_tag FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE CASCADE
+);
 
 CREATE TABLE saved_courses (
     id SERIAL PRIMARY KEY,                 
