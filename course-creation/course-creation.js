@@ -48,7 +48,9 @@ const translations = {
     chooseFiles: "Upload Materials (Video, PDF, etc.)",
     fillRequiredFields: "Please fill all required fields!",
     confirmDeleteModule: 'Are you sure you want to delete this module?',
-
+    courseTags: "Course Tags (hidden from users)",
+    enterTags: "Enter tags",
+    tagTip: "To add a tag, press ENTER",
   },
   ua: {
     pageTitle: 'StudyWith | Створення курсу',
@@ -99,7 +101,9 @@ const translations = {
     chooseFiles: "Завантажити матеріали (відео, PDF тощо)",
     fillRequiredFields: "Будь ласка, заповніть усі обов'язкові поля!",
     confirmDeleteModule: 'Ви впевнені, що хочете видалити цей модуль?',
-
+    courseTags: "Теги курсу (приховані від користувачів)",
+    enterTags: "Введіть теги",
+    tagTip: "Щоб додати тег, натисніть ENTER",
   },
 };
 

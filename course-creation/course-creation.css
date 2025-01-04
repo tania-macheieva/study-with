@@ -494,7 +494,7 @@ margin-bottom: 10px;
 .tags-container {
   margin-top: 20px;  
 }
- 
+
 
 #tags-list {
   display: flex;
@@ -504,6 +504,7 @@ margin-bottom: 10px;
   
 }
 #course-tags {
+  margin-top: 10px;
   margin-bottom: 0;
 }
 .tag {
