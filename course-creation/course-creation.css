@@ -501,8 +501,11 @@ margin-bottom: 10px;
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 10px;
+  
 }
-
+#course-tags {
+  margin-bottom: 0;
+}
 .tag {
   display: inline-flex;
   align-items: center;
