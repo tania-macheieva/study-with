@@ -4,6 +4,7 @@ function saveAuthData(authData) {
     localStorage.setItem('userId', authData.userId);
     localStorage.setItem('role', authData.role);
     localStorage.setItem('name', authData.name || '');
+    localStorage.setItem('email', authData.email || '');
 }
 
 // Функція для отримання даних автентифікації
@@ -12,7 +13,8 @@ function getAuthData() {
         token: localStorage.getItem('token'),
         userId: localStorage.getItem('userId'),
         role: localStorage.getItem('role'),
-        name: localStorage.getItem('name')
+        name: localStorage.getItem('name'),
+        email: localStorage.getItem('email'),
     };
 }
 
@@ -45,7 +47,8 @@ async function handleLogin() {
                 token: data.token,
                 userId: data.user.id,
                 role: data.user.role,
-                name: data.user.name
+                name: data.user.name,
+                email: data.user.email
             };
             saveAuthData(userData);
             

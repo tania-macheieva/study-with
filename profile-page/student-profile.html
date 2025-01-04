@@ -36,7 +36,7 @@
                         </button>
                     </div>
                     <p data-lang="username">username</p>
-                    <button class="btn-teacher" data-lang="btnTeacher">Become a teacher</button>
+                    <button class="btn-teacher" id="become-teacher-btn" data-lang="btnTeacher">Become a teacher</button>
                 </div>
 
                 <div class="container-my">
@@ -127,6 +127,69 @@
         </div>
 
         <script src="../footer/footer.js"></script>
+        <script>
+       document.addEventListener('DOMContentLoaded', () => {
+    const becomeTeacherButton = document.getElementById('become-teacher-btn');
+
+    if (becomeTeacherButton) {
+        becomeTeacherButton.addEventListener('click', async () => {
+            const authData = getAuthData();
+
+            if (!authData.token || !authData.email) {
+                alert("Please log in before becoming a teacher.");
+                window.location.href = "/login.html";
+                return;
+            }
+
+            // Додавання підтвердження перед дією
+            const userConfirmed = confirm(
+                "Are you sure you want to become a teacher? If you click 'OK', your role will be updated to 'teacher'."
+            );
+
+            if (!userConfirmed) {
+                return; // Користувач натиснув 'Скасувати'
+            }
+
+            try {
+                // Відправляємо запит для оновлення ролі
+                const response = await fetch("http://localhost:8000/auth/student-to-teacher", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${authData.token}`,
+                    },
+                    body: JSON.stringify({ email: authData.email, role: "teacher" }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert("You are now a teacher! Please provide the necessary details to create a teacher profile and verify your qualifications.");
+                    sessionStorage.setItem("currentStep", "0");
+                    window.location.href = "/registration_pages/full_reg_teacher.html";
+                } else {
+                    alert(data.error || "Failed to update role.");
+                }
+            } catch (error) {
+                console.error("Error updating role:", error);
+                alert("An error occurred. Please try again later.");
+            }
+        });
+    }
+});
+
+// Функція для отримання даних автентифікації (така сама, як у JS-файлі для логіну)
+function getAuthData() {
+    return {
+        token: localStorage.getItem('token'),
+        userId: localStorage.getItem('userId'),
+        role: localStorage.getItem('role'),
+        name: localStorage.getItem('name'),
+        email: localStorage.getItem('email'),
+    };
+}
+
+        </script>
 
     </div>
 </body>

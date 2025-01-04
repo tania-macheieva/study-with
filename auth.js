@@ -18,6 +18,30 @@ const EMAIL_USER = process.env.EMAIL_USER;
 const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:8000';
 
+// Middleware для аутентифікації
+function authenticate(req, res, next) {
+    const authHeader = req.headers['authorization'];
+
+    if (!authHeader) {
+        return res.status(401).json({ error: 'Authorization header is missing' });
+    }
+
+    const token = authHeader.split(' ')[1]; // Очікуємо "Bearer <token>"
+
+    if (!token) {
+        return res.status(401).json({ error: 'Token is missing' });
+    }
+
+    jwt.verify(token, SECRET_KEY, (err, user) => {
+        if (err) {
+            return res.status(403).json({ error: 'Invalid or expired token' });
+        }
+
+        req.user = user; // Додаємо користувача до запиту
+        next();
+    });
+}
+
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -25,6 +49,7 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASSWORD,
     },
 });
+
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
@@ -443,23 +468,44 @@ router.post("/register/teacher/full-registration", upload.array("certificates"),
         console.log("Received files:", req.files);
       
         // Перевіряємо, чи користувач вже існує
-        const existingUser = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
-        if (existingUser.rows.length > 0) {
+        const existingUserResult = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+       /* if (existingUser.rows.length > 0) {
             return res.status(400).json({ error: "Email already exists" });
+        }*/
+            let userId;
+
+            if (existingUserResult.rows.length > 0) {
+                // Користувач існує - оновлюємо дані
+                const existingUser = existingUserResult.rows[0];
+    
+                console.log("User exists, updating role and profile...");
+                await pool.query(
+                    `UPDATE users SET 
+                        name = $1, 
+                        phone_number = $2, 
+                        role = 'teacher' 
+                     WHERE email = $3`,
+                    [name, phone_number, email]
+                );
+                userId = existingUser.id;
+         // Хешуємо новий пароль, якщо його оновлюють
+         if (password && password !== existingUser.user_password) {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            await pool.query("UPDATE users SET user_password = $1 WHERE id = $2", [hashedPassword, userId]);
         }
-
-        // Хешуємо пароль
+    } else {
+        // Користувача немає - створюємо нового
+        console.log("Creating new teacher...");
         const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Створюємо запис у таблиці `users`
-        const userResult = await  pool.query(
+        const userResult = await pool.query(
             `INSERT INTO users (name, email, user_password, phone_number, role)
              VALUES ($1, $2, $3, $4, 'teacher')
              RETURNING id`,
             [name, email, hashedPassword, phone_number]
         );
 
-        const userId = userResult.rows[0].id;
+        userId = userResult.rows[0].id;
+    }
 
         // Зберігаємо сертифікати
         const certificates = req.files.map((file) => file.buffer);
@@ -471,6 +517,8 @@ router.post("/register/teacher/full-registration", upload.array("certificates"),
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11 )`,
             [userId, dob, gender, country, city, phone_number, zip_code, specialty, professional_experience, about, certificates]
         );
+        // Генеруємо посилання для підтвердження
+        const confirmationLink = `http://localhost:8000/auth/confirm-teacher/${userId}`;
 
         // Відправляємо email адміністратору
         const mailOptions2 = {
@@ -490,6 +538,9 @@ router.post("/register/teacher/full-registration", upload.array("certificates"),
                 Specialty: ${specialty}
                 Experience Start Date: ${ professional_experience}
                 About: ${about || "No additional information provided"}
+
+                To confirm this teacher, click the link below:
+                ${confirmationLink}
             `,
             attachments: req.files.map((file) => ({
                 filename: file.originalname,
@@ -506,23 +557,97 @@ router.post("/register/teacher/full-registration", upload.array("certificates"),
         res.status(500).json({ error: error.message || "Internal server error" });
     } 
 });
+router.post("/student-to-teacher", authenticate, upload.array("certificates"), async (req, res) => {
+    const {email} = req.body;
 
 
-// 3. Підтвердження даних адміністраторами
-router.post("/confirm-teacher/:id", async (req, res) => {
+    try {
+        // Перевіряємо, чи користувач існує
+        const userResult = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({ error: "User not found." });
+        }
+
+        const user = userResult.rows[0];
+
+        // Перевіряємо, чи користувач уже є вчителем
+        if (user.role === "teacher") {
+            return res.status(400).json({ error: "User is already a teacher." });
+        }
+
+        // Оновлюємо роль користувача
+        await pool.query("UPDATE users SET role = 'teacher' WHERE email = $1", [email]);
+     
+
+        res.status(200).json({ message: "User role updated to teacher successfully. Email sent to admin for confirmation." });
+    } catch (error) {
+        console.error("Error updating role to teacher:", error);
+        res.status(500).json({ error: "Internal server error." });
+    }
+});
+
+// Маршрут підтвердження даних адміністраторами
+router.get("/confirm-teacher/:id", async (req, res) => {
     const { id } = req.params;
 
     try {
-        const user = await pool.query("SELECT * FROM users WHERE id = $1 AND role = 'teacher'", [id]);
-        if (user.rows.length === 0) {
-            return res.status(404).json({ error: "Teacher not found" });
+        // Перевіряємо, чи існує користувач із відповідним ID
+        const userResult = await pool.query(
+            "SELECT * FROM users WHERE id = $1 AND role = 'teacher'",
+            [id]
+        );
+
+        if (userResult.rows.length === 0) {
+            return res.status(404).send("Teacher not found or already confirmed.");
         }
 
+        const user = userResult.rows[0];
+
+        // Якщо користувач вже підтверджений
+        if (user.is_verified) {
+            return res.status(400).send("Teacher is already verified.");
+        }
+
+        // Оновлюємо статус верифікації
         await pool.query("UPDATE users SET is_verified = TRUE WHERE id = $1", [id]);
-        res.status(200).json({ message: "Teacher registration confirmed successfully" });
+
+        // Текст повідомлення англійською та українською мовами
+        const emailTextEN = `
+            Dear ${user.name},
+
+            Your application as a teacher on the StudyWith platform has been successfully verified by our administrator.
+            You can now start working as a teacher on our platform.
+
+            Best regards,
+            The StudyWith Team
+        `;
+
+        const emailTextUA = `
+            Шановний(-на) ${user.name}!
+
+            Вашу заявку як викладача на платформі StudyWith було успішно перевірено нашим адміністратором.
+            Тепер ви можете почати працювати вчителем на нашій платформі.
+
+            З повагою,
+            Команда StudyWith
+        `;
+
+        // Надсилаємо повідомлення користувачу
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: user.email, // Отримуємо email користувача
+            subject: "Your account has been verified! / Ваш обліковий запис підтверджено!",
+            text: `${emailTextEN}\n\n${emailTextUA}`, // Об'єднані повідомлення на двох мовах
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log(`Verification email sent to ${user.email}`);
+
+        res.status(200).send("Teacher successfully confirmed, and email notification sent.");
     } catch (error) {
         console.error("Error confirming teacher:", error);
-        res.status(500).json({ error: "Internal server error" });
+        res.status(500).send("Internal server error.");
     }
 });
 

@@ -246,10 +246,6 @@ finishButton.addEventListener("click", async () => {
         alert(`Error: ${error.message}`);
     }
 });
-
-
-
-
     // Ініціалізація: відображаємо крок 2 (індекс 0)
     updateStep(stepIndex);
 });
