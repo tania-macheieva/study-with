@@ -515,20 +515,22 @@ document.addEventListener('DOMContentLoaded', function() {
   formData.append('modules', JSON.stringify(modules));
   formData.append('tags', JSON.stringify(tagsList));
 
-  const addedLectureFiles = [];
+// Масив для зберігання унікальних файлів
+const addedLectureFiles = [];
 
-  const lectureFiles = document.querySelectorAll('.lecture-materials');
-  lectureFiles.forEach(input => {
-    if (input.files.length > 0) {
-      Array.from(input.files).forEach(file => {
-        // Перевірка, чи файл вже додано
-        if (!addedLectureFiles.some(addedFile => addedFile.name === file.name && addedFile.size === file.size)) {
-          addedLectureFiles.push(file); // Додаємо файл у масив
-          formData.append('lecture_files', file); // Додаємо файл до formData
-        }
-      });
-    }
-  });
+const lectureFiles = document.querySelectorAll('.lecture-materials');
+lectureFiles.forEach(input => {
+  if (input.files.length > 0) {
+    Array.from(input.files).forEach(file => {
+      // Перевірка, чи файл вже додано
+      if (!addedLectureFiles.some(addedFile => addedFile.name === file.name && addedFile.size === file.size)) {
+        addedLectureFiles.push(file); // Додаємо файл у масив
+        formData.append('lecture_files', file); // Додаємо файл до formData
+      }
+    });
+  }
+});
+
 
   // Відправка даних на сервер
   fetch('/api/courses/create', {
