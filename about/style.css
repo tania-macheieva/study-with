@@ -10,6 +10,17 @@ body {
 .page-container {
     display: flex;
     flex-direction: column; 
+    animation: fadeIn 0.9s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .main {
@@ -48,25 +59,26 @@ body {
 }
 
 .text-block {
-    max-width: 50%;
-    top: 32px;
-    margin-right: 48px;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    text-align: justify;
+    border-radius: 10px;
+    font-family: "Carlito", serif;
 }
 
 .mission {
-    font-family: "Carlito", serif;
     font-size: 26px;
-    font-weight: 600;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
     text-align: center;
-
+    color: #283044;
+    font-weight: 600;
 }
 
 .descr {
-    font-family: "Carlito";
     font-size: 20px;
-    font-weight: 200;
-    text-align: center;
+    color: #222222;
+    font-weight: 400;
 }
 
 .title2 {
@@ -137,12 +149,14 @@ body {
     align-items: center;
     gap: 82px;
     margin-bottom: 164px;
+    flex-wrap: wrap;
 }
 
 .card {
     text-align: center;
     width: 200px;
     height: 300px;
+    margin-bottom: 64px;
 }
 
 .photo {
@@ -153,7 +167,7 @@ body {
     align-items: center;
     justify-content: center;
     margin-bottom: 10px;
-    border-radius: 12px;
+    border-radius: 14px;
     box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.25);
 }
 
@@ -162,3 +176,26 @@ body {
     font-family: "Carlito", serif;
 }
 
+.value-box,
+.card {
+    border-radius: 14px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.value-box:hover,
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 14px;
+}
+
+ .hidden {
+     opacity: 0;
+     transform: translateY(50px);
+     transition: opacity 1s ease, transform 1s ease;
+ }
+
+ .visible {
+     opacity: 1;
+     transform: translateY(0);
+ }

@@ -41,7 +41,7 @@
             </h4>
           </div>
         </div>
-        <div class="Valuesside">
+        <div class="Valuesside hidden">
           <p class="title2" data-lang="values">Our Values</p>
           <div class="container2">
             <div class="value-box">
@@ -100,7 +100,7 @@
             </div>
           </div>
         </div>
-        <div class="team">
+        <div class="team hidden">
           <p class="title3" data-lang="team">Team Members</p>
 <div class="container3">
 
@@ -201,6 +201,27 @@
         });
       </script>
       <script src="../footer/footer.js"></script>
+      <script>
+    function checkVisibility(element) {
+      const rect = element.getBoundingClientRect();
+      return rect.top < window.innerHeight && rect.bottom >= 0;
+    }
+
+    function onScroll() {
+      const valuesSection = document.querySelector('.Valuesside');
+      const teamSection = document.querySelector('.team');
+
+      if (checkVisibility(valuesSection)) {
+        valuesSection.classList.add('visible');
+      }
+
+      if (checkVisibility(teamSection)) {
+        teamSection.classList.add('visible');
+      }
+    }
+
+    window.addEventListener('scroll', onScroll);
+  </script>
     </div>
   </body>
 </html>
