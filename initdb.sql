@@ -57,11 +57,12 @@ CREATE TABLE all_courses (
     CONSTRAINT fk_education_level FOREIGN KEY (education_level_id) REFERENCES education_levels (id) ON DELETE SET NULL
 );
 
--- !!!! якщо немає education_level_id у вже створеній таблиці all_courses
-ALTER TABLE all_courses
-ADD COLUMN education_level_id INT,
-ADD CONSTRAINT fk_education_level FOREIGN KEY (education_level_id) REFERENCES education_levels (id) ON DELETE SET NULL;
-
+-- -- !!!! якщо немає education_level_id у вже створеній таблиці all_courses
+---------------------------------------------------------
+-- ALTER TABLE all_courses
+-- ADD COLUMN education_level_id INT,
+-- ADD CONSTRAINT fk_education_level FOREIGN KEY (education_level_id) REFERENCES education_levels (id) ON DELETE SET NULL;
+---------------------------------------------------------------------------------------
 
 CREATE TABLE tags (
     id SERIAL PRIMARY KEY,
