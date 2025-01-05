@@ -221,26 +221,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const addLectureBtn = moduleDiv.querySelector(".add-lecture-btn");
     const deleteModuleBtn = moduleDiv.querySelector(".delete-module-btn");
     let lectureCounter = 1;
+     
 
-    function updateLectureNumbers(moduleDiv) {
-      const lectures = moduleDiv.querySelectorAll(".lecture");
-      lectures.forEach((lectureDiv, index) => {
-        const lectureTitle = lectureDiv.querySelector(".title-3");
-        lectureTitle.innerText = `${translations[userLang].lecture} ${index + 1}`;
-      });
-    }
-    
     // Додавання лекції
     addLectureBtn.addEventListener("click", (event) => {
       event.preventDefault();
-      
+
       const lecturesDiv = moduleDiv.querySelector(".lectures");
       const lectureDiv = document.createElement("div");
       lectureDiv.classList.add("lecture");
-      
+
       const lectureTitle = translations[userLang].lectureTitle;
       const enterLectureDescription = translations[userLang].enterLectureDescription;
-    
+
       lectureDiv.innerHTML = `
         <div class="container">
           <p class="title-3">${translations[userLang].lecture} ${lectureCounter}</p>
@@ -258,19 +251,47 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="file-names-list" id="file-names-list-${lectureCounter}"></div>
         </div>
       `;
-    
+
       lecturesDiv.appendChild(lectureDiv);
-    
+
       const deleteLectureBtn = lectureDiv.querySelector(".delete-lecture-btn");
       deleteLectureBtn.addEventListener("click", () => {
         lectureDiv.remove(); // Видаляємо лекцію
         updateLectureNumbers(moduleDiv); // Оновлюємо нумерацію
       });
-    
+
+      // Обробка файлів для лекції
+      const lectureMaterialsInput = lectureDiv.querySelector(`#lecture-materials-${lectureCounter}`);
+      const fileNamesList = lectureDiv.querySelector(`#file-names-list-${lectureCounter}`);
+
+      lectureMaterialsInput.addEventListener("change", function(event) {
+        const files = Array.from(event.target.files);
+
+        files.forEach(file => {
+          const fileNameItem = document.createElement("div");
+          fileNameItem.classList.add("file-name-item");
+          fileNameItem.innerHTML = `
+            <span class="file-name">${file.name}</span>
+            <button class="delete-file-btn">✖</button>
+          `;
+          fileNamesList.appendChild(fileNameItem);
+
+          const deleteFileBtn = fileNameItem.querySelector(".delete-file-btn");
+          deleteFileBtn.addEventListener("click", () => {
+            const index = files.indexOf(file);
+            if (index > -1) {
+              files.splice(index, 1); // Видаляємо файл із списку
+            }
+            fileNameItem.remove();
+          });
+        });
+      });
+
       lectureCounter++;
       updateLectureNumbers(moduleDiv);
     });
-    
+
+   
     deleteModuleBtn.addEventListener("click", () => {
       if (confirm(translations[userLang].confirmDeleteModule)) {
         moduleDiv.remove();
