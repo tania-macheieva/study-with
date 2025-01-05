@@ -222,13 +222,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const deleteModuleBtn = moduleDiv.querySelector(".delete-module-btn");
     let lectureCounter = 1;
 
+    function updateLectureNumbers(moduleDiv) {
+      const lectures = moduleDiv.querySelectorAll(".lecture");
+      lectures.forEach((lectureDiv, index) => {
+        const lectureTitle = lectureDiv.querySelector(".title-3");
+        lectureTitle.innerText = `${translations[userLang].lecture} ${index + 1}`;
+      });
+    }
+    
+    // Додавання лекції
     addLectureBtn.addEventListener("click", (event) => {
       event.preventDefault();
-    
+      
       const lecturesDiv = moduleDiv.querySelector(".lectures");
       const lectureDiv = document.createElement("div");
       lectureDiv.classList.add("lecture");
-    
+      
       const lectureTitle = translations[userLang].lectureTitle;
       const enterLectureDescription = translations[userLang].enterLectureDescription;
     
@@ -251,47 +260,17 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
     
       lecturesDiv.appendChild(lectureDiv);
-      lectureCounter++;
-
-      // Add event listener for file input
-      const lectureMaterialsInput = lectureDiv.querySelector(`#lecture-materials-${lectureCounter - 1}`);
-      const fileNamesList = lectureDiv.querySelector(`#file-names-list-${lectureCounter - 1}`);
-      
-      lectureMaterialsInput.addEventListener("change", function(event) {
-        const files = Array.from(event.target.files);
-         
-
-        files.forEach(file => {
-          const fileNameItem = document.createElement("div");
-          fileNameItem.classList.add("file-name-item");
-          fileNameItem.innerHTML = `
-            <span class="file-name">${file.name}</span>
-            <button class="delete-file-btn">✖</button>
-          `;
-          fileNamesList.appendChild(fileNameItem);
-
-          const deleteFileBtn = fileNameItem.querySelector(".delete-file-btn");
-          deleteFileBtn.addEventListener("click", () => {
-            const index = files.indexOf(file);
-            if (index > -1) {
-              files.splice(index, 1); // Remove the file from the list
-            }
-            fileNameItem.remove();
-          });
-        });
+    
+      const deleteLectureBtn = lectureDiv.querySelector(".delete-lecture-btn");
+      deleteLectureBtn.addEventListener("click", () => {
+        lectureDiv.remove(); // Видаляємо лекцію
+        updateLectureNumbers(moduleDiv); // Оновлюємо нумерацію
       });
-       
+    
+      lectureCounter++;
       updateLectureNumbers(moduleDiv);
     });
-
-    function updateLectureNumbers(moduleDiv) {
-      const lectures = moduleDiv.querySelectorAll(".lecture");
-      lectures.forEach((lectureDiv, index) => {
-        const lectureTitle = lectureDiv.querySelector(".title-3");
-        lectureTitle.innerText = `${translations[userLang].lecture} ${index + 1}`;
-      });
-    }    
-
+    
     deleteModuleBtn.addEventListener("click", () => {
       if (confirm(translations[userLang].confirmDeleteModule)) {
         moduleDiv.remove();
