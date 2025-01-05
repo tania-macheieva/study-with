@@ -9,16 +9,20 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="../all_courses/all.css" />
-     
   </head>
   <body>
     <h1 class="h1-courses" data-lang="courseCatalog">Course catalog</h1>
     <h2 class="h2-find" data-lang="find">Find everything you need</h2>
     <div class="search-container">
-      <input type="text" class="Search" data-lang="searchPlaceholder" placeholder="Search courses..." />
+      <input
+        type="text"
+        class="Search"
+        data-lang="searchPlaceholder"
+        placeholder="Search courses..."
+      />
       <button class="search-btnn" data-lang="search">Search</button>
       <div class="search-suggestions"></div>
-  </div>
+    </div>
     <div class="container">
       <div class="left-container">
         <div class="filters">
@@ -27,7 +31,7 @@
 
           <!-- Filter Options -->
           <label class="checkbox">
-            <input type="checkbox" name="theme-option-1" class="checkbox"/>
+            <input type="checkbox" name="theme-option-1" class="checkbox" />
             <span data-lang="programming">Programming</span>
           </label>
           <label class="checkbox">
@@ -58,7 +62,7 @@
             <input type="checkbox" name="theme-option-8" class="checkbox" />
             <span data-lang="art">Art</span>
           </label>
-          
+
           <!-- Price Filter -->
           <h4 class="filters-themes" data-lang="price">Price</h4>
           <label class="checkbox">
@@ -69,9 +73,11 @@
             <input type="checkbox" name="price-paid" class="checkbox" />
             <span data-lang="paid">Paid</span>
           </label>
-          
+
           <!-- Educational Level Filter -->
-          <h4 class="filters-themes" data-lang="educationalLevel">Educational level</h4>
+          <h4 class="filters-themes" data-lang="educationalLevel">
+            Educational level
+          </h4>
           <label class="checkbox">
             <input type="checkbox" name="level-none" class="checkbox" />
             <span data-lang="noLevel">No level</span>
@@ -88,7 +94,6 @@
             <input type="checkbox" name="level-advanced" class="checkbox" />
             <span data-lang="advancedLevel">Advanced level</span>
           </label>
-          
 
           <h4 class="filters-apply" data-lang="applyFilters">Apply filters</h4>
         </div>
@@ -96,13 +101,17 @@
 
       <div class="right-container">
         <div class="container-text">
-          <h2 class="Result" data-lang="results">Results</h2>
+          <h2 class="Result" data-lang="results"></h2>
           <div class="Sort">
             <span data-lang="sort">Sort</span>
             <select class="dropdown">
               <option value="option0" data-lang="defaultSort">Default</option>
-              <option value="option1" data-lang="sortByPrice">Sort By Price</option>
-              <option value="option2" data-lang="sortByPopularity">Sort By Popularity</option>
+              <option value="option1" data-lang="sortByPrice">
+                Sort By Price
+              </option>
+              <option value="option2" data-lang="sortByPopularity">
+                Sort By Popularity
+              </option>
             </select>
           </div>
         </div>
@@ -111,102 +120,102 @@
     </div>
 
     <button class="more-btn" data-lang="loadMore">Load More</button>
-    
+
     <script>
-          const translations = {
-      en: {
-        pageTitle: 'StudyWith | Course Catalog',
-        courseCatalog: 'Course catalog',
-        find: 'Find everything you need',
-        searchPlaceholder: 'Search courses...',
-        search: 'Search',
-        themes: 'Themes',
-        programming: 'Programming',
-        design: 'Design',
-        marketing: 'Marketing',
-        business: 'Business',
-        languages: 'Languages',
-        finance: 'Finance',
-        personalDevelopment: 'Personal Development',
-        art: 'Art',
-        price: 'Price',
-        free: 'Free',
-        paid: 'Paid',
-        educationalLevel: 'Educational level',
-        noLevel: 'No level',
-        basicLevel: 'Basic level',
-        intermediateLevel: 'Intermediate level',
-        advancedLevel: 'Advanced level',
-        applyFilters: 'Apply filters',
-        clearFilters: 'Clear filters',
-        results: 'Results',
-        sort: 'Sort',
-        defaultSort: 'Default',
-        sortByPrice: 'Sort By Price',
-        sortByPopularity: 'Sort By Popularity',
-        loadMore: 'Load More',
-      },
-      ua: {
-        pageTitle: 'StudyWith | Каталог курсів',
-        courseCatalog: 'Каталог курсiв',
-        find: 'Знайдiть все, що вам потрiбно',
-        searchPlaceholder: 'Пошук курсiв...',
-        search: 'Пошук',
-        themes: 'Теми',
-        programming: 'Програмування',
-        design: 'Дизайн',
-        marketing: 'Маркетинг',
-        business: 'Бiзнес',
-        languages: 'Мови',
-        finance: 'Фiнанси',
-        personalDevelopment: 'Особистiсний розвиток',
-        art: 'Мистецтво',
-        price: 'Цiна',
-        free: 'Безкоштовно',
-        paid: 'Платно',
-        educationalLevel: 'Освiтнiй рiвень',
-        noLevel: 'Без рiвня',
-        basicLevel: 'Базовий рiвень',
-        intermediateLevel: 'Середнiй рiвень',
-        advancedLevel: 'Високий рiвень',
-        applyFilters: 'Застосувати фiльтри',
-        clearFilters: 'Очистити фiльтри',
-        results: 'Результат',
-        sort: 'Сортування',
-        defaultSort: 'За замовчуванням',
-        sortByPrice: 'Сортувати за цiною',
-        sortByPopularity: 'Сортувати за популярнiстю',
-        loadMore: 'Завантажити ще',
-      },
-    };
-    
-function applyLanguage(lang) {
-    const langData = translations[lang];
+      const translations = {
+        en: {
+          pageTitle: "StudyWith | Course Catalog",
+          courseCatalog: "Course catalog",
+          find: "Find everything you need",
+          searchPlaceholder: "Search courses...",
+          search: "Search",
+          themes: "Themes",
+          programming: "Programming",
+          design: "Design",
+          marketing: "Marketing",
+          business: "Business",
+          languages: "Languages",
+          finance: "Finance",
+          personalDevelopment: "Personal Development",
+          art: "Art",
+          price: "Price",
+          free: "Free",
+          paid: "Paid",
+          educationalLevel: "Educational level",
+          noLevel: "No level",
+          basicLevel: "Basic level",
+          intermediateLevel: "Intermediate level",
+          advancedLevel: "Advanced level",
+          applyFilters: "Apply filters",
+          clearFilters: "Clear filters",
+          results: "Results",
+          sort: "Sort",
+          defaultSort: "Default",
+          sortByPrice: "Sort By Price",
+          sortByPopularity: "Sort By Popularity",
+          loadMore: "Load More",
+        },
+        ua: {
+          pageTitle: "StudyWith | Каталог курсів",
+          courseCatalog: "Каталог курсiв",
+          find: "Знайдiть все, що вам потрiбно",
+          searchPlaceholder: "Пошук курсiв...",
+          search: "Пошук",
+          themes: "Теми",
+          programming: "Програмування",
+          design: "Дизайн",
+          marketing: "Маркетинг",
+          business: "Бiзнес",
+          languages: "Мови",
+          finance: "Фiнанси",
+          personalDevelopment: "Особистiсний розвиток",
+          art: "Мистецтво",
+          price: "Цiна",
+          free: "Безкоштовно",
+          paid: "Платно",
+          educationalLevel: "Освiтнiй рiвень",
+          noLevel: "Без рiвня",
+          basicLevel: "Базовий рiвень",
+          intermediateLevel: "Середнiй рiвень",
+          advancedLevel: "Високий рiвень",
+          applyFilters: "Застосувати фiльтри",
+          clearFilters: "Очистити фiльтри",
+          results: "Результат",
+          sort: "Сортування",
+          defaultSort: "За замовчуванням",
+          sortByPrice: "Сортувати за цiною",
+          sortByPopularity: "Сортувати за популярнiстю",
+          loadMore: "Завантажити ще",
+        },
+      };
 
-    document.title = langData.pageTitle;
+      function applyLanguage(lang) {
+        const langData = translations[lang];
 
-    document.querySelectorAll('[data-lang]').forEach(element => {
-        const langKey = element.getAttribute('data-lang');
-        if (langData[langKey]) {
-            if (element.tagName === 'INPUT') {
-                element.setAttribute('placeholder', langData[langKey]);
-            } else if (element.tagName === 'BUTTON') {
-                element.textContent = langData[langKey];
-            } else if (element.tagName === 'H2') {
-                element.textContent = langData[langKey];
-            } else if (element.tagName === 'P') {
-                element.textContent = langData[langKey];
+        document.title = langData.pageTitle;
+
+        document.querySelectorAll("[data-lang]").forEach((element) => {
+          const langKey = element.getAttribute("data-lang");
+          if (langData[langKey]) {
+            if (element.tagName === "INPUT") {
+              element.setAttribute("placeholder", langData[langKey]);
+            } else if (element.tagName === "BUTTON") {
+              element.textContent = langData[langKey];
+            } else if (element.tagName === "H2") {
+              element.textContent = langData[langKey];
+            } else if (element.tagName === "P") {
+              element.textContent = langData[langKey];
             } else {
-                element.innerHTML = langData[langKey];
+              element.innerHTML = langData[langKey];
             }
-        }
-    });
-}
+          }
+        });
+      }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const userLang = localStorage.getItem('language'); 
-    applyLanguage(userLang);
-});
+      document.addEventListener("DOMContentLoaded", () => {
+        const userLang = localStorage.getItem("language");
+        applyLanguage(userLang);
+      });
     </script>
     <script src="../header/auth-header.js"></script>
     <script src="../footer/footer.js"></script>

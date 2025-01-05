@@ -95,12 +95,30 @@ document.addEventListener("DOMContentLoaded", function() {
 }
 
   // Оновлення кількості результатів
-  function updateResultsCount() {
-      const resultsCount = document.querySelector(".Result");
-      if (resultsCount) {
-          resultsCount.textContent = `Результати (${currentCourses.length})`;
-      }
-  }
+function getTranslation(key) {
+    const translations = {
+        ua: {
+            results: "Результати ",
+        },
+        en: {
+            results: "Results "
+        },
+    };
+
+    const language = localStorage.getItem('language'); 
+    return translations[language] && translations[language][key] ? translations[language][key] : 'Translation not found';
+}
+
+function updateResultsCount() {
+    const resultsCount = document.querySelector(".Result");
+    if (resultsCount) {
+        const courseCount = currentCourses && Array.isArray(currentCourses) ? currentCourses.length : 0;
+        resultsCount.textContent = `${getTranslation('results')} (${courseCount})`;
+    }
+}
+
+updateResultsCount();
+
 
   
   // Функція пошуку
