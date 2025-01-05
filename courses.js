@@ -95,20 +95,20 @@ router.post('/create', upload, async (req, res) => {
                 if (moduleLectures && Array.isArray(moduleLectures)) {
                     const lecturePromises = moduleLectures.map(async (lecture, index) => {
                         const { title, description } = lecture;
-                    
+
                         if (!title) {
                             throw new Error('Lecture must have a title.');
                         }
-                    
+
                         const lectureResult = await pool.query(
                             `INSERT INTO lectures (module_id, title, description, order_num) VALUES ($1, $2, $3, $4) RETURNING id`,
                             [moduleId, title, description, index + 1]
                         );
-                    
-                        // Check if the current lecture has files and associate them
-                        const lectureFilesForThisLecture = req.files['lecture_files']?.slice(index, index + 1);  // This ensures only the correct file(s) are selected for the lecture
-                    
-                        if (lectureFilesForThisLecture && lectureFilesForThisLecture.length > 0) {
+
+                        // Отримаємо тільки файли для поточної лекції
+                        const lectureFilesForThisLecture = req.files['lecture_files']?.slice(index * 2, (index + 1) * 2);  // Призначаємо два файли на лекцію
+
+                        if (lectureFilesForThisLecture) {
                             const lectureFilePromises = lectureFilesForThisLecture.map((file) => {
                                 return pool.query(
                                     `INSERT INTO lecture_files (lecture_id, file_name, file_url, file_type)
@@ -116,16 +116,15 @@ router.post('/create', upload, async (req, res) => {
                                     [
                                         lectureResult.rows[0].id,
                                         file.originalname,
-                                        file.path,  // You may need to adjust the path
+                                        file.path,
                                         file.mimetype,
                                     ]
                                 );
                             });
-                    
-                            await Promise.all(lectureFilePromises);  // Ensure this is awaited
+
+                            await Promise.all(lectureFilePromises);
                         }
                     });
-                    
 
                     await Promise.all(lecturePromises);
                 }

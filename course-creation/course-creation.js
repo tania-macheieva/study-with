@@ -222,7 +222,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const deleteModuleBtn = moduleDiv.querySelector(".delete-module-btn");
     let lectureCounter = 1;
      
-
+    function updateLectureNumbers(moduleDiv) {
+      const lectures = moduleDiv.querySelectorAll(".lecture");
+      lectures.forEach((lecture, index) => {
+        const title = lecture.querySelector(".title-3");
+        title.textContent = `${translations[userLang].lecture} ${index + 1}`;
+      });
+    }
     // Додавання лекції
     addLectureBtn.addEventListener("click", (event) => {
       event.preventDefault();
@@ -533,25 +539,22 @@ lectureFiles.forEach(input => {
 
 
   // Відправка даних на сервер
+  // Send the data to the server
   fetch('/api/courses/create', {
     method: 'POST',
     body: formData,
   })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Мережна помилка');
-    }
-    return response.json();
-  })
-  .then(data => {
-    if (data.success) {
-      alert('Курс успішно створено!');
-    } else {
-      alert('Помилка при створенні курсу: ' + data.message);
-    }
-  })
-  .catch(error => {
-    console.error('Помилка:', error);
-    alert('Помилка при створенні курсу! ' + error.message);
-  });
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Course created successfully!');
+        window.location.href = '/courses'; // Redirect after successful creation
+      } else {
+        alert('Failed to create the course: ' + (data.error || 'Unknown error'));
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred while creating the course.');
+    });
 });    });
