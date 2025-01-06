@@ -222,13 +222,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const deleteModuleBtn = moduleDiv.querySelector(".delete-module-btn");
     let lectureCounter = 1;
      
-    function updateLectureNumbers(moduleDiv) {
-      const lectures = moduleDiv.querySelectorAll(".lecture");
-      lectures.forEach((lecture, index) => {
-        const title = lecture.querySelector(".title-3");
-        title.textContent = `${translations[userLang].lecture} ${index + 1}`;
-      });
-    }
+ // Функція для оновлення нумерації лекцій
+ function updateLectureNumbers(moduleDiv) {
+  const lectures = moduleDiv.querySelectorAll(".lecture .title-3");
+  lectures.forEach((lectureTitle, index) => {
+    lectureTitle.textContent = `${translations[userLang].lecture} ${index + 1}`;
+  });
+}
     // Додавання лекції
     addLectureBtn.addEventListener("click", (event) => {
       event.preventDefault();

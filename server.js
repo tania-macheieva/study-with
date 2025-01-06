@@ -18,6 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use("/auth", authRoutes);
 
+
 const searchRouter = require('./searchRouter');
 app.use('/api/search', searchRouter);
 
