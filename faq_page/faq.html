@@ -187,6 +187,15 @@
           <!-- Add more FAQ items as needed -->
         </div>
       </section>
+      <section class="add-question-section">
+        <h2>Add your question</h2>
+        <form id="questionForm">
+          <label id="questionInput-1"  for="questionInput">Your question:</label>
+          <textarea id="questionInput" name="question" required></textarea>
+          <button type="submit">Send</button>
+          <p id="message" style="display:none;"></p>
+        </form>
+      </section>
     </main>
     <script src="../header/auth-header.js"></script>
     <script src="../footer/footer.js"></script>
@@ -326,6 +335,75 @@
         const userLang = localStorage.getItem("language"); // Default to English
         applyLanguage(userLang);
       });
+
+      // Перевірка авторизації
+async function checkAuth() {
+  const token = localStorage.getItem('token'); // Припустимо, токен зберігається в localStorage
+  if (!token) {
+    document.querySelector('.add-question-section').style.display = 'none'; // Приховуємо форму
+    return false;
+  }
+
+  // Додаткова перевірка на сервері (опціонально)
+  const response = await fetch('http://localhost:8000/auth/auth-check', {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const result = await response.json();
+  if (!result.authenticated) {
+    document.querySelector('.add-question-section').style.display = 'none'; // Приховуємо форму
+    return false;
+  }
+
+  return true;
+}
+
+      // Обробка форми
+document.getElementById('questionForm').addEventListener('submit', async function (event) {
+  event.preventDefault();
+
+  const token = localStorage.getItem('token'); // Токен авторизації
+  if (!token) {
+    alert('Будь ласка, увійдіть у систему, щоб надіслати запитання.');
+    return;
+  }
+
+  const question = document.getElementById('questionInput').value;
+
+  try {
+    const response = await fetch('http://localhost:8000/auth/submit-question', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ question }),
+    });
+
+    const result = await response.json();
+    const messageElement = document.getElementById('message');
+    if (result.success) {
+      messageElement.textContent = 'Ваше запитання було успішно надіслане!';
+      messageElement.style.color = 'green';
+      document.getElementById('questionForm').reset();
+    } else {
+      messageElement.textContent = `Помилка: ${result.error}`;
+      messageElement.style.color = 'red';
+    }
+    messageElement.style.display = 'block';
+  } catch (error) {
+    console.error('Помилка:', error);
+    alert('Не вдалося надіслати запитання. Спробуйте пізніше.');
+  }
+});
+// Викликаємо перевірку авторизації під час завантаження сторінки
+window.onload = async () => {
+  await checkAuth();
+};
+
     </script>
   </body>
 </html>

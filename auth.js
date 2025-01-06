@@ -82,7 +82,7 @@ passport.use(new GoogleStrategy({
 
         // Перевірка, чи є user перед створенням токену
         if (user && user.id) {
-            const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            const token = jwt.sign({ id: user.id, role: user.role, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
             return done(null, { user, token });
         } else {
             return done(new Error('User not found or created'));
@@ -222,7 +222,7 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ error: 'Неправильний email або пароль' });
         }
 
-        const token = jwt.sign({ id: user.id, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
 
         // Повертаємо дані користувача та токен
         res.status(200).json({
@@ -386,7 +386,7 @@ router.post('/verify-email', async (req, res) => {
 
         // Генерація токену
         const token = jwt.sign(
-            { id: newUser.id, role: newUser.role }, 
+            { id: newUser.id, role: newUser.role, email: newUser.email }, 
             SECRET_KEY, 
             { expiresIn: '1h' }
         );
@@ -650,5 +650,40 @@ router.get("/confirm-teacher/:id", async (req, res) => {
         res.status(500).send("Internal server error.");
     }
 });
-
+// Маршрут для надсилання запитань
+router.post('/submit-question', authenticate, async (req, res) => {
+    const { question } = req.body;
+  
+    if (!question || question.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        error: 'Поле запитання не може бути порожнім.',
+      });
+    }
+  
+    try {
+      // Надсилання листа через Nodemailer
+      await transporter.sendMail({
+        from: req.user.email,
+        to: "studywith.connect@gmail.com",
+        subject: 'New question from a user',
+        text: `User: ${req.user.email || 'unknown'}\n\nQuestion:\n${question}`,
+      });
+  
+      res.json({
+        success: true,
+        message: 'Your question was successfully sent!',
+      });
+    } catch (error) {
+      console.error('Error sending email:', error);
+      res.status(500).json({
+        success: false,
+        error: 'There was a problem sending your question. Please try again later.',
+      });
+    }
+  });
+  router.get('/auth-check', authenticate, (req, res) => {
+    res.json({ authenticated: true });
+  });
+  
 module.exports = router;
