@@ -2,93 +2,98 @@
 <html lang="uk">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>StudyWith | Together Stronger</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-    rel="stylesheet">
-  <link rel="stylesheet" href="../donate/style.css"> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyWith | Together Stronger</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../donate/style.css">
 </head>
 
 <body>
     <main>
         <div class="page-container">
             <div class="main">
-                <p class="title1" data-lang="donationTitle">Our Contribution to <strong data-lang="donationTitleStrong">COME BACK ALIVE</strong></p>
+                <p class="title1" data-lang="donationTitle">Our Contribution to <strong
+                        data-lang="donationTitleStrong">COME BACK ALIVE</strong></p>
                 <hr class="divider" />
                 <div class="donation-info">
-                    <h2 data-lang="donationSubtitle">We Donate 15% of Our Profits</h2> 
-                    
-                        <p class="descr" data-lang="donationDescription">
-                            A significant portion of our earnings goes towards supporting <strong data-lang="donationDescriptionStrong">"Come Back Alive", a foundation dedicated to helping Ukrainian soldiers. With your help, we contribute to vital missions and initiatives that save lives and offer assistance to those in need.
-                        </p>
-                    <img src="../images/new-logo-en.svg" alt="Povernys Zhyvym Logo" class="foundation-logo" data-lang="logoSrc"/>
+                    <h2 data-lang="donationSubtitle">We Donate 15% of Our Profits</h2>
+
+                    <p class="descr" data-lang="donationDescription">
+                        A significant portion of our earnings goes towards supporting <strong
+                            data-lang="donationDescriptionStrong">"Come Back Alive", a foundation dedicated to helping
+                            Ukrainian soldiers. With your help, we contribute to vital missions and initiatives that
+                            save lives and offer assistance to those in need.
+                    </p>
+                    <img src="../images/new-logo-en.svg" alt="Povernys Zhyvym Logo" class="foundation-logo"
+                        data-lang="logoSrc" />
                 </div>
             </div>
         </div>
     </main>
 
-    <script src="../header/auth-header.js"></script> 
+    <script src="../header/auth-header.js"></script>
     <script>
         const translations = {
             en: {
-              pageTitle: "StudyWith | Together Stronger",
-              donationTitle: "Our Contribution to \"<strong>Come Back Alive</strong>\"",
-              donationSubtitle: "We Donate 15% of Our Profits",
-              donationDescription: "A significant portion of our earnings goes towards supporting \"<strong>Come Back Alive</strong>\", a foundation dedicated to helping Ukrainian soldiers. With your help, we contribute to vital missions and initiatives that save lives and offer assistance to those in need.",
-              logoSrc: "../images/new-logo-en.svg",
+                pageTitle: "StudyWith | Together Stronger",
+                donationTitle: "Our Contribution to \"<strong>Come Back Alive</strong>\"",
+                donationSubtitle: "We Donate 15% of Our Profits",
+                donationDescription: "A significant portion of our earnings goes towards supporting \"<strong>Come Back Alive</strong>\", a foundation dedicated to helping Ukrainian soldiers. With your help, we contribute to vital missions and initiatives that save lives and offer assistance to those in need.",
+                logoSrc: "../images/new-logo-en.svg",
             },
             ua: {
-              pageTitle: "StudyWith | Разом сильніші",
-              donationTitle: "Наш внесок у \"<strong>Повернись Живим</strong>\"",
-              donationSubtitle: "Ми жертвуємо 15% наших прибутків",
-              donationDescription: "Значна частина наших доходів йде на підтримку \"<strong>Повернись Живим</strong>\", фонду, який допомагає українським солдатам. Завдяки вашій допомозі ми сприяємо важливим місіям та ініціативам, які рятують життя і надають допомогу тим, хто цього потребує.",
-              logoSrc: "../images/Logo_of_the_Come_Back_Alive_Foundation.svg.png",
+                pageTitle: "StudyWith | Разом сильніші",
+                donationTitle: "Наш внесок у \"<strong>Повернись Живим</strong>\"",
+                donationSubtitle: "Ми жертвуємо 15% наших прибутків",
+                donationDescription: "Значна частина наших доходів йде на підтримку \"<strong>Повернись Живим</strong>\", фонду, який допомагає українським солдатам. Завдяки вашій допомозі ми сприяємо важливим місіям та ініціативам, які рятують життя і надають допомогу тим, хто цього потребує.",
+                logoSrc: "../images/Logo_of_the_Come_Back_Alive_Foundation.svg.png",
             },
-          };
-          
-          function applyLanguage(lang) {
+        };
+
+        function applyLanguage(lang) {
             console.log('Applying language:', lang);
             const langData = translations[lang];
-            
+
             if (!langData) {
-              console.log('Language data not found!');
-              return;
+                console.log('Language data not found!');
+                return;
             }
-          
+
             document.title = langData.pageTitle;
-            
+
             document.querySelectorAll("[data-lang]").forEach((element) => {
-              const langKey = element.getAttribute("data-lang");
-              if (langData[langKey]) {
-                if (element.tagName === "INPUT") {
-                  element.setAttribute("placeholder", langData[langKey]);
-                } else if (element.tagName === "BUTTON") {
-                  element.textContent = langData[langKey];
-                } else if (element.tagName === "H2") {
-                  element.textContent = langData[langKey];
-                } else if (element.tagName === "P") {
-                  element.innerHTML = langData[langKey];
-                } else if (langKey === "logoSrc") {
-                  console.log('Changing logo src to:', langData.logoSrc);
-                  element.setAttribute('src', langData.logoSrc);
-                  element.setAttribute('alt', langData.logoAltText || 'Foundation Logo'); 
-                } else {
-                  element.innerHTML = langData[langKey];
+                const langKey = element.getAttribute("data-lang");
+                if (langData[langKey]) {
+                    if (element.tagName === "INPUT") {
+                        element.setAttribute("placeholder", langData[langKey]);
+                    } else if (element.tagName === "BUTTON") {
+                        element.textContent = langData[langKey];
+                    } else if (element.tagName === "H2") {
+                        element.textContent = langData[langKey];
+                    } else if (element.tagName === "P") {
+                        element.innerHTML = langData[langKey];
+                    } else if (langKey === "logoSrc") {
+                        console.log('Changing logo src to:', langData.logoSrc);
+                        element.setAttribute('src', langData.logoSrc);
+                        element.setAttribute('alt', langData.logoAltText || 'Foundation Logo');
+                    } else {
+                        element.innerHTML = langData[langKey];
+                    }
                 }
-              }
             });
-          }
-          
-      document.addEventListener("DOMContentLoaded", () => {
-        const userLang = localStorage.getItem("language");
-        applyLanguage(userLang);
-      });
-    </script> 
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const userLang = localStorage.getItem("language");
+            applyLanguage(userLang);
+        });
+    </script>
     <script src="../footer/footer.js"></script>
 </body>
 
