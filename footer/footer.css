@@ -71,7 +71,7 @@ footer .logo span {
 .footer-links {
     display: flex;
     flex-direction: column; 
-    width: 25%;
+    width: 30%;
     align-items: center;
     padding-right: 30px;
 }
@@ -112,8 +112,7 @@ footer .logo span {
     color: #fff;
     text-decoration: underline;
     margin: 10px;  
-    font-size: 18px;
-
+    font-size: 18px; 
     white-space: nowrap; /* Запобігає обриву тексту всередині посилання */
 }
 
@@ -152,6 +151,8 @@ footer .logo span {
     color: #B3B8C4;
 }
 
+  
+  
 .footer-address {
     
     align-items: center;

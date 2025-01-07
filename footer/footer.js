@@ -45,6 +45,8 @@ const footerTranslations = {
     footerFAQ: "FAQ",
     footerTnC: "Terms & conditions",
     footerPrivacy: "Privacy policy",
+    footerDonate: "Donations",
+
   },
   ua: {
     footerReserved: "© 2024 Всі права захищені StudyWith",
@@ -53,5 +55,6 @@ const footerTranslations = {
     footerFAQ: "Поширені питання",
     footerTnC: "Умови та положення",
     footerPrivacy: "Політика конфіденційності",
+    footerDonate: "Донати",
   },
 };

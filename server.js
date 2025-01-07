@@ -105,6 +105,10 @@ app.use("/pay-page", stripeRoutes);
 app.get('/get-stripe-key', (req, res) => {
     res.json({ publicKey: process.env.STRIPE_PUBLIC_KEY });
 });
+app.use("/donate", stripeRoutes);
+app.get('/donate', (req, res) => {
+    res.sendFile(path.join(__dirname, 'donate/donate.html')); 
+});
 
 
 app.use((err, req, res, next) => {
