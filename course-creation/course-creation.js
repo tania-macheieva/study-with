@@ -223,13 +223,15 @@ document.addEventListener('DOMContentLoaded', () => {
     let lectureCounter = 1;
      
  // Функція для оновлення нумерації лекцій
-  function updateLectureNumbers(moduleDiv) {
-    const lecturesDiv = moduleDiv.querySelector(".lectures");
-    lecturesDiv.querySelectorAll(".lecture").forEach((lectureDiv, index) => {
-      const lectureTitle = lectureDiv.querySelector(".title-3");
-      lectureTitle.innerText = `Lecture ${index + 1}`; 
-    });
-  }
+ function updateLectureNumbers(moduleDiv) {
+  const lectures = moduleDiv.querySelectorAll('.lecture');
+  lectures.forEach((lecture, index) => {
+    const titleElement = lecture.querySelector('.title-3');
+    if (titleElement) {
+      titleElement.textContent = `${translations[userLang].lecture} ${index + 1}`;
+    }
+  });
+}
 
     // Додавання лекції
     addLectureBtn.addEventListener("click", (event) => {
