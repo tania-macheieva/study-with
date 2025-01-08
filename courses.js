@@ -17,7 +17,7 @@ router.post('/create', upload, async (req, res) => {
         course_category,
         education_level,
         author_id,
-        modules, 
+        modules,
     } = req.body;
 
     console.log('Files:', req.files);
@@ -27,17 +27,18 @@ router.post('/create', upload, async (req, res) => {
         ? req.files['course_thumbnail'][0].filename
         : null;
 
-    // Перевірка на наявність всіх необхідних полів
+    // Check for required fields
     if (!course_title || !course_description || !course_price || !course_category || !education_level || !author_id) {
         return res.status(400).json({ success: false, message: 'Please fill all required fields!' });
     }
 
-    let tags = req.body.tags; 
+    let tags = req.body.tags;
     if (tags && typeof tags === 'string') {
-        tags = tags.split(',').map(tag => tag.trim());  // Розділення і очищення тегів
+        tags = tags.split(',').map(tag => tag.trim());  // Split and trim tags
     }
 
     try {
+        // Check for valid category and education level
         const categoryCheckQuery = 'SELECT id FROM categories WHERE id = $1 LIMIT 1';
         const categoryResult = await pool.query(categoryCheckQuery, [course_category]);
 
@@ -52,12 +53,12 @@ router.post('/create', upload, async (req, res) => {
             return res.status(400).json({ success: false, message: 'Education level does not exist!' });
         }
 
+        // Insert course data
         const query = `
             INSERT INTO all_courses (name, description, price, category_id, image_url, author_id, education_level_id)
             VALUES ($1, $2, $3, $4, $5, $6, $7)
             RETURNING id;
         `;
-
         const result = await pool.query(query, [
             course_title,
             course_description,
@@ -70,6 +71,7 @@ router.post('/create', upload, async (req, res) => {
 
         const courseId = result.rows[0].id;
 
+        // Handle modules and lectures
         if (modules && modules !== 'undefined' && modules !== null) {
             let modulesArray = [];
             try {
@@ -77,62 +79,69 @@ router.post('/create', upload, async (req, res) => {
             } catch (err) {
                 return res.status(400).json({ success: false, message: 'Invalid modules data!' });
             }
-
+        
             const modulePromises = modulesArray.map(async (module) => {
                 const { title, order_num, lectures: moduleLectures } = module;
-
+        
                 if (!title || !order_num) {
                     throw new Error('Module must have a title and order_num.');
                 }
-
+        
                 const moduleResult = await pool.query(
                     `INSERT INTO modules (course_id, title, order_num) VALUES ($1, $2, $3) RETURNING id`,
                     [courseId, title, order_num]
                 );
-
+        
                 const moduleId = moduleResult.rows[0].id;
-
+        
                 if (moduleLectures && Array.isArray(moduleLectures)) {
                     const lecturePromises = moduleLectures.map(async (lecture, index) => {
                         const { title, description } = lecture;
-
+        
                         if (!title) {
                             throw new Error('Lecture must have a title.');
                         }
-
+        
                         const lectureResult = await pool.query(
                             `INSERT INTO lectures (module_id, title, description, order_num) VALUES ($1, $2, $3, $4) RETURNING id`,
                             [moduleId, title, description, index + 1]
                         );
-
-                        // Отримаємо тільки файли для поточної лекції
-                        const lectureFilesForThisLecture = req.files['lecture_files']?.slice(index * 2, (index + 1) * 2);  // Призначаємо два файли на лекцію
-
-                        if (lectureFilesForThisLecture) {
-                            const lectureFilePromises = lectureFilesForThisLecture.map((file) => {
+        
+                        const lectureId = lectureResult.rows[0].id;
+        
+                        // Map files to this lecture by indexing correctly
+                        const filesForThisLecture = req.files['lecture_files']?.slice(index, index + 1); // Assign one file per lecture
+        
+                        if (filesForThisLecture && filesForThisLecture.length > 0) {
+                            // Insert files for the current lecture
+                            const lectureFilePromises = filesForThisLecture.map((file) => {
                                 return pool.query(
                                     `INSERT INTO lecture_files (lecture_id, file_name, file_url, file_type)
                                      VALUES ($1, $2, $3, $4)`,
                                     [
-                                        lectureResult.rows[0].id,
+                                        lectureId,
                                         file.originalname,
                                         file.path,
                                         file.mimetype,
                                     ]
                                 );
                             });
-
+        
                             await Promise.all(lectureFilePromises);
                         }
                     });
-
+        
                     await Promise.all(lecturePromises);
                 }
             });
-
+        
             await Promise.all(modulePromises);
         }
+        
+        
+        
 
+        // Insert tags
         if (tags && Array.isArray(tags)) {
             const insertTagsQuery = `
                 INSERT INTO tags (name) 
