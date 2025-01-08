@@ -42,13 +42,15 @@ CREATE TABLE categories (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) UNIQUE NOT NULL
 );
-Створення таблиці рівнів освіти
+
+-- Створення таблиці рівнів освіти
 CREATE TABLE education_levels (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) UNIQUE NOT NULL,
     description TEXT
 );
 
+-- Створення таблиці курсів
 CREATE TABLE all_courses (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -64,9 +66,7 @@ CREATE TABLE all_courses (
     CONSTRAINT fk_education_level FOREIGN KEY (education_level_id) REFERENCES education_levels(id) ON DELETE SET NULL
 );
 
-
-
-
+-- Створення таблиці тегів
 CREATE TABLE tags (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) UNIQUE NOT NULL
@@ -123,3 +123,25 @@ CREATE TABLE lecture_files (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_lecture FOREIGN KEY (lecture_id) REFERENCES lectures(id) ON DELETE CASCADE
 );
+
+INSERT INTO categories (id, name) VALUES
+(1, 'Programming'),
+(2, 'Design'),
+(3, 'Marketing'),
+(4, 'Business'),
+(5, 'Languages'),
+(6, 'Finance'),
+(7, 'Personal Development'),
+(8, 'Art'),
+(9, 'Psychology'),
+(10, 'Health'),
+(11, 'Cooking'),
+(12, 'Science'),
+(13, 'Game Development'),
+(14, 'Childcare');
+
+INSERT INTO education_levels (id, name, description) VALUES
+(1, 'No level', 'No specific education level'),
+(2, 'Basic level', 'Basic understanding of the subject'),
+(3, 'Intermediate level', 'Intermediate knowledge and skills in the subject'),
+(4, 'Advanced level', 'Advanced expertise in the subject');
