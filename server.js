@@ -5,7 +5,7 @@ const fs = require('fs');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const authRoutes = require('./auth'); 
-require('dotenv').config();
+require('dotenv').config({path: './secret.env' });
 const passport = require('passport');
 const session = require('express-session');
 const stripeRoutes = require("./pay-page/stripe");
