@@ -1,5 +1,5 @@
 body {
-    font-family: "Jost", sans-serif;
+    font-family: "Inter", sans-serif;
     margin: 0;
     padding: 0;
     background-color: #fff;
@@ -108,7 +108,7 @@ body {
     font-size: 24px;
     font-weight:600;
     margin-bottom: 10px;
-    font-family: "Jost", sans-serif;
+    font-family: "Inter", sans-serif;
 }
 
 /* Контейнер для поля вводу і кнопки */
@@ -131,7 +131,7 @@ body {
     color: #333;
     outline: none;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-    font-family: "Jost", sans-serif;
+    font-family: "Inter", sans-serif;
 }
 
 .phone-input::placeholder {
@@ -152,7 +152,7 @@ body {
   color: #333;
   outline: none;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-  font-family: "Jost", sans-serif;
+  font-family: "Inter", sans-serif;
   align-items: flex-start;
 }
 .email-input::placeholder {
@@ -198,4 +198,8 @@ body {
     transform: translateX(3px); /* Зсуваємо стрілку трохи праворуч */
 }
 
- 
+ .email-box p {
+    font-family: "Inter";
+    font-size: 20px;
+    margin-bottom: 20px;
+ }

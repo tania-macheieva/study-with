@@ -1,61 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title data-lang="pageTitle">StudyWith</title>
     <!-- Підключення шрифтів -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/registration_pages/reg_teacher.css">
-</head>
-<body>
-      <!-- Прогресивна лінійка -->
-      <div class="progress-bar">
-        <div class="progress-bar__line">
-            <div class="progress-bar__indicator" style="width: 0%;"></div>
-        </div>
-        <div class="progress-bar__steps">
-            <span class="active">1</span>
-            <span>2</span>
-            <span>3</span>
-            <span>4</span>
-            <span>5</span>
-        </div>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/registration_pages/reg_teacher.css" />
+  </head>
+  <body>
+    <!-- Прогресивна лінійка -->
+    <div class="progress-bar">
+      <div class="progress-bar__line">
+        <div class="progress-bar__indicator" style="width: 0%"></div>
+      </div>
+      <div class="progress-bar__steps">
+        <span class="active">1</span>
+        <span>2</span>
+        <span>3</span>
+        <span>4</span>
+        <span>5</span>
+      </div>
     </div>
     <div class="content">
-         
-        <div class="illustration">
-            <img src="/images/Teacher student-rafiki.png" alt="Coach Illustration">
-        </div>
-        <div class="form-container">
-            <h1 data-lang="formTitle">Create an account <br>as a teacher</h1>
-            <form id="teacher-register-form">
-                <input type="text" name="name" placeholder="Name" required>
-                <input type="email" name="email" placeholder="Email" required>
-                <input type="password" name="password" placeholder="Password" required>
-                <div class="privacy-policy">
-                    <label>
-                        <input type="checkbox" name="privacy-policy" required>
-                        <span data-lang="privacyPolicyText"></span> <a href="/privacypolicy" data-lang="privacyPolicyLinkText"></a>
-                    </label>
-                </div>
-                <input type="hidden" name="role" value="teacher">
-                <button type="submit" data-lang="signUpButton">Sign Up</button>
-                <h3 data-lang="orText">or</h3>
-                <div class="google-auth">
-                    <a href="/auth/google" class="google-btn" data-lang="googleAuthText">
-                        <img src="/images/google_logo.png" alt="Google logo">
-                        Continue with Google
-                    </a>
-                </div>
-            </form>
-        </div>
+      <div class="illustration">
+        <img
+          src="/images/Teacher student-rafiki.png"
+          alt="Coach Illustration"
+        />
+      </div>
+      <div class="form-container">
+        <h1 data-lang="formTitle">Create an account <br />as a teacher</h1>
+        <form id="teacher-register-form">
+          <input type="text" name="name" placeholder="Name" required />
+          <input type="email" name="email" placeholder="Email" required />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            required
+          />
+          <div class="privacy-policy">
+            <label>
+              <input type="checkbox" name="privacy-policy" required />
+              <span data-lang="privacyPolicyText"></span>
+              <a href="/privacypolicy" data-lang="privacyPolicyLinkText"></a>
+            </label>
+          </div>
+          <input type="hidden" name="role" value="teacher" />
+          <button type="submit" data-lang="signUpButton">Sign Up</button>
+          <h3 data-lang="orText">or</h3>
+          <div class="google-auth">
+            <a
+              href="/auth/google"
+              class="google-btn"
+              data-lang="googleAuthText"
+            >
+              <img src="/images/google_logo.png" alt="Google logo" />
+              Continue with Google
+            </a>
+          </div>
+        </form>
+      </div>
     </div>
     <script src="../registration_pages/register.js"></script>
     <script src="../footer/footer.js"></script>
     <script src="../header/auth-header.js"></script>
     <script src="../registration_pages/reg-teacher-lang.js"></script>
-</body>
+  </body>
 </html>

@@ -2,7 +2,7 @@ body {
     margin: 0;
     padding: 0;
     background-color: #fff; 
-    font-family: 'Jost', sans-serif;
+    font-family: "Inter", sans-serif;
 }
 .page-container {
     display: flex;
@@ -18,7 +18,7 @@ body {
     justify-content: space-between; 
     align-items: flex-start; 
     margin-top: 50px;
-    font-family: "Jost", sans-serif;
+    font-family: "Inter", sans-serif;
 }
 
 /* User Info Section */
@@ -39,7 +39,7 @@ body {
     justify-content: flex-start;  
     align-items: flex-start;
     padding-right: 100px;
-    font-family: "Jost", sans-serif;
+    font-family: "Inter", sans-serif;
     font-weight: 100;
     
 }
@@ -90,7 +90,7 @@ body {
 }
 
 .profile-container .user-info p {
-    font-family: "Jost", sans-serif;
+    font-family: "Inter", sans-serif;
     font-weight: 500;
     margin-top: 5px;
     font-size: 18px;
@@ -100,7 +100,7 @@ body {
 
 .profile-container .user-info  .btn-teacher {
     width: 70%;
-    font-family: "Jost", sans-serif;
+    font-family: "Inter", sans-serif;
     padding: 9px 5px;
     background: #283044;
     color: #ffffff;
@@ -165,7 +165,7 @@ body {
 }
 .btn-resume { 
     width: 100%;
-    font-family: "Jost", sans-serif;
+    font-family: "Inter", sans-serif;
     padding: 8px 10px;
     background: #ffffff;
     color: #000000;
@@ -420,7 +420,7 @@ body {
 }
 .btn-open { 
     width: 100%;
-    font-family: "Jost", sans-serif;
+    font-family: "Inter", sans-serif;
     padding: 8px 10px;
     background: #ffffff;
     color: #000000;
@@ -502,7 +502,7 @@ body {
     width: 150px;
     padding: 8px 10px;
     font-size: 18px;
-    font-family: "Jost", sans-serif;
+    font-family: "Inter", sans-serif;
     font-weight: 640;
     background: #283044;
     color: #ffffff;
@@ -524,7 +524,7 @@ body {
     width: 150px;
     padding: 8px 10px;
     font-size: 18px;
-    font-family: "Jost", sans-serif; 
+    font-family: "Inter", sans-serif; 
     background: #283044;
     color: #ffffff;
     border: none;
@@ -546,7 +546,7 @@ body {
     width: 150px;
     padding: 8px 10px;
     font-size: 18px;  
-    font-family: "Jost", sans-serif; 
+    font-family: "Inter", sans-serif; 
     background: #283044;
     color: #ffffff;
     border: none;
@@ -568,7 +568,7 @@ body {
     width: 150px;
     padding: 8px 10px;
     font-size: 18px;
-    font-family: "Jost", sans-serif; 
+    font-family: "Inter", sans-serif; 
     background: #283044;
     color: #ffffff;
     border: none;

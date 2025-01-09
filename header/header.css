@@ -2,7 +2,7 @@ body {
     margin: 0;
     padding: 0;
     background-color: #fff; 
-    font-family: 'Jost', sans-serif;
+    font-family: 'Inter', sans-serif;
 }
 
 .logo a {
@@ -58,7 +58,7 @@ a.lang-btn {
     align-items: center;
     font-weight: 600;
     font-size: 24px;
-    font-family: 'Jost', sans-serif;
+    font-family: 'Inter', sans-serif;
     color: #283044;
 }
 
@@ -69,7 +69,7 @@ a.lang-btn {
 .nav-menu {
     display: flex;
     gap: 24px;
-    font-family: 'Jost', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 18px;
 }
 
@@ -92,7 +92,7 @@ a.lang-btn {
 .right-section {
     display: flex;
     gap: 24px;
-    font-family: 'Jost', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 18px;
 }
 
@@ -109,7 +109,7 @@ a.lang-btn {
 .search input[type="text"]  { 
     padding: 5px; /* Відступ справа для іконки + текст зліва */
     border-radius: 4px;
-    font-family: 'Jost', sans-serif;
+    font-family: 'Inter', sans-serif;
     border: 2px solid #c7c7c7;
     font-size: 16px;
     box-sizing: border-box; /* Увімкнення врахування padding */
@@ -136,7 +136,7 @@ a.lang-btn {
 .lang-switcher a {
     text-decoration: none;
     color: #283044;
-    font-family: 'Jost', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 16px;
 }
 
@@ -156,7 +156,7 @@ a.lang-btn {
     gap: 7px;  
     transition: color 0.3s ease, transform 0.3s ease; 
     text-decoration: none;
-    font-family: "Jost", sans-serif; 
+    font-family: 'Inter', sans-serif; 
     font-size: 18px;
     font-weight: 450;
     color: #283044;  
@@ -192,7 +192,7 @@ a.lang-btn {
     font-size: 16px;
     border-radius: 9px;
     cursor: pointer;
-    font-family: 'Jost', sans-serif;
+    font-family: 'Inter', sans-serif;
 }
 
 .sign-in-btn:hover {
@@ -210,7 +210,7 @@ a.lang-btn {
     font-size: 16px;
     border-radius: 9px;
     cursor: pointer;
-    font-family: 'Jost', sans-serif;
+    font-family: 'Inter', sans-serif;
 }
 
 .sign-up-btn:hover {

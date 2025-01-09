@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="../faq_page/faq.css" />
@@ -188,11 +188,11 @@
         </div>
       </section>
       <section class="add-question-section">
-        <h2>Add your question</h2>
+        <h2 data-lang="AdditionalQuestion">Add your question</h2>
         <form id="questionForm">
-          <label id="questionInput-1"  for="questionInput">Your question:</label>
+          <label id="questionInput-1"  for="questionInput"  data-lang="YourQuestion">Your question:</label>
           <textarea id="questionInput" name="question" required></textarea>
-          <button type="submit">Send</button>
+          <button type="submit" data-lang="Send">Send</button>
           <p id="message" style="display:none;"></p>
         </form>
       </section>
@@ -260,6 +260,15 @@
           promoCodeQuestion: "How can I get a promo code for a discount?",
           promoCodeAnswer:
             "Promo codes for discounts can be obtained during seasonal sales or special promotions that we run for our users. Stay tuned for updates on our website and social media to not miss great offers!",
+          AdditionalQuestion: "Add your question",
+          YourQuestion:  "Your question:",
+          Send: "Send",
+          questionSentSuccess: "Your question was successfully sent!",
+          questionSentError: "Error:",
+          questionSendFailed: "Could not send question. Please try again later.",
+          loginRequired: "Please log in to submit a question.",
+          changeLanguage: "Change Language",
+          submitQuestion: "Submit your question below:",
         },
         ua: {
           arrow: "&#62;",
@@ -305,13 +314,22 @@
           promoCodeQuestion: "Як отримати промокод на знижку?",
           promoCodeAnswer:
             "Промокоди на знижки можна отримати під час сезонних розпродажів або спеціальних акцій, які ми проводимо для наших користувачів. Слідкуйте за оновленнями на нашому сайті та в соціальних мережах, щоб не пропустити вигідні пропозиції!",
+          AdditionalQuestion: "Напишіть ваше запитання",
+          YourQuestion:  "Ваше запитання:",
+          Send: "Відправити",
+          questionSentSuccess: "Ваше запитання було успішно надіслано!",
+          questionSentError: "Помилка:",
+          questionSendFailed: "Не вдалося надіслати запитання. Будь ласка, спробуйте пізніше.",
+          loginRequired: "Увійдіть, щоб надіслати запитання.",
+          changeLanguage: "Змінити мову",
+          submitQuestion: "Надішліть ваше запитання:",
         },
       };
 
       function applyLanguage(lang) {
-        const langData = translations[lang];
+        const langData = translations[lang]|| translations.en;
 
-        document.title = langData.pageTitle;
+        document.title = langData.faqTitle;
 
         document.querySelectorAll("[data-lang]").forEach((element) => {
           const langKey = element.getAttribute("data-lang");
@@ -332,7 +350,7 @@
       }
 
       document.addEventListener("DOMContentLoaded", () => {
-        const userLang = localStorage.getItem("language"); // Default to English
+        const userLang = localStorage.getItem("language") || "en"; // Default to English
         applyLanguage(userLang);
       });
 
@@ -344,34 +362,44 @@ async function checkAuth() {
     return false;
   }
 
-  // Додаткова перевірка на сервері (опціонально)
-  const response = await fetch('http://localhost:8000/auth/auth-check', {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  try {
+    const response = await fetch("http://localhost:8000/auth/auth-check", {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+
 
   const result = await response.json();
   if (!result.authenticated) {
     document.querySelector('.add-question-section').style.display = 'none'; // Приховуємо форму
     return false;
   }
-
   return true;
-}
+}catch (error) {
+    console.error("Authorization check failed:", error);
+    return false;
+  }
+} 
 
       // Обробка форми
-document.getElementById('questionForm').addEventListener('submit', async function (event) {
-  event.preventDefault();
+      document.getElementById("questionForm").addEventListener("submit", async function (event) { 
+        event.preventDefault();
 
   const token = localStorage.getItem('token'); // Токен авторизації
+  const  userLang = localStorage.getItem("language") || "en";
+  const langData = translations[userLang]|| translations.en;
+  const messageElement = document.getElementById("message");
   if (!token) {
-    alert('Будь ласка, увійдіть у систему, щоб надіслати запитання.');
+    alert(langData.loginRequired || "Please log in to submit a question.");
     return;
   }
 
   const question = document.getElementById('questionInput').value;
+  if (!question.trim()) {
+    alert(langData.questionSendFailed || "Question cannot be empty.");
+    return;
+  }
 
   try {
     const response = await fetch('http://localhost:8000/auth/submit-question', {
@@ -384,23 +412,25 @@ document.getElementById('questionForm').addEventListener('submit', async functio
     });
 
     const result = await response.json();
-    const messageElement = document.getElementById('message');
     if (result.success) {
-      messageElement.textContent = 'Ваше запитання було успішно надіслане!';
+      messageElement.textContent = langData.questionSentSuccess;
       messageElement.style.color = 'green';
       document.getElementById('questionForm').reset();
     } else {
-      messageElement.textContent = `Помилка: ${result.error}`;
+      messageElement.textContent = `${langData.questionSentError} ${result.error}`;
       messageElement.style.color = 'red';
     }
-    messageElement.style.display = 'block';
+    
   } catch (error) {
-    console.error('Помилка:', error);
-    alert('Не вдалося надіслати запитання. Спробуйте пізніше.');
+    console.error("Error submitting question:", error);
+    alert(langData?.questionSendFailed || "An error occurred.");
   }
+  messageElement.style.display = 'block';
 });
 // Викликаємо перевірку авторизації під час завантаження сторінки
 window.onload = async () => {
+  const userLang = localStorage.getItem("language") || "en";
+  applyLanguage(userLang);
   await checkAuth();
 };
 

@@ -2,7 +2,7 @@ body {
     margin: 0;
     padding: 0;
     background-color: #fff; 
-    font-family: "Carlito", serif;
+    font-family: "Inter", serif;
     min-height: 100vh;    
     width: 100%;
 }
@@ -33,7 +33,7 @@ body {
     font-weight: 600;
     text-align: center;
     margin-bottom: 0px;
-    font-family: "Carlito", serif;
+    font-family: "Inter", serif;
     color: #283044;
 }
 
@@ -64,7 +64,7 @@ body {
     padding: 20px;
     text-align: justify;
     border-radius: 10px;
-    font-family: "Carlito", serif;
+    font-family: "Inter", serif;
 }
 
 .mission {
@@ -72,7 +72,7 @@ body {
     margin-bottom: 10px;
     text-align: center;
     color: #283044;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .descr {
@@ -87,7 +87,7 @@ body {
     font-weight: 600;
     text-align: center;
     margin-bottom: 0px;
-    font-family: "Carlito", serif;
+    font-family: "Inter", serif;
     margin-bottom: 64px;
     color: #283044;
 }
@@ -124,12 +124,12 @@ body {
                  .valueslogo {
                     margin-bottom: 12px;
                     text-align: center;
-                    font-family: "Carlito", serif;
+                    font-family: "Inter", serif;
                 }
                 .valuesdescr {
                     margin-bottom: 10px;
                     text-align: center;
-                    font-family: "Carlito", serif;
+                    font-family: "Inter", serif;
                 }
 
 .title3 {
@@ -138,7 +138,7 @@ body {
     font-weight: 600;
     text-align: center;
     margin-bottom: 0px;
-    font-family: "Carlito", serif;
+    font-family: "Inter", serif;
     margin-bottom: 64px;
     color: #283044;
 }
@@ -173,7 +173,7 @@ body {
 
 .caption {
     margin-top: 32px;
-    font-family: "Carlito", serif;
+    font-family: "Inter", serif;
 }
 
 .value-box,

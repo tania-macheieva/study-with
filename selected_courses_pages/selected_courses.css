@@ -1,5 +1,5 @@
 body {
-  font-family: "Jost", sans-serif;
+  font-family: "Inter", sans-serif;
   margin: 0;
   padding: 0;
   background-color: #DCECFC;
@@ -206,7 +206,7 @@ main {
   background: #283044;
   border-radius: 8px;
   color: #ffffff;
-  font-family: "Jost-SemiBold", sans-serif;
+  font-family: "Inter-SemiBold", sans-serif;
   font-size: 14px;
   font-weight: 600;
   text-align: center;
@@ -230,7 +230,7 @@ main {
   display: flex;
   align-items: center;    
   gap: 10px;
-  font-family: "Jost", sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: bold;
   font-size: 20px;
   margin-right: 40px; 
@@ -246,7 +246,7 @@ main {
     height: auto;
     color: #fff;
     padding: 50px 0;
-    font-family: "Jost", sans-serif;; 
+    font-family: "Inter", sans-serif;; 
     bottom: 0;
     left: 0;
     width: 100%;
@@ -272,7 +272,7 @@ footer .logo {
 }
 
 footer .logo span {
-  font-family: "Jost", sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 26px;
   font-weight: 600;
   color: #ffffff;
@@ -353,10 +353,13 @@ footer .logo span {
 }
 
 .contact-item a {
-    font-family: "Jost", sans-serif;
+    font-family: "Inter", sans-serif;
     font-weight: 400;
     font-size: 15px;
     color: #FFFFFF;
     text-decoration: none;
 }
-  
+
+button.delete-button {
+  font-family: "Inter", sans-serif;
+}

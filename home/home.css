@@ -1,5 +1,5 @@
 body {
-  font-family: 'Jost', sans-serif;
+  font-family: "Inter", serif;
 }
 
 /*Home*/
@@ -18,7 +18,7 @@ body h1 {
   font-weight: 500;
   font-size: 60px;
   text-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
-  font-family: 'Jost', Medium;
+  font-family: "Inter", Medium;
   margin-left: 64px;
   color: #283044;
 }
@@ -28,7 +28,7 @@ body h3 {
   font-weight: 300;
   font-size: 18px;
   color: #283044;
-  font-family: 'Jost', ExtraLight;
+  font-family: "Inter", ExtraLight;
   line-height: 1.6; 
   margin-left: 64px;
 }
@@ -41,7 +41,7 @@ body h3 {
   font-size: 18px;
   font-weight: 400;
   color: #fff;
-  font-family: 'Jost', Regular;
+  font-family: "Inter", Regular;
   border: none;
   margin-left: 64px;
   cursor: pointer;
@@ -111,7 +111,7 @@ body h3 {
 .course_name {
   color: #283044;
   text-align: left;
-  font-family: "Jost", Regular;
+  font-family: "Inter", Regular;
   font-weight: 500;
   font-size: 20px;
   position: absolute;
@@ -125,7 +125,7 @@ body h3 {
 .description {
   color: #283044;
   text-align: left;
-  font-family: "Jost", SemiBold;
+  font-family: "Inter", SemiBold;
   font-size: 16px;
   font-weight: 400;
   position: absolute;
@@ -145,7 +145,7 @@ body h3 {
 .price {
   color: #000000;
   text-align: left;
-  font-family: "Jost", SemiBold;
+  font-family: "Inter", SemiBold;
   font-size: 20px;
   font-weight: 600;
   position: absolute;
@@ -201,7 +201,7 @@ body h3 {
   background: #DCECFC;
   gap: 32px;
   text-align: center;
-  font-family: 'Jost', ExtraLight;
+  font-family: "Inter", ExtraLight;
   font-weight: 300;
   font-size: 20px;
   color: #283044;
@@ -217,7 +217,7 @@ body h3 {
   color: #283044;
   font-weight: 500;
   font-size: 32px;
-  font-family: 'Jost', Medium;
+  font-family: "Inter", Medium;
   margin-top: 48px;
 }
 
@@ -318,7 +318,7 @@ div.Footer {
   display: flex;
   align-items: center;    
   gap: 10px;
-  font-family: "Jost", sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: bold;
   font-size: 20px;
   margin-right: 40px; 
@@ -334,7 +334,7 @@ div.Footer {
   background-color: #283044;
   color: #fff;
   padding: 50px 0;
-  font-family: "Jost", sans-serif;
+  font-family: "Inter", sans-serif;
   margin-top: 48px; 
   bottom: 0;
   left: 0;
@@ -349,7 +349,7 @@ footer .logo {
 }
 
 footer .logo span {
-  font-family: "Jost", sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 26px;
   font-weight: 600;
   color: #ffffff;

@@ -1,5 +1,5 @@
 body {
-    font-family: "Jost", sans-serif;
+    font-family: "Inter", sans-serif;
     margin: 0;
     padding: 0;
     background-color: #fff;
@@ -54,12 +54,21 @@ body {
     border-radius: 12px; 
     cursor: pointer;
     font-size: 16px; /* Збільшуємо текст кнопки */
-    font-weight: 100;
+    font-weight: 300;
     transition: background-color 0.3s ease, transform 0.2s ease;
     margin-bottom: 15px;
+    font-family: "Inter";
   }
   
   .fail-button:hover {
     background-color: #0c101a;
     transform: scale(1.05); /* Невелике збільшення при наведенні */
+  }
+  
+  .h2 {
+    font-family: "Inter";
+  }
+
+  .h3{
+    font-family: "Inter";
   }

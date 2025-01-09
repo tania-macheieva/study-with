@@ -1,161 +1,255 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title data-lang="pageTitle">StudyWith</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-        href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="/registration_pages/full_reg_teacher.css">
-</head>
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/registration_pages/full_reg_teacher.css" />
+  </head>
 
-<body>
+  <body>
     <div class="main-container">
-        <!-- Прогресивна лінійка -->
-        <div class="progress-bar">
-            <div class="progress-bar__line">
-                <div class="progress-bar__indicator"></div>
+      <!-- Прогресивна лінійка -->
+      <div class="progress-bar">
+        <div class="progress-bar__line">
+          <div class="progress-bar__indicator"></div>
+        </div>
+        <div class="progress-bar__steps">
+          <span>1</span>
+          <span>2</span>
+          <span>3</span>
+          <span>4</span>
+          <span>5</span>
+        </div>
+      </div>
+
+      <!-- Форма реєстрації -->
+      <form
+        id="registrationForm"
+        method="POST"
+        enctype="multipart/form-data"
+        onsubmit="return false;"
+      >
+        <!-- Крок 2 -->
+        <div class="form-step" id="step-2">
+          <h1 data-lang="personalInfo">Personal Information</h1>
+          <div class="form-grid">
+            <!-- Ліва колонка -->
+            <div class="form-group">
+              <label for="dob" data-lang="dobLabel">Date of birth</label>
+              <input
+                type="date"
+                id="dob"
+                name="dob"
+                placeholder="Date of your birth"
+                data-lang="dobPlaceholder"
+                required
+              />
             </div>
-            <div class="progress-bar__steps">
-                <span>1</span>
-                <span>2</span>
-                <span>3</span>
-                <span>4</span>
-                <span>5</span>
+            <div class="form-group">
+              <label data-lang="genderLabel">Gender</label>
+              <div class="gender-options">
+                <label>
+                  <input type="radio" name="gender" value="men" />
+                  <span data-lang="genderOptions" data-value="men">Men</span>
+                </label>
+                <label>
+                  <input type="radio" name="gender" value="women" />
+                  <span data-lang="genderOptions" data-value="women"
+                    >Women</span
+                  >
+                </label>
+                <label>
+                  <input type="radio" name="gender" value="other" />
+                  <span data-lang="genderOptions" data-value="other"
+                    >Other</span
+                  >
+                </label>
+              </div>
             </div>
+            <div class="form-group">
+              <label for="country" data-lang="countryLabel">Country</label>
+              <input
+                type="text"
+                id="country"
+                name="country"
+                placeholder="Country"
+                data-lang="countryPlaceholder"
+                required
+              />
+            </div>
+            <!-- Права колонка -->
+            <div class="form-group">
+              <label for="city" data-lang="cityLabel">City</label>
+              <input
+                type="text"
+                id="city"
+                name="city"
+                placeholder="City"
+                data-lang="cityPlaceholder"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="phone" data-lang="phoneLabel">Phone number</label>
+              <input
+                type="tel"
+                id="phone_number"
+                name="phone_number"
+                placeholder="Phone"
+                data-lang="phonePlaceholder"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="zip" data-lang="zipLabel">Zip code</label>
+              <input
+                type="text"
+                id="zip"
+                name="zip"
+                placeholder="Zip code"
+                data-lang="zipPlaceholder"
+                required
+              />
+            </div>
+          </div>
+          <div class="button-group">
+            <button type="button" class="prev-btn" data-lang="prevButton">
+              Previous
+            </button>
+            <button type="button" class="next-btn-1" data-lang="nextButton">
+              Next
+            </button>
+          </div>
         </div>
 
-        <!-- Форма реєстрації -->
-        <form id="registrationForm" method="POST" enctype="multipart/form-data" onsubmit="return false;">
-           
-            <!-- Крок 2 -->
-            <div class="form-step" id="step-2">
-                <h1 data-lang="personalInfo">Personal Information</h1>
-                <div class="form-grid">
-                    <!-- Ліва колонка -->
-                    <div class="form-group">
-                        <label for="dob" data-lang="dobLabel">Date of birth</label>
-                        <input type="date" id="dob" name="dob" placeholder="Date of your birth"
-                            data-lang="dobPlaceholder" required>
-                    </div>
-                    <div class="form-group">
-                        <label data-lang="genderLabel">Gender</label>
-                        <div class="gender-options">
-                            <label>
-                                <input type="radio" name="gender" value="men">
-                                <span data-lang="genderOptions" data-value="men">Men</span>
-                            </label>
-                            <label>
-                                <input type="radio" name="gender" value="women">
-                                <span data-lang="genderOptions" data-value="women">Women</span>
-                            </label>
-                            <label>
-                                <input type="radio" name="gender" value="other">
-                                <span data-lang="genderOptions" data-value="other">Other</span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="country" data-lang="countryLabel">Country</label>
-                        <input type="text" id="country" name="country" placeholder="Country"
-                            data-lang="countryPlaceholder" required>
-                    </div>
-                    <!-- Права колонка -->
-                    <div class="form-group">
-                        <label for="city" data-lang="cityLabel">City</label>
-                        <input type="text" id="city" name="city" placeholder="City" data-lang="cityPlaceholder"
-                            required>
-                    </div>
-                    <div class="form-group">
-                        <label for="phone" data-lang="phoneLabel">Phone number</label>
-                        <input type="tel" id="phone_number" name="phone_number" placeholder="Phone"
-                            data-lang="phonePlaceholder" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="zip" data-lang="zipLabel">Zip code</label>
-                        <input type="text" id="zip" name="zip" placeholder="Zip code" data-lang="zipPlaceholder"
-                            required>
-                    </div>
-                </div>
-                <div class="button-group">
-                    <button type="button" class="prev-btn" data-lang="prevButton">Previous</button>
-                    <button type="button" class="next-btn-1" data-lang="nextButton">Next</button>
-                </div>
+        <!-- Крок 3 -->
+        <div class="form-step" id="step-3">
+          <h1 data-lang="professionalInfo">Professional Information</h1>
+          <div class="form-grid-2">
+            <div class="form-group-2">
+              <label for="specialty" data-lang="specialtyLabel"
+                >Specialty:</label
+              >
+              <input
+                type="text"
+                id="specialty"
+                name="specialty"
+                placeholder="Your speciality"
+                data-lang="specialtyPlaceholder"
+                required
+              />
             </div>
-           
-            <!-- Крок 3 -->
-            <div class="form-step" id="step-3">
-                <h1 data-lang="professionalInfo">Professional Information</h1>
-                <div class="form-grid-2">
-                    <div class="form-group-2">
-                        <label for="specialty" data-lang="specialtyLabel">Specialty:</label>
-                        <input type="text" id="specialty" name="specialty" placeholder="Your speciality" data-lang="specialtyPlaceholder" required>
-                    </div>
-                    <div class="form-group-2">
-                        <label for="experience" data-lang="experienceLabel">Beginning of Professional
-                            Experience:</label>
-                        <input type="date" id="experience" name="experience" required>
-                    </div>
-                </div>
-                <div class="upload-section">
-                    <label for="certificates" data-lang="certificatesLabel">Download certificates, diplomas,
-                        etc.</label>
-                    <p data-lang="certificatesInfo">(Upload any files that prove your qualifications)</p>
-                    <input type="file" id="certificates" name="certificates" accept=".pdf" multiple hidden>
-                    <button type="button" id="upload-btn" data-lang="chooseFileButton">Choose File</button>
-                    <span id="file-names" data-lang="noFileChosen">No file chosen</span>
-                    <small class="file-info" data-lang="wrongFormat">(Only PDF format allowed)</small>
+            <div class="form-group-2">
+              <label for="experience" data-lang="experienceLabel"
+                >Beginning of Professional Experience:</label
+              >
+              <input type="date" id="experience" name="experience" required />
+            </div>
+          </div>
+          <div class="upload-section">
+            <label for="certificates" data-lang="certificatesLabel"
+              >Download certificates, diplomas, etc.</label
+            >
+            <p data-lang="certificatesInfo">
+              (Upload any files that prove your qualifications)
+            </p>
+            <input
+              type="file"
+              id="certificates"
+              name="certificates"
+              accept=".pdf"
+              multiple
+              hidden
+            />
+            <button type="button" id="upload-btn" data-lang="chooseFileButton">
+              Choose File
+            </button>
+            <span id="file-names" data-lang="noFileChosen">No file chosen</span>
+            <small class="file-info" data-lang="wrongFormat"
+              >(Only PDF format allowed)</small
+            >
+          </div>
+          <div class="button-group">
+            <button type="button" class="prev-btn" data-lang="prevButton">
+              Previous
+            </button>
+            <button type="button" class="next-btn-2" data-lang="nextButton">
+              Next
+            </button>
+          </div>
+        </div>
 
-                </div>
-                <div class="button-group">
-                    <button type="button" class="prev-btn" data-lang="prevButton">Previous</button>
-                    <button type="button" class="next-btn-2" data-lang="nextButton">Next</button>
-                </div>
+        <!-- Крок 4 -->
+        <div class="form-step" id="step-4">
+          <h1 data-lang="aboutInfo">Additional Information</h1>
+          <h2 data-lang="aboutPlaceholder">
+            Write a short information about yourself and your teaching
+            experience.
+          </h2>
+          <p class="specification" data-lang="aboutDescription">
+            (Fill in this field as desired)
+          </p>
+          <textarea
+            id="about"
+            name="about"
+            rows="8"
+            placeholder="Write about yourself..."
+            data-lang="aboutPlaceholder_1"
+          ></textarea>
+          <div class="button-group">
+            <button type="button" class="prev-btn" data-lang="prevButton">
+              Previous
+            </button>
+            <button type="button" class="next-btn-3" data-lang="nextButton">
+              Next
+            </button>
+          </div>
+        </div>
+
+        <!-- Крок 5 -->
+        <div class="form-step" id="step-5">
+          <div class="step-5-container">
+            <img
+              src="/images/success_teacher_reg.jpg"
+              alt="Success registering"
+              class="step-5-image"
+            />
+            <div class="step-5-text">
+              <h2 data-lang="successHeader">Thank you for registering!</h2>
+              <p class="inf_about_reg" data-lang="successInfo">
+                The documents you submitted to confirm your qualifications will
+                be reviewed by our team. We will send a response to your email
+                within a few hours or, at most, up to 2 days. Thank you for your
+                trust and your interest in joining our platform!
+              </p>
+              <div class="button-group-end">
+                <button type="button" class="prev-btn" data-lang="prevButton">
+                  Previous
+                </button>
+                <button
+                  type="submit"
+                  class="finish-btn"
+                  data-lang="finishButton"
+                >
+                  Finish
+                </button>
+              </div>
             </div>
-          
-            <!-- Крок 4 -->
-            <div class="form-step" id="step-4">
-                <h1 data-lang="aboutInfo">Additional Information</h1>
-                <h2 data-lang="aboutPlaceholder">Write a short information about yourself and your teaching experience.
-                </h2>
-                <p class="specification" data-lang="aboutDescription">(Fill in this field as desired)</p>
-                <textarea id="about" name="about" rows="8" placeholder="Write about yourself..."
-                    data-lang="aboutPlaceholder_1"></textarea>
-                <div class="button-group">
-                    <button type="button" class="prev-btn" data-lang="prevButton">Previous</button>
-                    <button type="button" class="next-btn-3" data-lang="nextButton">Next</button>
-                </div>
-            </div>
-           
-            <!-- Крок 5 -->
-            <div class="form-step" id="step-5">
-                <div class="step-5-container">
-                    <img src="/images/success_teacher_reg.jpg" alt="Success registering" class="step-5-image">
-                    <div class="step-5-text">
-                        <h2 data-lang="successHeader">Thank you for registering!</h2>
-                        <p class="inf_about_reg" data-lang="successInfo">The documents you submitted to confirm your
-                            qualifications will be reviewed by our team. We will send a response to your email within a
-                            few hours or, at most, up to 2 days. Thank you for your trust and your interest in joining
-                            our platform!</p>
-                        <div class="button-group-end">
-                            <button type="button" class="prev-btn" data-lang="prevButton">Previous</button>
-                            <button type="submit" class="finish-btn" data-lang="finishButton">Finish</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form>
+          </div>
+        </div>
+      </form>
     </div>
 
     <script src="full_reg_teacher.js"></script>
     <script src="/footer/footer.js"></script>
     <script src="../header/header-login.js"></script>
     <script src="../registration_pages/full_reg_teacher_lang.js"></script>
-    
-</body>
-
+  </body>
 </html>
