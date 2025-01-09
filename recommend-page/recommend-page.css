@@ -1,5 +1,5 @@
 body {
-    font-family: "Jost", sans-serif;
+    font-family: "Inter", sans-serif;
     margin: 0;
     padding: 0;
     margin-bottom: 0;
@@ -285,7 +285,7 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-family: "Jost", sans-serif;
+    font-family: "Inter", sans-serif;
     font-weight: bold;
     font-size: 20px;
     margin-right: 30px;
@@ -301,7 +301,7 @@ body {
     background-color: #283044;
     color: #fff;
     padding: 28px 0;
-    font-family: "Jost", sans-serif;
+    font-family: "Inter", sans-serif;
     bottom: 0;
     left: 0;
     width: 100%;
@@ -322,7 +322,7 @@ footer .logo {
 }
 
 footer .logo span {
-    font-family: "Jost", sans-serif;
+    font-family: "Inter", sans-serif;
     font-size: 26px;
     font-weight: 600;
     color: #ffffff;
