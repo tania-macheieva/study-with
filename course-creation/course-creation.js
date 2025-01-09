@@ -45,7 +45,10 @@ const translations = {
     lecture: "Lecture",
     lectureTitle: "Enter lecture title",
     enterLectureDescription: "Enter lecture description",
-    chooseFiles: "Upload Materials (Video, PDF, etc.)",
+    chooseFiles: "Upload Materials (PDF, DOCX etc.)",
+    uploadVideo: "Upload Video",
+    chooseVideo: "Choose Video",
+    videoFileChosen: "No video chosen",
     fillRequiredFields: "Please fill all required fields!",
     confirmDeleteModule: 'Are you sure you want to delete this module?',
     courseTags: "Course Tags (hidden from users)",
@@ -98,7 +101,10 @@ const translations = {
     lecture: "Лекція",
     lectureTitle: "Введіть назву лекції",
     enterLectureDescription: "Введіть опис лекції",
-    chooseFiles: "Завантажити матеріали (відео, PDF тощо)",
+    chooseFiles: "Завантажити матеріали (PDF, DOCX тощо)",
+    uploadVideo: "Завантажити відео",
+    chooseVideo: "Оберіть відео",
+    videoFileChosen: "Відео не вибрано",
     fillRequiredFields: "Будь ласка, заповніть усі обов'язкові поля!",
     confirmDeleteModule: 'Ви впевнені, що хочете видалити цей модуль?',
     courseTags: "Теги курсу (приховані від користувачів)",
@@ -233,73 +239,102 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 }
 
-    // Додавання лекції
-    addLectureBtn.addEventListener("click", (event) => {
-      event.preventDefault();
+addLectureBtn.addEventListener("click", (event) => {
+  event.preventDefault();
 
-      const lecturesDiv = moduleDiv.querySelector(".lectures");
-      const lectureDiv = document.createElement("div");
-      lectureDiv.classList.add("lecture");
+  const lecturesDiv = moduleDiv.querySelector(".lectures");
+  const lectureDiv = document.createElement("div");
+  lectureDiv.classList.add("lecture");
 
-      const lectureTitle = translations[userLang].lectureTitle;
-      const enterLectureDescription = translations[userLang].enterLectureDescription;
+  const lectureTitle = translations[userLang].lectureTitle;
+  const enterLectureDescription = translations[userLang].enterLectureDescription;
+  const uploadVideoLabel = translations[userLang].uploadVideo;
+  const chooseVideoLabel = translations[userLang].chooseVideo;
 
-      lectureDiv.innerHTML = `
-        <div class="container">
-          <p class="title-3">${translations[userLang].lecture} ${lectureCounter}</p>
-          <button class="delete-lecture-btn"><img src="../images/delete.png" alt=""></button>
-        </div>
-        <input type="text" placeholder="${lectureTitle}">
-        <label class="title-3" for="lecture-description">${translations[userLang].enterLectureDescription}</label>
-        <textarea placeholder="${enterLectureDescription}" rows="5"></textarea>
-        <label class="upload">${translations[userLang].chooseFiles}</label>
-        <div class="custom-file-container">
-          <label class="custom-file-upload">
-            ${translations[userLang].chooseFile}
-            <input class="lecture-materials" name="lecture_files" id="lecture-materials-${lectureCounter}" type="file" multiple />
-          </label>
-          <div class="file-names-list" id="file-names-list-${lectureCounter}"></div>
-        </div>
+  lectureDiv.innerHTML = `
+    <div class="container">
+      <p class="title-3">${translations[userLang].lecture} ${lectureCounter}</p>
+      <button class="delete-lecture-btn"><img src="../images/delete.png" alt=""></button>
+    </div>
+    <input type="text" placeholder="${lectureTitle}">
+    <label class="title-3" for="lecture-description">${translations[userLang].enterLectureDescription}</label>
+    <textarea placeholder="${enterLectureDescription}" rows="5"></textarea>
+
+    <label class="upload" ">${translations[userLang].chooseVideo}</label>
+    <div class="custom-file-container"  style="margin-bottom: 15px;">
+      <label class="custom-file-upload">
+        ${translations[userLang].chooseFile}
+        <input class="lecture-video" name="lecture_video" id="lecture-video-${lectureCounter}" type="file" accept="video/*" />
+      </label>
+      <div class="file-names-list" id="video-names-list-${lectureCounter}"></div>
+    </div>
+    <label class="upload" >${translations[userLang].chooseFiles}</label>
+    <div class="custom-file-container">
+      <label class="custom-file-upload">
+        ${translations[userLang].chooseFile}
+        <input class="lecture-materials" name="lecture_files" id="lecture-materials-${lectureCounter}" type="file" />
+      </label>
+      <div class="file-names-list" id="file-names-list-${lectureCounter}"></div>
+    </div>
+
+    
+  `;
+
+  lecturesDiv.appendChild(lectureDiv);
+
+  const deleteLectureBtn = lectureDiv.querySelector(".delete-lecture-btn");
+  deleteLectureBtn.addEventListener("click", () => {
+    lectureDiv.remove(); // Видаляємо лекцію
+    updateLectureNumbers(moduleDiv); // Оновлюємо нумерацію
+  });
+
+  // Обробка файлів для лекції
+  const lectureMaterialsInput = lectureDiv.querySelector(`#lecture-materials-${lectureCounter}`);
+  const fileNamesList = lectureDiv.querySelector(`#file-names-list-${lectureCounter}`); 
+  lectureMaterialsInput.addEventListener("change", function(event) {
+    const file = event.target.files[0]; // Вибирається тільки перший файл
+    fileNamesList.innerHTML = ''; 
+    if (file) {
+      const fileNameItem = document.createElement("div");
+      fileNameItem.classList.add("file-name-item");
+      fileNameItem.innerHTML = `
+        <span class="file-name">${file.name}</span>
+        <button class="delete-file-btn">✖</button>
       `;
+      fileNamesList.appendChild(fileNameItem);
 
-      lecturesDiv.appendChild(lectureDiv);
-
-      const deleteLectureBtn = lectureDiv.querySelector(".delete-lecture-btn");
-      deleteLectureBtn.addEventListener("click", () => {
-        lectureDiv.remove(); // Видаляємо лекцію
-        updateLectureNumbers(moduleDiv); // Оновлюємо нумерацію
+      const deleteFileBtn = fileNameItem.querySelector(".delete-file-btn");
+      deleteFileBtn.addEventListener("click", () => {
+        fileNamesList.innerHTML = ''; // Очищаємо список файлів
       });
+    }
+  });
 
-      // Обробка файлів для лекції
-      const lectureMaterialsInput = lectureDiv.querySelector(`#lecture-materials-${lectureCounter}`);
-      const fileNamesList = lectureDiv.querySelector(`#file-names-list-${lectureCounter}`);
+  // Обробка відеофайлів для лекції
+  const lectureVideoInput = lectureDiv.querySelector(`#lecture-video-${lectureCounter}`);
+  const videoNamesList = lectureDiv.querySelector(`#video-names-list-${lectureCounter}`);
+  lectureVideoInput.addEventListener("change", function(event) {
+    const file = event.target.files[0]; // Вибирається тільки перший файл
+    videoNamesList.innerHTML = ''; 
+    if (file) {
+      const fileNameItem = document.createElement("div");
+      fileNameItem.classList.add("file-name-item");
+      fileNameItem.innerHTML = `
+        <span class="file-name">${file.name}</span>
+        <button class="delete-file-btn">✖</button>
+      `;
+      videoNamesList.appendChild(fileNameItem);
 
-      lectureMaterialsInput.addEventListener("change", function(event) {
-        const files = Array.from(event.target.files);
-
-        files.forEach(file => {
-          const fileNameItem = document.createElement("div");
-          fileNameItem.classList.add("file-name-item");
-          fileNameItem.innerHTML = `
-            <span class="file-name">${file.name}</span>
-            <button class="delete-file-btn">✖</button>
-          `;
-          fileNamesList.appendChild(fileNameItem);
-
-          const deleteFileBtn = fileNameItem.querySelector(".delete-file-btn");
-          deleteFileBtn.addEventListener("click", () => {
-            const index = files.indexOf(file);
-            if (index > -1) {
-              files.splice(index, 1); // Видаляємо файл із списку
-            }
-            fileNameItem.remove();
-          });
-        });
+      const deleteFileBtn = fileNameItem.querySelector(".delete-file-btn");
+      deleteFileBtn.addEventListener("click", () => {
+        videoNamesList.innerHTML = ''; // Очищаємо список відеофайлів
       });
+    }
+  });
 
-      lectureCounter++;
-      updateLectureNumbers(moduleDiv);
-    });
+  lectureCounter++;
+  updateLectureNumbers(moduleDiv);
+});
 
    
     deleteModuleBtn.addEventListener("click", () => {
@@ -452,31 +487,33 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
   });
 
   // Дочекаємось завантаження DOM, щоб гарантувати, що елементи доступні
-document.addEventListener('DOMContentLoaded', function() {
-  // Знайдемо елемент input за ID
-  const lectureMaterialsInput = document.getElementById('lecture-materials');
-  let submitButton = document.getElementById('submitLectureMaterials');
+  document.addEventListener('DOMContentLoaded', function() {
+    // Знайдемо елемент input за ID
+    const lectureMaterialsInput = document.getElementById('lecture-materials');
+    const submitButton = document.getElementById('submitLectureMaterials');
+    fileNamesList.innerHTML = '';
 
-  // Перевіримо, чи елемент існує
-  if (lectureMaterialsInput && submitButton) {
-    // Додаємо обробник події на кнопку
-    submitButton.addEventListener('click', function() {
-      // Перевіримо, чи є вибрані матеріали
-      if (lectureMaterialsInput.files.length > 0) {
-        // Отримуємо файл
-        let selectedFile = lectureMaterialsInput.files[0];
-        console.log('Selected file:', selectedFile.name);
-
-        // Тут можна виконати додаткові дії з файлом, наприклад, завантаження
-      } else {
-        console.log('No file selected');
-      }
-    });
-  } else {
-    console.log('Elements not found');
-  }
-});
-
+    // Перевіримо, чи елемент існує
+    if (lectureMaterialsInput && submitButton) {
+      // Додаємо обробник події на кнопку
+      submitButton.addEventListener('click', function() {
+        // Перевіримо, чи є вибрані матеріали
+        if (lectureMaterialsInput.files.length > 0) {
+          // Отримуємо файл
+          let selectedFile = lectureMaterialsInput.files[0];
+          console.log('Selected file:', selectedFile.name);
+  
+          // Тут можна виконати додаткові дії з файлом, наприклад, завантаження
+        } else {
+          console.log('No file selected');
+          alert('Please select a file before submitting.');
+        }
+      });
+    } else {
+      console.log('Elements not found');
+    }
+  });
+  
   const categoryError = document.querySelector(".category-error");
   const educationError = document.querySelector(".education-error");
 
@@ -541,6 +578,18 @@ lectureFiles.forEach(input => {
   }
 });
 
+// Додаємо відеофайли
+const lectureVideos = document.querySelectorAll('.lecture-video');
+lectureVideos.forEach(input => {
+  if (input.files.length > 0) {
+    Array.from(input.files).forEach(file => {
+      // Додаємо відеофайл до formData
+      formData.append('lecture_videos', file);
+    });
+  }
+});
+
+
 
   // Відправка даних на сервер
   // Send the data to the server
@@ -552,7 +601,7 @@ lectureFiles.forEach(input => {
     .then(data => {
       if (data.success) {
         alert('Course created successfully!');
-        window.location.href = '/courses'; // Redirect after successful creation
+        window.location.href = '/courses';
       } else {
         alert('Failed to create the course: ' + (data.error || 'Unknown error'));
       }

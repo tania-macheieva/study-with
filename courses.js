@@ -7,6 +7,7 @@ const storage = require('./course-creation/storage-config');
 const upload = multer({ storage }).fields([
     { name: 'course_thumbnail', maxCount: 1 },
     { name: 'lecture_files' },
+    { name: 'lecture_videos' }, // Додано для відеофайлів
 ]);
 
 router.post('/create', upload, async (req, res) => {
@@ -108,26 +109,47 @@ router.post('/create', upload, async (req, res) => {
                         );
         
                         const lectureId = lectureResult.rows[0].id;
-        
-                        // Map files to this lecture by indexing correctly
-                        const filesForThisLecture = req.files['lecture_files']?.slice(index, index + 1); // Assign one file per lecture
-        
+
+                        // Обробка файлів для лекції, обмежуємо до одного файлу на лекцію
+                        const filesForThisLecture = req.files['lecture_files']?.slice(index, index + 1); // Вибираємо тільки один файл для кожної лекції
+
                         if (filesForThisLecture && filesForThisLecture.length > 0) {
-                            // Insert files for the current lecture
-                            const lectureFilePromises = filesForThisLecture.map((file) => {
-                                return pool.query(
-                                    `INSERT INTO lecture_files (lecture_id, file_name, file_url, file_type)
-                                     VALUES ($1, $2, $3, $4)`,
-                                    [
-                                        lectureId,
-                                        file.originalname,
-                                        file.path,
-                                        file.mimetype,
-                                    ]
-                                );
-                            });
-        
-                            await Promise.all(lectureFilePromises);
+                            // Очищаємо попередні файли для цієї лекції
+                            await pool.query('DELETE FROM lecture_files WHERE lecture_id = $1', [lectureId]);
+
+                            // Вставляємо новий файл для цієї лекції
+                            const file = filesForThisLecture[0]; // Беремо перший файл
+                            await pool.query(
+                                `INSERT INTO lecture_files (lecture_id, file_name, file_url, file_type)
+                                 VALUES ($1, $2, $3, $4)`,
+                                [
+                                    lectureId,
+                                    file.originalname,
+                                    file.path,
+                                    file.mimetype,
+                                ]
+                            );
+                        }
+
+                        // Обробка відео для лекції
+                        const videosForThisLecture = req.files['lecture_videos']?.slice(index, index + 1); // Вибираємо тільки одне відео для кожної лекції
+
+                        if (videosForThisLecture && videosForThisLecture.length > 0) {
+                            // Очищаємо попередні відеофайли для цієї лекції
+                            await pool.query('DELETE FROM videos WHERE lecture_id = $1', [lectureId]);
+
+                            // Вставляємо новий відеофайл для цієї лекції
+                            const video = videosForThisLecture[0]; // Беремо перший відеофайл
+                            await pool.query(
+                                `INSERT INTO videos (lecture_id, file_name, file_path, file_size)
+                                 VALUES ($1, $2, $3, $4)`,
+                                [
+                                    lectureId,
+                                    video.originalname,
+                                    video.path,
+                                    video.size,
+                                ]
+                            );
                         }
                     });
         
@@ -137,9 +159,6 @@ router.post('/create', upload, async (req, res) => {
         
             await Promise.all(modulePromises);
         }
-        
-        
-        
 
         // Insert tags
         if (tags && Array.isArray(tags)) {

@@ -145,3 +145,15 @@ INSERT INTO education_levels (id, name, description) VALUES
 (2, 'Basic level', 'Basic understanding of the subject'),
 (3, 'Intermediate level', 'Intermediate knowledge and skills in the subject'),
 (4, 'Advanced level', 'Advanced expertise in the subject');
+
+
+CREATE TABLE videos (
+    id SERIAL PRIMARY KEY,
+    lecture_id INT NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    file_path VARCHAR(255) NOT NULL,
+    file_size INT NOT NULL,
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    language_code VARCHAR(10) DEFAULT 'en',
+    FOREIGN KEY (lecture_id) REFERENCES lectures(id) ON DELETE CASCADE
+);
