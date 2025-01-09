@@ -1,117 +1,343 @@
 <!DOCTYPE html>
 <html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-lang="pageTitle"></title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../course-creation/course-creation.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title data-lang="pageTitle"></title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-    rel="stylesheet">
-  <link rel="stylesheet" href="../course-creation/course-creation.css"> 
-</head>
+  <body>
+    <main>
+      <div class="create-course-form">
+        <form
+          id="create-course"
+          action="/api/courses/create"
+          method="POST"
+          enctype="multipart/form-data"
+        >
+          <label class="title-1" data-lang="courseTitle" for="course-title"
+            >Course Title</label
+          >
+          <input
+            type="text"
+            id="course-title"
+            name="course-title"
+            data-lang="enterCourseTitle"
+            placeholder="Enter course title"
+            required
+          />
 
-<body>
-  <main>
-    <div class="create-course-form"> 
-      <form id="create-course"  action="/api/courses/create" method="POST" enctype="multipart/form-data"> 
-          
-          <label class="title-1" data-lang="courseTitle" for="course-title">Course Title</label>
-          <input type="text" id="course-title" name="course-title" data-lang="enterCourseTitle" placeholder="Enter course title" required>
-        
-          <label class="title-1" data-lang="description" for="course-description">Description</label>
-          <textarea id="course-description" name="course-description" data-lang="enterDescription" placeholder="Enter course description" rows="5" required></textarea>
-          
-          <label class="title-1" data-lang="thumbnail" for="course-thumbnail">Thumbnail</label>
+          <label
+            class="title-1"
+            data-lang="description"
+            for="course-description"
+            >Description</label
+          >
+          <textarea
+            id="course-description"
+            name="course-description"
+            data-lang="enterDescription"
+            placeholder="Enter course description"
+            rows="5"
+            required
+          ></textarea>
+
+          <label class="title-1" data-lang="thumbnail" for="course-thumbnail"
+            >Thumbnail</label
+          >
           <div class="input-container">
-            <label class="custom-file-upload" for="course-thumbnail" data-lang="chooseFile">
+            <label
+              class="custom-file-upload"
+              for="course-thumbnail"
+              data-lang="chooseFile"
+            >
               Choose File
             </label>
-            <input type="file" id="course-thumbnail" name="course-thumbnail" accept="image/*"/>
-            <span id="file-name" class="file-name" data-lang="noFileChosen">No file chosen</span>
+            <input
+              type="file"
+              id="course-thumbnail"
+              name="course-thumbnail"
+              accept="image/*"
+            />
+            <span id="file-name" class="file-name" data-lang="noFileChosen"
+              >No file chosen</span
+            >
           </div>
-          
-          <label class="title-1" data-lang="price" for="course-price">Price (USD)</label>
+
+          <label class="title-1" data-lang="price" for="course-price"
+            >Price (USD)</label
+          >
           <div class="price-input">
-              <input type="number" id="course-price" name="course-price" data-lang="enterPrice" placeholder="Enter price" min="0" required>
-              <span class="currency-symbol">$</span>
+            <input
+              type="number"
+              id="course-price"
+              name="course-price"
+              data-lang="enterPrice"
+              placeholder="Enter price"
+              min="0"
+              required
+            />
+            <span class="currency-symbol">$</span>
           </div>
-          
+
           <!-- Category Dropdown -->
           <label class="title-1" data-lang="category">Category</label>
-          <div class="custom-select-wrapper" data-required="true" id="category-wrapper">
-            <div class="custom-select" role="combobox" aria-labelledby="category-wrapper">
+          <div
+            class="custom-select-wrapper"
+            data-required="true"
+            id="category-wrapper"
+          >
+            <div
+              class="custom-select"
+              role="combobox"
+              aria-labelledby="category-wrapper"
+            >
               <div class="select-trigger" tabindex="0" aria-haspopup="listbox">
                 <span data-lang="selectCategory">Select a category</span>
                 <div class="arrow"></div>
               </div>
               <ul class="options" role="listbox">
-                <li class="option" data-value="1" role="option" data-lang="programming">Programming</li>
-                <li class="option" data-value="2" role="option" data-lang="design">Design</li>
-                <li class="option" data-value="3" role="option" data-lang="marketing">Marketing</li>
-                <li class="option" data-value="4" role="option" data-lang="business">Business</li>
-                <li class="option" data-value="5" role="option" data-lang="languages">Languages</li>
-                <li class="option" data-value="6" role="option" data-lang="finance">Finance</li>
-                <li class="option" data-value="7" role="option" data-lang="personalDevelopment">Personal Development</li>
-                <li class="option" data-value="8" role="option" data-lang="art">Art</li>
-                <li class="option" data-value="9" role="option" data-lang="psychology">Psychology</li>
-                <li class="option" data-value="10" role="option" data-lang="healthcare">Health</li>
-                <li class="option" data-valu e="11" role="option" data-lang="cooking">Cooking</li>
-                <li class="option" data-value="12" role="option" data-lang="science">Science</li>
-                <li class="option" data-value="13" role="option" data-lang="gameDevelopment">Game Development</li>
-                <li class="option" data-value="14" role="option" data-lang="childcare">Childcare</li> 
+                <li
+                  class="option"
+                  data-value="1"
+                  role="option"
+                  data-lang="programming"
+                >
+                  Programming
+                </li>
+                <li
+                  class="option"
+                  data-value="2"
+                  role="option"
+                  data-lang="design"
+                >
+                  Design
+                </li>
+                <li
+                  class="option"
+                  data-value="3"
+                  role="option"
+                  data-lang="marketing"
+                >
+                  Marketing
+                </li>
+                <li
+                  class="option"
+                  data-value="4"
+                  role="option"
+                  data-lang="business"
+                >
+                  Business
+                </li>
+                <li
+                  class="option"
+                  data-value="5"
+                  role="option"
+                  data-lang="languages"
+                >
+                  Languages
+                </li>
+                <li
+                  class="option"
+                  data-value="6"
+                  role="option"
+                  data-lang="finance"
+                >
+                  Finance
+                </li>
+                <li
+                  class="option"
+                  data-value="7"
+                  role="option"
+                  data-lang="personalDevelopment"
+                >
+                  Personal Development
+                </li>
+                <li class="option" data-value="8" role="option" data-lang="art">
+                  Art
+                </li>
+                <li
+                  class="option"
+                  data-value="9"
+                  role="option"
+                  data-lang="psychology"
+                >
+                  Psychology
+                </li>
+                <li
+                  class="option"
+                  data-value="10"
+                  role="option"
+                  data-lang="healthcare"
+                >
+                  Health
+                </li>
+                <li
+                  class="option"
+                  data-valu
+                  e="11"
+                  role="option"
+                  data-lang="cooking"
+                >
+                  Cooking
+                </li>
+                <li
+                  class="option"
+                  data-value="12"
+                  role="option"
+                  data-lang="science"
+                >
+                  Science
+                </li>
+                <li
+                  class="option"
+                  data-value="13"
+                  role="option"
+                  data-lang="gameDevelopment"
+                >
+                  Game Development
+                </li>
+                <li
+                  class="option"
+                  data-value="14"
+                  role="option"
+                  data-lang="childcare"
+                >
+                  Childcare
+                </li>
               </ul>
             </div>
           </div>
-          <div class="category-error" data-lang="categoryError">Please select a category</div>
+          <div class="category-error" data-lang="categoryError">
+            Please select a category
+          </div>
 
-          <br>
+          <br />
 
-          <label class="title-1" data-lang="educationLevel">Education level</label>
-          <div class="custom-select-wrapper" data-required="true" id="education-wrapper">
-            <div class="custom-select" role="combobox" aria-labelledby="education-wrapper">
+          <label class="title-1" data-lang="educationLevel"
+            >Education level</label
+          >
+          <div
+            class="custom-select-wrapper"
+            data-required="true"
+            id="education-wrapper"
+          >
+            <div
+              class="custom-select"
+              role="combobox"
+              aria-labelledby="education-wrapper"
+            >
               <div class="select-trigger" tabindex="0" aria-haspopup="listbox">
-                <span data-lang="selectEducationLevel">Select an education level</span>
+                <span data-lang="selectEducationLevel"
+                  >Select an education level</span
+                >
                 <div class="arrow"></div>
               </div>
               <ul class="options" role="listbox">
-                <li class="option" data-value="1" role="option" data-lang="noLevel">No level</li>
-                <li class="option" data-value="2" role="option" data-lang="basicLevel">Basic level</li>
-                <li class="option" data-value="3" role="option" data-lang="intermediateLevel">Intermediate level</li>
-                <li class="option" data-value="4" role="option" data-lang="advancedLevel">Advanced level</li>
+                <li
+                  class="option"
+                  data-value="1"
+                  role="option"
+                  data-lang="noLevel"
+                >
+                  No level
+                </li>
+                <li
+                  class="option"
+                  data-value="2"
+                  role="option"
+                  data-lang="basicLevel"
+                >
+                  Basic level
+                </li>
+                <li
+                  class="option"
+                  data-value="3"
+                  role="option"
+                  data-lang="intermediateLevel"
+                >
+                  Intermediate level
+                </li>
+                <li
+                  class="option"
+                  data-value="4"
+                  role="option"
+                  data-lang="advancedLevel"
+                >
+                  Advanced level
+                </li>
               </ul>
             </div>
           </div>
-          <div class="education-error" data-lang="educationError">Please select an education level</div>
-          <div class="tags-container">
-            <label class="title-1 tag-title" for="course-tags" data-lang="courseTags" style="margin-bottom: 0;">Course Tags (hidden from users) <br></label><span style="font-style:italic; font-weight: 450; font-size: 16px; color: #545F7A;" data-lang="tagTip">To add a tag, press ENTER</span>
-            <input type="text" id="course-tags" placeholder="Enter tags" data-lang="enterTags">
-            <div id="tags-list"></div> <!-- Для відображення введених тегів -->
+          <div class="education-error" data-lang="educationError">
+            Please select an education level
           </div>
-          
+          <div class="tags-container">
+            <label
+              class="title-1 tag-title"
+              for="course-tags"
+              data-lang="courseTags"
+              style="margin-bottom: 0"
+              >Course Tags (hidden from users) <br /></label
+            ><span
+              style="
+                font-style: italic;
+                font-weight: 450;
+                font-size: 16px;
+                color: #545f7a;
+              "
+              data-lang="tagTip"
+              >To add a tag, press ENTER</span
+            >
+            <input
+              type="text"
+              id="course-tags"
+              placeholder="Enter tags"
+              data-lang="enterTags"
+            />
+            <div id="tags-list"></div>
+            <!-- Для відображення введених тегів -->
+          </div>
+
           <!-- Modules Section First -->
           <div class="modules-container">
-              <p class="title-1" data-lang="modules">Modules</p>
-              <div id="modules-list">
-                  <!-- List of modules will be added here -->
-              </div>
-              <button class="add-module-btn" type="button" id="add-module-btn" data-lang="addModule">Add Module</button>
+            <p class="title-1" data-lang="modules">Modules</p>
+            <div id="modules-list">
+              <!-- List of modules will be added here -->
+            </div>
+            <button
+              class="add-module-btn"
+              type="button"
+              id="add-module-btn"
+              data-lang="addModule"
+            >
+              Add Module
+            </button>
           </div>
           <div class="btns">
-            <button type="submit" class="btn-сreate" data-lang="createCourse">Create Course</button>
-            <button type="button" class="btn-draft" data-lang="saveAsDraft">Save as draft</button>
+            <button type="submit" class="btn-сreate" data-lang="createCourse">
+              Create Course
+            </button>
+            <button type="button" class="btn-draft" data-lang="saveAsDraft">
+              Save as draft
+            </button>
           </div>
-         
-
-      </form>
-  </div>
-</main>
-  <script src="../header/auth-header.js"></script>
-  <script src="../course-creation/course-creation.js"></script> 
-  <script src="../footer/footer.js"></script>
-</body>
-
+        </form>
+      </div>
+    </main>
+    <script src="../header/auth-header.js"></script>
+    <script src="../course-creation/course-creation.js"></script>
+    <script src="../footer/footer.js"></script>
+  </body>
 </html>
