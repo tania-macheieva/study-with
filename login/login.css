@@ -1,5 +1,5 @@
 body {
-    font-family: 'Jost', sans-serif;
+    font-family: "Inter", sans-serif;
     margin: 0;
     padding: 0;
     display: flex;
@@ -59,6 +59,7 @@ h2 {
     position: relative;
     width: 100%;
     margin-bottom: 16px;
+    font-family: "Inter";
 }
 
 .login-form {
@@ -74,6 +75,7 @@ h2 {
     background: #fff;
     transition: all 0.3s ease;
     width: 400px;
+    font-family: "Inter";
 }
 
 .login-form label {
@@ -96,6 +98,7 @@ h2 {
     transition: border-color 0.3s ease;
     margin-bottom: 16px;
     color: #283044;
+    font-family: "Inter";
 }
 
 .login-form input:focus {
@@ -116,6 +119,7 @@ h2 {
     transition: background 0.3s ease, transform 0.2s ease;
     margin-top: 10px;
     margin-bottom: 12px;
+    font-family: "Inter";
 }
 
 .login-form button:hover {
@@ -131,6 +135,7 @@ h2 {
     text-decoration: none;
     font-size: 16px;
     width: 100%;
+    font-family: "Inter";
 }
 
 .login-form a:hover {
