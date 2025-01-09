@@ -1,5 +1,5 @@
 body {
-  font-family: "Jost", sans-serif;
+  font-family: "Inter", sans-serif;
   margin: 0;
   padding: 0;
   background-color: #fff;
@@ -61,7 +61,7 @@ body {
 .email-successfully-verified {
   color: #000000;
   text-align: center;
-  font-family: "Jost", sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 32px;
   font-weight: 600;
   position: absolute;
@@ -80,11 +80,12 @@ body {
   border-radius: 12px; 
   cursor: pointer;
   font-size: 16px;
-  font-weight: 100;
+  font-weight: 300;
   transition: background-color 0.3s ease, transform 0.2s ease;
   position: absolute;
   right: 110px;
   top: 70px;
+  font-family: "Inter",
 }
 
 .emaild {
@@ -112,7 +113,7 @@ body {
 .so-let-s-study {
   color: #000000;
   text-align: center;
-  font-family: "Jost", sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 28px;
   font-weight: 400;
   position: absolute;
