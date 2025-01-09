@@ -1,99 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Contact - StudyWith</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../inform_pages/contact.css">
-</head>
-<body>
-      <main class="main">
-        <section class="contact-section">
-            <div class="illustration">
-                <img  src="../inform_pages/images/20943705.jpg" alt="Contact Illustration">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../inform_pages/contact.css" />
+  </head>
+  <body>
+    <main class="main">
+      <section class="contact-section">
+        <div class="illustration">
+          <img
+            src="../inform_pages/images/20943705.jpg"
+            alt="Contact Illustration"
+          />
+        </div>
+        <div class="contact-info">
+          <h1>Contact</h1>
+          <div class="contact-line"></div>
+          <div class="email-box">
+            <p>
+              Do you have any questions?<br />We would be glad to receive your
+              message.
+            </p>
+            <a href="mailto:studywith.connect@gmail.com" class="email-button"
+              >studywith.connect@gmail.com</a
+            >
+          </div>
+          <div class="small-boxes">
+            <form id="phone-form">
+              <div class="small-box">
+                <p>We will call you back</p>
+                <div class="phone-container">
+                  <input
+                    type="email"
+                    class="email-input"
+                    class="email-input"
+                    placeholder="Your email"
+                    id="from-email"
+                    required
+                  />
+                  <input
+                    type="tel"
+                    class="phone-input"
+                    placeholder="+38(0__) ___-___-____"
+                    id="phone"
+                    required
+                  />
+                  <button type="button" id="send-button" class="submit-button">
+                    <span>&#62;</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+            <div class="small-box">
+              <p>Meet in person</p>
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2573.5489525950034!2d24.024761176210824!3d49.83214207148078!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x473add642c0a3f8d%3A0x9fe083bd4cd1cd7e!2z0LLRg9C70LjRhtGPINCU0YDQsNCz0L7QvNCw0L3QvtCy0LAsIDUwLCDQm9GM0LLRltCyLCDQm9GM0LLRltCy0YHRjNC60LAg0L7QsdC70LDRgdGC0YwsIDc5MDAw!5e0!3m2!1suk!2sua!4v1734367846820!5m2!1suk!2sua"
+                width="550"
+                height="250"
+                style="border: 0"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+              >
+              </iframe>
             </div>
-            <div class="contact-info">
-                <h1>Contact</h1>
-                <div class="contact-line"></div> 
-                <div class="email-box">
-                    <p>Do you have any questions?<br>We would be glad to receive your message.</p>
-                    <a href="mailto:studywith.connect@gmail.com" class="email-button">studywith.connect@gmail.com</a>
-                </div>
-                <div class="small-boxes">
-                  <form id="phone-form">
-                    <div class="small-box">
-                        <p>We will call you back</p>
-                        <div class="phone-container">
-                            <input type="email" class="email-input" class="email-input" placeholder="Your email"  id="from-email"required>
-                            <input type="tel" class="phone-input" placeholder="+38(0__) ___-___-____" id="phone" required>
-                            <button type="button"  id="send-button"  class="submit-button">
-                                <span>&#62;</span>
-                            </button>
-                        </div>
-                    </div>
-                  </form>
-                  <div class="small-box">
-                    <p>Meet in person</p>
-                    <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2573.5489525950034!2d24.024761176210824!3d49.83214207148078!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x473add642c0a3f8d%3A0x9fe083bd4cd1cd7e!2z0LLRg9C70LjRhtGPINCU0YDQsNCz0L7QvNCw0L3QvtCy0LAsIDUwLCDQm9GM0LLRltCyLCDQm9GM0LLRltCy0YHRjNC60LAg0L7QsdC70LDRgdGC0YwsIDc5MDAw!5e0!3m2!1suk!2sua!4v1734367846820!5m2!1suk!2sua" 
-                    width="550" 
-                    height="250" 
-                    style="border:0;" 
-                    allowfullscreen="" 
-                    loading="lazy" 
-                    referrerpolicy="no-referrer-when-downgrade">
-                </iframe>
-                </div>
-                </div>
-            </div>
-        </section>
+          </div>
+        </div>
+      </section>
     </main>
 
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
-    const sendButton = document.getElementById('send-button');
-    sendButton.addEventListener('click', async () => {
-        const emailInput = document.getElementById('from-email');
-        const phoneInput = document.getElementById('phone');
+      document.addEventListener("DOMContentLoaded", () => {
+        const sendButton = document.getElementById("send-button");
+        sendButton.addEventListener("click", async () => {
+          const emailInput = document.getElementById("from-email");
+          const phoneInput = document.getElementById("phone");
 
-        if (!emailInput || !phoneInput) {
+          if (!emailInput || !phoneInput) {
             alert("Email or phone input fields not found.");
             return;
-        }
+          }
 
-        const email = emailInput.value;
-        const phone = phoneInput.value;
+          const email = emailInput.value;
+          const phone = phoneInput.value;
 
-        if (!email || !phone) {
+          if (!email || !phone) {
             alert("Please enter both your email and phone number.");
             return;
-        }
+          }
 
-        try {
-            const response = await fetch('http://localhost:8000/auth/send-email', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+          try {
+            const response = await fetch(
+              "http://localhost:8000/auth/send-email",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, phone }),
-            });
+              }
+            );
 
             if (response.ok) {
-                alert("Your details have been submitted successfully.");
+              alert("Your details have been submitted successfully.");
             } else {
-                alert("There was an error. Please try again.");
+              alert("There was an error. Please try again.");
             }
-        } catch (error) {
+          } catch (error) {
             console.error(error);
             alert("There was a network error. Please try again.");
-        }
-    });
-});
-
-  </script>
-   <script src="../footer/footer.js"></script>
-   <script src="../header/auth-header.js"></script>
-   <script src="../inform_pages/lang.js"></script>
-</body>
+          }
+        });
+      });
+    </script>
+    <script src="../footer/footer.js"></script>
+    <script src="../header/auth-header.js"></script>
+    <script src="../inform_pages/lang.js"></script>
+  </body>
 </html>

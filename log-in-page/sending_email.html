@@ -1,28 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Password Reset</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Password Reset</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
 
-<style>
-    body {
-    font-family: "Jost", sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #fff;
-    color: #333;
-}
-      
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #fff;
+        color: #333;
+      }
+
       .content {
         display: flex;
         flex-direction: column;
         min-height: 140vh;
       }
-      
+
       .main {
         display: flex;
         align-items: center;
@@ -30,20 +33,20 @@
         flex-grow: 1;
         padding: 40px;
       }
-      
+
       .image-section {
         flex: 1;
         display: flex;
         justify-content: center;
         align-items: center;
       }
-      
+
       .email-image {
         max-width: 70%;
         height: auto;
         transform: translateX(-15%);
       }
-      
+
       .form-section {
         flex: 1;
         max-width: 520px;
@@ -54,7 +57,7 @@
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.153);
         transform: translateX(-15%);
       }
-      
+
       .form-section h2 {
         text-align: center;
         font-size: 32px;
@@ -62,22 +65,22 @@
         margin-bottom: 20px;
         color: #080808;
       }
-      
+
       .form-section p {
         font-size: 20px;
         font-weight: 300px;
         margin-bottom: 20px;
         margin-top: 30px;
-        color:  #080808;
+        color: #080808;
       }
-      .form-section a{
+      .form-section a {
         align-items: center;
       }
-      
+
       .btn {
         text-align: center;
         display: block;
-        margin: 40px auto 0; 
+        margin: 40px auto 0;
         padding: 10px 10px;
         width: 280px;
         height: 30px;
@@ -88,77 +91,80 @@
         border-radius: 12px;
         text-align: center;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        transition: transform 0.6s ease, background-color 0.3s ease; 
+        transition: transform 0.6s ease, background-color 0.3s ease;
       }
-      
+
       .btn:hover {
         background-color: #0a0b0c;
         transform: scale(1.1);
       }
-</style>
-</head>
-<body>
-
-  
+    </style>
+  </head>
+  <body>
     <main class="main">
-        <div class="image-section">
-          <img src="../images/2880031.jpg" alt="Email Sent" class="email-image">
-        </div>
-        <div class="form-section">
-          <h2 data-lang="heading">Check Your Email</h2>
-          <p data-lang="description">We’ve sent a password reset link to your email. Don’t forget to check your spam folder if it’s not there.</p>
-          <p data-lang="desc">We can’t wait to have you back on our platform!</p>
-          <a href="/" class="btn" data-lang="continueButton">Send again</a>
-        </div>
-      </main>
+      <div class="image-section">
+        <img src="../images/2880031.jpg" alt="Email Sent" class="email-image" />
+      </div>
+      <div class="form-section">
+        <h2 data-lang="heading">Check Your Email</h2>
+        <p data-lang="description">
+          We’ve sent a password reset link to your email. Don’t forget to check
+          your spam folder if it’s not there.
+        </p>
+        <p data-lang="desc">We can’t wait to have you back on our platform!</p>
+        <a href="/" class="btn" data-lang="continueButton">Send again</a>
+      </div>
+    </main>
 
-  <script src="../footer/footer.js"></script>
-  <script src="../header/auth-header.js"></script>
-  <script>
-    const translations = {
-en: {
-    pageTitle: 'StudyWith | Check Your Email',
-    heading: 'Check Your Email',
-    description: 'We’ve sent a password reset link to your email. Don’t forget to check your spam folder if it’s not there.',
-    desc: 'We can’t wait to have you back on our platform!',
-    continueButton: 'Send again'
-},
-ua: {
-    pageTitle: 'StudyWith | Перевiрьте Вашу Пошту',
-    heading: 'Перевірьте Вашу Пошту',
-    description: 'Ми надiслали посилання для зміни паролю на вашу електронну пошту. Не забудьте перевiрити папку «Спам», якщо її там немає.',
-    desc: 'Ми не можемо дочекатися, коли ви повернетеся на нашу платформу!',
-    continueButton: 'Надiслати знову'
-}
-};
+    <script src="../footer/footer.js"></script>
+    <script src="../header/auth-header.js"></script>
+    <script>
+      const translations = {
+        en: {
+          pageTitle: "StudyWith | Check Your Email",
+          heading: "Check Your Email",
+          description:
+            "We’ve sent a password reset link to your email. Don’t forget to check your spam folder if it’s not there.",
+          desc: "We can’t wait to have you back on our platform!",
+          continueButton: "Send again",
+        },
+        ua: {
+          pageTitle: "StudyWith | Перевiрьте Вашу Пошту",
+          heading: "Перевірьте Вашу Пошту",
+          description:
+            "Ми надiслали посилання для зміни паролю на вашу електронну пошту. Не забудьте перевiрити папку «Спам», якщо її там немає.",
+          desc: "Ми не можемо дочекатися, коли ви повернетеся на нашу платформу!",
+          continueButton: "Надiслати знову",
+        },
+      };
 
-function applyLanguage(lang) {
-const langData = translations[lang];
+      function applyLanguage(lang) {
+        const langData = translations[lang];
 
-document.title = langData.pageTitle;
+        document.title = langData.pageTitle;
 
-document.querySelectorAll('[data-lang]').forEach(element => {
-    const langKey = element.getAttribute('data-lang');
-    if (langData[langKey]) {
-        if (element.tagName === 'INPUT') {
-            element.setAttribute('placeholder', langData[langKey]);
-        } else if (element.tagName === 'BUTTON') {
-            element.textContent = langData[langKey];
-        } else if (element.tagName === 'H2') {
-            element.textContent = langData[langKey];
-        } else if (element.tagName === 'P') {
-            element.textContent = langData[langKey];
-        } else {
-            element.innerHTML = langData[langKey];
-        }
-    }
-});
-}
+        document.querySelectorAll("[data-lang]").forEach((element) => {
+          const langKey = element.getAttribute("data-lang");
+          if (langData[langKey]) {
+            if (element.tagName === "INPUT") {
+              element.setAttribute("placeholder", langData[langKey]);
+            } else if (element.tagName === "BUTTON") {
+              element.textContent = langData[langKey];
+            } else if (element.tagName === "H2") {
+              element.textContent = langData[langKey];
+            } else if (element.tagName === "P") {
+              element.textContent = langData[langKey];
+            } else {
+              element.innerHTML = langData[langKey];
+            }
+          }
+        });
+      }
 
-document.addEventListener('DOMContentLoaded', () => {
-const userLang = localStorage.getItem('language'); // Default to English
-applyLanguage(userLang);
-});
-  </script>
-</body>
+      document.addEventListener("DOMContentLoaded", () => {
+        const userLang = localStorage.getItem("language"); // Default to English
+        applyLanguage(userLang);
+      });
+    </script>
+  </body>
 </html>
