@@ -1,6 +1,6 @@
 /* Загальні стилі */
 body {
-  font-family: "Jost", sans-serif;
+  font-family: "Inter", sans-serif;
   margin: 0;
   padding: 0;
   background-color: #fff;
@@ -89,7 +89,7 @@ button.prev-btn {
 /* Форма */
 .form-container {
   max-width: 340px;
-  height: 560px;
+  height: 520px;
   width: 100%;
   text-align: center;
   flex-direction: column;
@@ -102,13 +102,13 @@ button.prev-btn {
 }
 
 .form-container h1 {
-  font-family: "Jost", sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 24px;
   font-weight: 700;
   margin-bottom: 20px;
 }
 .form-container h3{
-  font-family: "Jost", sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 16px;
   font-weight: 400;
   margin: 0px;
@@ -125,7 +125,7 @@ button.prev-btn {
   padding: 10px;
   margin-bottom: 15px;
   font-size: 14px;
-  font-family: "Jost", sans-serif;
+  font-family: "Inter", sans-serif;
   border: 1px solid #ddd;
   border-radius: 12px;
   outline: none;
@@ -148,7 +148,7 @@ button.prev-btn {
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  font-family: "Jost", sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 16px;
   transition: background-color 0.3s ease;
   box-sizing: border-box; 
@@ -196,7 +196,7 @@ button.prev-btn {
 
 .privacy-policy {
   margin: 15px 0;
-  font-family: 'Jost', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 .privacy-policy label {

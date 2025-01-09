@@ -1,5 +1,5 @@
 body {
-    font-family: "Jost", sans-serif;
+    font-family: "Inter", sans-serif;
     margin: 0;
     padding: 0;
     background-color: #fff;
@@ -84,6 +84,7 @@ body {
     border-radius: 8px;
     outline: none;
     box-sizing: border-box;
+    font-family: "Inter";
 }
 
 .form-group input[type="text"]:focus,
@@ -111,6 +112,7 @@ body {
     width: 20px;
     height: 20px;
    text-align: center;
+   
 }
 
 /* Кнопка переходу */
@@ -222,6 +224,7 @@ body {
     border: 1px solid #ccc;
     border-radius: 8px;
     box-sizing: border-box;
+    font-family: "Inter";
 }
 
 /* Фокус на полях вводу */
@@ -510,7 +513,7 @@ body {
     font-size: 36px;
     color: #243044;
     margin-bottom: 15px;
-    font-family: "Jost", sans-serif;
+    font-family: "Inter", sans-serif;
     font-weight: 600;
 }
 
@@ -519,7 +522,7 @@ body {
     font-size: 16px;
     color: #243044;
     margin-bottom: 20px; /* Відступ між текстом і кнопкою */
-    font-family: "Jost", sans-serif;
+    font-family: "Inter", sans-serif;
     font-weight: 400;
 }
 #step-5 .button-group-end {
@@ -644,4 +647,24 @@ button.prev-btn {
     outline: none;
     border-color: darkred;
     box-shadow: 0 0 5px rgba(255, 0, 0, 0.8);
+}
+
+button#upload-btn {
+    font-family: 'Inter';
+}
+
+button.prev-btn {
+    font-family: "Inter";
+}
+
+button.next-btn-2 {
+    font-family: "Inter";
+}
+
+textarea#about {
+    font-family: "Inter";
+}
+
+button.finish-btn {
+    font-family: "Inter";
 }
