@@ -1,0 +1,718 @@
+/* Базові стилі */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Загальні стилі для скролбара */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #FFFFFF;
+    margin: 20px 4px;
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #283044;
+    border-radius: 2px;
+    min-height: 40px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #506088;
+}
+
+::-webkit-scrollbar-horizontal {
+    height: 6px;
+}
+
+::-webkit-scrollbar-track-horizontal {
+    background: #FFFFFF;
+    margin: 4px 20px;
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb-horizontal {
+    background: #283044;
+    border-radius: 2px;
+    min-width: 40px;
+}
+
+::-webkit-scrollbar-thumb-horizontal:hover {
+    background: #506088;
+}
+
+body {
+    background: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    justify-content: center;
+    min-height: 195vh;
+    overflow-y: auto;
+}
+
+.container {
+    width: 1280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
+    padding: 20px;
+    height: auto;
+    min-height: 100vh;
+}
+
+/* Головна картка */
+.main-preview {
+    top: 50px;
+    width: 1200px;
+    background: #FFFFFF;
+    box-shadow: 0px 4px 24px rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
+    margin: 50px auto;
+    position: relative;
+    display: flex;
+    padding: 32px;
+    gap: 32px;
+    min-height: 397px;
+}
+
+.preview-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    justify-content: space-between;
+}
+
+.preview-image {
+    width: 454px;
+    height: 333px;
+    background: #D9D9D9;
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+/* Заголовок контенту */
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    gap: 20px;
+}
+
+.course-name {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 30px 0;
+    word-wrap: break-word;
+    max-width: calc(100% - 80px);
+    text-align: left;
+    color: #283044;
+}
+
+/* Кнопки дій */
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+}
+
+.action-btn img {
+    width: 20px;
+    height: 20px;
+}
+
+.save-btn {
+    position: relative;
+}
+
+.save-btn img {
+    transition: opacity 0.3s ease;
+}
+
+/* Стан для незбереженої закладки при наведенні */
+.save-btn:not(.saved):hover img {
+    content: url('../images/save_add.svg');
+}
+
+/* Стан для збереженої закладки */
+.save-btn.saved img {
+    content: url('../images/save_saved.svg');
+}
+
+/* Стан для збереженої закладки при наведенні */
+.save-btn.saved:hover img {
+    content: url('../images/save_remove.svg');
+}
+
+.share-btn {
+    position:relative;
+}
+
+.share-btn:hover img{
+    content: url('../images/share_hover.svg');
+}
+
+/* Опис курсу */
+.course-description {
+    margin: 20px 0 32px;
+    font-size: 16px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    overflow: hidden;
+    position: relative;
+    top: -70px;
+}
+
+.course-description.collapsed {
+    max-height: 100px;
+}
+
+.course-description.expanded {
+    max-height: none;
+}
+
+.see-more {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 4px 10px;
+    background: linear-gradient(to right, rgba(255,255,255,0), #FFFFFF 35%);
+    cursor: pointer;
+    color: #283044;
+    font-weight: 500;
+    width: 120px;
+    text-align: right;
+    display: inline-block;
+    height: 24px;
+    line-height: 16px;
+}
+
+/* Деталі */
+.details-row {
+    margin-top: -100px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+}
+
+.details-main {
+    display: flex;
+    gap: 32px;
+}
+
+.detail-item {
+    flex: 1;
+}
+
+.detail-category {
+    margin-bottom: 24px;
+}
+
+.detail-label {
+    font-weight: 500;
+    font-size: 16px;
+    color: #283044;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.detail-value {
+    font-size: 16px;
+}
+
+/* Кнопка реєстрації */
+.sign-up {
+    align-self: flex-end;
+    padding: 12px 24px;
+    background: #283044;
+    border-radius: 12px;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: -35px;
+    font-weight: 600;
+}
+
+/* Інфо секції */
+.info-label {
+    position: absolute;
+    width: 240px;
+    height: 47px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    top: -23.5px;
+    background: #FFFFFF;
+    box-shadow: 0px 4px 24px rgba(0, 0, 0, 0.25);
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.info-label:hover {
+    transform: translate(-50%, 0) scale(1.05);
+}
+
+/* Нижні секції */
+.bottom-sections {
+    display: flex;
+    gap: 100px;
+    justify-content: space-between;
+    margin-top: 100px;
+    width: 100%;
+    max-width: 2000px;
+}
+
+.section {
+    position: relative;
+    background: #DCECFC;
+    border-radius: 24px;
+    padding: 44px 20px 20px;
+    width: calc((100% - 200px) / 3);
+    min-width: 350px;
+}
+
+.speakers-section,
+.modules-section,
+.reviews-section {
+    flex: 1;
+}
+
+/* Біла картка */
+.white-card {
+    background: #FFFFFF;
+    box-shadow: 0px 4px 24px rgba(0, 0, 0, 0.25);
+    border-radius: 12px;
+    padding: 20px;
+    padding-right: 12px;
+    height: 504px;
+    min-height: 504px;
+    width: 100%;
+    position: relative;
+    overflow-y: auto;
+}
+
+/* Стилі для відгуків */
+.user-avatar {
+    width: 57px;
+    height: 57px;
+    background: #D9D9D9;
+    border-radius: 8px;
+    float: left;
+    margin-right: 10px;
+}
+
+.user-info {
+    margin-left: 67px;
+}
+
+.username {
+    font-weight: 500;
+    font-size: 20px;
+    margin-bottom: 5px;
+    color: #283044;
+}
+
+.review-text {
+    clear: both;
+    padding-top: 15px;
+    text-align: center;
+    font-size: 16px;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+/* Модулі */
+.module {
+    margin-bottom: 30px;
+}
+
+.module:last-child {
+    margin-bottom: 0;
+}
+
+.module h3 {
+    font-weight: 500;
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.topic {
+    padding-left: 20px;
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+/* Спікери */
+.speaker-card {
+    text-align: center;
+}
+
+.speaker-card p {
+    text-align: center;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+.speaker-image {
+    width: 100%;
+    height: 288px;
+    background: #D9D9D9;
+    border-radius: 8px;
+    margin: 20px 0;
+    flex-shrink: 0;
+}
+
+.speaker-name-link {
+    color: #283044;
+    text-decoration: none;
+    font-family: 'Jost', sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    display: block;
+    margin-bottom: 20px;
+}
+
+.speaker-name-link:hover {
+    text-decoration: underline;
+}
+
+/* Кнопки навігації */
+.arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+.arrow-left {
+    left: -40px;
+}
+
+.arrow-right {
+    right: -40px;
+}
+
+.arrow::before {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    top: 0;
+    left: 0;
+    border: solid black;
+    border-width: 0 5px 5px 0;
+}
+
+.arrow-left::before {
+    transform: rotate(135deg);
+}
+
+.arrow-right::before {
+    transform: rotate(-45deg);
+}
+
+.arrow:hover::before {
+    border-color: #506088;
+}
+
+/* Модальне вікно */
+.modal-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: none;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow: hidden;
+}
+
+.modal-content {
+    background: #DCECFC;
+    padding: 30px;
+    border-radius: 12px;
+    position: relative;
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    max-height: 90vh;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.modal-content::-webkit-scrollbar {
+    display: none;
+}
+
+.modal-content .white-card {
+    width: 100%;
+    margin: 20px 0;
+    height: auto;
+    min-height: 500px;
+    padding: 30px;
+    box-sizing: border-box;
+    overflow: visible;
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* Фільтри відгуків */
+.reviews-filter {
+    display: flex;
+    gap: 12px;
+    margin: 0 0 20px;
+    justify-content: center;
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    border: 1px solid #283044;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Jost', sans-serif;
+    font-size: 16px;
+}
+
+.filter-btn.active,
+.filter-btn:hover {
+    background: #283044;
+    color: white;
+}
+
+/* Картки відгуків */
+.review-card {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.review-card:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.reviews-container {
+    padding: 20px;
+    overflow-y: auto;
+    margin-bottom: 60px;
+    padding-right: 8px;
+    flex: 1;
+}
+
+.reviews-section .modal-content .white-card {
+    height: 40%;
+}
+
+.no-reviews {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-style: italic;
+}
+
+/* Модальне вікно спікера */
+.modal-content .speaker-image {
+    width: 288px;
+    height: 288px;
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+.modal-content .speaker-info-container {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.modal-content .speaker-name-link {
+    margin: 0 0 20px 0;
+    font-size: 24px;
+}
+
+.modal-content .speaker-card p {
+    text-align: left;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.speakers-container {
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.speaker-card-modal {
+    padding: 20px 0;
+}
+
+.speaker-card-modal.with-border {
+    border-bottom: 1px solid #eee;
+}
+
+.speaker-content {
+    display: flex;
+    gap: 20px;
+}
+
+.speaker-image-small {
+    width: 120px;
+    height: 120px;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.speaker-info {
+    flex: 1;
+}
+
+.speaker-info .speaker-name-link {
+    font-size: 20px;
+    margin-bottom: 12px;
+}
+
+.speaker-achievements {
+    font-size: 16px;
+    line-height: 1.5;
+    text-align: left;
+}
+
+/* Медіа-запити */
+@media (max-width: 1200px) {
+    .main-preview {
+        width: 95%;
+        flex-direction: column;
+    }
+
+    .preview-image {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 16/9;
+    }
+
+    .details-row,
+    .details-main {
+        flex-wrap: wrap;
+    }
+
+    .detail-item {
+        flex: 1 1 calc(50% - 16px);
+    }
+
+    .bottom-sections {
+        flex-direction: column;
+        gap: 50px;
+    }
+    
+    .section {
+        width: 100%;
+        padding-left: 40px;
+        padding-right: 40px;
+    }
+
+    .speaker-image {
+        width: 288px;
+        height: 288px;
+        margin: 20px auto;
+        aspect-ratio: 1/1;
+    }
+
+    .arrow {
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1;
+    }
+
+    .arrow-left {
+        left: 10px;
+    }
+
+    .arrow-right {
+        right: 10px;
+    }
+
+    /* Додаткові стилі для модального вікна в адаптиві */
+    .modal-content .speaker-image {
+        width: 200px;
+        height: 200px;
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .section {
+        min-width: 280px;
+        padding: 44px 30px 20px;
+    }
+
+    .arrow {
+        width: 20px;
+        height: 20px;
+    }
+
+    .arrow::before {
+        width: 20px;
+        height: 20px;
+    }
+
+    .speaker-image {
+        width: 200px;
+        height: 200px;
+    }
+}
+
+.review-date {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: #666;
+    font-size: 14px;
+}
