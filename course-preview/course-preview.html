@@ -1,121 +1,126 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Course preview</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="course-preview.css">
+    <link rel="stylesheet" href="../course-preview/course-preview.css">
 </head>
 <body>
-<div class="container">
-    <!-- Головна картка -->
-    <div class="main-preview">
-    <div class="preview-image"></div>
-    <div class="preview-content">
-        <div class="content-header">
-            <h1 class="course-name">Course name</h1>
-            <div class="action-buttons">
-                <button class="action-btn save-btn">
-                    <img src="..\images\save_normal.svg" alt="save">
-                </button>
-                <button class="action-btn share-btn">
-                    <img src="..\images\share.svg" alt="share">
-                </button>
+    <div class="container">
+        <div id="header"></div>
+        
+        <!-- Головна картка -->
+        <div class="main-preview">
+            <div class="preview-image"></div>
+            <div class="preview-content">
+                <div class="content-header">
+                    <h1 class="course-name">Course name</h1>
+                    <div class="action-buttons">
+                        <button class="action-btn save-btn">
+                            <img src="..\images\save_normal.svg" alt="save">
+                        </button>
+                        <button class="action-btn share-btn">
+                            <img src="..\images\share.svg" alt="share">
+                        </button>
+                    </div>
+                </div>
+                <p class="course-description">here should be the course description here should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course description</p>
+                <!-- Опис курсу -->
+                <div class="details-row">
+                    <div class="detail-category">
+                        <span class="detail-label">Category</span>
+                        <span class="detail-value">Programming</span>
+                    </div>
+                    <div class="details-main">
+                        <div class="detail-item">
+                            <span class="detail-label">Education level</span>
+                            <span class="detail-value">Beginner</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Duration</span>
+                            <span class="detail-value">6 weeks</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Price</span>
+                            <span class="detail-value">$200</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="sign-up">Sign Up</button>
             </div>
         </div>
-        <p class="course-description">here should be the course description here should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course descriptionhere should be the course description</p>
-            <!-- Опис курсу -->
-            <div class="details-row">
-                <div class="detail-category">
-                    <span class="detail-label">Category</span>
-                    <span class="detail-value">Programming</span>
+
+        <!-- Нижні секції -->
+        <div class="bottom-sections">
+            <!-- Секція спікерів -->
+            <div class="section speakers-section">
+                <div class="info-label">Course speakers</div>
+                <div class="white-card speaker-card">
+                    <a href="#" class="speaker-name-link">Speaker name</a>
+                    <div class="speaker-image"></div>
+                    <p>here should be the speaker's achievements here should be the speaker's achievements...</p>
                 </div>
-                <div class="details-main">
-                    <div class="detail-item">
-                        <span class="detail-label">Education level</span>
-                        <span class="detail-value">Beginner</span>
+                <div class="arrow arrow-left"></div>
+                <div class="arrow arrow-right"></div>
+            </div>
+
+            <!-- Секція модулів -->
+            <div class="section">
+                <div class="info-label">Course modules</div>
+                <div class="white-card">
+                    <!-- Вміст модулів -->
+                    <div class="module">
+                        <h3>Module 1</h3>
+                        <div class="topic">topic 1 name</div>
+                        <div class="topic">topic 2 name</div>
+                        <div class="topic">topic 3 name</div>
                     </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Duration</span>
-                        <span class="detail-value">6 weeks</span>
+                    <div class="module">
+                        <h3>Module 1</h3>
+                        <div class="topic">topic 1 name</div>
+                        <div class="topic">topic 2 name</div>
+                        <div class="topic">topic 3 name</div>
                     </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Price</span>
-                        <span class="detail-value">$200</span>
+                    <div class="module">
+                        <h3>Module 1</h3>
+                        <div class="topic">topic 1 name</div>
+                        <div class="topic">topic 2 name</div>
+                        <div class="topic">topic 3 name</div>
+                    </div>
+                    <div class="module">
+                        <h3>Module 1</h3>
+                        <div class="topic">topic 1 name</div>
+                        <div class="topic">topic 2 name</div>
+                        <div class="topic">topic 3 name</div>
                     </div>
                 </div>
             </div>
-        <button class="sign-up">Sign Up</button>
+
+            <!-- Секція відгуків -->
+            <div class="section reviews-section">
+                <div class="info-label">Course reviews</div>
+                <div class="white-card">
+                    <div class="user-avatar"></div>
+                    <div class="user-info">
+                        <div class="username"></div>
+                        <div class="rating"></div>
+                    </div>
+                    <div class="review-text"></div>
+                </div>
+                <div class="arrow arrow-left"></div>
+                <div class="arrow arrow-right"></div>
+            </div>
+        </div>
+
+        <div id="footer"></div>
     </div>
-</div>
 
-    <!-- Нижні секції -->
-    <div class="bottom-sections">
-        <!-- Секція спікерів -->
-        <div class="section speakers-section">
-            <div class="info-label">Course speakers</div>
-            <div class="white-card speaker-card">
-              <a href="#" class="speaker-name-link">Speaker name</a>
-              <div class="speaker-image"></div>
-              <p>here should be the speaker's achievements here should be the speaker's achievements...</p>
-            </div>
-            <div class="arrow arrow-left"></div>
-            <div class="arrow arrow-right"></div>
-        </div>
-
-        <!-- Секція модулів -->
-        <div class="section">
-            <div class="info-label">Course modules</div>
-            <div class="white-card">
-                <!-- Вміст модулів -->
-                <div class="module">
-                    <h3>Module 1</h3>
-                    <div class="topic">topic 1 name</div>
-                    <div class="topic">topic 2 name</div>
-                    <div class="topic">topic 3 name</div>
-                </div>
-                <div class="module">
-                    <h3>Module 1</h3>
-                    <div class="topic">topic 1 name</div>
-                    <div class="topic">topic 2 name</div>
-                    <div class="topic">topic 3 name</div>
-                </div>
-                <div class="module">
-                    <h3>Module 1</h3>
-                    <div class="topic">topic 1 name</div>
-                    <div class="topic">topic 2 name</div>
-                    <div class="topic">topic 3 name</div>
-                </div>
-                <div class="module">
-                    <h3>Module 1</h3>
-                    <div class="topic">topic 1 name</div>
-                    <div class="topic">topic 2 name</div>
-                    <div class="topic">topic 3 name</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Секція відгуків -->
-        <div class="section reviews-section">
-            <div class="info-label">Course reviews</div>
-            <div class="white-card">
-                <div class="user-avatar"></div>
-                <div class="user-info">
-                    <div class="username"></div>
-                    <div class="rating"></div>
-                </div>
-                <div class="review-text"></div>
-            </div>
-            <div class="arrow arrow-left"></div>
-            <div class="arrow arrow-right"></div>
-        </div>
-    </div>
-</div>
-<script src="..\header\auth-header.js"></script>
-<script src="..\footer\footer\footer.js"></script>
-<script src="course-preview.js"></script>
+    <script src="../header/auth-header.js"></script>
+    <script src="../footer/footer.js"></script>
+    <script src="../course-preview/course-preview.js"></script>
 </body>
 </html>
