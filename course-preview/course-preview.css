@@ -45,40 +45,48 @@
 ::-webkit-scrollbar-thumb-horizontal:hover {
     background: #506088;
 }
-
 body {
-    background: #FFFFFF;
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+    color: #333;
+    min-height: 100vh;
     display: flex;
-    justify-content: center;
-    min-height: 195vh;
-    overflow-y: auto;
+    flex-direction: column; 
 }
+main 
+{
 
-.container {
-    width: 1280px;
+    font-family: "Inter", sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+    color: #333;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    margin: 0 auto;
-    padding: 20px;
-    height: auto;
-    min-height: 100vh;
+    align-items: center; /* Вирівнювання всіх елементів по центру */
+    margin-bottom: 100px;
 }
-
 /* Головна картка */
 .main-preview {
     top: 50px;
-    width: 1200px;
+    max-width: 1200px; /* Встановлено max-width для адаптивності */
+    width: 100%;
     background: #FFFFFF;
     box-shadow: 0px 4px 24px rgba(0, 0, 0, 0.15);
     border-radius: 12px;
-    margin: 50px auto;
+    margin: 50px 0; /* Центрування по вертикалі з відступами */
     position: relative;
     display: flex;
+    flex-direction: row; /* Вирівнювання елементів всередині картки */
+    align-items: center; /* Вирівнювання по вертикалі */
+    justify-content: space-between; /* Розподіл елементів по ширині */
     padding: 32px;
     gap: 32px;
     min-height: 397px;
+    box-sizing: border-box;
 }
 
 .preview-content {
@@ -273,12 +281,14 @@ body {
 /* Нижні секції */
 .bottom-sections {
     display: flex;
-    gap: 100px;
-    justify-content: space-between;
-    margin-top: 100px;
-    width: 100%;
-    max-width: 2000px;
+    gap: 100px; /* Залишає відступ між секціями */
+    justify-content: center; /* Вирівнює секції по центру горизонтально */
+    margin-top: 100px; /* Відступ від верхніх елементів */
+    max-width: 1500px; /* Обмежує максимальну ширину */
+    width: 100%; /* Секції займають всю ширину контейнера */
+    
 }
+
 
 .section {
     position: relative;
@@ -646,11 +656,6 @@ body {
     .detail-item {
         flex: 1 1 calc(50% - 16px);
     }
-
-    .bottom-sections {
-        flex-direction: column;
-        gap: 50px;
-    }
     
     .section {
         width: 100%;
@@ -685,6 +690,7 @@ body {
         height: 200px;
         margin: 0 auto;
     }
+    
 }
 
 @media (max-width: 768px) {
@@ -716,4 +722,3 @@ body {
     color: #666;
     font-size: 14px;
 }
-
