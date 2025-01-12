@@ -371,6 +371,8 @@ router.post('/verify-email', async (req, res) => {
         const { userData } = verification;
         const passwordHash = await bcrypt.hash(userData.password, 10);
 
+        // Використання транзакції для збереження даних
+        await pool.query('BEGIN');
         // Створення користувача після успішної верифікації
         const result = await pool.query(
             `INSERT INTO users (name, email, user_password, phone_number, role)
@@ -378,9 +380,17 @@ router.post('/verify-email', async (req, res) => {
              RETURNING id, name, email, role, created_at`,
             [userData.name, email, passwordHash, userData.phone_number, userData.role]
         );
-
         const newUser = result.rows[0];
-        
+        // Якщо роль — студент, створити запис у таблиці `students`
+        if (userData.role === 'student') {
+            await pool.query(
+                `INSERT INTO students (user_id, phone_number, additional_info)
+                 VALUES ($1, $2, $3)`,
+                [newUser.id, userData.phone_number, '']
+            );
+        }
+         // Завершення транзакції
+         await pool.query('COMMIT');
         // Видалення коду верифікації
         verificationCodes.delete(email);
 
@@ -685,5 +695,266 @@ router.post('/submit-question', authenticate, async (req, res) => {
   router.get('/auth-check', authenticate, (req, res) => {
     res.json({ authenticated: true });
   });
+
+  router.put('/profile/:id', async (req, res) => {
+    const userId = req.params.id;
+    const { name, nickname, date_of_birth, phone_number, description } = req.body;
+
+    try {
+        // Використання транзакції для оновлення даних
+        await pool.query('BEGIN');
+
+        // Оновлення таблиці `users`
+        await pool.query(
+            `UPDATE users
+             SET name = $1, phone_number = $2
+             WHERE id = $3`,
+            [name, phone_number, userId]
+        );
+
+        // Оновлення таблиці `students`
+        const result = await pool.query(
+            `UPDATE students
+             SET additional_info = $1, date_of_birth = $2, phone_number = $3, nickname = $4
+             WHERE user_id = $5
+             RETURNING id`,
+            [description, date_of_birth, phone_number, nickname, userId]
+        );
+
+        // Якщо запис у `students` не існує, створюємо його
+        if (result.rowCount === 0) {
+            await pool.query(
+                `INSERT INTO students (user_id, phone_number, date_of_birth, additional_info, nickname)
+                 VALUES ($1, $2, $3, $4, $5)`,
+                [userId, phone_number, date_of_birth, description, nickname]
+            );
+        }
+
+        await pool.query('COMMIT');
+        res.status(200).json({ message: 'Profile updated successfully!' });
+    } catch (err) {
+        await pool.query('ROLLBACK');
+        console.error(err.message);
+        res.status(500).json({ error: 'Failed to update profile' });
+    }
+});
+// Маршрут для оновлення пароля авторизованого користувача
+router.put('/update-password', async (req, res) => {
+    const { userId, currentPassword, newPassword } = req.body;
+
+    // Перевірка обов’язкових полів
+    if (!userId || !currentPassword || !newPassword) {
+        return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    try {
+        // Отримання даних користувача
+        const userResult = await pool.query('SELECT user_password FROM users WHERE id = $1', [userId]);
+        const user = userResult.rows[0];
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Перевірка поточного пароля
+        const isPasswordValid = await bcrypt.compare(currentPassword, user.user_password);
+        if (!isPasswordValid) {
+            return res.status(400).json({ error: 'Current password is incorrect' });
+        }
+
+        // Хешування нового пароля
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Оновлення пароля в базі даних
+        await pool.query('UPDATE users SET user_password = $1 WHERE id = $2', [hashedPassword, userId]);
+
+        res.status(200).json({ message: 'Password updated successfully' });
+    } catch (error) {
+        console.error('Error updating password:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+//маршрут для закриття акаунта
+router.put('/close-account', async (req, res) => {
+    const { userId } = req.body;
+
+    if (!userId) {
+        return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    try {
+        // Оновлюємо стан профілю в базі
+        await pool.query(
+            `UPDATE users
+             SET is_private = TRUE
+             WHERE id = $1`,
+            [userId]
+        );
+
+        res.status(200).json({ message: 'Account closed successfully. Your profile is now private.' });
+    } catch (error) {
+        console.error('Error closing account:', error.message);
+        res.status(500).json({ error: 'Failed to close account' });
+    }
+});
+router.put('/open-account', async (req, res) => {
+    const { userId } = req.body;
+
+    if (!userId) {
+        return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    try {
+        // Оновлення стану профілю в базі
+        await pool.query(
+            `UPDATE users
+             SET is_private = FALSE
+             WHERE id = $1`,
+            [userId]
+        );
+
+        res.status(200).json({ message: 'Account is now public. Your profile is visible to others.' });
+    } catch (error) {
+        console.error('Error opening account:', error.message);
+        res.status(500).json({ error: 'Failed to open account' });
+    }
+});
+
+// маршрут для перевірки приватності профілю
+router.get('/auth/profile/:id', async (req, res) => {
+    const userId = req.params.id;
+
+    try {
+        // Отримуємо дані користувача
+        const userResult = await pool.query(
+            `SELECT name, email, phone_number, is_private
+             FROM users
+             WHERE id = $1`,
+            [userId]
+        );
+
+        const user = userResult.rows[0];
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Якщо профіль приватний, повертаємо відповідне повідомлення
+        if (user.is_private) {
+            return res.status(403).json({ error: 'This profile is private.' });
+        }
+
+        // Повертаємо дані профілю
+        res.status(200).json(user);
+    } catch (error) {
+        console.error('Error fetching profile:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+router.put('/profile/teacher/:id', async (req, res) => {
+    const userId = req.params.id;
+    const {
+        name,
+        phone_number,
+        nickname,
+        dob,
+        gender,
+        country,
+        city,
+        zip_code,
+        specialty,
+        professional_experience,
+        experience,
+        about,
+        education,
+        hobbies,
+        language,
+    } = req.body;
+
+    if (!userId) {
+        return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    // Валідація вхідних даних
+    if (!name || !phone_number || !country || !city) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    try {
+        // Початок транзакції
+        await pool.query('BEGIN');
+
+        // Оновлення основних даних у таблиці `users`
+        await pool.query(
+            `UPDATE users
+             SET name = $1, phone_number = $2
+             WHERE id = $3`,
+            [name, phone_number, userId]
+        );
+        // Оновлення таблиці `teachers` для специфічних даних викладача
+        const result = await pool.query(
+            `UPDATE teachers
+             SET nickname = $1, dob = $2, phone_number = $3, gender = $4, country = $5, city = $6, 
+                 zip_code = $7, specialty = $8, professional_experience = $9, 
+                 experience = $10, about = $11, education = $12, hobbies = $13, language = $14
+             WHERE user_id = $15
+             RETURNING id`,
+            [
+                nickname,
+                dob,
+                phone_number,
+                gender,
+                country,
+                city,
+                zip_code,
+                specialty,
+                professional_experience,
+                experience,
+                about,
+                education,
+                hobbies,
+                language,
+                userId,
+            ]
+        );
+
+         // Якщо запису у `teachers` немає, створюємо його
+         if (result.rowCount === 0) {
+            await pool.query(
+                `INSERT INTO teachers (user_id, nickname, dob, phone_number, gender, country, city, zip_code, specialty, 
+                 professional_experience, experience, about, education, hobbies, language)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`,
+                [
+                    userId,
+                    nickname,
+                    dob,
+                    phone_number,
+                    gender,
+                    country,
+                    city,
+                    zip_code,
+                    specialty,
+                    professional_experience,
+                    experience,
+                    about,
+                    education,
+                    hobbies,
+                    language,
+                ]
+            );
+        }
+
+        // Завершення транзакції
+        await pool.query('COMMIT');
+
+        res.status(200).json({ message: 'Teacher profile updated successfully!' });
+    } catch (err) {
+        // Відкат транзакції у разі помилки
+        await pool.query('ROLLBACK');
+        console.error('Error updating teacher profile:', err.message);
+        res.status(500).json({ error: 'Failed to update teacher profile' });
+    }
+});
+
   
 module.exports = router;

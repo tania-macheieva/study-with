@@ -22,7 +22,7 @@
             <main class="profile-container">
                 <div class="user-info">
                     <label for="upload-image">
-                        <img id="profile-image" class="profile-image" src="images/profile-picture.png" alt="user image">
+                        <img id="profile-image" class="profile-image" src="/images/profile-picture.png" alt="user image">
                     </label>
                     <input type="file" id="upload-image" accept="image/*" style="display: none;">
                     <div class="action-buttons">
@@ -33,9 +33,30 @@
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
-                    <p data-lang="username">username</p>
+                    <p data-lang="username" id="username">username</p>
                     <button class="btn-teacher" id="become-teacher-btn" data-lang="btnTeacher">Become a teacher</button>
+                <!-- Вкладки -->
+            <div class="tab-container">
+                    <div class="tabs">
+                        <button class="tab-link active" data-tab="public-profile">Public profile</button>
+                        <button class="tab-link" data-tab="profile">Profile</button>
+                        <button class="tab-link" data-tab="security">Security</button>
+                        <button class="tab-link" data-tab="messages">Messages</button>
+                        <button class="tab-link" data-tab="close-account">Closing an account</button>
+                    </div>
+             </div>
+                <!-- Модальне вікно -->
+                <div id="modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-button">&times;</span>
+                        <div id="modal-content-container"></div>
+                    </div>
                 </div>
+
+        </div>
+
+        
+
 
                 <div class="container-my">
                     <div class="my-courses">
@@ -47,7 +68,7 @@
                                     <span style="width: 70%;"></span>
                                 </div>
                                 <p class="percent">70%</p>
-                                <img src="images/250x100.png" alt="image">
+                                <img src="/images/250x100.png" alt="image">
                                 <button class="btn-resume" data-lang="btnResume">Resume</button>
                             </div>
                             <div class="course">
@@ -56,7 +77,7 @@
                                     <span style="width: 40%;"></span>
                                 </div>
                                 <p class="percent">40%</p>
-                                <img src="images/250x100.png" alt="image">
+                                <img src="/images/250x100.png" alt="image">
                                 <button class="btn-resume" data-lang="btnResume">Resume</button>
                             </div>
                             <div class="course">
@@ -65,7 +86,7 @@
                                     <span style="width: 50%;"></span>
                                 </div>
                                 <p class="percent">50%</p>
-                                <img src="images/250x100.png" alt="image">
+                                <img src="/images/250x100.png" alt="image">
                                 <button class="btn-resume" data-lang="btnResume">Resume</button>
                             </div>
                         </div>
@@ -79,21 +100,21 @@
                                     <p class="p-1" data-lang="certificateName">Certificate name 1</p>
                                     <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
                                     <button class="btn-download" data-lang="downloadCertificate">
-                                        <img src="images/download-certificate.png" alt="">
+                                        <img src="/images/download-certificate.png" alt="">
                                     </button>
                                 </div>
                                 <div class="certificate">
                                     <p class="p-1" data-lang="certificateName">Certificate name 2</p>
                                     <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
                                     <button class="btn-download" data-lang="downloadCertificate">
-                                        <img src="images/download-certificate.png" alt="">
+                                        <img src="/images/download-certificate.png" alt="">
                                     </button>
                                 </div>
                                 <div class="certificate">
                                     <p class="p-1" data-lang="certificateName">Certificate name 3</p>
                                     <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
                                     <button class="btn-download" data-lang="downloadCertificate">
-                                        <img src="images/download-certificate.png" alt="">
+                                        <img src="/images/download-certificate.png" alt="">
                                     </button>
                                 </div>
                             </div>
@@ -105,17 +126,17 @@
                         <div class="bookmarks-list">
                             <div class="bookmark">
                                 <p class="p-1" data-lang="bookmarkName">Bookmark name 1</p>
-                                <img src="images/250x100.png" alt="image">
+                                <img src="/images/250x100.png" alt="image">
                                 <button class="btn-open" data-lang="btnOpen">Open</button>
                             </div>
                             <div class="bookmark">
                                 <p class="p-1" data-lang="bookmarkName">Bookmark name 2</p>
-                                <img src="images/250x100.png" alt="image">
+                                <img src="/images/250x100.png" alt="image">
                                 <button class="btn-open" data-lang="btnOpen">Open</button>
                             </div>
                             <div class="bookmark">
                                 <p class="p-1" data-lang="bookmarkName">Bookmark name 3</p>
-                                <img src="images/250x100.png" alt="image">
+                                <img src="/images/250x100.png" alt="image">
                                 <button class="btn-open" data-lang="btnOpen">Open</button>
                             </div>
                         </div>
@@ -186,6 +207,266 @@ function getAuthData() {
         email: localStorage.getItem('email'),
     };
 }
+/*document.querySelectorAll('.tab-link').forEach(button => {
+    button.addEventListener('click', () => {
+        const tabContainer = button.closest('.tab-container');
+        const tabName = button.getAttribute('data-tab');
+
+        // Знімаємо активний клас з усіх вкладок і панелей
+        tabContainer.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active'));
+        tabContainer.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+
+        // Додаємо активний клас до вибраної вкладки і панелі
+        button.classList.add('active');
+        tabContainer.querySelector(`#${tabName}`).classList.add('active');
+    });
+});*/
+const tabLinks = document.querySelectorAll('.tab-link');
+const modal = document.getElementById('modal');
+const modalContentContainer = document.getElementById('modal-content-container');
+const closeButton = document.querySelector('.close-button');
+
+// Зміст для кожної вкладки
+const tabContents = {
+    "public-profile": `
+        <h2>Public profile</h2>
+        <p>This is your public profile. You can see how it looks to other users.</p>
+    `,
+    "profile": `
+        <h2>Editing your profile</h2>
+        <div class="input-group">
+            <label>Name:</label>
+            <input type="text" placeholder="Enter your real name">
+        </div>
+        <div class="input-group">
+            <label>Nickname:</label>
+            <input type="text" placeholder="Enter your nickname">
+        </div>
+         <div class="input-group">
+            <label>Date of birth:</label>
+            <input type="date" placeholder="Enter your date of birth">
+        </div>
+        <div class="input-group">
+            <label>Phone:</label>
+            <input type="text" placeholder="Enter your phone number">
+        </div>
+        <div class="input-group">
+            <label>Description:</label>
+            <input type="text" placeholder="Write some information about yourself">
+        </div>
+        <button>Save changes</button>
+    `,
+    "security": `
+    <h2>Security settings</h2>
+    <div class="input-group">
+        <label>Current Password:</label>
+        <input type="password" placeholder="Enter current password">
+    </div>
+    <div class="input-group">
+        <label>New Password:</label>
+        <input type="password" placeholder="Enter new password">
+    </div>
+    <button>Update password</button>
+`,
+    "messages": `
+        <h2>Messages</h2>
+        <p>You have no new messages yet.</p>
+    `,
+    "close-account": `
+   <h2>Manage Account Visibility</h2>
+    <p>You can make your account private or public using the buttons below.</p>
+    <button id="close-account-btn" style="background-color: #f44336; color: white; margin-bottom: 10px;">Close Account</button>
+    <button id="open-account-btn" style="background-color: #4CAF50; color: white;">Open Account</button>
+`
+};
+
+// Відкриття модального вікна
+tabLinks.forEach(tab => {
+    tab.addEventListener('click', () => {
+        const tabName = tab.getAttribute('data-tab');
+        modalContentContainer.innerHTML = tabContents[tabName] || "<p>Content not found.</p>";
+        modal.style.display = "flex";
+    });
+});
+
+// Закриття модального вікна
+closeButton.addEventListener('click', () => {
+    modal.style.display = "none";
+});
+
+// Закриття модального вікна при кліку за його межами
+window.addEventListener('click', (event) => {
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
+});
+document.body.addEventListener('click', async (event) => {
+    if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Save changes') {
+        const name = document.querySelector('input[placeholder="Enter your real name"]').value;
+        const nickname = document.querySelector('input[placeholder="Enter your nickname"]').value;
+        const dateOfBirth = document.querySelector('input[placeholder="Enter your date of birth"]').value;
+        const phone = document.querySelector('input[placeholder="Enter your phone number"]').value;
+        const description = document.querySelector('input[placeholder="Write some information about yourself"]').value;
+
+        const userId = localStorage.getItem('userId'); 
+
+        try {
+            const response = await fetch(`http://localhost:8000/auth/profile/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name,
+                    nickname,
+                    date_of_birth: dateOfBirth,
+                    phone_number: phone,
+                    description,
+                }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert('Profile updated successfully!');
+                const usernameElement = document.getElementById('username');
+                usernameElement.textContent = nickname; 
+            } else {
+                alert(`Error: ${result.error}`);
+            }
+        } catch (err) {
+            console.error('Error:', err);
+            alert('An error occurred while updating the profile.');
+        }
+    }
+});
+document.body.addEventListener('click', async (event) => {
+    if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Update password') {
+        const currentPassword = document.querySelector('input[placeholder="Enter current password"]').value;
+        const newPassword = document.querySelector('input[placeholder="Enter new password"]').value;
+
+        const userId = localStorage.getItem('userId'); 
+
+        // Перевірка, чи всі поля заповнені
+        if (!currentPassword || !newPassword) {
+            alert('Please fill out all fields.');
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:8000/auth/update-password', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId,
+                    currentPassword,
+                    newPassword,
+                }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert('Password updated successfully!');
+            } else {
+                alert(`Error: ${result.error}`);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while updating the password.');
+        }
+    }
+});
+document.body.addEventListener('click', async (event) => {
+    const userId = localStorage.getItem('userId'); 
+
+    if (event.target.id === 'close-account-btn') {
+        if (!confirm('Are you sure you want to close your account?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:8000/auth/close-account', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ userId }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert(result.message);
+            } else {
+                alert(`Error: ${result.error}`);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while closing the account.');
+        }
+    }
+
+    if (event.target.id === 'open-account-btn') {
+        if (!confirm('Are you sure you want to open your account?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:8000/auth/open-account', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ userId }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert(result.message);
+            } else {
+                alert(`Error: ${result.error}`);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while opening the account.');
+        }
+    }
+});
+
+// Приклад API-запиту для отримання профілю користувача
+async function fetchUserProfile() {
+    const userId = localStorage.getItem('userId');
+
+    if (!userId) {
+        console.error('User not logged in!');
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:8000/auth/profile/${userId}`);
+        const data = await response.json();
+
+        if (response.ok) {
+            // Оновлюємо значення в елементі <p id="username">
+            const usernameElement = document.getElementById('username');
+            usernameElement.textContent = data.nickname || 'Default Username';
+        } else {
+            console.error('Failed to fetch user profile:', data.error);
+        }
+    } catch (err) {
+        console.error('Error fetching user profile:', err);
+    }
+}
+
+// Виклик функції під час завантаження сторінки
+window.addEventListener('DOMContentLoaded', fetchUserProfile);
+
+
+
 
         </script>
 

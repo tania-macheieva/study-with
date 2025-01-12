@@ -6,7 +6,7 @@ body {
 }
 .page-container {
     display: flex;
-    flex-direction: column;
+    flex-direction:column;
     min-height: 100vh; 
 } 
 
@@ -118,6 +118,173 @@ body {
     background-color: #545F7A;
     transform: translateY(-2px);
 } 
+.tab-container {
+    margin: 20px;
+}
+
+.tabs {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid #ccc;
+}
+
+.tab-link {
+    padding: 10px 20px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 20px;
+    font-weight: 500;
+    font-family: "Inter", sans-serif;
+    text-align: left; /* Вирівнювання тексту ліворуч */
+    color: #283044; /* Колір тексту вкладки */
+    background-color: transparent; 
+    transition: background-color 0.3s ease, color 0.3s ease;
+    border-bottom: 4px solid #283044;
+}
+
+
+/* Ефект при наведенні */
+.tab-link:hover {
+    color: #141821; /* Зміна кольору тексту при наведенні */
+    background-color: #e9ecef; /* Світло-сірий фон */
+    transform: translateY(-5px); /* Легкий рух праворуч */
+}
+
+.tab-content {
+    margin-top: 20px;
+   
+}
+.tab-content h2{
+    font-size: 30px;
+    font-weight: 700;
+    font-family: "Inter", sans-serif;
+}
+.tab-content p{
+    font-size: 20px;
+    font-weight: 400;
+    font-family: "Inter", sans-serif;
+}
+
+.tab-panel {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    padding: 20px;
+    text-align: center; /* Центрування тексту */
+}
+
+.tab-panel.active {
+    display: block;
+    opacity: 1;
+}
+/* Вміст вкладки */
+.input-group {
+    margin: 15px auto;
+    width: 100%;
+    max-width: 400px; /* Ширина для полів вводу */
+    text-align: left; /* Для вирівнювання підписів */
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px; /* Заокруглення полів */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Легка тінь */
+    font-size: 16px;
+    font-family: "Inter", sans-serif;
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus {
+    border-color: #283044;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2); /* Синя підсвітка при фокусі */
+    outline: none;
+}
+/* Кнопки */
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    background-color: #283044;
+    border: none;
+    border-radius: 12px; /* Заокруглення кнопки */
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Легка тінь */
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: #545F7A;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 86, 179, 0.4); /* Більша тінь */
+  
+}
+
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 15px;
+    padding: 20px;
+    border-radius: 12px;
+    width: 600px;
+    max-height: 80vh; 
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.3s ease; /* Анімація */
+}
+/* Анімація для модального вікна */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #000;
+    text-decoration: none;
+}
 
 .profile-container .container-my {
     text-align: center;

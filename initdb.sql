@@ -7,13 +7,15 @@ CREATE TABLE users (
   phone_number VARCHAR(15),
   role VARCHAR(50) CHECK (role IN ('student', 'teacher')) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  is_verified BOOLEAN DEFAULT FALSE
+  is_verified BOOLEAN DEFAULT FALSE,
+  is_private BOOLEAN DEFAULT FALSE
 );
 
 -- Створення таблиці викладачів
 CREATE TABLE teachers (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    nickname VARCHAR(150),
     dob DATE,
     gender VARCHAR(50),
     country VARCHAR(100),
@@ -22,7 +24,11 @@ CREATE TABLE teachers (
     zip_code VARCHAR(20),
     specialty VARCHAR(255),
     professional_experience DATE,
+    experience TEXT,
     about TEXT,
+    education TEXT,
+    hobbies TEXT,
+    language TEXT,
     certificates BYTEA,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -31,6 +37,7 @@ CREATE TABLE teachers (
 CREATE TABLE students (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    nickname VARCHAR(150) ,
     date_of_birth DATE,
     phone_number VARCHAR(15),
     additional_info TEXT,
