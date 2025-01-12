@@ -30,6 +30,7 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use('/api/courses', coursesRouter);
 
 app.use((req, res, next) => {
     if (req.url.endsWith('.js')) {
@@ -97,19 +98,25 @@ app.get('/profile-student', (req, res) => {
 app.get('/profile-teacher', (req, res) => {
     res.sendFile(path.join(__dirname, 'profile-page/teacher-profile.html')); 
 });
-app.use('/api/courses', coursesRouter);
 app.get('/course-creation', (req, res) => {
     res.sendFile(path.join(__dirname, 'course-creation/course-creation.html')); 
 });
+app.get('/donate', (req, res) => {
+    res.sendFile(path.join(__dirname, 'donate/donate.html')); 
+});
+app.get('/course-preview', (req, res) => {
+    res.sendFile(path.join(__dirname, 'course-preview/course-preview.html')); 
+});
+
+
+
+
+
 app.use("/pay-page", stripeRoutes);
 app.get('/get-stripe-key', (req, res) => {
     res.json({ publicKey: process.env.STRIPE_PUBLIC_KEY });
 });
 app.use("/donate", stripeRoutes);
-app.get('/donate', (req, res) => {
-    res.sendFile(path.join(__dirname, 'donate/donate.html')); 
-});
-
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
