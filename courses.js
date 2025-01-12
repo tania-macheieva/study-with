@@ -7,7 +7,7 @@ const storage = require('./course-creation/storage-config');
 const upload = multer({ storage }).fields([
     { name: 'course_thumbnail', maxCount: 1 },
     { name: 'lecture_files' },
-    { name: 'lecture_videos' }, // Додано для відеофайлів
+    { name: 'lecture_videos' }, 
 ]);
 
 router.post('/create', upload, async (req, res) => {

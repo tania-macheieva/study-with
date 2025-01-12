@@ -478,7 +478,7 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
       const lectureTitle = lectureDiv.querySelector('input').value;
       const lectureDescription = lectureDiv.querySelector('textarea').value;
       const lectureOrderNum = moduleCounter;
-   
+      
       lectures.push({ title: lectureTitle, description: lectureDescription, order_num: lectureOrderNum });
     });
 
@@ -592,7 +592,6 @@ lectureVideos.forEach(input => {
 
 
   // Відправка даних на сервер
-  // Send the data to the server
   fetch('/api/courses/create', {
     method: 'POST',
     body: formData,
