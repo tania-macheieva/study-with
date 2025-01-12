@@ -16,6 +16,37 @@ const translations = {
         bookmarkName: 'Bookmark name',
         btnOpen: 'Open',
         btnViewAll: 'View all',
+        publicProf: 'Public profile',
+        profile: 'Profile',
+        security: 'Security',
+        messages: 'Messages',
+        closeAccount: 'Closing an account',
+        infPublicProf: 'This is your public profile. You can see how it looks to other users.',
+        editProf: 'Editing your profile',
+        name: 'Name:',
+        entername:'Enter your real name',
+        nickname: 'Nickname:',
+        enterNickname: 'Enter your nickname',
+        dob: 'Date of birth:',
+        enterDOB: 'Enter your date of birth',
+        phone: 'Phone:',
+        enterPhone: 'Enter your phone number"',
+        description: 'Description:',
+        writeDescription: 'Write some information about yourself',
+        saveChanges: 'Save changes',
+        securitySettings: 'Security settings',
+        currentPassword: 'Current Password:',
+        enterCurrentPassword: 'Enter current password',
+        newPassword: 'New Password:',
+        enterNewPassword: 'Enter new password',
+        updatePassword: 'Update password',
+        messages: 'Messages',
+        noMessages: 'You have no new messages yet.',
+        manageAccount: 'Manage Account Visibility',
+        privatePublic: 'You can make your account private or public using the buttons below.',
+        closeAccount: 'Close Account',
+        openAccount: 'Open Account'
+
     },
     ua: {
         pageTitle: 'Study With | Профіль',
@@ -34,8 +65,57 @@ const translations = {
         bookmarkName: 'Назва закладки',
         btnOpen: 'Відкрити',
         btnViewAll: 'Показати все',
+        publicProf: 'Публічний профіль',
+        profile: 'Профіль',
+        security: 'Безпека',
+        messages: 'Повідомлення',
+        closeAccount: 'Закриття акаунту',
+        infPublicProf: 'Це ваш публічний профіль. Ви можете побачити, як це виглядає для інших користувачів.',
+        editProf: 'Редагування профілю',
+        name: 'Ім`я:',
+        entername:'Введіть своє справжнє ім`я',
+        nickname: 'Нік:',
+        enterNickname: 'Введіть ваш нік',
+        dob: 'Дата народження:',
+        enterDOB: 'Введіть вашу дату народження',
+        phone: 'Телефон:',
+        enterPhone: 'Введіть ваш номер телефону',
+        description: 'Опис:',
+        writeDescription: 'Напишіть трохи інформації про себе',
+        saveChanges: 'Зберегти зміни',
+        securitySettings: 'Налаштування безпеки',
+        currentPassword: 'Поточний пароль:',
+        enterCurrentPassword: 'Введіть поточний пароль',
+        newPassword: 'Новий пароль:',
+        enterNewPassword: 'Введіть новий пароль',
+        updatePassword: 'Оновити пароль',
+        messages: 'Повідомлення',
+        noMessages: 'У вас ще немає нових повідомлень.',
+        manageAccount: 'Управління видимістю акаунту',
+        privatePublic: 'Ви можете зробити свій акаунт приватним або публічним за допомогою кнопок нижче.',
+        closeAccount: 'Закрити акаунт',
+        openAccount: 'Відкрити акаунт'
     },
 };
+// Відкриття модального вікна
+tabLinks.forEach(tab => {
+    tab.addEventListener('click', () => {
+        const tabName = tab.getAttribute('data-tab');
+
+        // Додаємо вміст вкладки в модальне вікно
+        modalContentContainer.innerHTML = tabContents[tabName] || "<p>Content not found.</p>";
+        modal.style.display = "flex";
+
+        // Застосовуємо переклад для нового вмісту модального вікна
+        applyLanguage(localStorage.getItem('language') || 'en');
+    });
+});
+
+// Закриття модального вікна
+closeButton.addEventListener('click', () => {
+    modal.style.display = "none";
+});
+
 
 function applyLanguage(lang) {
     const langData = translations[lang];
@@ -60,7 +140,14 @@ function applyLanguage(lang) {
     });
 }
 
+
 document.addEventListener('DOMContentLoaded', () => {
-    const userLang = localStorage.getItem('language'); 
+    const userLang = localStorage.getItem('language') || 'en'; 
     applyLanguage(userLang);
+    document.getElementById('lang-switcher').addEventListener('change', (e) => {
+        const selectedLang = e.target.value;
+        localStorage.setItem('language', selectedLang);
+        applyLanguage(selectedLang);
+    });
 });
+

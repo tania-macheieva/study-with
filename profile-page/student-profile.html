@@ -38,11 +38,11 @@
                 <!-- Вкладки -->
             <div class="tab-container">
                     <div class="tabs">
-                        <button class="tab-link active" data-tab="public-profile">Public profile</button>
-                        <button class="tab-link" data-tab="profile">Profile</button>
-                        <button class="tab-link" data-tab="security">Security</button>
-                        <button class="tab-link" data-tab="messages">Messages</button>
-                        <button class="tab-link" data-tab="close-account">Closing an account</button>
+                        <button class="tab-link active" data-tab="public-profile" data-lang="publicProf">Public profile</button>
+                        <button class="tab-link" data-tab="profile" data-lang="profile">Profile</button>
+                        <button class="tab-link" data-tab="security" data-lang="security">Security</button>
+                        <button class="tab-link" data-tab="messages" data-lang="messages">Messages</button>
+                        <button class="tab-link" data-tab="close-account" data-lang="closeAccount">Closing an account</button>
                     </div>
              </div>
                 <!-- Модальне вікно -->
@@ -146,6 +146,7 @@
         </div>
 
         <script src="../footer/footer.js"></script>
+        <script> src="/profile-page/student-lang.js" </script>
         <script>
        document.addEventListener('DOMContentLoaded', () => {
     const becomeTeacherButton = document.getElementById('become-teacher-btn');
@@ -229,54 +230,54 @@ const closeButton = document.querySelector('.close-button');
 // Зміст для кожної вкладки
 const tabContents = {
     "public-profile": `
-        <h2>Public profile</h2>
-        <p>This is your public profile. You can see how it looks to other users.</p>
+        <h2 data-lang="publicProf">Public profile</h2>
+        <p data-lang="infPublicProf">This is your public profile. You can see how it looks to other users.</p>
     `,
     "profile": `
-        <h2>Editing your profile</h2>
+        <h2 data-lang="editProf">Editing your profile</h2>
         <div class="input-group">
-            <label>Name:</label>
-            <input type="text" placeholder="Enter your real name">
+            <label data-lang="name">Name:</label>
+            <input data-lang="enterName" type="text" placeholder="Enter your real name">
         </div>
         <div class="input-group">
-            <label>Nickname:</label>
-            <input type="text" placeholder="Enter your nickname">
+            <label data-lang="nickname">Nickname:</label>
+            <input data-lang="enterNickname" type="text" placeholder="Enter your nickname">
         </div>
          <div class="input-group">
-            <label>Date of birth:</label>
-            <input type="date" placeholder="Enter your date of birth">
+            <label data-lang="dob">Date of birth:</label>
+            <input data-lang="enterDOB" type="date" placeholder="Enter your date of birth">
         </div>
         <div class="input-group">
-            <label>Phone:</label>
-            <input type="text" placeholder="Enter your phone number">
+            <label data-lang="phone">Phone:</label>
+            <input data-lang="enterPhone" type="text" placeholder="Enter your phone number">
         </div>
         <div class="input-group">
-            <label>Description:</label>
-            <input type="text" placeholder="Write some information about yourself">
+            <label data-lang="description">Description:</label>
+            <input data-lang="writeDescription" type="text" placeholder="Write some information about yourself">
         </div>
-        <button>Save changes</button>
+        <button data-lang="saveChanges">Save changes</button>
     `,
     "security": `
-    <h2>Security settings</h2>
+    <h2 data-lang="securitySettings">Security settings</h2>
     <div class="input-group">
-        <label>Current Password:</label>
-        <input type="password" placeholder="Enter current password">
+        <label data-lang="currentPassword">Current Password:</label>
+        <input data-lang="enterCurrentPassword" type="password" placeholder="Enter current password">
     </div>
     <div class="input-group">
-        <label>New Password:</label>
-        <input type="password" placeholder="Enter new password">
+        <label data-lang="newPassword">New Password:</label>
+        <input data-lang="enterNewPassword" type="password" placeholder="Enter new password">
     </div>
-    <button>Update password</button>
+    <button data-lang="updatePassword">Update password</button>
 `,
     "messages": `
-        <h2>Messages</h2>
-        <p>You have no new messages yet.</p>
+        <h2 data-lang="messages">Messages</h2>
+        <p data-lang="noMessages">You have no new messages yet.</p>
     `,
     "close-account": `
-   <h2>Manage Account Visibility</h2>
-    <p>You can make your account private or public using the buttons below.</p>
-    <button id="close-account-btn" style="background-color: #f44336; color: white; margin-bottom: 10px;">Close Account</button>
-    <button id="open-account-btn" style="background-color: #4CAF50; color: white;">Open Account</button>
+   <h2 data-lang="manageAccount">Manage Account Visibility</h2>
+    <p data-lang="privatePublic">You can make your account private or public using the buttons below.</p>
+    <button data-lang="closeAccount" id="close-account-btn" style="background-color: #f44336; color: white; margin-bottom: 10px;">Close Account</button>
+    <button  data-lang="openAccount" id="open-account-btn" style="background-color: #4CAF50; color: white;">Open Account</button>
 `
 };
 

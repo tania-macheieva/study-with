@@ -15,6 +15,56 @@ const translations = {
         bookmarkName: 'Bookmark name',
         btnOpen: 'Open',
         btnViewAll: 'View all',
+        publicProf: 'Public profile',
+        profile: 'Profile',
+        security: 'Security',
+        messages: 'Messages',
+        closeAccount: 'Closing an account',
+        infPublicProf: 'This is your public profile. You can see how it looks to other users.',
+        editProf: 'Editing your profile',
+        name: 'Name:',
+        entername:'Enter your real name',
+        nickname: 'Nickname:',
+        enterNickname: 'Enter your nickname',
+        dob: 'Date of birth:',
+        enterDOB: 'Enter your date of birth',
+        phone: 'Phone:',
+        enterPhone: 'Enter your phone number"',
+        gender: 'Gender:',
+        enterGender: 'Enter your gender',
+        description: 'Description:',
+        writeDescription: 'Write some information about yourself',
+        country: 'Country:',
+        enterCountry: 'Enter your country',
+        city: 'City:',
+        enterCity: 'Enter your city',
+        zipCode: 'Zip code:',
+        enterzipCode: 'Enter your zip code',
+        specialty: 'Specialty:',
+        enterSpecialty: 'Enter your specialty',
+        DOPE: 'Beginning of professional experience:',
+        enterDOPE:'Enter the start date of your professional experience',
+        enterExperience: 'Experience:',
+        enterExperience:'Write about your teaching experience',
+        education:'Education:',
+        writeEducation:'Write about your education',
+        hobby:'Hobbies:',
+        writeHobby: 'Write about your hobbies and interests.',
+        language: 'Language:',
+        writeLanguage:'Write what languages ​​you speak',
+        saveChanges: 'Save changes',
+        securitySettings: 'Security settings',
+        currentPassword: 'Current Password:',
+        enterCurrentPassword: 'Enter current password',
+        newPassword: 'New Password:',
+        enterNewPassword: 'Enter new password',
+        updatePassword: 'Update password',
+        messages: 'Messages',
+        noMessages: 'You have no new messages yet.',
+        manageAccount: 'Manage Account Visibility',
+        privatePublic: 'You can make your account private or public using the buttons below.',
+        closeAccount: 'Close Account',
+        openAccount: 'Open Account'
     },
     ua: {
         pageTitle: 'Study With | Профіль Вчителя',
@@ -32,8 +82,77 @@ const translations = {
         bookmarkName: 'Назва закладки',
         btnOpen: 'Відкрити',
         btnViewAll: 'Показати все',
+        publicProf: 'Публічний профіль',
+        profile: 'Профіль',
+        security: 'Безпека',
+        messages: 'Повідомлення',
+        closeAccount: 'Закриття акаунту',
+        infPublicProf: 'Це ваш публічний профіль. Ви можете побачити, як це виглядає для інших користувачів.',
+        editProf: 'Редагування профілю',
+        name: 'Ім`я:',
+        entername:'Введіть своє справжнє ім`я',
+        nickname: 'Нік:',
+        enterNickname: 'Введіть ваш нік',
+        dob: 'Дата народження:',
+        enterDOB: 'Введіть вашу дату народження',
+        phone: 'Телефон:',
+        enterPhone: 'Введіть ваш номер телефону',
+        gender: 'Стать:',
+        enterGender: 'Введіть вашу стать',
+        description: 'Опис:',
+        writeDescription: 'Напишіть трохи інформації про себе',
+        country: 'Країна:',
+        enterCountry: 'Введіть вашу країну',
+        city: 'Місто:',
+        enterCity: 'Введіть ваше місто',
+        zipCode: 'Поштовий індекс:',
+        enterzipCode: 'Введіть ваш поштовий індекс',
+        specialty: 'Спеціалізація:',
+        enterSpecialty: 'Введіть вашу спеціалізацію',
+        DOPE: 'Початок професійного досвіду:',
+        enterDOPE:'Введіть дату початку вашого професійного досвіду',
+        enterExperience: 'Досвід:',
+        enterExperience:'Напишіть про свій педагогічний досвід',
+        education:'Освіта:',
+        writeEducation:'Напишіть про вашу освіту',
+        hobby:'Хобі:',
+        writeHobby: 'Напишіть про свої захоплення та інтереси.',
+        language: 'Мова:',
+        writeLanguage:'Напишіть якими мовами ви володієте',
+        saveChanges: 'Зберегти зміни',
+        securitySettings: 'Налаштування безпеки',
+        currentPassword: 'Поточний пароль:',
+        enterCurrentPassword: 'Введіть поточний пароль',
+        newPassword: 'Новий пароль:',
+        enterNewPassword: 'Введіть новий пароль',
+        updatePassword: 'Оновити пароль',
+        messages: 'Повідомлення',
+        noMessages: 'У вас ще немає нових повідомлень.',
+        manageAccount: 'Управління видимістю акаунту',
+        privatePublic: 'Ви можете зробити свій акаунт приватним або публічним за допомогою кнопок нижче.',
+        closeAccount: 'Закрити акаунт',
+        openAccount: 'Відкрити акаунт'
     },
 };
+// Відкриття модального вікна
+tabLinks.forEach(tab => {
+    tab.addEventListener('click', () => {
+        const tabName = tab.getAttribute('data-tab');
+
+        // Додаємо вміст вкладки в модальне вікно
+        modalContentContainer.innerHTML = tabContents[tabName] || "<p>Content not found.</p>";
+        modal.style.display = "flex";
+
+        // Застосовуємо переклад для нового вмісту модального вікна
+        applyLanguage(localStorage.getItem('language') || 'en');
+    });
+});
+
+// Закриття модального вікна
+closeButton.addEventListener('click', () => {
+    modal.style.display = "none";
+});
+
 
 function applyLanguage(lang) {
     const langData = translations[lang];
@@ -58,7 +177,14 @@ function applyLanguage(lang) {
     });
 }
 
+
 document.addEventListener('DOMContentLoaded', () => {
-    const userLang = localStorage.getItem('language'); 
+    const userLang = localStorage.getItem('language') || 'en'; 
     applyLanguage(userLang);
+    document.getElementById('lang-switcher').addEventListener('change', (e) => {
+        const selectedLang = e.target.value;
+        localStorage.setItem('language', selectedLang);
+        applyLanguage(selectedLang);
+    });
 });
+
