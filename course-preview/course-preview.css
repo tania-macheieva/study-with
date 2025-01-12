@@ -65,23 +65,23 @@ main
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    align-items: center; /* Вирівнювання всіх елементів по центру */
+    align-items: center;
     margin-bottom: 100px;
 }
 /* Головна картка */
 .main-preview {
     top: 50px;
-    max-width: 1200px; /* Встановлено max-width для адаптивності */
+    max-width: 1200px;
     width: 100%;
     background: #FFFFFF;
     box-shadow: 0px 4px 24px rgba(0, 0, 0, 0.15);
     border-radius: 12px;
-    margin: 50px 0; /* Центрування по вертикалі з відступами */
+    margin: 50px 0;
     position: relative;
     display: flex;
-    flex-direction: row; /* Вирівнювання елементів всередині картки */
-    align-items: center; /* Вирівнювання по вертикалі */
-    justify-content: space-between; /* Розподіл елементів по ширині */
+    flex-direction: row;
+    align-items: center;  
+    justify-content: space-between;
     padding: 32px;
     gap: 32px;
     min-height: 397px;
@@ -280,11 +280,11 @@ main
 /* Нижні секції */
 .bottom-sections {
     display: flex;
-    gap: 100px; /* Залишає відступ між секціями */
-    justify-content: center; /* Вирівнює секції по центру горизонтально */
-    margin-top: 100px; /* Відступ від верхніх елементів */
+    gap: 100px;
+    justify-content: center;  
+    margin-top: 100px; 
     max-width: 1200px;
-    width: 100%; /* Секції займають всю ширину контейнера */
+    width: 100%;
     margin-top: 130px;
 }
 
