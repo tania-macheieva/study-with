@@ -129,8 +129,107 @@ function applyLanguage(lang) {
     }
   });
 
-  localStorage.setItem('language', lang);  
+  localStorage.setItem('language', lang);
 }
+
+document.getElementById("save-draft-btn").addEventListener("click", function() {
+  const courseThumbnailElement = document.getElementById("course-thumbnail");
+  const courseThumbnail = courseThumbnailElement ? courseThumbnailElement.files[0] : null;
+  
+  console.log("Course Thumbnail:", courseThumbnail);
+  
+  const authData = getAuthDataFromStorage();
+  const authorId = authData ? authData.userId : null;
+  
+  console.log("Author ID:", authorId);
+  
+  const courseTitleElement = document.querySelector("input[data-lang='enterCourseTitle']");
+  const courseTitle = courseTitleElement ? courseTitleElement.value : '';
+  console.log("Course Title:", courseTitle);
+  
+  const courseDescriptionElement = document.querySelector("textarea[data-lang='enterDescription']");
+  const courseDescription = courseDescriptionElement ? courseDescriptionElement.value : '';
+  console.log("Course Description:", courseDescription);
+  
+  const coursePriceElement = document.querySelector("input[data-lang='enterPrice']");
+  const coursePrice = coursePriceElement ? coursePriceElement.value : '';
+
+  const courseCategoryElement = document.querySelector(".select-trigger[data-value]");
+  const courseCategory = courseCategoryElement ? courseCategoryElement.dataset.value : '';
+  console.log("Course Category:", courseCategory);
+  
+  const courseEducationLevelElement = document.querySelector(".select-trigger[data-value]");
+  const courseEducationLevel = courseEducationLevelElement ? courseEducationLevelElement.dataset.value : '';
+  console.log("Course Education Level:", courseEducationLevel);
+
+  const tagsElement = document.getElementById('course-tags'); // Correct selector
+  const tags = tagsElement ? tagsElement.value : '';  // Get value of the input field
+  
+
+  const courseModules = [];
+  
+  document.querySelectorAll('.module').forEach(moduleDiv => {
+    const moduleTitle = moduleDiv.querySelector('input').value;
+    const lectures = [];
+    moduleDiv.querySelectorAll('.lecture').forEach(lectureDiv => {
+      const lectureTitle = lectureDiv.querySelector('input').value;
+      const lectureDescription = lectureDiv.querySelector('textarea').value;
+      lectures.push({ lectureTitle, lectureDescription });
+    });
+    courseModules.push({ moduleTitle, lectures });
+  });
+
+  console.log("Course Modules:", courseModules);
+
+  const courseData = {
+    title: courseTitle,
+    description: courseDescription,
+    category: courseCategory,
+    authorId: authorId,
+    educationLevel: courseEducationLevel,
+    tags: tags,
+    modules: courseModules,
+  };
+
+  console.log("Course Data before sending:", courseData);
+  
+  const formData = new FormData();
+  formData.append('course_data', JSON.stringify(courseData)); 
+  if (courseThumbnail) {
+    formData.append('course_thumbnail', courseThumbnail); 
+  }
+  
+  // Convert tags into an array
+  const tagsArray = tags.split(',').map(tag => tag.trim());
+  
+  // Append the form data
+  formData.append('course_title', courseTitle);
+  formData.append('course_description', courseDescription);
+  formData.append('course_price', coursePrice);
+  formData.append('course_category', courseCategory);
+  formData.append('education_level', courseEducationLevel);
+  formData.append('author_id', authorId);
+  formData.append('tags', JSON.stringify(tagsArray));
+  formData.append('modules', JSON.stringify(courseModules)); // Correct variable name
+  
+  fetch('/api/courses/save-draft', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert("Course saved as draft!");
+    } else {
+      alert("Failed to save draft: " + (data.error || 'Unknown error'));
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('An error occurred while saving the draft.');
+  });
+});
+
 document.addEventListener('DOMContentLoaded', () => {
   const userLang = localStorage.getItem('language') || 'en';
   applyLanguage(userLang);

@@ -60,14 +60,16 @@ CREATE TABLE education_levels (
 -- Створення таблиці курсів
 CREATE TABLE all_courses (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    author_id INT NOT NULL,
+    name VARCHAR(100),
+    author_id INT,
     price NUMERIC(10, 2),
-    description TEXT NOT NULL,
-    category_id INT NOT NULL,
+    description TEXT,
+    category_id INT,
     image_url VARCHAR(1024),
     education_level_id INT,
+    status VARCHAR(20) DEFAULT 'draft', -- Додано поле для статусу курсу (чернетка або опублікований)
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Додано поле для оновлення курсу
     CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
     CONSTRAINT fk_education_level FOREIGN KEY (education_level_id) REFERENCES education_levels(id) ON DELETE SET NULL

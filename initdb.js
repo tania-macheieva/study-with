@@ -1,7 +1,7 @@
 const { Client } = require('pg');
 const fs = require('fs');
 const path = require('path');
-require('dotenv').config({ path: './secret.env' });
+require('dotenv').config();
 
 const client = new Client({
     user: process.env.DB_USER,
