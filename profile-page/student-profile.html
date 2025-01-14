@@ -261,11 +261,30 @@ const tabContents = {
     <h2 data-lang="securitySettings">Security settings</h2>
     <div class="input-group">
         <label data-lang="currentPassword">Current Password:</label>
-        <input data-lang="enterCurrentPassword" type="password" placeholder="Enter current password">
+        <div class="password-container">
+            <input data-lang="enterCurrentPassword" id="current-password" type="password" placeholder="Enter current password">
+            <span class="toggle-password" data-target="current-password">
+                <i class="fas fa-eye"></i>
+            </span>
+        </div>
     </div>
     <div class="input-group">
         <label data-lang="newPassword">New Password:</label>
-        <input data-lang="enterNewPassword" type="password" placeholder="Enter new password">
+        <div class="password-container">
+            <input data-lang="enterNewPassword" id="new-password" type="password" placeholder="Enter new password">
+            <span class="toggle-password" data-target="new-password">
+                <i class="fas fa-eye"></i>
+            </span>
+        </div>
+    </div>
+    <div class="input-group">
+        <label data-lang="confirmNewPassword">Confirm New Password:</label>
+        <div class="password-container">
+            <input data-lang="confirmEnterNewPassword" id="confirm-new-password" type="password" placeholder="Confirm new password">
+            <span class="toggle-password" data-target="confirm-new-password">
+                <i class="fas fa-eye"></i>
+            </span>
+        </div>
     </div>
     <button data-lang="updatePassword">Update password</button>
 `,
@@ -345,12 +364,23 @@ document.body.addEventListener('click', async (event) => {
     if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Update password') {
         const currentPassword = document.querySelector('input[placeholder="Enter current password"]').value;
         const newPassword = document.querySelector('input[placeholder="Enter new password"]').value;
+        const confirmPassword = document.querySelector('input[placeholder="Confirm new password"]').value;
 
         const userId = localStorage.getItem('userId'); 
+        const token = localStorage.getItem('token'); // Для авторизації
 
-        // Перевірка, чи всі поля заповнені
-        if (!currentPassword || !newPassword) {
-            alert('Please fill out all fields.');
+       // Валідація полів
+        if (!currentPassword || !newPassword || !confirmPassword) {
+        alert('Please fill out all fields.');
+        return;
+        }
+        if (newPassword !== confirmPassword) {
+            alert('New password and confirmation do not match.');
+            return;
+        }
+
+        if (newPassword.length < 6) { // Приклад мінімальної довжини
+            alert('New password must be at least 6 characters long.');
             return;
         }
 
@@ -359,6 +389,7 @@ document.body.addEventListener('click', async (event) => {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     userId,
@@ -377,6 +408,24 @@ document.body.addEventListener('click', async (event) => {
         } catch (error) {
             console.error('Error:', error);
             alert('An error occurred while updating the password.');
+        }
+    }
+});
+document.addEventListener('click', (event) => {
+    if (event.target.closest('.toggle-password')) {
+        const toggle = event.target.closest('.toggle-password');
+        const inputId = toggle.getAttribute('data-target');
+        const input = document.getElementById(inputId);
+
+        if (input) {
+            // Перемикання типу поля
+            if (input.type === 'password') {
+                input.type = 'text';
+                toggle.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            } else {
+                input.type = 'password';
+                toggle.innerHTML = '<i class="fas fa-eye"></i>';
+            }
         }
     }
 });

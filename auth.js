@@ -750,11 +750,11 @@ router.put('/update-password', async (req, res) => {
     try {
         // Отримання даних користувача
         const userResult = await pool.query('SELECT user_password FROM users WHERE id = $1', [userId]);
-        const user = userResult.rows[0];
-
-        if (!user) {
+        if (userResult.rows.length === 0) {
             return res.status(404).json({ error: 'User not found' });
         }
+        const user = userResult.rows[0];
+        
 
         // Перевірка поточного пароля
         const isPasswordValid = await bcrypt.compare(currentPassword, user.user_password);
