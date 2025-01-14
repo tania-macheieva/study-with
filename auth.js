@@ -1,7 +1,10 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const pool = require('./db.js'); 
+const db = require('./db');
 const router = express.Router();
+const path = require("path");
+const fs = require('fs'); 
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
@@ -955,6 +958,72 @@ router.put('/profile/teacher/:id', async (req, res) => {
         res.status(500).json({ error: 'Failed to update teacher profile' });
     }
 });
+// Налаштування multer для завантаження файлів
+const uploadDir = path.join(__dirname, 'uploads/profile-images');
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        // Унікальне ім'я файлу
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        const ext = path.extname(file.originalname); // отримуємо розширення
+        cb(null, `profile-${uniqueSuffix}${ext}`);
+    },
+});
+
+// Фільтр для обмеження типів файлів
+const fileFilter = (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (allowedTypes.includes(file.mimetype)) {
+        cb(null, true);
+    } else {
+        cb(new Error('Only JPEG, PNG, and GIF formats are allowed!'), false);
+    }
+};
+
+
+const uploads = multer({
+    storage,
+    limits: { fileSize: 1 * 1024 * 1024 }, // Обмеження на 1MB
+    fileFilter: (req, file, cb) => {
+        if (!file.mimetype.startsWith('image/')) {
+            cb(new Error('Only image files are allowed!'));
+        } else {
+            cb(null, true);
+        }
+    },
+});
+router.post('/upload-profile-image', uploads.single('profileImage'), async (req, res) => {
+    try {
+        const email = req.body.email; // Отримуємо email із тіла запиту
+        if (!email) {
+            return res.status(400).json({ error: 'Email is required.' });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({ error: 'No file uploaded.' });
+        }
+
+        const filePath = `/uploads/profile-images/${req.file.filename}`; // Шлях до завантаженого файлу
+
+        // Оновлення шляху до зображення в таблиці teachers
+        const query = `UPDATE users SET profile_image = $1 WHERE email = $2`;
+        const values = [filePath, email];
+
+        const result = await db.query(query, values);
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'User not found.' });
+        }
+
+        res.status(200).json({ message: 'Profile image updated successfully!', filePath });
+    } catch (error) {
+        console.error('Error uploading profile image:', error);
+        res.status(500).json({ error: 'Failed to upload profile image.' });
+    }
+});
+
 
   
 module.exports = router;
