@@ -152,22 +152,26 @@ document.getElementById("save-draft-btn").addEventListener("click", function() {
   console.log("Course Description:", courseDescription);
   
   const coursePriceElement = document.querySelector("input[data-lang='enterPrice']");
-  const coursePrice = coursePriceElement ? coursePriceElement.value : '';
+  const coursePrice = coursePriceElement && coursePriceElement.value ? parseFloat(coursePriceElement.value) : 0;
 
-  const courseCategoryElement = document.querySelector(".select-trigger[data-value]");
-  const courseCategory = courseCategoryElement ? courseCategoryElement.dataset.value : '';
+  // Get selected category value
+  const categoryWrapper = document.getElementById('category-wrapper');
+  const courseCategoryElement = categoryWrapper ? categoryWrapper.querySelector('.select-trigger') : null;
+  const courseCategory = courseCategoryElement && courseCategoryElement.dataset.value ? parseInt(courseCategoryElement.dataset.value, 10) : null;
   console.log("Course Category:", courseCategory);
   
-  const courseEducationLevelElement = document.querySelector(".select-trigger[data-value]");
-  const courseEducationLevel = courseEducationLevelElement ? courseEducationLevelElement.dataset.value : '';
+  // Get selected education level value
+  const educationWrapper = document.getElementById('education-wrapper');
+  const courseEducationLevelElement = educationWrapper ? educationWrapper.querySelector('.select-trigger') : null;
+  const courseEducationLevel = courseEducationLevelElement && courseEducationLevelElement.dataset.value ? parseInt(courseEducationLevelElement.dataset.value, 10) : null;
   console.log("Course Education Level:", courseEducationLevel);
 
-  const tagsElement = document.getElementById('course-tags'); // Correct selector
-  const tags = tagsElement ? tagsElement.value : '';  // Get value of the input field
+  const tagsElement = document.getElementById('course-tags'); 
+  const tags = tagsElement && tagsElement.value ? tagsElement.value.split(',').map(tag => tag.trim()) : [];
   
 
   const courseModules = [];
-  
+
   document.querySelectorAll('.module').forEach(moduleDiv => {
     const moduleTitle = moduleDiv.querySelector('input').value;
     const lectures = [];
@@ -177,7 +181,7 @@ document.getElementById("save-draft-btn").addEventListener("click", function() {
       lectures.push({ lectureTitle, lectureDescription });
     });
     courseModules.push({ moduleTitle, lectures });
-  });
+  }); 
 
   console.log("Course Modules:", courseModules);
 
@@ -190,31 +194,37 @@ document.getElementById("save-draft-btn").addEventListener("click", function() {
     tags: tags,
     modules: courseModules,
   };
-
+  localStorage.setItem('courseDraft', JSON.stringify(courseData));
+  console.log('Saved course data to localStorage:', courseData);
   console.log("Course Data before sending:", courseData);
   
+  // Save course data in localStorage
+  localStorage.setItem('courseDraft', JSON.stringify(courseData));
+  localStorage.setItem('courseThumbnail', courseThumbnail ? courseThumbnail.name : null);
+  
+  // Send data to the server
   const formData = new FormData();
   formData.append('course_data', JSON.stringify(courseData)); 
   if (courseThumbnail) {
     formData.append('course_thumbnail', courseThumbnail); 
   }
+   
   
-  // Convert tags into an array
-  const tagsArray = tags.split(',').map(tag => tag.trim());
-  
-  // Append the form data
   formData.append('course_title', courseTitle);
   formData.append('course_description', courseDescription);
   formData.append('course_price', coursePrice);
   formData.append('course_category', courseCategory);
   formData.append('education_level', courseEducationLevel);
   formData.append('author_id', authorId);
-  formData.append('tags', JSON.stringify(tagsArray));
-  formData.append('modules', JSON.stringify(courseModules)); // Correct variable name
+  formData.append('tags', JSON.stringify(tags));
+  formData.append('modules', JSON.stringify(courseModules));
   
   fetch('/api/courses/save-draft', {
     method: 'POST',
-    body: formData
+    body: JSON.stringify(courseData),  // дані курсу в JSON
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
   .then(response => response.json())
   .then(data => {
@@ -228,7 +238,36 @@ document.getElementById("save-draft-btn").addEventListener("click", function() {
     console.error('Error:', error);
     alert('An error occurred while saving the draft.');
   });
+  
 });
+
+window.addEventListener('load', function() {
+  const savedCourseData = localStorage.getItem('courseDraft');
+  if (savedCourseData) {
+    const courseData = JSON.parse(savedCourseData);
+    console.log('Loaded course data from localStorage:', courseData);
+
+    // Заповнюємо поля форми
+    const courseTitleElement = document.querySelector("input[data-lang='enterCourseTitle']");
+    if (courseTitleElement) courseTitleElement.value = courseData.title;
+    
+    const courseDescriptionElement = document.querySelector("textarea[data-lang='enterDescription']");
+    if (courseDescriptionElement) courseDescriptionElement.value = courseData.description;
+
+
+    const coursePriceElement = document.querySelector("input[data-lang='enterPrice']");
+    if (coursePriceElement) coursePriceElement.value = courseData.price || '';
+    
+    const tagsElement = document.getElementById('course-tags');
+    if (tagsElement) tagsElement.value = tags.join(', ');  // Now using the 'tags' variable
+    
+    
+    
+    // Populate modules and lectures if needed (this could be dynamic based on your data)
+    // Example: Add logic to add modules dynamically
+  }
+});
+
 
 document.addEventListener('DOMContentLoaded', () => {
   const userLang = localStorage.getItem('language') || 'en';
@@ -699,7 +738,7 @@ lectureVideos.forEach(input => {
     .then(data => {
       if (data.success) {
         alert('Course created successfully!');
-        window.location.href = '/courses';
+        // window.location.href = '/courses';
       } else {
         alert('Failed to create the course: ' + (data.error || 'Unknown error'));
       }
