@@ -7,6 +7,7 @@ CREATE TABLE users (
   phone_number VARCHAR(15),
   role VARCHAR(50) CHECK (role IN ('student', 'teacher')) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  profile_image VARCHAR(255),
   is_verified BOOLEAN DEFAULT FALSE,
   is_private BOOLEAN DEFAULT FALSE
 );
