@@ -8,168 +8,182 @@ const upload = multer({ storage }).fields([
     { name: 'course_thumbnail', maxCount: 1 },
     { name: 'lecture_files' },
     { name: 'lecture_videos' },
-]);
-router.post('/save-draft', upload, async (req, res) => {
+  ]);
+  
+  router.post('/save-draft', upload, async (req, res) => {
     const {
-        course_title = '',
-        course_description = '',
-        course_price = '',
-        course_category = null,
-        education_level = null,
-        author_id,
-        modules,
-        tags,
-        course_id, // added course_id to identify course to update
+      course_title = '',  
+      course_description = '',
+      course_price = '',
+      course_category = null,
+      education_level = null,
+      author_id,
+      modules,
+      tags,
+      course_id, // added for updating existing course
     } = req.body;
-
-    const parsedCoursePrice = course_price ? parseFloat(course_price) : 0;
-    const parsedCourseCategory = course_category ? parseInt(course_category, 10) : null;
-    const parsedEducationLevel = education_level ? parseInt(education_level, 10) : null;
-
-    if (isNaN(parsedCoursePrice) || (course_category && isNaN(parsedCourseCategory)) || (education_level && isNaN(parsedEducationLevel))) {
-        return res.status(400).json({ success: false, message: 'Invalid numeric fields!' });
-    }
-
-    const courseThumbnail = req.files['course_thumbnail'] ? req.files['course_thumbnail'][0].filename : null;
-
+  
+    let parsedCoursePrice = course_price ? parseFloat(course_price) : null;
+    let parsedCourseCategory = course_category ? parseInt(course_category, 10) : null;
+    let parsedEducationLevel = education_level ? parseInt(education_level, 10) : null;
+    
+    if (isNaN(parsedCoursePrice)) parsedCoursePrice = null;
+    if (isNaN(parsedCourseCategory)) parsedCourseCategory = null;
+    if (isNaN(parsedEducationLevel)) parsedEducationLevel = null;
+  
+    const courseThumbnail =
+      req.files && req.files['course_thumbnail'] && req.files['course_thumbnail'][0]
+        ? req.files['course_thumbnail'][0].filename
+        : null;
+  
     if (!author_id) {
-        return res.status(400).json({ success: false, message: 'Author ID is required!' });
+      return res.status(400).json({ success: false, message: 'Author ID is required!' });
     }
-
+  
     let parsedTags = tags;
     if (tags && typeof tags === 'string') {
-        parsedTags = [...new Set(tags.split(',').map(tag => tag.trim()))];
+      parsedTags = [...new Set(tags.split(',').map(tag => tag.trim()))];
     }
-
+  
     try {
-        let courseId = course_id; // if provided, use course_id to find the existing course
-        let courseToUpdate;
-
-        if (courseId) {
-            // Check if the course exists with the given course_id and author_id
-            const courseQuery = `
-                SELECT id, name, description, price, category_id, image_url, education_level_id, status 
-                FROM all_courses 
-                WHERE id = $1 AND author_id = $2 AND status != 'published'
-            `;
-            const courseResult = await pool.query(courseQuery, [courseId, author_id]);
-
-            if (courseResult.rows.length > 0) {
-                // If course exists, update it
-                courseToUpdate = courseResult.rows[0];
-                const updateQuery = `
-                    UPDATE all_courses
-                    SET
-                        name = COALESCE($1, name),
-                        description = COALESCE($2, description),
-                        price = COALESCE($3, price),
-                        category_id = COALESCE($4, category_id),
-                        image_url = COALESCE($5, image_url),
-                        education_level_id = COALESCE($6, education_level_id),
-                        status = 'draft'  -- ensure it's saved as draft
-                    WHERE id = $7;
-                `;
-                const updateValues = [
-                    course_title || courseToUpdate.name,
-                    course_description || courseToUpdate.description,
-                    parsedCoursePrice || courseToUpdate.price,
-                    parsedCourseCategory || courseToUpdate.category_id,
-                    courseThumbnail || courseToUpdate.image_url,
-                    parsedEducationLevel || courseToUpdate.education_level_id,
-                    courseId,
-                ];
-                await pool.query(updateQuery, updateValues);
-            } else {
-                return res.status(404).json({ success: false, message: 'Course not found or not in draft status.' });
-            }
-        } else {
-            // If no course_id provided, create a new course
-            const query = `
-                INSERT INTO all_courses (name, description, price, category_id, image_url, author_id, education_level_id, status)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, 'draft')
-                RETURNING id;
-            `;
-            const result = await pool.query(query, [
-                course_title,
-                course_description,
-                parsedCoursePrice,
-                parsedCourseCategory,
-                courseThumbnail,
-                author_id,
-                parsedEducationLevel,
-            ]);
-            courseId = result.rows[0].id;
+      let courseId = course_id;  // Use provided course_id to either update or create course
+      let courseToUpdate;
+  
+      // Check if course exists for the given author, title, or description
+      const courseCheckQuery = `
+        SELECT id, name, description, price, category_id, image_url, education_level_id, status
+        FROM all_courses
+        WHERE author_id = $1 AND (name = $2 OR description = $3) AND status != 'published'
+      `;
+      const courseCheckResult = await pool.query(courseCheckQuery, [author_id, course_title, course_description]);
+  
+      if (courseCheckResult.rows.length > 0) {
+        // If course found, update it
+        courseToUpdate = courseCheckResult.rows[0];
+  
+        const updateQuery = `
+          UPDATE all_courses
+          SET
+            name = COALESCE($1, name),
+            description = COALESCE($2, description),
+            price = COALESCE($3, price),
+            category_id = COALESCE($4, category_id),
+            image_url = COALESCE($5, image_url),
+            education_level_id = COALESCE($6, education_level_id),
+            status = 'draft'
+          WHERE id = $7;
+        `;
+        const updateValues = [
+          course_title || courseToUpdate.name,
+          course_description || courseToUpdate.description,
+          parsedCoursePrice || courseToUpdate.price,
+          parsedCourseCategory || courseToUpdate.category_id,
+          courseThumbnail || courseToUpdate.image_url,
+          parsedEducationLevel || courseToUpdate.education_level_id,
+          courseToUpdate.id
+        ];
+  
+        await pool.query(updateQuery, updateValues);
+        courseId = courseToUpdate.id;  // Set courseId from updated course
+      } else {
+        // If no course found, create a new course
+        if (!courseId) {
+          const query = `
+            INSERT INTO all_courses (name, description, price, category_id, image_url, author_id, education_level_id, status)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, 'draft')
+            RETURNING id;
+          `;
+          const result = await pool.query(query, [
+            course_title,
+            course_description,
+            parsedCoursePrice,
+            parsedCourseCategory,
+            courseThumbnail,
+            author_id,
+            parsedEducationLevel,
+          ]);
+          courseId = result.rows[0].id;  // Use the generated courseId
         }
-
-        // Process modules and lectures
-        if (modules && modules !== 'undefined' && modules !== null) {
-            let modulesArray = [];
-            try {
-                modulesArray = JSON.parse(modules);
-            } catch (err) {
-                return res.status(400).json({ success: false, message: 'Invalid modules data!' });
-            }
-
-            const modulePromises = modulesArray.map(async (module, index) => {
-                const { title = '', order_num = index + 1, lectures: moduleLectures } = module;
-
-                const moduleResult = await pool.query(
-                    `INSERT INTO modules (course_id, title, order_num) VALUES ($1, $2, $3) RETURNING id`,
-                    [courseId, title, order_num]
-                );
-
-                const moduleId = moduleResult.rows[0].id;
-
-                if (moduleLectures && Array.isArray(moduleLectures)) {
-                    const lecturePromises = moduleLectures.map(async (lecture, lectureIndex) => {
-                        const { title = '', description = '' } = lecture;
-
-                        await pool.query(
-                            `INSERT INTO lectures (module_id, title, description, order_num) VALUES ($1, $2, $3, $4)`,
-                            [moduleId, title, description, lectureIndex + 1]
-                        );
-                    });
-
-                    await Promise.all(lecturePromises);
-                }
+      }
+  
+      // Handle modules and lectures (unchanged)
+      if (modules && modules !== 'undefined' && modules !== null) {
+        let modulesArray = [];
+        try {
+          modulesArray = JSON.parse(modules);
+        } catch (err) {
+          return res.status(400).json({ success: false, message: 'Invalid module data!' });
+        }
+  
+        const modulePromises = modulesArray.map(async (module, index) => {
+          const { title = '', order_num = index + 1, lectures: moduleLectures } = module;
+  
+          const moduleResult = await pool.query(
+            `INSERT INTO modules (course_id, title, order_num) VALUES ($1, $2, $3) RETURNING id`,
+            [courseId, title, order_num]
+          );
+  
+          const moduleId = moduleResult.rows[0].id;
+  
+          if (moduleLectures && Array.isArray(moduleLectures)) {
+            const lecturePromises = moduleLectures.map(async (lecture, lectureIndex) => {
+              const { title = '', description = '' } = lecture;
+  
+              await pool.query(
+                `INSERT INTO lectures (module_id, title, description, order_num) VALUES ($1, $2, $3, $4)`,
+                [moduleId, title, description, lectureIndex + 1]
+              );
             });
-
-            await Promise.all(modulePromises);
-        }
-
-        // Insert tags into the tags table
-        if (parsedTags && Array.isArray(parsedTags)) {
-            const insertTagsQuery = `
-                INSERT INTO tags (name) 
-                SELECT * FROM (VALUES ${parsedTags.map((_, i) => `($${i + 1})`).join(', ')}) AS t(name)
-                ON CONFLICT(name) DO NOTHING;
-            `;
-            await pool.query(insertTagsQuery, parsedTags);
-
-            const selectTagIdsQuery = `
-                SELECT id FROM tags WHERE name = ANY($1);
-            `;
-            const tagIdsResult = await pool.query(selectTagIdsQuery, [parsedTags]);
-
-            const courseTagPromises = tagIdsResult.rows.map(tag => {
-                return pool.query(`INSERT INTO course_tags (course_id, tag_id) VALUES ($1, $2)`, [courseId, tag.id]);
-            });
-
-            await Promise.all(courseTagPromises);
-        }
-
-        return res.json({
-            success: true,
-            message: 'Draft saved successfully!',
-            courseId,
-            tags: parsedTags,
+  
+            await Promise.all(lecturePromises);
+          }
         });
-    } catch (err) {
-        console.error('Error saving draft:', err);
-        return res.status(500).json({ success: false, message: 'Internal server error', error: err.message });
+  
+        await Promise.all(modulePromises);
+      }
+  
+      // Insert tags into the database 
+    if (parsedTags && Array.isArray(parsedTags)) {
+        const insertTagsQuery = `
+        INSERT INTO tags (name) 
+        SELECT * FROM (VALUES ${parsedTags.map((_, i) => `($${i + 1})`).join(', ')}) AS t(name)
+        ON CONFLICT(name) DO NOTHING;
+        `;
+        await pool.query(insertTagsQuery, parsedTags);
+    
+        const selectTagIdsQuery = `
+        SELECT id FROM tags WHERE name = ANY($1);
+        `;
+        const tagIdsResult = await pool.query(selectTagIdsQuery, [parsedTags]);
+    
+        // Insert tags into course_tags table with a check for existing entries
+        const courseTagPromises = tagIdsResult.rows.map(tag => {
+        return pool.query(
+            `INSERT INTO course_tags (course_id, tag_id)
+            SELECT $1, $2
+            WHERE NOT EXISTS (
+            SELECT 1 FROM course_tags WHERE course_id = $1 AND tag_id = $2
+            )`,
+            [courseId, tag.id]
+        );
+        });
+    
+        await Promise.all(courseTagPromises);
     }
-});
-
+    
+  
+      return res.json({
+        success: true,
+        message: 'Draft saved successfully!',
+        courseId,
+        tags: parsedTags,
+      });
+    } catch (err) {
+      console.error('Error saving draft:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error', error: err.message });
+    }
+  });
+    
 router.post('/create', upload, async (req, res) => {
     const {
         course_title,
