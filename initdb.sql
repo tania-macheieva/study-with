@@ -7,6 +7,7 @@ CREATE TABLE users (
   phone_number VARCHAR(15),
   role VARCHAR(50) CHECK (role IN ('student', 'teacher')) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  profile_image VARCHAR(255),
   is_verified BOOLEAN DEFAULT FALSE,
   is_private BOOLEAN DEFAULT FALSE
 );
@@ -67,13 +68,13 @@ CREATE TABLE all_courses (
     category_id INT,
     image_url VARCHAR(1024),
     education_level_id INT,
-    status VARCHAR(20) DEFAULT 'draft', -- Додано поле для статусу курсу (чернетка або опублікований)
+    status VARCHAR(20) DEFAULT 'draft',  -- Course status: 'draft' or 'published'
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Додано поле для оновлення курсу
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
     CONSTRAINT fk_education_level FOREIGN KEY (education_level_id) REFERENCES education_levels(id) ON DELETE SET NULL
-);
+); 
 
 -- Створення таблиці тегів
 CREATE TABLE tags (

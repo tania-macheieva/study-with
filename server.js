@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const authRoutes = require('./auth'); 
 require('dotenv').config();
+const db = require('./db');
 const passport = require('passport');
 const session = require('express-session');
 const stripeRoutes = require("./pay-page/stripe");
@@ -21,6 +22,9 @@ app.use("/auth", authRoutes);
 
 const searchRouter = require('./searchRouter');
 app.use('/api/search', searchRouter);
+
+//статична директорія для доступу до завантажених файлів
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Ініціалізація сесії та Passport 
 app.use(session({

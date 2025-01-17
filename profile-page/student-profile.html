@@ -9,8 +9,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
     <link rel="stylesheet" href="../profile-page/style.css">
+    <link rel="icon" href="../images/menu-logo.ico">
+    
 </head>
 
 <body>
@@ -148,6 +149,88 @@
         <script src="../footer/footer.js"></script>
         <script> src="/profile-page/student-lang.js" </script>
         <script>
+    const uploadInput = document.getElementById('upload-image');
+    const profileImage = document.getElementById('profile-image');
+    const removeImageButton = document.getElementById('remove-image');
+    const confirmImageButton = document.getElementById('confirm-image');
+
+
+    uploadInput.addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        if (file) {
+
+            if (file.size > 1 * 1024 * 1024) {
+                alert('The file size exceeds 1 MB. Please upload a smaller file.');
+                uploadInput.value = '';
+                return;
+            }
+
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                profileImage.src = e.target.result;
+                removeImageButton.style.display = 'inline-block';
+                confirmImageButton.style.display = 'inline-block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+
+    profileImage.addEventListener('click', function () {
+        removeImageButton.style.display = 'inline-block';
+        confirmImageButton.style.display = 'inline-block';
+    });
+
+
+    removeImageButton.addEventListener('click', function () {
+        profileImage.src = 'images/profile-picture.png';
+        uploadInput.value = '';
+        removeImageButton.style.display = 'none';
+        confirmImageButton.style.display = 'none';
+    });
+
+
+//бек для завантаження фото профіля в базу
+    confirmImageButton.addEventListener('click', async function () {
+    const file = uploadInput.files[0];
+    if (!file) {
+        alert('Please select an image to upload.');
+        return;
+    }
+
+    const email = localStorage.getItem('email'); // Отримання ID користувача
+    if (!email) {
+        alert('User email is not available. Please log in again.');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('profileImage', file);
+    formData.append('email', email);
+    try {
+        const response = await fetch('http://localhost:8000/auth/upload-profile-image', {
+            method: 'POST',
+            body: formData,
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            alert('Profile image updated successfully!');
+            profileImage.src = `http://localhost:8000${result.filePath}`; // Додаємо абсолютний шлях
+        } else {
+            alert(`Error: ${result.error}`);
+        }
+    } catch (error) {
+        console.error('Error uploading profile image:', error);
+        alert('An error occurred while uploading the profile image.');
+    }
+    // Ховаємо кнопки після завантаження
+    removeImageButton.style.display = 'none';
+    confirmImageButton.style.display = 'none';
+});
+
+
        document.addEventListener('DOMContentLoaded', () => {
     const becomeTeacherButton = document.getElementById('become-teacher-btn');
 
