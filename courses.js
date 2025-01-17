@@ -12,7 +12,7 @@ const upload = multer({ storage }).fields([
   
   router.post('/save-draft', upload, async (req, res) => {
     const {
-      course_title = '',  
+      course_title = '',
       course_description = '',
       course_price = '',
       course_category = null,
@@ -26,7 +26,7 @@ const upload = multer({ storage }).fields([
     let parsedCoursePrice = course_price ? parseFloat(course_price) : null;
     let parsedCourseCategory = course_category ? parseInt(course_category, 10) : null;
     let parsedEducationLevel = education_level ? parseInt(education_level, 10) : null;
-    
+  
     if (isNaN(parsedCoursePrice)) parsedCoursePrice = null;
     if (isNaN(parsedCourseCategory)) parsedCourseCategory = null;
     if (isNaN(parsedEducationLevel)) parsedEducationLevel = null;
@@ -142,21 +142,30 @@ const upload = multer({ storage }).fields([
         await Promise.all(modulePromises);
       }
   
-      // Insert tags into the database 
+    // Handle tags (delete old, add new)
     if (parsedTags && Array.isArray(parsedTags)) {
+        // Remove previous tags associated with the course
+        const deleteTagsQuery = `
+        DELETE FROM course_tags
+        WHERE course_id = $1;
+        `;
+        await pool.query(deleteTagsQuery, [courseId]);
+    
+        // Insert new tags into the tags table if they don't exist
         const insertTagsQuery = `
-        INSERT INTO tags (name) 
+        INSERT INTO tags (name)
         SELECT * FROM (VALUES ${parsedTags.map((_, i) => `($${i + 1})`).join(', ')}) AS t(name)
         ON CONFLICT(name) DO NOTHING;
         `;
         await pool.query(insertTagsQuery, parsedTags);
     
+        // Get tag IDs for the newly added tags
         const selectTagIdsQuery = `
         SELECT id FROM tags WHERE name = ANY($1);
         `;
         const tagIdsResult = await pool.query(selectTagIdsQuery, [parsedTags]);
     
-        // Insert tags into course_tags table with a check for existing entries
+        // Insert new tags into course_tags table
         const courseTagPromises = tagIdsResult.rows.map(tag => {
         return pool.query(
             `INSERT INTO course_tags (course_id, tag_id)
@@ -171,7 +180,6 @@ const upload = multer({ storage }).fields([
         await Promise.all(courseTagPromises);
     }
     
-  
       return res.json({
         success: true,
         message: 'Draft saved successfully!',
@@ -183,7 +191,7 @@ const upload = multer({ storage }).fields([
       return res.status(500).json({ success: false, message: 'Internal server error', error: err.message });
     }
   });
-    
+  
 router.post('/create', upload, async (req, res) => {
     const {
         course_title,
@@ -370,23 +378,54 @@ router.post('/create', upload, async (req, res) => {
             await Promise.all(modulePromises);
         }
 
-        // Insert tags (same logic as before)
         if (tags && Array.isArray(tags)) {
-            const insertTagsQuery = `
-                INSERT INTO tags (name) 
-                SELECT * FROM (VALUES ${tags.map((_, i) => `($${i + 1})`).join(', ')}) AS t(name)
-                ON CONFLICT(name) DO NOTHING
-                RETURNING id;
+            // Fetch existing tags for the course
+            const existingTagsQuery = `
+                SELECT t.name
+                FROM tags t
+                JOIN course_tags ct ON t.id = ct.tag_id
+                WHERE ct.course_id = $1;
             `;
-            const tagIds = await pool.query(insertTagsQuery, tags);
-
-            const courseTagPromises = tagIds.rows.map(tag => {
-                return pool.query(`INSERT INTO course_tags (course_id, tag_id) VALUES ($1, $2)`, [courseId, tag.id]);
-            });
-
-            await Promise.all(courseTagPromises);
+            const existingTagsResult = await pool.query(existingTagsQuery, [courseId]);
+            const existingTags = existingTagsResult.rows.map(row => row.name);
+        
+            // Determine which tags have been removed or added
+            const tagsToRemove = existingTags.filter(tag => !tags.includes(tag));
+            const tagsToAdd = tags.filter(tag => !existingTags.includes(tag));
+        
+            // Delete tags that are no longer associated with the course
+            if (tagsToRemove.length > 0) {
+                const deleteTagsQuery = `
+                    DELETE FROM course_tags
+                    WHERE course_id = $1 AND tag_id IN (
+                        SELECT id FROM tags WHERE name = ANY($2)
+                    );
+                `;
+                await pool.query(deleteTagsQuery, [courseId, tagsToRemove]);
+            }
+        
+            // Insert new tags into the tags table if they don't exist
+            if (tagsToAdd.length > 0) {
+                const insertTagsQuery = `
+                    INSERT INTO tags (name)
+                    SELECT * FROM (VALUES ${tagsToAdd.map((_, i) => `($${i + 1})`).join(', ')}) AS t(name)
+                    ON CONFLICT(name) DO NOTHING
+                    RETURNING id;
+                `;
+                const tagIds = await pool.query(insertTagsQuery, tagsToAdd);
+        
+                // Associate new tags with the course
+                const courseTagPromises = tagIds.rows.map(tag => {
+                    return pool.query(
+                        `INSERT INTO course_tags (course_id, tag_id) VALUES ($1, $2)`,
+                        [courseId, tag.id]
+                    );
+                });
+        
+                await Promise.all(courseTagPromises);
+            }
         }
-
+        
         return res.json({
             success: true,
             message: 'Course created successfully!',

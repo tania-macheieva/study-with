@@ -454,7 +454,7 @@ document.addEventListener('DOMContentLoaded', function () {
       tagsListContainer.appendChild(tagDiv);
     });
   }
-  document.getElementById("save-draft-btn").addEventListener("click", function() {
+document.getElementById("save-draft-btn").addEventListener("click", function() {
     const courseThumbnailElement = document.getElementById('course_thumbnail').files[0];
     const courseThumbnail = courseThumbnailElement ? courseThumbnailElement : null;
     
@@ -486,9 +486,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const courseEducationLevel = courseEducationLevelElement && courseEducationLevelElement.dataset.value ? parseInt(courseEducationLevelElement.dataset.value, 10) : null;
     console.log("Course Education Level:", courseEducationLevel);
     
-    const tagsElement = document.getElementById('course-tags'); 
-    const tags = tagsElement && tagsElement.value ? tagsElement.value.split(',').map(tag => tag.trim()) : [];
-    
+    const tags = tagsList;
+
     const courseModules = [];
     document.querySelectorAll('.module').forEach(moduleDiv => {
       const moduleTitle = moduleDiv.querySelector('input') ? moduleDiv.querySelector('input').value : '';
@@ -538,7 +537,7 @@ document.addEventListener('DOMContentLoaded', function () {
     formData.append('education_level', courseEducationLevel);
     formData.append('author_id', authorId);
     formData.append('tags', JSON.stringify(tags));
-    formData.append('modules', JSON.stringify(courseModules));
+    formData.append('modules', JSON.stringify(courseModules)); // Send modules as a JSON string
     
     fetch('/api/courses/save-draft', {
       method: 'POST',
@@ -557,7 +556,6 @@ document.addEventListener('DOMContentLoaded', function () {
       alert('An error occurred while saving the draft.');
     });
   });
-  
   
   window.addEventListener('load', function() {
     const savedCourseData = localStorage.getItem('courseDraft');
@@ -582,7 +580,7 @@ document.addEventListener('DOMContentLoaded', function () {
       // You can add dynamic logic here for populating modules if needed
     }
   });
-  
+
 
 // Перевірка значення категорії та рівня освіти перед відправкою
 document.getElementById('create-course').addEventListener('submit', function(e) {
