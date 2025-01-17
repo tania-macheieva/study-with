@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-lang="title">StudyWith| Profile</title>
+    <link rel="stylesheet" href="public-profile.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+        rel="stylesheet" />
+<style>
+    .truncate {
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        line-clamp: 3;
+        box-orient: vertical;
+    }
+    .show-more {
+        display: inline-block; 
+        text-align: right;
+        padding: 6px 20px;
+        font-size: 16px;
+        font-family: "Inter", sans-serif;
+        font-weight: 640;
+        background: #283044;
+        color: #ffffff;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.2s ease;
+        margin-top: 8px;
+        margin-left: auto;
+    }
+    .container {
+        display: flex;
+        justify-content: flex-end;
+    }
+    .hidden-items {
+        display: none;
+    }
+</style>
+</head>
+<body>
+    <div class="page-container">
+        <main class="profile">
+            <div class="left-p">
+                <aside>
+                    <div class="info">
+                        <img class="profile-image" src="/images/profile-picture.png" alt="user image" width="150px" height="150px">
+                        <p class="user-n">UserName</p>
+                        <p class="user-n">RealName</p>
+                    </div>
+
+                    <div class="hobbies">
+                        <h2 data-lang="hobbies"><img src="/images/hobbies.png" alt="hobbies-ico" 
+                            width="27px " height="27px">Hobbies</h2>
+                        <ul class="hobbies-d">
+                            <li>Software development</li>
+                            <li>Cybersecurity</li>
+                            <li>Travel and tourism</li>
+                            <li>Reading books</li>
+                        </ul>
+                    </div>
+
+                    <div class="languages">
+                        <h2 data-lang="languages"><img src="/images/lang.png" alt="language-ico" 
+                            width="27px " height="27px">Languages</h2>
+                        <ul>
+                            <li>English (B2)</li>
+                            <li>Ukrainian (C2)</li>
+                        </ul>
+                    </div>
+                </aside>
+            </div>
+
+            <div class="right-p">
+                <h2 data-lang="aboutMe"><img src="/images/about-me.png" alt="about-me-ico" 
+                    width="27px " height="27px">About me</h2>
+                <p class="about-me truncate" id="about-me">An experienced teacher with over 7 years of experience in programming 
+                    and software development. I help students not only
+                    to master the basics of programming, but also to become real 
+                    professionals in this field. An experienced teacher with over 7 years of experience in programming
+                    and software development. I help students not only
+                    to master the basics of programming, but also to become real
+                    professionals in this field.</p>
+                <div class="container">
+                    <span class="show-more" id="show-more" data-lang="showMore">Show more...</span>
+                </div>    
+ 
+                <h2 data-lang="education"><img src="/images/education.png" alt="education-ico" 
+                    width="27px " height="27px">Education</h2>
+                <ul>
+                    <li>Master of Computer Science, National University of Ukraine “Kyiv Polytechnic Institute” (2015)</li>
+                    <li>Coursera course in software development (2018)</li>
+                </ul>
+
+                <h2 data-lang="experience"><img src="/images/experience.png" alt="experience-ico" 
+                    width="27px " height="27px">Experience</h2>
+                <ul>
+                    <li>Programming teacher, TechSkills Online School (2018 - present) 
+                        Taught programming courses in Python, JavaScript, C++.
+                        Conducted both theoretical classes and practical projects for students.</li>
+                    <li>Software developer, SoftTech LLC (2015-2018) Worked in a team to develop software for large clients, in particular in
+                        the field of finance and medicine. Developed solutions in Python and Java.</li>
+                </ul>
+
+                <h2 data-lang="myCourses"><img src="/images/my-courses.png" alt="my-courses-ico" 
+                    width="27px " height="27px">My courses</h2>
+                <div class="courses-list">
+                    <div class="course">
+                        <p class="p-1" data-lang="courseName">Course name 1</p>
+                        <p class="p-2">course description course description course description</p>
+                            <img src="/images/250x100.png" alt="image">
+                            <button class="btn-resume" data-lang="btnResume">Learn more</button>
+                        </div>
+                        <div class="course">
+                            <p class="p-1" data-lang="courseName">Course name 2</p>
+                            <p class="p-2">course description course description course description</p>
+                            <img src="/images/250x100.png" alt="image">
+                            <button class="btn-resume" data-lang="btnResume">Learn more</button>
+                        </div>
+                        <div class="course">
+                            <p class="p-1" data-lang="courseName">Course name 3</p>
+                            <p class="p-2">course description course description course description</p>
+                            <img src="/images/250x100.png" alt="image">
+                            <button class="btn-resume" data-lang="btnResume">Learn more</button>
+                        </div>
+                        <div class="course">
+                            <p class="p-1" data-lang="courseName">Course name 2</p>
+                            <p class="p-2">course description course description course description</p>
+                            <img src="/images/250x100.png" alt="image">
+                            <button class="btn-resume" data-lang="btnResume">Learn more</button>
+                        </div>
+                        <div class="course">
+                            <p class="p-1" data-lang="courseName">Course name 3</p>
+                            <p class="p-2">course description course description course description</p>
+                            <img src="/images/250x100.png" alt="image">
+                            <button class="btn-resume" data-lang="btnResume">Learn more</button>
+                        </div>
+                </div>
+                    <div class="btn-container">
+                        <button data-lang="viewAll" class="btn-view-all-1" >View all</button>
+                    </div>
+                
+                <h2 data-lang="review" ><img src="/images/Comment.png" alt="Comment" 
+                    width="27px " height="27px">Student reviews</h2>
+                <div class="reviews-list">
+                    <div class="review">
+                        <p class="p-1">Review name 1</p>
+                        <p class="p-2">Reviewer text Reviewer text Reviewer text</p>
+                    </div>
+                    <div class="review">
+                        <p class="p-1">Review name 2</p>
+                        <p class="p-2">Reviewer text Reviewer text Reviewer text</p>
+                    </div>
+                    <div class="review">
+                        <p class="p-1">Review name 3</p>
+                        <p class="p-2">Reviewer text Reviewer text Reviewer text</p>
+                    </div>
+                   <!--<div class="review">
+                        <p class="p-1">Review name 2</p>
+                        <p class="p-2">Reviewer text Reviewer text Reviewer text</p>
+                    </div>
+                    <div class="review">
+                        <p class="p-1">Review name 3</p>
+                        <p class="p-2">Reviewer text Reviewer text Reviewer text</p>
+                    </div>--> 
+            </div>
+            <div class="btn-container">
+                <button class="btn-view-all-2" data-lang="viewAll">View all</button>
+            </div>
+
+        </div>
+        </main>
+    </div>
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+    const aboutMe = document.getElementById("about-me");
+    const showMore = document.getElementById("show-more");
+
+    const checkAboutMeHeight = () => {
+    const fullHeight = aboutMe.scrollHeight;
+    const visibleHeight = aboutMe.offsetHeight;
+    if (fullHeight <= visibleHeight) { showMore.style.display="none" ; } else { showMore.style.display="inline-block" ; } };
+        checkAboutMeHeight(); 
+        showMore.addEventListener("click", ()=> {
+        aboutMe.classList.toggle("truncate");
+        showMore.textContent = aboutMe.classList.contains("truncate") ? getTranslation('showMore') :
+        getTranslation('showLess');
+        });
+
+        showMore.textContent = getTranslation('showMore');
+        });
+
+        function getTranslation(key) {
+        const userLang = localStorage.getItem('language') || 'en';
+        return translations[userLang] && translations[userLang][key] ? translations[userLang][key] : key;
+        }
+
+        function limitVisibleItems(containerSelector, maxVisible, buttonSelector) {
+        const container = document.querySelector(containerSelector);
+        const items = Array.from(container.children);
+        const button = document.querySelector(buttonSelector);
+
+        if (items.length <= maxVisible) { button.style.display="none" ; return; } items.forEach((item, index)=> {
+            if (index >= maxVisible) {
+            item.style.display = "none";
+            item.classList.add("hidden-item");
+            }
+            });
+
+            button.addEventListener("click", () => {
+            const hiddenItems = items.filter(item => item.classList.contains("hidden-item"));
+            hiddenItems.forEach(item => {
+            item.style.display = item.style.display === "none" ? "block" : "none";
+            });
+
+            const isAnyHidden = hiddenItems.some(item => item.style.display === "none");
+            button.textContent = isAnyHidden ? getTranslation('viewAll') : getTranslation('viewLess');
+            });
+            }
+
+            document.addEventListener("DOMContentLoaded", () => {
+            limitVisibleItems(".courses-list", 3, ".btn-view-all-1");
+            limitVisibleItems(".reviews-list", 3, ".btn-view-all-2");
+            });
+</script>
+
+<script src="../header/auth-header.js"></script>
+<script src="../footer/footer.js"></script>
+<script src="../profile-page/public-lang.js"></script>
+</html>

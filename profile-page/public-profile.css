@@ -1,0 +1,265 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+}
+
+.page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.profile{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-top: 10px;
+    font-family: "Inter", sans-serif;
+}
+
+.right-p {
+    flex: 3;
+    padding: 32px 60px 32px 40px;}
+
+.left-p {
+    flex: 1;
+    padding: 40px;
+}
+
+h2 {
+    font-size: 22px;
+    margin-bottom: 16px;
+    margin-top: 48px;
+    display: flex;
+    align-items: left;
+    gap: 8px;
+}
+
+li {
+    margin-bottom: 8px;
+}
+
+
+
+
+
+/*#region left part*/
+.info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.profile-image {
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 4px;
+}
+
+.user-n {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+.hobbies {
+    margin-left: 40px;
+
+}
+
+.languages {
+    margin-left: 40px;
+}
+/*#endregion*/
+
+/*#region right part*/
+.course {
+    background-color: #e0e0e0;
+    padding: 2px 15px;
+    border-radius: 12px;
+    text-align: center;
+    margin-bottom: 10px;
+    width: 250px;
+}
+
+.course img {
+    width: 250px;
+    border-radius: 12px;
+}
+
+.courses-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    overflow: hidden;
+    transition: height 0.5s ease-in-out;
+}
+
+.btn-resume {
+    width: 100%;
+    font-family: "Inter", sans-serif;
+    padding: 8px 10px;
+    background: #ffffff;
+    color: #000000;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 640;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.course h3 {
+    margin-bottom: 5px;
+}
+
+.btn-resume:hover {
+    background-color: #545F7A;
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+.courses-list.expanded {
+    height: auto;
+}
+
+.courses-list .course:nth-child(n+4) {
+    display: none;
+}
+
+.courses-list.expanded .course:nth-child(n+4) {
+    display: block;
+} 
+
+.course .p-1 {
+    font-weight: 580;
+    font-size: 18px;
+    margin-bottom: 8px;
+    text-align: left;
+}
+
+.course .p-2 {
+    font-size: 16px;
+    color: #555555;
+    text-align: left;
+}
+
+.btn-view-all-1,
+.btn-view-all-2{
+    display: inline-block;
+    padding: 8px 20px;
+    font-size: 18px;
+    font-family: "Inter", sans-serif;
+    font-weight: 640;
+    background: #283044;
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    margin-top: 10px;
+    margin-bottom: 12px;
+}
+
+.btn-view-all-1:hover,
+.btn-view-all-2:hover {
+    background-color: #545F7A;
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+.reviews-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    margin-top: 20px;
+}
+
+.review {
+    background-color: #e0e0e0;
+    padding: 2px 15px;
+    border-radius: 12px;
+    text-align: center;
+    margin-bottom: 10px;
+    width: 250px;
+}
+
+.btn-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.review .p-1 {
+    font-weight: 580;
+    font-size: 18px;
+    margin-bottom: 8px;
+    text-align: left;
+}
+
+.review .p-2 {
+    font-size: 16px;
+    color: #555555;
+    text-align: left;
+}
+/*#endregion*/
+
+@media (max-width: 1024px) {
+    .profile {
+        flex-direction: column;
+    }
+
+    .left-p,
+    .right-p {
+        max-width: 100%;
+        padding: 20px;
+    }
+
+    h2 {
+        font-size: 18px;
+    }
+
+    .courses-list,
+    .reviews-list {
+        grid-template-columns: repeat(1, 1fr);
+        gap: 20px;
+    }
+
+    .course,
+    .review {
+        margin: 0 auto;
+    }
+
+    .profile-image {
+        width: 120px;
+        height: 120px;
+    }
+}
+
+@media (max-width: 768px) {
+    .profile {
+        flex-direction: column;
+    }
+
+    .left-p,
+    .right-p {
+        max-width: 100%;
+    }
+
+    h2 {
+        font-size: 16px;
+    }
+
+    .btn-resume,
+    .btn-view-all-1,
+    .btn-view-all-2 {
+        font-size: 16px;
+    }
+
+}
