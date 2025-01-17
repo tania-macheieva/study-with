@@ -106,41 +106,94 @@ const upload = multer({ storage }).fields([
         }
       }
   
-      // Handle modules and lectures (unchanged)
-      if (modules && modules !== 'undefined' && modules !== null) {
-        let modulesArray = [];
-        try {
-          modulesArray = JSON.parse(modules);
-        } catch (err) {
-          return res.status(400).json({ success: false, message: 'Invalid module data!' });
-        }
-  
-        const modulePromises = modulesArray.map(async (module, index) => {
-          const { title = '', order_num = index + 1, lectures: moduleLectures } = module;
-  
-          const moduleResult = await pool.query(
-            `INSERT INTO modules (course_id, title, order_num) VALUES ($1, $2, $3) RETURNING id`,
-            [courseId, title, order_num]
-          );
-  
-          const moduleId = moduleResult.rows[0].id;
-  
-          if (moduleLectures && Array.isArray(moduleLectures)) {
-            const lecturePromises = moduleLectures.map(async (lecture, lectureIndex) => {
-              const { title = '', description = '' } = lecture;
-  
-              await pool.query(
-                `INSERT INTO lectures (module_id, title, description, order_num) VALUES ($1, $2, $3, $4)`,
-                [moduleId, title, description, lectureIndex + 1]
-              );
+        // Handle modules and lectures
+        if (modules && modules !== 'undefined' && modules !== null) {
+            let modulesArray = [];
+            try {
+                modulesArray = JSON.parse(modules);
+            } catch (err) {
+                return res.status(400).json({ success: false, message: 'Invalid modules data!' });
+            }
+
+            const modulePromises = modulesArray.map(async (module) => {
+                const { title, order_num, lectures: moduleLectures } = module;
+
+                if (!title || !order_num) {
+                    throw new Error('Module must have a title and order_num.');
+                }
+
+                const moduleResult = await pool.query(
+                    `INSERT INTO modules (course_id, title, order_num) VALUES ($1, $2, $3) RETURNING id`,
+                    [courseId, title, order_num]
+                );
+
+                const moduleId = moduleResult.rows[0].id;
+
+                if (moduleLectures && Array.isArray(moduleLectures)) {
+                    const lecturePromises = moduleLectures.map(async (lecture, index) => {
+                        const { title, description } = lecture;
+
+                        if (!title) {
+                            throw new Error('Lecture must have a title.');
+                        }
+
+                        const lectureResult = await pool.query(
+                            `INSERT INTO lectures (module_id, title, description, order_num) VALUES ($1, $2, $3, $4) RETURNING id`,
+                            [moduleId, title, description, index + 1]
+                        );
+
+                        const lectureId = lectureResult.rows[0].id;
+
+
+                        // Обробка файлів для лекції, обмежуємо до одного файлу на лекцію
+                        const filesForThisLecture = req.files['lecture_files']?.slice(index, index + 1); // Вибираємо тільки один файл для кожної лекції
+
+                        if (filesForThisLecture && filesForThisLecture.length > 0) {
+                            // Очищаємо попередні файли для цієї лекції
+                            await pool.query('DELETE FROM lecture_files WHERE lecture_id = $1', [lectureId]);
+
+                            // Вставляємо новий файл для цієї лекції
+                            const file = filesForThisLecture[0]; // Беремо перший файл
+                            await pool.query(
+                                    `INSERT INTO lecture_files (lecture_id, file_name, file_url, file_type)
+                                    VALUES ($1, $2, $3, $4)`,
+                                [
+                                    lectureId,
+                                    file.originalname,
+                                    file.path,
+                                    file.mimetype,
+                                ]
+                            );
+                        }
+
+                        // Обробка відео для лекції
+                        const videosForThisLecture = req.files['lecture_videos']?.slice(index, index + 1); // Вибираємо тільки одне відео для кожної лекції
+
+                        if (videosForThisLecture && videosForThisLecture.length > 0) {
+                            // Очищаємо попередні відеофайли для цієї лекції
+                            await pool.query('DELETE FROM videos WHERE lecture_id = $1', [lectureId]);
+
+                            // Вставляємо новий відеофайл для цієї лекції
+                            const video = videosForThisLecture[0]; // Беремо перший відеофайл
+                            await pool.query(
+                                `INSERT INTO videos (lecture_id, file_name, file_path, file_size)
+                                 VALUES ($1, $2, $3, $4)`,
+                                [
+                                    lectureId,
+                                    video.originalname,
+                                    video.path,
+                                    video.size,
+                                ]
+                            );
+                        }
+                    });
+
+                    await Promise.all(lecturePromises);
+                }
             });
-  
-            await Promise.all(lecturePromises);
-          }
-        });
-  
-        await Promise.all(modulePromises);
-      }
+
+            await Promise.all(modulePromises);
+        }
   
     // Handle tags (delete old, add new)
     if (parsedTags && Array.isArray(parsedTags)) {
