@@ -106,94 +106,121 @@ const upload = multer({ storage }).fields([
         }
       }
   
-        // Handle modules and lectures
-        if (modules && modules !== 'undefined' && modules !== null) {
-            let modulesArray = [];
-            try {
-                modulesArray = JSON.parse(modules);
-            } catch (err) {
-                return res.status(400).json({ success: false, message: 'Invalid modules data!' });
+      if (modules && modules !== 'undefined' && modules !== null) {
+        let modulesArray = [];
+        try {
+            modulesArray = JSON.parse(modules);
+        } catch (err) {
+            return res.status(400).json({ success: false, message: 'Invalid modules data!' });
+        }
+    
+        const modulePromises = modulesArray.map(async (module) => {
+            const { title, order_num, lectures: moduleLectures } = module;
+    
+            if (!title || !order_num) {
+                throw new Error('Module must have a title and order_num.');
             }
-
-            const modulePromises = modulesArray.map(async (module) => {
-                const { title, order_num, lectures: moduleLectures } = module;
-
-                if (!title || !order_num) {
-                    throw new Error('Module must have a title and order_num.');
-                }
-
+    
+            // Перевірка на існування модуля для конкретного курсу та порядкового номера
+            const existingModuleResult = await pool.query(
+                `SELECT id FROM modules WHERE course_id = $1 AND order_num = $2`,
+                [courseId, order_num]
+            );
+    
+            let moduleId;
+            if (existingModuleResult.rows.length > 0) {
+                // Якщо модуль існує, оновлюємо його
+                moduleId = existingModuleResult.rows[0].id;
+                await pool.query(
+                    `UPDATE modules SET title = $1 WHERE id = $2`,
+                    [title, moduleId]
+                );
+            } else {
+                // Якщо модуль не існує, додаємо новий
                 const moduleResult = await pool.query(
                     `INSERT INTO modules (course_id, title, order_num) VALUES ($1, $2, $3) RETURNING id`,
                     [courseId, title, order_num]
                 );
-
-                const moduleId = moduleResult.rows[0].id;
-
-                if (moduleLectures && Array.isArray(moduleLectures)) {
-                    const lecturePromises = moduleLectures.map(async (lecture, index) => {
-                        const { title, description } = lecture;
-
-                        if (!title) {
-                            throw new Error('Lecture must have a title.');
-                        }
-
+                moduleId = moduleResult.rows[0].id;
+            }
+    
+            if (moduleLectures && Array.isArray(moduleLectures)) {
+                const lecturePromises = moduleLectures.map(async (lecture, index) => {
+                    const { title, description } = lecture;
+    
+                    if (!title) {
+                        throw new Error('Lecture must have a title.');
+                    }
+    
+                    // Перевірка на існування лекції для поточного модуля
+                    const existingLectureResult = await pool.query(
+                        `SELECT id FROM lectures WHERE module_id = $1 AND order_num = $2`,
+                        [moduleId, index + 1]
+                    );
+    
+                    let lectureId;
+                    if (existingLectureResult.rows.length > 0) {
+                        // Якщо лекція існує, оновлюємо її
+                        lectureId = existingLectureResult.rows[0].id;
+                        await pool.query(
+                            `UPDATE lectures SET title = $1, description = $2 WHERE id = $3`,
+                            [title, description, lectureId]
+                        );
+                    } else {
+                        // Якщо лекція не існує, додаємо нову
                         const lectureResult = await pool.query(
                             `INSERT INTO lectures (module_id, title, description, order_num) VALUES ($1, $2, $3, $4) RETURNING id`,
                             [moduleId, title, description, index + 1]
                         );
-
-                        const lectureId = lectureResult.rows[0].id;
-
-
-                        // Обробка файлів для лекції, обмежуємо до одного файлу на лекцію
-                        const filesForThisLecture = req.files['lecture_files']?.slice(index, index + 1); // Вибираємо тільки один файл для кожної лекції
-
-                        if (filesForThisLecture && filesForThisLecture.length > 0) {
-                            // Очищаємо попередні файли для цієї лекції
-                            await pool.query('DELETE FROM lecture_files WHERE lecture_id = $1', [lectureId]);
-
-                            // Вставляємо новий файл для цієї лекції
-                            const file = filesForThisLecture[0]; // Беремо перший файл
-                            await pool.query(
-                                    `INSERT INTO lecture_files (lecture_id, file_name, file_url, file_type)
-                                    VALUES ($1, $2, $3, $4)`,
-                                [
-                                    lectureId,
-                                    file.originalname,
-                                    file.path,
-                                    file.mimetype,
-                                ]
-                            );
-                        }
-
-                        // Обробка відео для лекції
-                        const videosForThisLecture = req.files['lecture_videos']?.slice(index, index + 1); // Вибираємо тільки одне відео для кожної лекції
-
-                        if (videosForThisLecture && videosForThisLecture.length > 0) {
-                            // Очищаємо попередні відеофайли для цієї лекції
-                            await pool.query('DELETE FROM videos WHERE lecture_id = $1', [lectureId]);
-
-                            // Вставляємо новий відеофайл для цієї лекції
-                            const video = videosForThisLecture[0]; // Беремо перший відеофайл
-                            await pool.query(
-                                `INSERT INTO videos (lecture_id, file_name, file_path, file_size)
-                                 VALUES ($1, $2, $3, $4)`,
-                                [
-                                    lectureId,
-                                    video.originalname,
-                                    video.path,
-                                    video.size,
-                                ]
-                            );
-                        }
-                    });
-
-                    await Promise.all(lecturePromises);
-                }
-            });
-
-            await Promise.all(modulePromises);
-        }
+                        lectureId = lectureResult.rows[0].id;
+                    }
+    
+                    // Обробка файлів для лекції
+                    const filesForThisLecture = req.files['lecture_files']?.slice(index, index + 1); // Вибираємо тільки один файл для кожної лекції
+                    if (filesForThisLecture && filesForThisLecture.length > 0) {
+                        // Очищаємо попередні файли для цієї лекції
+                        await pool.query('DELETE FROM lecture_files WHERE lecture_id = $1', [lectureId]);
+    
+                        const file = filesForThisLecture[0]; // Беремо перший файл
+                        await pool.query(
+                            `INSERT INTO lecture_files (lecture_id, file_name, file_url, file_type)
+                             VALUES ($1, $2, $3, $4)`,
+                            [
+                                lectureId,
+                                file.originalname,
+                                file.path,
+                                file.mimetype,
+                            ]
+                        );
+                    }
+    
+                    // Обробка відео для лекції
+                    const videosForThisLecture = req.files['lecture_videos']?.slice(index, index + 1); // Вибираємо тільки одне відео для кожної лекції
+                    if (videosForThisLecture && videosForThisLecture.length > 0) {
+                        // Очищаємо попередні відеофайли для цієї лекції
+                        await pool.query('DELETE FROM videos WHERE lecture_id = $1', [lectureId]);
+    
+                        const video = videosForThisLecture[0]; // Беремо перший відеофайл
+                        await pool.query(
+                            `INSERT INTO videos (lecture_id, file_name, file_path, file_size)
+                             VALUES ($1, $2, $3, $4)`,
+                            [
+                                lectureId,
+                                video.originalname,
+                                video.path,
+                                video.size,
+                            ]
+                        );
+                    }
+                });
+    
+                await Promise.all(lecturePromises);
+            }
+        });
+    
+        await Promise.all(modulePromises);
+    }
+    
   
     // Handle tags (delete old, add new)
     if (parsedTags && Array.isArray(parsedTags)) {

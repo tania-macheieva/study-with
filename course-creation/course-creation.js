@@ -488,68 +488,69 @@ document.addEventListener('DOMContentLoaded', function () {
     
     const tags = tagsList;
 
-  // Отримання існуючих даних модулів з localStorage
-  const existingCourseData = JSON.parse(localStorage.getItem('courseDraft')) || {};
-  const existingModules = existingCourseData.modules || [];
+    // Getting existing modules from localStorage
+    const existingCourseData = JSON.parse(localStorage.getItem('courseDraft')) || {};
+    const existingModules = existingCourseData.modules || [];
 
-  const modules = [];
-  document.querySelectorAll('.module').forEach((moduleDiv, moduleIndex) => {
-    const moduleId = moduleDiv.dataset.id || `module-${moduleIndex + 1}`;
-    const moduleTitle = moduleDiv.querySelector('input').value;
-    const lectures = [];
+    const modules = [];
+    document.querySelectorAll('.module').forEach((moduleDiv, moduleIndex) => {
+        const moduleId = moduleDiv.dataset.id || `module-${moduleIndex + 1}`;
+        const moduleTitle = moduleDiv.querySelector('input').value;
+        const lectures = [];
 
-    moduleDiv.querySelectorAll('.lecture').forEach((lectureDiv, lectureIndex) => {
-      const lectureId = lectureDiv.dataset.id || `lecture-${moduleId}-${lectureIndex + 1}`;
-      const lectureTitle = lectureDiv.querySelector('input').value;
-      const lectureDescription = lectureDiv.querySelector('textarea').value;
+        moduleDiv.querySelectorAll('.lecture').forEach((lectureDiv, lectureIndex) => {
+            const lectureId = lectureDiv.dataset.id || `lecture-${moduleId}-${lectureIndex + 1}`;
+            const lectureTitle = lectureDiv.querySelector('input').value;
+            const lectureDescription = lectureDiv.querySelector('textarea').value;
 
-      lectures.push({
-        id: lectureId,
-        title: lectureTitle,
-        description: lectureDescription,
-        order_num: lectureIndex + 1,
-      });
+            lectures.push({
+                id: lectureId,
+                title: lectureTitle,
+                description: lectureDescription,
+                order_num: lectureIndex + 1,
+            });
+        });
+
+        modules.push({
+            id: moduleId,
+            title: moduleTitle,
+            order_num: moduleIndex + 1,
+            lectures: lectures,
+        });
     });
 
-    modules.push({
-      id: moduleId,
-      title: moduleTitle,
-      order_num: moduleIndex + 1,
-      lectures: lectures,
-    });
-  });
-
-  // Перевірка та оновлення модулів
-  modules.forEach((module) => {
-    const existingModule = existingModules.find((mod) => mod.id === module.id);
-    if (existingModule) {
-      // Оновлення модулів
-      existingModule.title = module.title;
-      existingModule.order_num = module.order_num;
-      module.lectures.forEach((lecture) => {
-        const existingLecture = existingModule.lectures.find((lec) => lec.id === lecture.id);
-        if (existingLecture) {
-          // Оновлення лекцій
-          existingLecture.title = lecture.title;
-          existingLecture.description = lecture.description;
+    // Checking and updating modules
+    modules.forEach((module) => {
+        const existingModule = existingModules.find((mod) => mod.id === module.id);
+        if (existingModule) {
+            // Updating modules
+            existingModule.title = module.title;
+            existingModule.order_num = module.order_num;
+            module.lectures.forEach((lecture) => {
+                const existingLecture = existingModule.lectures.find((lec) => lec.id === lecture.id);
+                if (existingLecture) {
+                    // Updating lectures
+                    existingLecture.title = lecture.title;
+                    existingLecture.description = lecture.description;
+                } else {
+                    // Adding new lectures
+                    existingModule.lectures.push(lecture);
+                }
+            });
         } else {
-          // Додавання нових лекцій
-          existingModule.lectures.push(lecture);
+            // Adding new modules
+            existingModules.push(module);
         }
-      });
-    } else {
-      // Додавання нових модулів
-      existingModules.push(module);
-    }
-  });
+    });
+
     const courseData = {
-      title: courseTitle,
-      description: courseDescription,
-      category: courseCategory,
-      authorId: authorId,
-      educationLevel: courseEducationLevel,
-      tags: tags,
-      modules: modules,
+        title: courseTitle,
+        description: courseDescription,
+        category: courseCategory,
+        authorId: authorId,
+        educationLevel: courseEducationLevel,
+        tags: tags,
+        modules: modules,
     };
     
     // Save course data in localStorage
@@ -558,14 +559,14 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Save course thumbnail if available
     if (courseThumbnail) {
-      localStorage.setItem('courseThumbnail', courseThumbnail.name);
+        localStorage.setItem('courseThumbnail', courseThumbnail.name);
     }
-  
+
     // Send data to the server using FormData
     const formData = new FormData();
     formData.append('course_data', JSON.stringify(courseData));
     if (courseThumbnail) {
-      formData.append('course_thumbnail', courseThumbnail);
+        formData.append('course_thumbnail', courseThumbnail);
     }
     
     formData.append('course_title', courseTitle);
@@ -575,25 +576,26 @@ document.addEventListener('DOMContentLoaded', function () {
     formData.append('education_level', courseEducationLevel);
     formData.append('author_id', authorId);
     formData.append('tags', JSON.stringify(tags));
-    formData.append('modules', JSON.stringify( modules )); // Send modules as a JSON string
+    formData.append('modules', JSON.stringify(modules)); // Send modules as a JSON string
     
     fetch('/api/courses/save-draft', {
-      method: 'POST',
-      body: formData,  // Use formData here, not courseData (which is JSON)
+        method: 'POST',
+        body: formData,  // Use formData here, not courseData (which is JSON)
     })
     .then(response => response.json())
     .then(data => {
-      if (data.success) {
-        alert("Course saved as draft!");
-      } else {
-        alert("Failed to save draft: " + (data.error || 'Unknown error'));
-      }
+        if (data.success) {
+            alert("Course saved as draft!");
+        } else {
+            alert("Failed to save draft: " + (data.error || 'Unknown error'));
+        }
     })
     .catch(error => {
-      console.error('Error:', error);
-      alert('An error occurred while saving the draft.');
+        console.error('Error:', error);
+        alert('An error occurred while saving the draft.');
     });
 });
+
   
   window.addEventListener('load', function() {
     const savedCourseData = localStorage.getItem('courseDraft');
