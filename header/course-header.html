@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyWith</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    rel="stylesheet" />
+    <link rel="stylesheet" href="course-header.css">
+
+</head>
+<body>
+    <header> 
+        <div class="container">
+            <div class="left-s">
+                <h2 class="home"> <img src="../images/arrow.svg" alt="arrow-exit-ico">Home</h2>
+                <h2 class="course-n"><img src="../images/save-c.svg" alt="save-course-ico">Course name course name</h2>
+            </div>
+
+            <div class="right-s">
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <span style="width: 50%;"></span>
+                    </div>
+                    <div class="progress-text">
+                        <span>Progress</span>
+                        <span class="percent">50%</span>
+                    </div>
+                </div>
+
+                <div class="lang-switcher">
+                    <a class="lang-btn" data-lang="en">EN</a> |
+                    <a class="lang-btn" data-lang="ua">UA</a>
+                </div>
+                <button class="btn">
+                    <a id="user" href="/profile-student">
+                        <img src="../images/user-avatar.png" alt="user image" />
+                    </a>
+                </button>
+                <div>
+                    <button>
+                        <img class="oth" src="../images/more.png" alt="other-options-ico">
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="#">
+                            <img src="../images/share-c.svg" alt="share-ico">
+                            Share this course</a>
+                        <a href="#">
+                            <img src="../images/unenroll.svg" alt="Unenroll">
+                            Unenroll from this course</a>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <script>
+        document.querySelector('.oth').parentElement.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const dropdownMenu = this.nextElementSibling;
+                dropdownMenu.classList.toggle('show');
+            });
+
+            document.addEventListener('click', function (e) {
+                const dropdownMenus = document.querySelectorAll('.dropdown-menu');
+                dropdownMenus.forEach(menu => {
+                    if (!menu.contains(e.target)) {
+                        menu.classList.remove('show');
+                    }
+                });
+            });
+    </script>
+</body>
+</html>
