@@ -13,8 +13,8 @@
     <header> 
         <div class="container">
             <div class="left-s">
-                <h2 class="home"> <img src="../images/arrow.svg" alt="arrow-exit-ico">Home</h2>
-                <h2 class="course-n"><img src="../images/save-c.svg" alt="save-course-ico">Course name course name</h2>
+                <h2 class="home" data-lang="home"> <img src="../images/arrow.svg" alt="arrow-exit-ico">Home</h2>
+                <h2 class="course-n" data-lang="courseName"><img src="../images/save-c.svg" alt="save-course-ico">Course name course name</h2>
             </div>
 
             <div class="right-s">
@@ -23,7 +23,7 @@
                         <span style="width: 50%;"></span>
                     </div>
                     <div class="progress-text">
-                        <span>Progress</span>
+                        <span data-lang="progress">Progress</span>
                         <span class="percent">50%</span>
                     </div>
                 </div>
@@ -42,10 +42,10 @@
                         <img class="oth" src="../images/more.png" alt="other-options-ico">
                     </button>
                     <div class="dropdown-menu">
-                        <a href="#">
+                        <a href="#" data-lang="shareCourse">
                             <img src="../images/share-c.svg" alt="share-ico">
                             Share this course</a>
-                        <a href="#">
+                        <a href="#" data-lang="unenrollCourse">
                             <img src="../images/unenroll.svg" alt="Unenroll">
                             Unenroll from this course</a>
                         
@@ -54,7 +54,9 @@
             </div>
         </div>
     </header>
+    <script> src="/header/course-header.js" </script>
     <script>
+        
         document.querySelector('.oth').parentElement.addEventListener('click', function (e) {
                 e.stopPropagation();
                 const dropdownMenu = this.nextElementSibling;
@@ -69,6 +71,83 @@
                     }
                 });
             });
+ // Переклади
+const headerTranslations = {
+    en: {
+        home: "Home",
+        courseName: "Course name",
+        progress:"Progress",
+        shareCourse: "Share this course",
+        unenrollCourse: "Unenroll from this course",
+    },
+    ua: {
+        home: "Головна сторінка",
+        courseName: "Назва курсу",
+        progress:"Прогрес",
+        shareCourse: "Поділитися цим курсом",
+        unenrollCourse: "Відписатися від цього курсу",
+    },
+};
+
+// Функція ініціалізації мови
+function initializeLanguage() {
+            const currentLang = localStorage.getItem("language") || "en";
+            document.documentElement.lang = currentLang;
+
+            const langSwitcher = document.querySelector(".lang-switcher");
+            if (langSwitcher) {
+                const buttons = langSwitcher.querySelectorAll(".lang-btn");
+                buttons.forEach((btn) => {
+                    btn.classList.toggle("active", btn.getAttribute("data-lang") === currentLang);
+                });
+
+                langSwitcher.addEventListener("click", (event) => {
+                    if (event.target.classList.contains("lang-btn")) {
+                        event.preventDefault();
+                        const selectedLang = event.target.getAttribute("data-lang");
+
+                        if (selectedLang !== currentLang) {
+                            localStorage.setItem("language", selectedLang);
+                            applyTranslations(selectedLang);
+
+                            buttons.forEach((btn) => {
+                                btn.classList.toggle("active", btn.getAttribute("data-lang") === selectedLang);
+                            });
+                        }
+                    }
+                });
+            }
+
+            applyTranslations(currentLang);
+        }
+
+        // Функція застосування перекладів
+        function applyTranslations(lang) {
+            const translations = headerTranslations[lang];
+            if (!translations) return;
+
+            document.querySelectorAll("[data-lang]").forEach((element) => {
+                const key = element.getAttribute("data-lang");
+                if (translations[key]) {
+                    if (element.querySelector("img")) {
+                        let textNode = Array.from(element.childNodes).find(
+                            (node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== ""
+                        );
+
+                        if (textNode) {
+                            textNode.textContent = ` ${translations[key]}`;
+                        } else {
+                            element.appendChild(document.createTextNode(` ${translations[key]}`));
+                        }
+                    } else {
+                        element.textContent = translations[key];
+                    }
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", initializeLanguage);
+
     </script>
 </body>
 </html>
