@@ -457,35 +457,27 @@ document.addEventListener('DOMContentLoaded', function () {
   document.getElementById("save-draft-btn").addEventListener("click", function() {
     const courseThumbnailElement = document.getElementById('course_thumbnail').files[0];
     const courseThumbnail = courseThumbnailElement ? courseThumbnailElement : null;
-    
-    console.log("Course Thumbnail:", courseThumbnail);
-    
+
     const authData = getAuthDataFromStorage();
     const authorId = authData ? authData.userId : null;
-    
-    console.log("Author ID:", authorId);
-    
+
     const courseTitleElement = document.querySelector("input[data-lang='enterCourseTitle']");
     const courseTitle = courseTitleElement ? courseTitleElement.value : '';
-    console.log("Course Title:", courseTitle);
-    
+
     const courseDescriptionElement = document.querySelector("textarea[data-lang='enterDescription']");
     const courseDescription = courseDescriptionElement ? courseDescriptionElement.value : '';
-    console.log("Course Description:", courseDescription);
-    
+
     const coursePriceElement = document.querySelector("input[data-lang='enterPrice']");
     const coursePrice = coursePriceElement && coursePriceElement.value ? parseFloat(coursePriceElement.value) : 0;
-    
+
     const categoryWrapper = document.getElementById('category-wrapper');
     const courseCategoryElement = categoryWrapper ? categoryWrapper.querySelector('.select-trigger') : null;
     const courseCategory = courseCategoryElement && courseCategoryElement.dataset.value ? parseInt(courseCategoryElement.dataset.value, 10) : null;
-    console.log("Course Category:", courseCategory);
-    
+
     const educationWrapper = document.getElementById('education-wrapper');
     const courseEducationLevelElement = educationWrapper ? educationWrapper.querySelector('.select-trigger') : null;
     const courseEducationLevel = courseEducationLevelElement && courseEducationLevelElement.dataset.value ? parseInt(courseEducationLevelElement.dataset.value, 10) : null;
-    console.log("Course Education Level:", courseEducationLevel);
-    
+
     const tags = tagsList;
 
     // Getting existing modules from localStorage
@@ -494,54 +486,38 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const modules = [];
     document.querySelectorAll('.module').forEach((moduleDiv, moduleIndex) => {
-        const moduleId = moduleDiv.dataset.id || `module-${moduleIndex + 1}`;
-        const moduleTitle = moduleDiv.querySelector('input').value;
-        const lectures = [];
+      const moduleId = moduleDiv.dataset.id && !moduleDiv.dataset.id.startsWith('module-') 
+          ? parseInt(moduleDiv.dataset.id, 10) 
+          : null; // Use null for new modules
+      const moduleTitle = moduleDiv.querySelector('input').value;
+      const lectures = [];
+  
+      moduleDiv.querySelectorAll('.lecture').forEach((lectureDiv, lectureIndex) => {
+          const lectureId = lectureDiv.dataset.id && !lectureDiv.dataset.id.startsWith('lecture-')
+              ? parseInt(lectureDiv.dataset.id, 10)
+              : null; // Use null for new lectures
+          const lectureTitle = lectureDiv.querySelector('input').value;
+          const lectureDescription = lectureDiv.querySelector('textarea').value;
+  
+          lectures.push({
+              id: lectureId, // Send null for new lectures
+              title: lectureTitle,
+              description: lectureDescription,
+              order_num: lectureIndex + 1,
+          });
+      });
+  
+      modules.push({
+          id: moduleId, // Send null for new modules
+          title: moduleTitle,
+          order_num: moduleIndex + 1,
+          lectures: lectures,
+      });
+  });
+  
 
-        moduleDiv.querySelectorAll('.lecture').forEach((lectureDiv, lectureIndex) => {
-            const lectureId = lectureDiv.dataset.id || `lecture-${moduleId}-${lectureIndex + 1}`;
-            const lectureTitle = lectureDiv.querySelector('input').value;
-            const lectureDescription = lectureDiv.querySelector('textarea').value;
-
-            lectures.push({
-                id: lectureId,
-                title: lectureTitle,
-                description: lectureDescription,
-                order_num: lectureIndex + 1,
-            });
-        });
-
-        modules.push({
-            id: moduleId,
-            title: moduleTitle,
-            order_num: moduleIndex + 1,
-            lectures: lectures,
-        });
-    });
-
-    // Checking and updating modules
-    modules.forEach((module) => {
-        const existingModule = existingModules.find((mod) => mod.id === module.id);
-        if (existingModule) {
-            // Updating modules
-            existingModule.title = module.title;
-            existingModule.order_num = module.order_num;
-            module.lectures.forEach((lecture) => {
-                const existingLecture = existingModule.lectures.find((lec) => lec.id === lecture.id);
-                if (existingLecture) {
-                    // Updating lectures
-                    existingLecture.title = lecture.title;
-                    existingLecture.description = lecture.description;
-                } else {
-                    // Adding new lectures
-                    existingModule.lectures.push(lecture);
-                }
-            });
-        } else {
-            // Adding new modules
-            existingModules.push(module);
-        }
-    });
+    // Find and track removed modules
+    const removedModules = existingModules.filter(existingModule => !modules.some(module => module.id === existingModule.id));
 
     const courseData = {
         title: courseTitle,
@@ -551,13 +527,12 @@ document.addEventListener('DOMContentLoaded', function () {
         educationLevel: courseEducationLevel,
         tags: tags,
         modules: modules,
+        removedModules: removedModules.map(module => module.id), // Only send IDs of removed modules
     };
-    
+
     // Save course data in localStorage
     localStorage.setItem('courseDraft', JSON.stringify(courseData));
-    console.log('Saved course data to localStorage:', courseData);
-    
-    // Save course thumbnail if available
+
     if (courseThumbnail) {
         localStorage.setItem('courseThumbnail', courseThumbnail.name);
     }
@@ -568,7 +543,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (courseThumbnail) {
         formData.append('course_thumbnail', courseThumbnail);
     }
-    
+
     formData.append('course_title', courseTitle);
     formData.append('course_description', courseDescription);
     formData.append('course_price', coursePrice);
@@ -577,10 +552,11 @@ document.addEventListener('DOMContentLoaded', function () {
     formData.append('author_id', authorId);
     formData.append('tags', JSON.stringify(tags));
     formData.append('modules', JSON.stringify(modules)); // Send modules as a JSON string
-    
+    formData.append('removed_modules', JSON.stringify(courseData.removedModules)); // Send removed module IDs
+
     fetch('/api/courses/save-draft', {
         method: 'POST',
-        body: formData,  // Use formData here, not courseData (which is JSON)
+        body: formData,
     })
     .then(response => response.json())
     .then(data => {
