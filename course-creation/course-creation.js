@@ -536,7 +536,33 @@ document.addEventListener('DOMContentLoaded', function () {
     if (courseThumbnail) {
         localStorage.setItem('courseThumbnail', courseThumbnail.name);
     }
+// Дочекаємось завантаження DOM, щоб гарантувати, що елементи доступні
+document.addEventListener('DOMContentLoaded', function() {
+  // Знайдемо елемент input за ID
+  const lectureMaterialsInput = document.getElementById('lecture-materials');
+  const submitButton = document.getElementById('submitLectureMaterials');
+  fileNamesList.innerHTML = '';
 
+  // Перевіримо, чи елемент існує
+  if (lectureMaterialsInput && submitButton) {
+    // Додаємо обробник події на кнопку
+    submitButton.addEventListener('click', function() {
+      // Перевіримо, чи є вибрані матеріали
+      if (lectureMaterialsInput.files.length > 0) {
+        // Отримуємо файл
+        let selectedFile = lectureMaterialsInput.files[0];
+        console.log('Selected file:', selectedFile.name);
+
+        // Тут можна виконати додаткові дії з файлом, наприклад, завантаження
+      } else {
+        console.log('No file selected');
+        alert('Please select a file before submitting.');
+      }
+    });
+  } else {
+    console.log('Elements not found');
+  }
+});
     // Send data to the server using FormData
     const formData = new FormData();
     formData.append('course_data', JSON.stringify(courseData));
@@ -553,7 +579,32 @@ document.addEventListener('DOMContentLoaded', function () {
     formData.append('tags', JSON.stringify(tags));
     formData.append('modules', JSON.stringify(modules)); // Send modules as a JSON string
     formData.append('removed_modules', JSON.stringify(courseData.removedModules)); // Send removed module IDs
+// Масив для зберігання унікальних файлів
+const addedLectureFiles = [];
 
+const lectureFiles = document.querySelectorAll('.lecture-materials');
+lectureFiles.forEach(input => {
+  if (input.files.length > 0) {
+    Array.from(input.files).forEach(file => {
+      // Перевірка, чи файл вже додано
+      if (!addedLectureFiles.some(addedFile => addedFile.name === file.name && addedFile.size === file.size)) {
+        addedLectureFiles.push(file); // Додаємо файл у масив
+        formData.append('lecture_files', file); // Додаємо файл до formData
+      }
+    });
+  }
+});
+
+// Додаємо відеофайли
+const lectureVideos = document.querySelectorAll('.lecture-video');
+lectureVideos.forEach(input => {
+  if (input.files.length > 0) {
+    Array.from(input.files).forEach(file => {
+      // Додаємо відеофайл до formData
+      formData.append('lecture_videos', file);
+    });
+  }
+});
     fetch('/api/courses/save-draft', {
         method: 'POST',
         body: formData,
