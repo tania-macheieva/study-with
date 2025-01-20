@@ -1,205 +1,180 @@
-document.addEventListener("DOMContentLoaded", function() {
-  let displayedCourses = 6;
-  let currentCourses = [...coursesData];
-
-  // Функція фільтрації курсів
-  function filterCourses() {
-      let filteredCourses = [...currentCourses]; // Використовуємо поточні результати пошуку
-
-      // Отримуємо вибрані теми
-      const selectedThemes = Array.from(document.querySelectorAll('input[name^="theme-option-"]:checked'))
-          .map(checkbox => checkbox.nextElementSibling.textContent.trim());
-
-      // Фільтрація за темами
-      if (selectedThemes.length > 0) {
-          filteredCourses = filteredCourses.filter(course => 
-              course.themes.some(theme => selectedThemes.includes(theme))
-          );
-      }
-
-      // Отримуємо вибрані фільтри ціни
-      const selectedPrices = Array.from(document.querySelectorAll('input[name^="price-"]:checked'))
-          .map(checkbox => checkbox.name);
-
-      // Фільтрація за ціною
-      if (selectedPrices.length > 0) {
-          filteredCourses = filteredCourses.filter(course => {
-              if (selectedPrices.includes('price-free') && course.price === 0) return true;
-              if (selectedPrices.includes('price-paid') && course.price > 0) return true;
-              return false;
-          });
-      }
-
-      // Отримуємо вибрані рівні
-      const selectedLevels = Array.from(document.querySelectorAll('input[name^="level-"]:checked'))
-          .map(checkbox => checkbox.name);
-
-      // Фільтрація за рівнем
-      if (selectedLevels.length > 0) {
-          filteredCourses = filteredCourses.filter(course => 
-              selectedLevels.includes(course.level)
-          );
-      }
-
-      currentCourses = filteredCourses;
-      displayedCourses = 6;
-      renderCourses();
-      updateResultsCount();
-  }
-
-  function renderCourses() {
-    const coursesToShow = currentCourses.slice(0, displayedCourses);
-    const coursesContainer = document.querySelector(".courses");
-    coursesContainer.innerHTML = '';
-
-    if (coursesToShow.length === 0) {
-        coursesContainer.innerHTML = '<p>Курсів не знайдено</p>';
-        return;
-    }
-
-    // Створюємо обгортку для сітки курсів
-    coursesContainer.style.display = 'grid';
-    coursesContainer.style.gridTemplateColumns = 'repeat(3, 1fr)';
-    coursesContainer.style.gap = '40px';
-
-    coursesToShow.forEach(course => {
-        const courseHTML = `
-            <div class="course_group">
-                <div class="course_name">${course.name}</div>
-                <div class="description">${course.description}</div>
-
-
-
-
-
-
-
-
-
-
-                
-                <div class="group-27">
-                    <div class="price">${course.price === 0 ? 'Free' : '$' + course.price}</div>
-                    <img class="arrow" src="/images/right-arrow.png" alt="Arrow Icon" />
-                </div>
-            </div>
-        `;
-        coursesContainer.insertAdjacentHTML('beforeend', courseHTML);
-    });
-
-    // Оновлюємо кнопку "Load More"
-    const loadMoreButton = document.querySelector(".more-btn");
-    if (loadMoreButton) {
-        loadMoreButton.style.display = currentCourses.length > displayedCourses ? "block" : "none";
-    }
-}
-
-  // Оновлення кількості результатів
-function getTranslation(key) {
-    const translations = {
-        ua: {
-            results: "Результати ",
-        },
-        en: {
-            results: "Results "
-        },
-    };
-
-    const language = localStorage.getItem('language'); 
-    return translations[language] && translations[language][key] ? translations[language][key] : 'Translation not found';
-}
-
-function updateResultsCount() {
-    const resultsCount = document.querySelector(".Result");
-    if (resultsCount) {
-        const courseCount = currentCourses && Array.isArray(currentCourses) ? currentCourses.length : 0;
-        resultsCount.textContent = `${getTranslation('results')} (${courseCount})`;
-    }
-}
-
-updateResultsCount();
-
-
+document.addEventListener("DOMContentLoaded", async function() {
+    let displayedCourses = 6;
+    let currentCourses = [];
   
-  // Функція пошуку
-  async function performSearch(query) {
+    async function loadInitialCourses() {
       try {
-          const searchButton = document.querySelector(".search-btnn");
-          searchButton.disabled = true;
-
-          if (query.trim() === '') {
-              currentCourses = [...coursesData];
-          } else {
-              const response = await fetch(`/api/search/search?query=${encodeURIComponent(query)}`);
-              if (!response.ok) throw new Error('Помилка пошуку');
-              currentCourses = await response.json();
-          }
-
-          filterCourses(); // Застосовуємо фільтри після пошуку
-          searchButton.disabled = false;
+        const response = await fetch('/api/courses');
+        if (!response.ok) throw new Error('Failed to fetch courses');
+        currentCourses = await response.json();
+        renderCourses();
+        updateResultsCount();
       } catch (error) {
-          console.error('Помилка пошуку:', error);
-          searchButton.disabled = false;
+        console.error('Error loading courses:', error);
+        const coursesContainer = document.querySelector(".courses");
+        coursesContainer.innerHTML = '<p>Помилка завантаження курсів. Спробуйте пізніше.</p>';
       }
-  }
-
-  // Event Listeners
-  const searchInput = document.querySelector(".Search");
-  const searchButton = document.querySelector(".search-btnn");
-
-  // Обробники подій для пошуку
-  searchButton.addEventListener('click', () => {
-      performSearch(searchInput.value);
-      filterCourses();
-  });
-
-  searchInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-          performSearch(searchInput.value);
-          filterCourses();
+    }
+  
+    function filterCourses() {
+        let filteredCourses = [...currentCourses];
+  
+        const selectedThemes = Array.from(document.querySelectorAll('input[name^="theme-option-"]:checked'))
+            .map(checkbox => checkbox.nextElementSibling.textContent.trim());
+  
+        if (selectedThemes.length > 0) {
+            filteredCourses = filteredCourses.filter(course => 
+                course.themes.some(theme => selectedThemes.includes(theme))
+            );
+        }
+  
+        const selectedPrices = Array.from(document.querySelectorAll('input[name^="price-"]:checked'))
+            .map(checkbox => checkbox.name);
+  
+        if (selectedPrices.length > 0) {
+            filteredCourses = filteredCourses.filter(course => {
+                if (selectedPrices.includes('price-free') && course.price === 0) return true;
+                if (selectedPrices.includes('price-paid') && course.price > 0) return true;
+                return false;
+            });
+        }
+  
+        const selectedLevels = Array.from(document.querySelectorAll('input[name^="level-"]:checked'))
+            .map(checkbox => checkbox.name);
+  
+        if (selectedLevels.length > 0) {
+            filteredCourses = filteredCourses.filter(course => 
+                selectedLevels.includes(course.level)
+            );
+        }
+  
+        currentCourses = filteredCourses;
+        displayedCourses = 6;
+        renderCourses();
+        updateResultsCount();
+    }
+  
+    function renderCourses() {
+      const coursesToShow = currentCourses.slice(0, displayedCourses);
+      const coursesContainer = document.querySelector(".courses");
+      coursesContainer.innerHTML = '';
+  
+      if (coursesToShow.length === 0) {
+          coursesContainer.innerHTML = '<p>Курсів не знайдено</p>';
+          return;
       }
-  });
-
-  // Обробник для очищення фільтрів
-  document.querySelector('.filters-clear').addEventListener('click', function() {
-      document.querySelectorAll('.filters input[type="checkbox"]').forEach(checkbox => {
-          checkbox.checked = false;
+  
+      coursesContainer.style.display = 'grid';
+      coursesContainer.style.gridTemplateColumns = 'repeat(3, 1fr)';
+      coursesContainer.style.gap = '40px';
+  
+      coursesToShow.forEach(course => {
+          const courseHTML = `
+              <div class="course_group">
+                  <div class="course_name">${course.name}</div>
+                  <div class="description">${course.description}</div>
+                  <div class="group-27">
+                      <div class="price">${course.price === 0 ? 'Free' : '$' + course.price}</div>
+                      <img class="arrow" src="/images/right-arrow.png" alt="Arrow Icon" />
+                  </div>
+              </div>
+          `;
+          coursesContainer.insertAdjacentHTML('beforeend', courseHTML);
       });
-      currentCourses = [...coursesData];
-      displayedCourses = 6;
-      renderCourses();
-      updateResultsCount();
-  });
-
-  // Обробник для застосування фільтрів
-  document.querySelector('.filters-apply').addEventListener('click', filterCourses);
-
-  // Обробник для сортування
-  document.querySelector(".dropdown").addEventListener("change", function(e) {
-      const sortValue = e.target.value;
-      
-      switch(sortValue) {
-          case "option1": // Сортування за ціною
-              currentCourses.sort((a, b) => a.price - b.price);
-              break;
-          case "option2": // Сортування за популярністю
-              currentCourses.sort((a, b) => b.popularity - a.popularity);
-              break;
-          default:
-              // За замовчуванням не сортуємо
-              break;
+  
+      const loadMoreButton = document.querySelector(".more-btn");
+      if (loadMoreButton) {
+          loadMoreButton.style.display = currentCourses.length > displayedCourses ? "block" : "none";
       }
-      
-      renderCourses();
+    }
+  
+    function getTranslation(key) {
+        const translations = {
+            ua: {
+                results: "Результати ",
+            },
+            en: {
+                results: "Results "
+            },
+        };
+  
+        const language = localStorage.getItem('language'); 
+        return translations[language] && translations[language][key] ? translations[language][key] : 'Translation not found';
+    }
+  
+    function updateResultsCount() {
+        const resultsCount = document.querySelector(".Result");
+        if (resultsCount) {
+            const courseCount = currentCourses && Array.isArray(currentCourses) ? currentCourses.length : 0;
+            resultsCount.textContent = `${getTranslation('results')} (${courseCount})`;
+        }
+    }
+  
+    async function performSearch(query) {
+        try {
+            const searchButton = document.querySelector(".search-btnn");
+            searchButton.disabled = true;
+  
+            if (query.trim() === '') {
+                await loadInitialCourses();
+            } else {
+                const response = await fetch(`/api/search/search?query=${encodeURIComponent(query)}`);
+                if (!response.ok) throw new Error('Помилка пошуку');
+                currentCourses = await response.json();
+            }
+  
+            filterCourses();
+            searchButton.disabled = false;
+        } catch (error) {
+            console.error('Помилка пошуку:', error);
+            searchButton.disabled = false;
+        }
+    }
+  
+    const searchInput = document.querySelector(".Search");
+    const searchButton = document.querySelector(".search-btnn");
+  
+    searchButton.addEventListener('click', () => {
+        performSearch(searchInput.value);
+    });
+  
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            performSearch(searchInput.value);
+        }
+    });
+  
+    document.querySelector('.filters-clear').addEventListener('click', async function() {
+        document.querySelectorAll('.filters input[type="checkbox"]').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        await loadInitialCourses();
+    });
+  
+    document.querySelector('.filters-apply').addEventListener('click', filterCourses);
+  
+    document.querySelector(".dropdown").addEventListener("change", function(e) {
+        const sortValue = e.target.value;
+        
+        switch(sortValue) {
+            case "option1": 
+                currentCourses.sort((a, b) => a.price - b.price);
+                break;
+            case "option2": 
+                currentCourses.sort((a, b) => b.popularity - a.popularity);
+                break;
+            default:
+                break;
+        }
+        
+        renderCourses();
+    });
+  
+    document.querySelector(".more-btn").addEventListener("click", function() {
+        displayedCourses += 6;
+        renderCourses();
+    });
+  
+    await loadInitialCourses();
+    updateResultsCount();
   });
-
-  // Обробник для кнопки "Завантажити ще"
-  document.querySelector(".more-btn").addEventListener("click", function() {
-      displayedCourses += 6;
-      renderCourses();
-  });
-
-  // Початкова ініціалізація
-  renderCourses();
-  updateResultsCount();
-});

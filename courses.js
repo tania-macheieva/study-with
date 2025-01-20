@@ -585,4 +585,90 @@ router.post('/create', upload, async (req, res) => {
     }
 });
 
+////////
+router.get('/', async (req, res) => {
+  try {
+      const { 
+          search, 
+          themes, 
+          price_type,
+          level,
+          sort 
+      } = req.query;
+
+      let query = `
+          SELECT c.*, 
+                 u.name as author_name,
+                 cat.name as category_name,
+                 el.name as education_level,
+                 COALESCE(
+                     (SELECT COUNT(*) FROM saved_courses sc WHERE sc.course_id = c.id),
+                     0
+                 ) as popularity
+          FROM all_courses c
+          LEFT JOIN users u ON c.author_id = u.id
+          LEFT JOIN categories cat ON c.category_id = cat.id
+          LEFT JOIN education_levels el ON c.education_level_id = el.id
+          WHERE c.status = 'published'
+      `;
+
+      const queryParams = [];
+      let paramCount = 1;
+
+      if (search) {
+          queryParams.push(`%${search}%`);
+          query += ` AND (c.name ILIKE $${paramCount} OR c.description ILIKE $${paramCount})`;
+          paramCount++;
+      }
+
+      if (themes) {
+          const themesList = themes.split(',');
+          queryParams.push(themesList);
+          query += ` AND cat.name = ANY($${paramCount})`;
+          paramCount++;
+      }
+
+      if (price_type === 'free') {
+          query += ` AND c.price = 0`;
+      } else if (price_type === 'paid') {
+          query += ` AND c.price > 0`;
+      }
+
+      if (level) {
+          const levelMap = {
+              'level-basic': 'Basic level',
+              'level-intermediate': 'Intermediate level',
+              'level-advanced': 'Advanced level'
+          };
+          queryParams.push(levelMap[level]);
+          query += ` AND el.name = $${paramCount}`;
+          paramCount++;
+      }
+
+      if (sort === 'option1') { 
+          query += ` ORDER BY c.price ASC`;
+      } else if (sort === 'option2') { 
+          query += ` ORDER BY popularity DESC`;
+      }
+
+      const result = await pool.query(query, queryParams);
+      
+      const formattedCourses = result.rows.map(course => ({
+          name: course.name,
+          description: course.description,
+          price: parseFloat(course.price),
+          themes: [course.category_name],
+          level: course.education_level.toLowerCase().replace(' level', ''),
+          popularity: parseInt(course.popularity),
+          image_url: course.image_url,
+          author: course.author_name
+      }));
+
+      res.json(formattedCourses);
+  } catch (err) {
+      console.error('Error getting courses:', err);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 module.exports = router;
