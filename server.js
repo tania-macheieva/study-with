@@ -11,7 +11,7 @@ const passport = require('passport');
 const session = require('express-session');
 const stripeRoutes = require("./pay-page/stripe");
 const coursesRouter = require('./courses'); 
-const courseDraftRouter = require('./courses');
+const courseDraftRouter = require('./courses'); 
 
 app.use(cors());
 app.use(express.json());
@@ -35,7 +35,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use('/api/courses', coursesRouter);
-app.use('/api/save-draft', courseDraftRouter);
+app.use('/api/save-draft', courseDraftRouter); 
 
 app.use((req, res, next) => {
     if (req.url.endsWith('.js')) {

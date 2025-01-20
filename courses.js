@@ -20,7 +20,7 @@ const upload = multer({ storage }).fields([
       author_id,
       modules,
       tags,
-      course_id, // added for updating existing course
+      course_id, 
     } = req.body;
   
     let parsedCoursePrice = course_price ? parseFloat(course_price) : null;
@@ -46,10 +46,10 @@ const upload = multer({ storage }).fields([
     }
   
     try {
-      let courseId = course_id;  // Use provided course_id to either update or create course
+      let courseId = course_id;  
       let courseToUpdate;
   
-      // Check if course exists for the given author, title, or description
+      
       const courseCheckQuery = `
         SELECT id, name, description, price, category_id, image_url, education_level_id, status
         FROM all_courses
@@ -58,7 +58,7 @@ const upload = multer({ storage }).fields([
       const courseCheckResult = await pool.query(courseCheckQuery, [author_id, course_title, course_description]);
   
       if (courseCheckResult.rows.length > 0) {
-        // If course found, update it
+        
         courseToUpdate = courseCheckResult.rows[0];
   
         const updateQuery = `
@@ -113,30 +113,30 @@ const upload = multer({ storage }).fields([
           return res.status(400).json({ success: false, message: 'Invalid modules data!' });
         }
       
-        // Отримати всі модулі для курсу з бази
+        
         const existingModulesResult = await pool.query(
           `SELECT id FROM modules WHERE course_id = $1`,
           [courseId]
         );
         const existingModuleIds = existingModulesResult.rows.map(row => row.id);
       
-        // Отримати ID модулів із запиту користувача
+        
         const newModuleIds = modulesArray.map(module => module.id).filter(id => id !== undefined);
       
-        // Знайти ID модулів, яких немає в новому списку
+        
         const modulesToDelete = existingModuleIds.filter(id => !newModuleIds.includes(id));
       
         if (modulesToDelete.length > 0) {
-          // Видалити лекції, файли та відео, пов'язані з цими модулями
+          
           await pool.query(`DELETE FROM lecture_files WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
           await pool.query(`DELETE FROM videos WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
           await pool.query(`DELETE FROM lectures WHERE module_id = ANY($1::int[])`, [modulesToDelete]);
       
-          // Видалити самі модулі
+          
           await pool.query(`DELETE FROM modules WHERE id = ANY($1::int[])`, [modulesToDelete]);
         }
       
-        // Обробка нових або оновлених модулів
+        
         const modulePromises = modulesArray.map(async (module) => {
           const { id, title, order_num, lectures: moduleLectures } = module;
       
@@ -164,7 +164,7 @@ const upload = multer({ storage }).fields([
         }
         
       
-          // Обробка лекцій для модуля (додати чи оновити лекції)
+          
           if (moduleLectures && Array.isArray(moduleLectures)) {
             const lecturePromises = moduleLectures.map(async (lecture, index) => {
               const { id: lectureId, title, description } = lecture;
@@ -174,13 +174,13 @@ const upload = multer({ storage }).fields([
               }
       
               if (lectureId) {
-                // Оновити існуючу лекцію
+                
                 await pool.query(
                   `UPDATE lectures SET title = $1, description = $2 WHERE id = $3`,
                   [title, description, lectureId]
                 );
               } else {
-                // Додати нову лекцію
+                
                 const lectureResult = await pool.query(
                     `INSERT INTO lectures (module_id, title, description, order_num) VALUES ($1, $2, $3, $4) RETURNING id`,
                     [moduleId, title, description, index + 1]
@@ -189,15 +189,15 @@ const upload = multer({ storage }).fields([
                   
 
 
-                // Обробка файлів для лекції, обмежуємо до одного файлу на лекцію
-                const filesForThisLecture = req.files['lecture_files']?.slice(index, index + 1); // Вибираємо тільки один файл для кожної лекції
+                
+                const filesForThisLecture = req.files['lecture_files']?.slice(index, index + 1); 
 
                 if (filesForThisLecture && filesForThisLecture.length > 0) {
-                    // Очищаємо попередні файли для цієї лекції
+                    
                     await pool.query('DELETE FROM lecture_files WHERE lecture_id = $1', [lectureId]);
 
-                    // Вставляємо новий файл для цієї лекції
-                    const file = filesForThisLecture[0]; // Беремо перший файл
+                    
+                    const file = filesForThisLecture[0]; 
                     await pool.query(
                         `INSERT INTO lecture_files (lecture_id, file_name, file_url, file_type)
                          VALUES ($1, $2, $3, $4)`,
@@ -210,15 +210,15 @@ const upload = multer({ storage }).fields([
                     );
                 }
 
-                // Обробка відео для лекції
-                const videosForThisLecture = req.files['lecture_videos']?.slice(index, index + 1); // Вибираємо тільки одне відео для кожної лекції
+                
+                const videosForThisLecture = req.files['lecture_videos']?.slice(index, index + 1); 
 
                 if (videosForThisLecture && videosForThisLecture.length > 0) {
-                    // Очищаємо попередні відеофайли для цієї лекції
+                    
                     await pool.query('DELETE FROM videos WHERE lecture_id = $1', [lectureId]);
 
-                    // Вставляємо новий відеофайл для цієї лекції
-                    const video = videosForThisLecture[0]; // Беремо перший відеофайл
+                    
+                    const video = videosForThisLecture[0]; 
                     await pool.query(
                         `INSERT INTO videos (lecture_id, file_name, file_path, file_size)
                          VALUES ($1, $2, $3, $4)`,
@@ -242,16 +242,16 @@ const upload = multer({ storage }).fields([
       }
       
   
-    // Handle tags (delete old, add new)
+    
     if (parsedTags && Array.isArray(parsedTags)) {
-        // Remove previous tags associated with the course
+        
         const deleteTagsQuery = `
         DELETE FROM course_tags
         WHERE course_id = $1;
         `;
         await pool.query(deleteTagsQuery, [courseId]);
     
-        // Insert new tags into the tags table if they don't exist
+        
         const insertTagsQuery = `
         INSERT INTO tags (name)
         SELECT * FROM (VALUES ${parsedTags.map((_, i) => `($${i + 1})`).join(', ')}) AS t(name)
@@ -259,13 +259,13 @@ const upload = multer({ storage }).fields([
         `;
         await pool.query(insertTagsQuery, parsedTags);
     
-        // Get tag IDs for the newly added tags
+        
         const selectTagIdsQuery = `
         SELECT id FROM tags WHERE name = ANY($1);
         `;
         const tagIdsResult = await pool.query(selectTagIdsQuery, [parsedTags]);
     
-        // Insert new tags into course_tags table
+        
         const courseTagPromises = tagIdsResult.rows.map(tag => {
         return pool.query(
             `INSERT INTO course_tags (course_id, tag_id)
@@ -331,7 +331,7 @@ router.post('/create', upload, async (req, res) => {
             return res.status(400).json({ success: false, message: 'Education level does not exist!' });
         }
 
-        // Перевірка чи курс вже існує з статусом "draft" для цього автора
+        
         const existingCourseQuery = `
             SELECT id, status FROM all_courses WHERE author_id = $1 AND name = $2
         `;
@@ -340,7 +340,7 @@ router.post('/create', upload, async (req, res) => {
         let courseId;
 
         if (existingCourseResult.rows.length > 0) {
-            // Якщо курс існує в статусі "draft", просто оновлюємо його, змінюючи статус на "published"
+            
             const existingCourse = existingCourseResult.rows[0];
             courseId = existingCourse.id;
 
@@ -369,7 +369,7 @@ router.post('/create', upload, async (req, res) => {
 
             await pool.query(updateQuery, updateValues);
         } else {
-            // Якщо курс не знайдений, створюємо новий курс зі статусом "published"
+            
             const query = `
                 INSERT INTO all_courses (name, description, price, category_id, image_url, author_id, education_level_id, status)
                 VALUES ($1, $2, $3, $4, $5, $6, $7, 'published')
@@ -397,30 +397,30 @@ router.post('/create', upload, async (req, res) => {
               return res.status(400).json({ success: false, message: 'Invalid modules data!' });
             }
           
-            // Отримати всі модулі для курсу з бази
+            
             const existingModulesResult = await pool.query(
               `SELECT id FROM modules WHERE course_id = $1`,
               [courseId]
             );
             const existingModuleIds = existingModulesResult.rows.map(row => row.id);
           
-            // Отримати ID модулів із запиту користувача
+            
             const newModuleIds = modulesArray.map(module => module.id).filter(id => id !== undefined);
           
-            // Знайти ID модулів, яких немає в новому списку
+            
             const modulesToDelete = existingModuleIds.filter(id => !newModuleIds.includes(id));
           
             if (modulesToDelete.length > 0) {
-              // Видалити лекції, файли та відео, пов'язані з цими модулями
+              
               await pool.query(`DELETE FROM lecture_files WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
               await pool.query(`DELETE FROM videos WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
               await pool.query(`DELETE FROM lectures WHERE module_id = ANY($1::int[])`, [modulesToDelete]);
           
-              // Видалити самі модулі
+              
               await pool.query(`DELETE FROM modules WHERE id = ANY($1::int[])`, [modulesToDelete]);
             }
           
-            // Обробка нових або оновлених модулів
+            
             const modulePromises = modulesArray.map(async (module) => {
               const { id, title, order_num, lectures: moduleLectures } = module;
           
@@ -448,7 +448,7 @@ router.post('/create', upload, async (req, res) => {
             }
             
           
-              // Обробка лекцій для модуля (додати чи оновити лекції)
+              
               if (moduleLectures && Array.isArray(moduleLectures)) {
                 const lecturePromises = moduleLectures.map(async (lecture, index) => {
                   const { id: lectureId, title, description } = lecture;
@@ -458,13 +458,13 @@ router.post('/create', upload, async (req, res) => {
                   }
           
                   if (lectureId) {
-                    // Оновити існуючу лекцію
+                    
                     await pool.query(
                       `UPDATE lectures SET title = $1, description = $2 WHERE id = $3`,
                       [title, description, lectureId]
                     );
                   } else {
-                    // Додати нову лекцію
+                    
                     const lectureResult = await pool.query(
                         `INSERT INTO lectures (module_id, title, description, order_num) VALUES ($1, $2, $3, $4) RETURNING id`,
                         [moduleId, title, description, index + 1]
@@ -473,15 +473,15 @@ router.post('/create', upload, async (req, res) => {
                       
     
     
-                    // Обробка файлів для лекції, обмежуємо до одного файлу на лекцію
-                    const filesForThisLecture = req.files['lecture_files']?.slice(index, index + 1); // Вибираємо тільки один файл для кожної лекції
+                    
+                    const filesForThisLecture = req.files['lecture_files']?.slice(index, index + 1); 
     
                     if (filesForThisLecture && filesForThisLecture.length > 0) {
-                        // Очищаємо попередні файли для цієї лекції
+                        
                         await pool.query('DELETE FROM lecture_files WHERE lecture_id = $1', [lectureId]);
     
-                        // Вставляємо новий файл для цієї лекції
-                        const file = filesForThisLecture[0]; // Беремо перший файл
+                        
+                        const file = filesForThisLecture[0]; 
                         await pool.query(
                             `INSERT INTO lecture_files (lecture_id, file_name, file_url, file_type)
                              VALUES ($1, $2, $3, $4)`,
@@ -494,15 +494,15 @@ router.post('/create', upload, async (req, res) => {
                         );
                     }
     
-                    // Обробка відео для лекції
-                    const videosForThisLecture = req.files['lecture_videos']?.slice(index, index + 1); // Вибираємо тільки одне відео для кожної лекції
+                    
+                    const videosForThisLecture = req.files['lecture_videos']?.slice(index, index + 1); 
     
                     if (videosForThisLecture && videosForThisLecture.length > 0) {
-                        // Очищаємо попередні відеофайли для цієї лекції
+                        
                         await pool.query('DELETE FROM videos WHERE lecture_id = $1', [lectureId]);
     
-                        // Вставляємо новий відеофайл для цієї лекції
-                        const video = videosForThisLecture[0]; // Беремо перший відеофайл
+                        
+                        const video = videosForThisLecture[0]; 
                         await pool.query(
                             `INSERT INTO videos (lecture_id, file_name, file_path, file_size)
                              VALUES ($1, $2, $3, $4)`,
@@ -527,7 +527,7 @@ router.post('/create', upload, async (req, res) => {
           
 
           if (tags && Array.isArray(tags)) {
-            // Fetch existing tags for the course
+            
             const existingTagsQuery = `
                 SELECT t.name
                 FROM tags t
@@ -537,11 +537,11 @@ router.post('/create', upload, async (req, res) => {
             const existingTagsResult = await pool.query(existingTagsQuery, [courseId]);
             const existingTags = existingTagsResult.rows.map(row => row.name);
         
-            // Determine which tags have been removed or added
+            
             const tagsToRemove = existingTags.filter(tag => !tags.includes(tag));
             const tagsToAdd = tags.filter(tag => !existingTags.includes(tag));
         
-            // Delete tags that are no longer associated with the course
+            
             if (tagsToRemove.length > 0) {
                 const deleteTagsQuery = `
                     DELETE FROM course_tags
@@ -552,7 +552,7 @@ router.post('/create', upload, async (req, res) => {
                 await pool.query(deleteTagsQuery, [courseId, tagsToRemove]);
             }
         
-            // Insert new tags into the tags table if they don't exist
+            
             if (tagsToAdd.length > 0) {
                 const insertTagsQuery = `
                     INSERT INTO tags (name)
@@ -562,7 +562,7 @@ router.post('/create', upload, async (req, res) => {
                 `;
                 const tagIds = await pool.query(insertTagsQuery, tagsToAdd);
         
-                // Associate new tags with the course
+                
                 const courseTagPromises = tagIds.rows.map(tag => {
                     return pool.query(
                         `INSERT INTO course_tags (course_id, tag_id) VALUES ($1, $2)`,
