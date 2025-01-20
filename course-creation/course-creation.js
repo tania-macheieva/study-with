@@ -765,31 +765,6 @@ if (savedCourseData) {
 document.getElementById("save-draft-btn").addEventListener("click", function() { saveDraftAutomatically()});
 
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
   document.getElementById('create-course').addEventListener('submit', function(e) {
     e.preventDefault();
   

@@ -10,7 +10,7 @@ const upload = multer({ storage }).fields([
     { name: 'lecture_videos' },
   ]);
   
-  router.post('/save-draft', upload, async (req, res) => {
+  router.post('/save-draft', upload, async (req, res) => {  
     const {
       course_title = '',
       course_description = '',
