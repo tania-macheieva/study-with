@@ -45,11 +45,23 @@ if (teacherForm) {
         const name = formData.get("name").trim();
         const email = formData.get("email").trim();
         const password = formData.get("password").trim();
+        const forbiddenChars = /[^a-zA-Z0-9]/;
+        const minPasswordLength = 6;
 
         // Перевіряємо, чи всі поля заповнені
         if (!name || !email || !password) {
             alert("Please fill in all required fields.");
             return;
+        }
+
+        if (password.length < minPasswordLength) {
+         alert(`Password must be at least ${minPasswordLength} characters long`);
+        return;
+        }
+
+        if (forbiddenChars.test(password)) {
+         alert('Password can only contain letters and numbers');
+        return;
         }
 
         // Створюємо об'єкт для зберігання

@@ -11,7 +11,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/registration_pages/full_reg_teacher.css" />
-    <link rel="icon" href="../images/menu-logo.ico">
+    <link rel="icon" href="../images/menu-logo.ico" />
   </head>
 
   <body>
@@ -45,10 +45,11 @@
             <div class="form-group">
               <label for="dob" data-lang="dobLabel">Date of birth</label>
               <input
+                class="date-input"
+                placeholder="Date of your birth"
                 type="date"
                 id="dob"
                 name="dob"
-                placeholder="Date of your birth"
                 data-lang="dobPlaceholder"
                 required
               />
@@ -77,6 +78,7 @@
             <div class="form-group">
               <label for="country" data-lang="countryLabel">Country</label>
               <input
+                list="countries"
                 type="text"
                 id="country"
                 name="country"
@@ -84,6 +86,7 @@
                 data-lang="countryPlaceholder"
                 required
               />
+              <datalist id="countries"></datalist>
             </div>
             <!-- Права колонка -->
             <div class="form-group">
@@ -103,7 +106,7 @@
                 type="tel"
                 id="phone_number"
                 name="phone_number"
-                placeholder="Phone"
+                placeholder="+38 (0__) __-__-___"
                 data-lang="phonePlaceholder"
                 required
               />
@@ -169,7 +172,12 @@
               multiple
               hidden
             />
-            <button type="button" id="upload-btn" data-lang="chooseFileButton">
+            <button
+              type="button"
+              id="upload-btn"
+              data-lang="chooseFileButton"
+              class="buttons"
+            >
               Choose File
             </button>
             <span id="file-names" data-lang="noFileChosen">No file chosen</span>
@@ -205,7 +213,12 @@
             data-lang="aboutPlaceholder_1"
           ></textarea>
           <div class="button-group">
-            <button type="button" class="prev-btn" data-lang="prevButton">
+            <button
+              class="buttons"
+              type="button"
+              class="prev-btn"
+              data-lang="prevButton"
+            >
               Previous
             </button>
             <button type="button" class="next-btn-3" data-lang="nextButton">
@@ -247,10 +260,74 @@
         </div>
       </form>
     </div>
-
     <script src="full_reg_teacher.js"></script>
-    <script src="/footer/footer.js"></script>
-    <script src="../header/header-login.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const phoneInput = document.getElementById("phone_number");
+        const prefix = "+38 (0";
+        const maxLength = 7;
+
+        phoneInput.addEventListener("focus", () => {
+          if (!phoneInput.value.startsWith(prefix)) {
+            phoneInput.value = prefix;
+          }
+          setCursorPosition(phoneInput, phoneInput.value.length);
+        });
+
+        phoneInput.addEventListener("input", () => {
+          let value = phoneInput.value;
+
+          if (value === "") {
+            return;
+          }
+
+          if (!value.startsWith(prefix)) {
+            value = prefix + value.slice(prefix.length);
+          }
+
+          const withoutPrefix = value.slice(prefix.length);
+          const bracketIndex = withoutPrefix.indexOf(")");
+
+          if (
+            bracketIndex > 0 &&
+            withoutPrefix.length <= 2 &&
+            withoutPrefix[2] !== " "
+          ) {
+            value = value.replace(/\)\s?/, "");
+          } else if (bracketIndex === -1 && withoutPrefix.length >= 2) {
+            value = `${value.slice(
+              0,
+              prefix.length + 2
+            )}) ${withoutPrefix.slice(2)}`;
+          }
+
+          const maxTotalLength = prefix.length + 2 + maxLength + 2;
+          if (value.length > maxTotalLength) {
+            value = value.slice(0, maxTotalLength);
+          }
+
+          if (value === prefix) {
+            phoneInput.value = "";
+          } else {
+            phoneInput.value = value;
+          }
+
+          setCursorPosition(phoneInput, phoneInput.value.length);
+        });
+
+        phoneInput.addEventListener("blur", () => {
+          if (phoneInput.value === prefix) {
+            phoneInput.value = "";
+          }
+        });
+
+        function setCursorPosition(input, position) {
+          input.setSelectionRange(position, position);
+        }
+      });
+    </script>
+    <script src="/header/auth-header.js"></script>
     <script src="../registration_pages/full_reg_teacher_lang.js"></script>
+    <script src="/footer/footer.js"></script>
   </body>
 </html>

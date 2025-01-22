@@ -25,7 +25,7 @@ body {
 /* Форма */
 .form-container {
   max-width: 340px;
-  height: 500px;
+  height: 520px;
   width: 100%;
   text-align: center;
   background: #fff;
@@ -74,7 +74,7 @@ body {
   border-color: #283044;
 }
 
-.form-container form button {
+.submit {
   width: 100%; 
   padding: 10px;
   border: none;
@@ -156,4 +156,44 @@ body {
 
 .privacy-policy a:hover {
   text-decoration: none;
+}
+
+.button-view {
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 1em;
+  margin-left: 5px;
+  margin-bottom: 15px;
+}
+
+.button-view:hover {
+  background: none !important;
+  border: none !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+}
+
+.password-things {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-input {
+  padding: 10px;
+  font-size: 1em;
+  flex-grow: 1;
+  padding: 12px;
+
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  font-size: 16px;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+
+  color: #283044;
+  font-family: "Inter";
+
 }
