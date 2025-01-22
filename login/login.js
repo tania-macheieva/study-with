@@ -23,6 +23,18 @@ async function handleLogin() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const errorElement = document.getElementById('error-message');
+    const forbiddenChars = /[^a-zA-Z0-9]/;
+    const minPasswordLength = 6;
+
+    if (forbiddenChars.test(password)) {
+        errorElement.textContent = 'Password can only contain letters and numbers';
+        return;
+    }
+
+    if (password.length < minPasswordLength) {
+        errorElement.textContent = `Password must be at least ${minPasswordLength} characters long`;
+        return;
+    }
 
     // Базова валідація
     if (!email || !password) {
@@ -77,6 +89,19 @@ function handleGoogleAuthCallback() {
         window.location.href = '/';
     }
 }
+
+function togglePasswordVisibility() {
+        const passwordField = document.getElementById('password');
+        const passwordToggleButton = document.getElementById('toggle-password');
+
+        if (passwordField.type === 'password') {
+          passwordField.type = 'text';
+          passwordToggleButton.textContent = '🙈'; // Змінюємо іконку на "прикритий" символ
+        } else {
+          passwordField.type = 'password';
+          passwordToggleButton.textContent = '👁️'; // Змінюємо іконку на "видимий" символ
+        }
+      }
 
 // Перевіряємо наявність параметрів Google Auth при завантаженні сторінки
 document.addEventListener('DOMContentLoaded', () => {

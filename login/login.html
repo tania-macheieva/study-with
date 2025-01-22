@@ -10,7 +10,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="../login/login.css" />
-    <link rel="icon" href="../images/menu-logo.ico"> 
+    <link rel="icon" href="../images/menu-logo.ico" />
   </head>
   <body>
     <script src="../header/auth-header.js"></script>
@@ -25,24 +25,37 @@
 
         <div class="login-form">
           <input
+            class="email-input"
             type="email"
             id="email"
             placeholder="Email"
             required
             data-lang="emailPlaceholder"
           />
-          <input
-            type="password"
-            id="password"
-            placeholder="Password"
-            required
-            data-lang="passwordPlaceholder"
-          />
+          <div class="password-things">
+            <input
+              type="password"
+              id="password"
+              placeholder="Password"
+              required
+              data-lang="passwordPlaceholder"
+              class="password-input"
+            />
+            <button
+              type="button"
+              id="toggle-password"
+              class="button-view"
+              onclick="togglePasswordVisibility()"
+            >
+              👁️
+            </button>
+          </div>
           <div id="error-message" style="color: red; margin-bottom: 10px"></div>
           <button
             type="button"
             onclick="handleLogin()"
             data-lang="signInButton"
+            class="button-login"
           >
             Sign In
           </button>
