@@ -115,7 +115,7 @@ a.lang-btn {
     box-sizing: border-box; /* Увімкнення врахування padding */
     border-radius: 10px;
     width: 15vw;
-    
+    color: #000000;
 }
 
 /* Іконка пошуку */
