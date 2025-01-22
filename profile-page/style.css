@@ -78,6 +78,7 @@ body {
     cursor: pointer; 
     color: #4caf50;  
     font-size: 14px;
+    
 }
 
 .action-buttons button#remove-image {
@@ -142,6 +143,7 @@ body {
     background-color: transparent; 
     transition: background-color 0.3s ease, color 0.3s ease;
     border-bottom: 4px solid #283044;
+    margin-top: 18px;
 }
 
 
@@ -223,6 +225,7 @@ button {
     cursor: pointer;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Легка тінь */
     transition: all 0.3s ease;
+    
 }
 
 button:hover {
