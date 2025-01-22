@@ -54,6 +54,7 @@ body {
     border: 2px solid #ddd;
     border-radius: 12px; /* Збільшуємо округлення */
     transition: border-color 0.3s ease;
+    text-transform: uppercase;
   }
   
   /*.code-inputs input {

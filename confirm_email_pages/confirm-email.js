@@ -22,6 +22,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    inputs.forEach((input) => {
+    input.addEventListener('input', () => {
+        // Завжди переміщуємо курсор у кінець
+        const length = input.value.length;
+        input.setSelectionRange(length, length);
+    });
+
+    input.addEventListener('focus', () => {
+        // Коли фокусуємо поле, курсор також стає в кінець
+        const length = input.value.length;
+        input.setSelectionRange(length, length);
+    });
+});
+І
+
     // Таймер для повторної відправки
     let timeLeft = 60;
     const timer = setInterval(() => {
