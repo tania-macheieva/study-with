@@ -11,7 +11,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
       rel="stylesheet"
     />
-    <link rel="icon" href="../images/menu-logo.ico">
+    <link rel="icon" href="../images/menu-logo.ico" />
     <link rel="stylesheet" href="/registration_pages/reg_teacher.css" />
   </head>
   <body>
@@ -38,14 +38,41 @@
       <div class="form-container">
         <h1 data-lang="formTitle">Create an account <br />as a teacher</h1>
         <form id="teacher-register-form">
-          <input type="text" name="name" placeholder="Name" required />
-          <input type="email" name="email" placeholder="Email" required />
           <input
-            type="password"
-            name="password"
-            placeholder="Password"
+            type="text"
+            name="name"
+            placeholder="Name"
+            data-lang="namePlaceholder"
+            required
+            oninput="this.value = this.value.replace(/[^a-zA-Zа-яА-ЯїЇєЄіІґҐ' ]/g, '')"
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            data-lang="emailPlaceholder"
             required
           />
+          <div class="password-things">
+            <input
+              type="password"
+              name="password"
+              id="password"
+              placeholder="Password"
+              data-lang="passwordPlaceholder"
+              required
+              class="password-input"
+              oninput="this.value = this.value.replace(/[^a-zA-Zа-яА-ЯїЇєЄіІґҐ0-9]/g, '')"
+            />
+            <button
+              class="button-view"
+              type="button"
+              id="toggle-password"
+              onclick="togglePasswordVisibility()"
+            >
+              👁️
+            </button>
+          </div>
           <div class="privacy-policy">
             <label>
               <input type="checkbox" name="privacy-policy" required />
@@ -54,7 +81,9 @@
             </label>
           </div>
           <input type="hidden" name="role" value="teacher" />
-          <button type="submit" data-lang="signUpButton">Sign Up</button>
+          <button type="submit" data-lang="signUpButton" class="submit">
+            Sign Up
+          </button>
           <h3 data-lang="orText">or</h3>
           <div class="google-auth">
             <a
@@ -69,6 +98,20 @@
         </form>
       </div>
     </div>
+    <script>
+      function togglePasswordVisibility() {
+        const passwordField = document.getElementById("password");
+        const passwordToggleButton = document.getElementById("toggle-password");
+
+        if (passwordField.type === "password") {
+          passwordField.type = "text";
+          passwordToggleButton.textContent = "🙈"; // Змінюємо іконку на "прикритий" символ
+        } else {
+          passwordField.type = "password";
+          passwordToggleButton.textContent = "👁️"; // Змінюємо іконку на "видимий" символ
+        }
+      }
+    </script>
     <script src="../registration_pages/register.js"></script>
     <script src="../footer/footer.js"></script>
     <script src="../header/auth-header.js"></script>
