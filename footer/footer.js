@@ -39,7 +39,7 @@ const translateFooter = (lang) => {
 // Дані перекладу для футера
 const footerTranslations = {
   en: {
-    footerReserved: "© 2024 All Rights Reserved StudyWith",
+    footerReserved: "© 2025 All Rights Reserved StudyWith",
     footerAbout: "About",
     footerContact: "Contact",
     footerFAQ: "FAQ",
@@ -49,7 +49,7 @@ const footerTranslations = {
 
   },
   ua: {
-    footerReserved: "© 2024 Всі права захищені StudyWith",
+    footerReserved: "© 2025 Всі права захищені StudyWith",
     footerAbout: "Про нас",
     footerContact: "Контакти",
     footerFAQ: "Поширені питання",
