@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Contact - StudyWith</title>
+    <title data-lang="Title"></title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -11,7 +11,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="../inform_pages/contact.css" />
-    <link rel="icon" href="../images/menu-logo.ico">
+    <link rel="icon" href="../images/menu-logo.ico" />
   </head>
   <body>
     <main class="main">
@@ -50,7 +50,7 @@
                   <input
                     type="tel"
                     class="phone-input"
-                    placeholder="+38(0__) ___-___-____"
+                    placeholder="+38 (0__) __-__-___"
                     id="phone"
                     required
                   />
@@ -118,6 +118,71 @@
             alert("There was a network error. Please try again.");
           }
         });
+      });
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const phoneInput = document.getElementById("phone");
+        const prefix = "+38 (0";
+        const maxLength = 7;
+
+        phoneInput.addEventListener("focus", () => {
+          if (!phoneInput.value.startsWith(prefix)) {
+            phoneInput.value = prefix;
+          }
+          setCursorPosition(phoneInput, phoneInput.value.length);
+        });
+
+        phoneInput.addEventListener("input", () => {
+          let value = phoneInput.value;
+
+          if (value === "") {
+            return;
+          }
+
+          if (!value.startsWith(prefix)) {
+            value = prefix + value.slice(prefix.length);
+          }
+
+          const withoutPrefix = value.slice(prefix.length);
+          const bracketIndex = withoutPrefix.indexOf(")");
+
+          if (
+            bracketIndex > 0 &&
+            withoutPrefix.length <= 2 &&
+            withoutPrefix[2] !== " "
+          ) {
+            value = value.replace(/\)\s?/, "");
+          } else if (bracketIndex === -1 && withoutPrefix.length >= 2) {
+            value = `${value.slice(
+              0,
+              prefix.length + 2
+            )}) ${withoutPrefix.slice(2)}`;
+          }
+
+          const maxTotalLength = prefix.length + 2 + maxLength + 2;
+          if (value.length > maxTotalLength) {
+            value = value.slice(0, maxTotalLength);
+          }
+
+          if (value === prefix) {
+            phoneInput.value = "";
+          } else {
+            phoneInput.value = value;
+          }
+
+          setCursorPosition(phoneInput, phoneInput.value.length);
+        });
+
+        phoneInput.addEventListener("blur", () => {
+          if (phoneInput.value === prefix) {
+            phoneInput.value = "";
+          }
+        });
+
+        function setCursorPosition(input, position) {
+          input.setSelectionRange(position, position);
+        }
       });
     </script>
     <script src="../footer/footer.js"></script>

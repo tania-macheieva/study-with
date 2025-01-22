@@ -1,8 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
-    let currentLang = localStorage.getItem('language') || 'ua';
+    let currentLang = localStorage.getItem('language');
 
     const translations = {
       en: {
+        Title: "StudyWith | Contact",
         title: 'Contact',
         description: 'Do you have any questions? We would be glad to receive your message.',
         email: 'studywith.connect@gmail.com',
@@ -10,7 +11,8 @@ document.addEventListener("DOMContentLoaded", () => {
         meetInPerson: 'Meet in person',
       },
       ua: {
-        title: 'Контакти',
+        Title: "StudyWith | Зв'язок",
+        title: "Зв'язок",
         description: 'У вас є питання? Ми будемо раді отримати ваше повідомлення.',
         email: 'studywith.connect@gmail.com',
         callBack: 'Ми передзвонимо вам',
@@ -18,7 +20,8 @@ document.addEventListener("DOMContentLoaded", () => {
       },
     };
 
-    const updateTextForLanguage = (lang) => {
+  const updateTextForLanguage = (lang) => {
+      document.querySelector('title').textContent = translations[lang].Title;
       document.querySelector('h1').textContent = translations[lang].title;
       document.querySelector('.email-box p').textContent = translations[lang].description;
       document.querySelector('.email-button').textContent = translations[lang].email;
