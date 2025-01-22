@@ -23,13 +23,7 @@ async function handleLogin() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const errorElement = document.getElementById('error-message');
-    const forbiddenChars = /[^a-zA-Z0-9]/;
     const minPasswordLength = 6;
-
-    if (forbiddenChars.test(password)) {
-        errorElement.textContent = 'Password can only contain letters and numbers';
-        return;
-    }
 
     if (password.length < minPasswordLength) {
         errorElement.textContent = `Password must be at least ${minPasswordLength} characters long`;
