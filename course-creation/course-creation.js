@@ -762,10 +762,14 @@ if (savedCourseData) {
   console.log("Чернетки не знайдено в localStorage");
 }
 });
-document.getElementById("save-draft-btn").addEventListener("click", function() { saveDraftAutomatically()});
+
+document.getElementById("save-draft-btn").addEventListener("click", function() {   
+  saveDraftAutomatically();
+  window.location.href = '/profile-teacher';
+});
 
 
-  document.getElementById('create-course').addEventListener('submit', function(e) {
+document.getElementById('create-course').addEventListener('submit', function(e) {
     e.preventDefault();
   
     const courseTitle = document.getElementById('course-title').value;
@@ -895,8 +899,8 @@ document.getElementById("save-draft-btn").addEventListener("click", function() {
     })
       .then(response => response.json())
       .then(data => {
-        if (data.success) {
-          alert('Course created successfully!');
+        if (data.success) { 
+          window.location.href = '/profile-teacher';
         } else {
           alert('Failed to create the course: ' + (data.error || 'Unknown error'));
         }
