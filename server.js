@@ -117,6 +117,7 @@ app.get('/course-preview', (req, res) => {
 
 
 
+
 app.use("/pay-page", stripeRoutes);
 app.get('/get-stripe-key', (req, res) => {
     res.json({ publicKey: process.env.STRIPE_PUBLIC_KEY });

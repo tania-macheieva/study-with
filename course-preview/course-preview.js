@@ -8,20 +8,36 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     try {
-        const response = await fetch(`/api/courses/${courseId}`);
+        const response = await fetch(`/api/courses/${courseId}/full`);
         if (!response.ok) throw new Error('Помилка завантаження курсу');
         const course = await response.json();
         
+        // Оновлюємо елементи сторінки даними з API
         document.querySelector('.course-name').textContent = course.name;
         document.querySelector('.course-description').textContent = course.description;
         document.querySelector('.detail-category .detail-value').textContent = course.category;
         
         const detailsMainValues = document.querySelectorAll('.details-main .detail-value');
         detailsMainValues[0].textContent = course.level;
-        detailsMainValues[1].textContent = course.duration;
+        detailsMainValues[1].textContent = '6 weeks'; // Можна додати в API
         detailsMainValues[2].textContent = course.price === 0 ? 'Безкоштовно' : `$${course.price}`;
+
+        // Оновлюємо модулі курсу
+        const modulesContainer = document.querySelector('.white-card');
+        if (course.modules && course.modules.length > 0) {
+            modulesContainer.innerHTML = course.modules.map(module => `
+                <div class="module">
+                    <h3>${module.title}</h3>
+                    ${module.lectures.map(lecture => `
+                        <div class="topic">${lecture.title}</div>
+                    `).join('')}
+                </div>
+            `).join('');
+        }
+
     } catch (error) {
         console.error('Помилка:', error);
+        document.querySelector('.course-name').textContent = 'Помилка завантаження курсу';
     }
 
 

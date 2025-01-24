@@ -706,4 +706,69 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+router.get('/:id/full', async (req, res) => {
+  try {
+      const { id } = req.params;
+      
+      const query = `
+          SELECT 
+              c.*,
+              cat.name as category_name,
+              el.name as education_level,
+              (
+                  SELECT json_agg(
+                      json_build_object(
+                          'id', m.id,
+                          'title', m.title,
+                          'order_num', m.order_num,
+                          'lectures', (
+                              SELECT json_agg(
+                                  json_build_object(
+                                      'id', l.id,
+                                      'title', l.title,
+                                      'description', l.description,
+                                      'order_num', l.order_num
+                                  )
+                                  ORDER BY l.order_num
+                              )
+                              FROM lectures l
+                              WHERE l.module_id = m.id
+                          )
+                      )
+                      ORDER BY m.order_num
+                  )
+                  FROM modules m
+                  WHERE m.course_id = c.id
+              ) as modules
+          FROM all_courses c
+          LEFT JOIN categories cat ON c.category_id = cat.id
+          LEFT JOIN education_levels el ON c.education_level_id = el.id
+          WHERE c.id = $1 AND c.status = 'published';
+      `;
+
+      const result = await pool.query(query, [id]);
+      
+      if (result.rows.length === 0) {
+          return res.status(404).json({ error: 'Курс не знайдено' });
+      }
+
+      const course = result.rows[0];
+      
+      res.json({
+          id: course.id,
+          name: course.name,
+          description: course.description,
+          price: parseFloat(course.price),
+          category: course.category_name,
+          level: course.education_level,
+          image_url: course.image_url,
+          modules: course.modules || []
+      });
+
+  } catch (err) {
+      console.error('Помилка отримання курсу:', err);
+      res.status(500).json({ error: 'Внутрішня помилка сервера' });
+  }
+});
+
 module.exports = router;
