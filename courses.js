@@ -654,6 +654,7 @@ router.get('/', async (req, res) => {
       const result = await pool.query(query, queryParams);
       
       const formattedCourses = result.rows.map(course => ({
+          id: course.id,  
           name: course.name,
           description: course.description,
           price: parseFloat(course.price),
@@ -667,6 +668,40 @@ router.get('/', async (req, res) => {
       res.json(formattedCourses);
   } catch (err) {
       console.error('Error getting courses:', err);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.get('/:id', async (req, res) => {
+  try {
+      const { id } = req.params;
+      const query = `
+          SELECT c.*, 
+                 cat.name as category_name,
+                 el.name as education_level
+          FROM all_courses c
+          LEFT JOIN categories cat ON c.category_id = cat.id
+          LEFT JOIN education_levels el ON c.education_level_id = el.id
+          WHERE c.id = $1 AND c.status = 'published'
+      `;
+      const result = await pool.query(query, [id]);
+      
+      if (result.rows.length === 0) {
+          return res.status(404).json({ error: 'Course not found' });
+      }
+
+      const course = result.rows[0];
+      res.json({
+          id: course.id,
+          name: course.name,
+          description: course.description,
+          price: parseFloat(course.price),
+          category: course.category_name,
+          level: course.education_level,
+          duration: '6 weeks'
+      });
+  } catch (err) {
+      console.error('Error getting course:', err);
       res.status(500).json({ error: 'Internal server error' });
   }
 });

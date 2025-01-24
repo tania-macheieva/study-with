@@ -1,4 +1,31 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const courseId = urlParams.get('id');
+
+    if (!courseId) {
+        console.error('ID курсу не вказано');
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/courses/${courseId}`);
+        if (!response.ok) throw new Error('Помилка завантаження курсу');
+        const course = await response.json();
+        
+        document.querySelector('.course-name').textContent = course.name;
+        document.querySelector('.course-description').textContent = course.description;
+        document.querySelector('.detail-category .detail-value').textContent = course.category;
+        
+        const detailsMainValues = document.querySelectorAll('.details-main .detail-value');
+        detailsMainValues[0].textContent = course.level;
+        detailsMainValues[1].textContent = course.duration;
+        detailsMainValues[2].textContent = course.price === 0 ? 'Безкоштовно' : `$${course.price}`;
+    } catch (error) {
+        console.error('Помилка:', error);
+    }
+
+
+
     // Функціонал для кнопки збереження
     const saveBtn = document.querySelector('.save-btn');
     if (saveBtn) {
