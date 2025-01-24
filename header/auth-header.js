@@ -118,49 +118,39 @@ function clearAuthData() {
     localStorage.removeItem('name');
 }
 
-// Initialize header based on auth state
 async function initializeHeader() {
-    let authData = getAuthDataFromURL();
+    let authData = getAuthDataFromURL() || getAuthDataFromStorage();
+    const isCourseView = window.location.pathname.includes('course-view');
     
+    let headerPath;
     if (!authData) {
-        authData = getAuthDataFromStorage();
+        headerPath = '/header/header-noauth.html';
+    } else if (isCourseView) {
+        headerPath = '/header/course-header.html';
     } else {
-        saveAuthData(authData);
-        window.history.replaceState({}, document.title, window.location.pathname);
-    }
-
-    let headerPath = '/header/header-noauth.html';
-    
-    if (authData) {
-        switch (authData.role) {
-            case 'teacher':
-                headerPath = '/header/header-teacher.html';
-                break;
-            case 'student':
-                headerPath = '/header/header-student.html';
-                break;
-            default:
-                headerPath = '/header/header-noauth.html';
-        }
+        headerPath = authData.role === 'teacher' 
+            ? '/header/header-teacher.html' 
+            : '/header/header-student.html';
     }
 
     try {
         const response = await fetch(headerPath);
         const headerHtml = await response.text();
         document.body.insertAdjacentHTML('afterbegin', headerHtml);
-
+        
         initializeLanguage();
-
-        if (authData && authData.name) {
-            const usernameElement = document.querySelector('#user span');
-            if (usernameElement) {
-                usernameElement.textContent = authData.name;
+        
+        if (authData) {
+            if (authData.name) {
+                const usernameElement = document.querySelector('#user span');
+                if (usernameElement) {
+                    usernameElement.textContent = authData.name;
+                }
+            }
+            if (!isCourseView) {
+                initializeUserDropdown(authData);
             }
         }
-
-        // Initialize user dropdown for authenticated users
-        initializeUserDropdown(authData);
-
     } catch (error) {
         console.error('Error loading header:', error);
     }

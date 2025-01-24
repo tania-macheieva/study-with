@@ -112,6 +112,9 @@ app.get('/donate', (req, res) => {
 app.get('/course-preview', (req, res) => {
     res.sendFile(path.join(__dirname, 'course-preview/course-preview.html')); 
 });
+app.get('/course-view', (req, res) => {
+    res.sendFile(path.join(__dirname, 'course-view/course-view.html')); 
+});
 
 
 
