@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Page</title>
+    <link rel="icon" href="../images/menu-logo.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Jost:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="course-view.css">
+</head>
+<body>
+    <main class="course-view">
+        <div class="main-content">
+            <section class="video-container">
+                <div class="video-player"></div>
+            </section>
+
+            <nav class="tabs">
+                <button class="tab active">Discussion</button>
+                <button class="tab">Search by keyword</button>
+                <button class="tab">My curriculum</button>
+                <button class="tab">My notes & marks</button>
+            </nav>
+
+            <section class="discussion-section">
+                <div class="search-bar">
+                    <input type="text" placeholder="ask or search a question">
+                    <button class="icon-button send"></button>
+                    <button class="icon-button search"></button>
+                </div>
+
+                <div class="filters">
+                    <div class="filter-group">
+                        <button class="filter-btn">Questions I asked</button>
+                        <button class="filter-btn">Questions I'm following</button>
+                        <button class="filter-btn">Questions with responses</button>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <button class="filter-btn active">Whole course</button>
+                        <button class="filter-btn">Current topic</button>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <button class="filter-btn active">Recent</button>
+                        <button class="filter-btn">Oldest</button>
+                    </div>
+                </div>
+
+                <section class="discussion-thread">
+                    <!-- Messages will be dynamically inserted here -->
+                </section>
+            </section>
+        </div>
+
+        <aside class="course-content">
+            <h1>Course content</h1>
+            
+            <section class="module">
+                <h2>Module 1</h2>
+                <div class="module-progress">
+                    <span>3/3 complete</span>
+                    <span class="separator">|</span>
+                    <span>0 hour left out of 16</span>
+                </div>
+                <ul class="topics">
+                    <li class="completed">topic 1 name</li>
+                    <li class="completed">topic 2 name</li>
+                    <li class="completed">topic 3 name</li>
+                </ul>
+            </section>
+
+            <section class="module">
+                <h2>Module 2</h2>
+                <div class="module-progress">
+                    <span>0/3 complete</span>
+                    <span class="separator">|</span>
+                    <span>1 hour left out of 11</span>
+                </div>
+                <ul class="topics">
+                    <li>topic 1 name</li>
+                    <li>topic 2 name</li>
+                    <li>topic 3 name</li>
+                </ul>
+            </section>
+
+            <section class="module">
+                <h2>Module 3</h2>
+            </section>
+        </aside>
+    </main>
+    <script src="course-header.js"></script>
+    <script src="study-with/footer/footer.js"></script>
+    <script src="course-view.js"></script>
+</body>
+</html>
