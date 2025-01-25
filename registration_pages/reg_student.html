@@ -107,9 +107,14 @@
         const minPasswordLength = 6;
 
         errorElement.textContent = "";
+        const shortpass = {
+          en: `Password must be at least ${minPasswordLength} characters long`,
+          ua: `Пароль має бути щонайменше ${minPasswordLength} символів завдовжки`,
+        };
 
+        const currentLang = localStorage.getItem("language");
         if (password.length < minPasswordLength) {
-          errorElement.textContent = `Password must be at least ${minPasswordLength} characters long`;
+          errorElement.textContent = shortpass[currentLang];
           return;
         }
 

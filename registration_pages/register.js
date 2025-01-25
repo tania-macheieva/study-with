@@ -47,21 +47,27 @@ if (teacherForm) {
         const password = formData.get("password").trim();
         const forbiddenChars = /[^a-zA-Z0-9]/;
         const minPasswordLength = 6;
-
+        const currentLang = localStorage.getItem('language');
+        const errorElement = document.getElementById('error-message');
+        const fillfields = {
+            en: `Please fill in all fields`,
+            ua: `Будь ласка, заповніть всі поля`
+        };
         // Перевіряємо, чи всі поля заповнені
         if (!name || !email || !password) {
-            alert("Please fill in all required fields.");
+            errorElement.textContent = fillfields[currentLang];
             return;
         }
 
-        if (password.length < minPasswordLength) {
-         alert(`Password must be at least ${minPasswordLength} characters long`);
-        return;
-        }
 
-        if (forbiddenChars.test(password)) {
-         alert('Password can only contain letters and numbers');
-        return;
+        const shortpass = {
+            en: `Password must be at least ${minPasswordLength} characters long`,
+            ua: `Пароль має бути щонайменше ${minPasswordLength} символів завдовжки`
+        };
+        
+        if (password.length < minPasswordLength) {
+            errorElement.textContent = shortpass[currentLang];
+            return;
         }
 
         // Створюємо об'єкт для зберігання
