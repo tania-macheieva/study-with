@@ -18,6 +18,10 @@ function getAuthData() {
     };
 }
 
+
+
+
+
 // Основна функція для обробки логіну
 async function handleLogin() {
     const email = document.getElementById('email').value;
@@ -25,14 +29,26 @@ async function handleLogin() {
     const errorElement = document.getElementById('error-message');
     const minPasswordLength = 6;
 
-    if (password.length < minPasswordLength) {
-        errorElement.textContent = `Password must be at least ${minPasswordLength} characters long`;
+    const shortpass = {
+    en: `Password must be at least ${minPasswordLength} characters long`,
+    ua: `Пароль має бути щонайменше ${minPasswordLength} символів завдовжки`
+    };
+
+    const currentLang = localStorage.getItem('language');
+
+    if (password.length > 1 & password.length < minPasswordLength) {
+        errorElement.textContent = shortpass[currentLang];
         return;
     }
 
+    const fillfields = {
+    en: `Please fill in all fields`,
+    ua: `Будь ласка, заповніть всі поля`
+    };
+    
     // Базова валідація
     if (!email || !password) {
-        errorElement.textContent = 'Please fill in all fields';
+        errorElement.textContent = fillfields[currentLang];
         return;
     }
 
