@@ -8,7 +8,7 @@ body {
     display: flex;
     align-items: center;    
     gap: 10px;
-    font-family: "Jost", sans-serif;
+    font-family: "Inter";
     font-weight: bold;
     font-size: 20px;
     margin-right: 40px; 
@@ -24,7 +24,7 @@ body {
     background-color: #283044;
     color: #fff;
     padding: 50px 0;
-    font-family: "Jost", sans-serif;; 
+    font-family: "Inter"; 
     bottom: 0;
     left: 0;
     width: 100%;
@@ -48,7 +48,7 @@ footer .logo {
 }
 
 footer .logo span {
-    font-family: "Jost", sans-serif;
+    font-family: "Inter";
     font-size: 26px;
     font-weight: 600;
     color: #ffffff;
