@@ -11,7 +11,8 @@ const passport = require('passport');
 const session = require('express-session');
 const stripeRoutes = require("./pay-page/stripe");
 const coursesRouter = require('./courses'); 
-const courseDraftRouter = require('./courses'); 
+const courseDraftRouter = require('./courses');
+const testRouter = require('./test') 
 
 app.use(cors());
 app.use(express.json());
@@ -43,6 +44,8 @@ app.use((req, res, next) => {
     }
     next();
 });
+
+app.use('/tests', testRouter);
 
 app.use(express.static(path.join(__dirname)));
 
@@ -116,6 +119,10 @@ app.get('/course-view', (req, res) => {
     res.sendFile(path.join(__dirname, 'course-view/course-view.html')); 
 });
 
+
+app.get('/test-creation', (req, res) => {
+    res.sendFile(path.join(__dirname, './tests/test-creation.html')); 
+});
 
 
 

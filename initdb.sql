@@ -167,3 +167,32 @@ CREATE TABLE videos (
     language_code VARCHAR(10) DEFAULT 'en',
     FOREIGN KEY (lecture_id) REFERENCES lectures(id) ON DELETE CASCADE
 );
+
+CREATE TABLE tests (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE questions (
+  id SERIAL PRIMARY KEY,
+  test_id INTEGER REFERENCES tests(id) ON DELETE CASCADE,
+  type VARCHAR(50) NOT NULL,
+  question_text TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE subquestions (
+  id SERIAL PRIMARY KEY,
+  question_id INTEGER REFERENCES questions(id) ON DELETE CASCADE,
+  subquestion_text TEXT NOT NULL
+);
+
+CREATE TABLE answers (
+  id SERIAL PRIMARY KEY,
+  question_id INTEGER REFERENCES questions(id) ON DELETE CASCADE,
+  subquestion_id INTEGER REFERENCES subquestions(id) ON DELETE CASCADE,
+  answer_text TEXT NOT NULL,
+  is_correct BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
