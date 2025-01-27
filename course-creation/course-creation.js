@@ -729,7 +729,7 @@ lectureVideos.forEach(input => {
     });
   }
 
-setInterval(saveDraftAutomatically, 20000);  
+setInterval(saveDraftAutomatically, 10000);  
 
 window.addEventListener('load', function () {
 const savedCourseData = localStorage.getItem('courseDraft');
@@ -765,7 +765,7 @@ if (savedCourseData) {
 
 document.getElementById("save-draft-btn").addEventListener("click", function() {   
   saveDraftAutomatically();
-  window.location.href = '/profile-teacher';
+  // window.location.href = '/profile-teacher';
 });
 
 
@@ -900,7 +900,7 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
       .then(response => response.json())
       .then(data => {
         if (data.success) { 
-          window.location.href = '/profile-teacher';
+          // window.location.href = '/profile-teacher';
         } else {
           alert('Failed to create the course: ' + (data.error || 'Unknown error'));
         }
