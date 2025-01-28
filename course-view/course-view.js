@@ -1,9 +1,53 @@
+const COURSE_MODULES = [
+    {
+        id: 1,
+        title: "Module 1",
+        progress: {
+            completed: 3,
+            total: 3,
+            timeLeft: 0,
+            totalTime: 16
+        },
+        topics: [
+            { id: 1, title: "topic 1 name", completed: true },
+            { id: 2, title: "topic 2 name", completed: true },
+            { id: 3, title: "topic 3 name", completed: true }
+        ]
+    },
+    {
+        id: 2,
+        title: "Module 2",
+        progress: {
+            completed: 0,
+            total: 3,
+            timeLeft: 1,
+            totalTime: 11
+        },
+        topics: [
+            { id: 4, title: "topic 1 name", completed: false },
+            { id: 5, title: "topic 2 name", completed: false },
+            { id: 6, title: "topic 3 name", completed: false }
+        ]
+    },
+    {
+        id: 3,
+        title: "Module 3",
+        progress: {
+            completed: 0,
+            total: 0,
+            timeLeft: 0,
+            totalTime: 0
+        },
+        topics: []
+    }
+];
+
 const DISCUSSION_MESSAGES = [
     {
         id: "1",
         user: {
             name: "question user 1",
-            avatar: "user-avatar.png"
+            avatar: "/images/user-avatar.png"
         },
         date: "29.01.2024",
         text: "question question question question question 1",
@@ -12,7 +56,7 @@ const DISCUSSION_MESSAGES = [
                 id: "1.1",
                 user: {
                     name: "Answer user 2",
-                    avatar: "user-avatar.png"
+                    avatar: "/images/user-avatar.png"
                 },
                 date: "28.01.2024",
                 text: "Answer Answer Answer 2",
@@ -22,7 +66,7 @@ const DISCUSSION_MESSAGES = [
                 id: "1.2",
                 user: {
                     name: "Answer user 2",
-                    avatar: "user-avatar.png"
+                    avatar: "/images/user-avatar.png"
                 },
                 date: "28.01.2024",
                 text: "Answer Answer Answer 2",
@@ -32,7 +76,7 @@ const DISCUSSION_MESSAGES = [
                 id: "1.3",
                 user: {
                     name: "Answer user 2",
-                    avatar: "user-avatar.png"
+                    avatar: "/images/user-avatar.png"
                 },
                 date: "28.01.2024",
                 text: "Answer Answer Answer 2",
@@ -42,7 +86,7 @@ const DISCUSSION_MESSAGES = [
                 id: "1.4",
                 user: {
                     name: "Answer user 2",
-                    avatar: "user-avatar.png"
+                    avatar: "/images/user-avatar.png"
                 },
                 date: "28.01.2024",
                 text: "Answer Answer Answer 2",
@@ -52,7 +96,7 @@ const DISCUSSION_MESSAGES = [
                 id: "1.5",
                 user: {
                     name: "Answer user 2",
-                    avatar: "user-avatar.png"
+                    avatar: "/images/user-avatar.png"
                 },
                 date: "28.01.2024",
                 text: "Answer Answer Answer 2",
@@ -64,7 +108,7 @@ const DISCUSSION_MESSAGES = [
         id: "2",
         user: {
             name: "question user 2",
-            avatar: "user-avatar.png"
+            avatar: "/images/user-avatar.png"
         },
         date: "28.01.2024",
         text: "question question question question 2",
@@ -74,7 +118,7 @@ const DISCUSSION_MESSAGES = [
         id: "3",
         user: {
             name: "question user 3",
-            avatar: "user-avatar.png"
+            avatar: "/images/user-avatar.png"
         },
         date: "28.01.2024",
         text: "question question question question 3",
@@ -83,7 +127,7 @@ const DISCUSSION_MESSAGES = [
                 id: "3.1",
                 user: {
                     name: "Answer user 2",
-                    avatar: "user-avatar.png"
+                    avatar: "/images/user-avatar.png"
                 },
                 date: "28.01.2024",
                 text: "Answer Answer Answer 2",
@@ -92,6 +136,124 @@ const DISCUSSION_MESSAGES = [
         ]
     }
 ];
+
+const createModuleHTML = (module) => {
+    const hasContent = module.topics && module.topics.length > 0;
+    
+    return `
+        <section class="module collapsed" data-module-id="${module.id}">
+            <div class="module-header">
+                <h2>${module.title}</h2>
+                ${hasContent ? `
+                    <button class="toggle-module collapsed" aria-label="Toggle module content">
+                        <img src="chevron-right.svg" alt="Toggle icon" class="toggle-icon">
+                    </button>
+                ` : ''}
+            </div>
+            
+            ${hasContent ? `
+                <div class="module-content" style="display: none;">
+                    <div class="module-progress">
+                        <span>${module.progress.completed}/${module.progress.total} complete</span>
+                        <span class="separator">|</span>
+                        <span>${module.progress.timeLeft} hour left out of ${module.progress.totalTime}</span>
+                    </div>
+                    <ul class="topics">
+                        ${module.topics.map(topic => `
+                            <li class="${topic.completed ? 'completed' : ''}" data-topic-id="${topic.id}">
+                                ${topic.title}
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            ` : ''}
+        </section>
+    `;
+};
+
+const renderCourseContent = () => {
+    const courseContent = document.querySelector('.course-content');
+    if (!courseContent) return;
+
+    // Очищаємо поточний вміст
+    courseContent.innerHTML = '';
+    
+    // Додаємо заголовок і встановлюємо початковий стан як згорнутий
+    courseContent.innerHTML = `
+        <div class="course-header">
+            <h1>Course content</h1>
+            <button class="toggle-all collapsed" aria-label="Toggle all content">
+                <img src="chevron-right.svg" alt="Toggle icon" class="toggle-icon">
+            </button>
+        </div>
+    `;
+
+    // Додаємо клас collapsed до course-content
+    courseContent.classList.add('collapsed');
+
+    // Додаємо модулі
+    COURSE_MODULES.forEach(module => {
+        courseContent.insertAdjacentHTML('beforeend', createModuleHTML(module));
+    });
+
+    // Ініціалізуємо обробники подій
+    initializeModuleListeners();
+};
+
+const initializeModuleListeners = () => {
+    const toggleAll = document.querySelector('.toggle-all');
+    const courseContent = document.querySelector('.course-content');
+    const moduleToggles = document.querySelectorAll('.toggle-module');
+
+    // Обробник для згортання/розгортання всього контенту
+    toggleAll?.addEventListener('click', () => {
+        toggleAll.classList.toggle('collapsed');
+        courseContent.classList.toggle('collapsed');
+        
+        const modules = document.querySelectorAll('.module');
+        if (!courseContent.classList.contains('collapsed')) {
+            modules.forEach(module => {
+                module.classList.remove('collapsed');
+                const moduleContent = module.querySelector('.module-content');
+                if (moduleContent) {
+                    moduleContent.style.display = 'block';
+                }
+                const toggleButton = module.querySelector('.toggle-module');
+                if (toggleButton) {
+                    toggleButton.classList.remove('collapsed');
+                }
+            });
+        } else {
+            modules.forEach(module => {
+                module.classList.add('collapsed');
+                const moduleContent = module.querySelector('.module-content');
+                if (moduleContent) {
+                    moduleContent.style.display = 'none';
+                }
+                const toggleButton = module.querySelector('.toggle-module');
+                if (toggleButton) {
+                    toggleButton.classList.add('collapsed');
+                }
+            });
+        }
+    });
+
+    // Обробники для згортання/розгортання окремих модулів
+    moduleToggles.forEach(toggle => {
+        toggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const module = toggle.closest('.module');
+            const moduleContent = module.querySelector('.module-content');
+            
+            toggle.classList.toggle('collapsed');
+            module.classList.toggle('collapsed');
+            
+            if (moduleContent) {
+                moduleContent.style.display = moduleContent.style.display === 'none' ? 'block' : 'none';
+            }
+        });
+    });
+};
 
 const createMessageHTML = (message, isReply = false) => {
     const messageElement = document.createElement('article');
@@ -231,7 +393,7 @@ const toggleReplies = (messageId, show) => {
                 const showMoreButton = document.createElement('button');
                 showMoreButton.id = `show-more-${messageId}`;
                 showMoreButton.className = 'show-more-button';
-                showMoreButton.textContent = 'Показати більше відповідей';
+                showMoreButton.textContent = 'Show more replies';
                 
                 Object.assign(showMoreButton.style, {
                     margin: '10px 0',
@@ -274,7 +436,7 @@ const addNewReply = (parentId, replyText) => {
         id: newReplyId,
         user: {
             name: "Current User",
-            avatar: "user-avatar.png"
+            avatar: "/images/user-avatar.png"
         },
         date: new Date().toLocaleDateString(),
         text: replyText,
@@ -323,6 +485,87 @@ const renderDiscussion = () => {
     }
 };
 
+const initializeFilters = () => {
+    // Отримуємо всі групи фільтрів
+    const filterGroups = document.querySelectorAll('.filter-group');
+    
+    filterGroups.forEach((group, groupIndex) => {
+        const buttons = group.querySelectorAll('.filter-btn');
+        
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Для першої групи (Questions I asked, Questions I'm following, Questions with responses)
+                if (groupIndex === 0) {
+                    // Перемикаємо клас active для кожної кнопки незалежно
+                    button.classList.toggle('active');
+                    filterMessages();
+                }
+                // Для інших груп (Whole course/Current topic та Recent/Oldest)
+                else {
+                    // Знімаємо active з усіх кнопок в групі
+                    buttons.forEach(btn => btn.classList.remove('active'));
+                    // Додаємо active тільки натиснутій кнопці
+                    button.classList.add('active');
+                    filterMessages();
+                }
+            });
+        });
+    });
+};
+
+// Функція для фільтрації повідомлень
+const filterMessages = () => {
+    let filteredMessages = [...DISCUSSION_MESSAGES];
+    
+    // Отримуємо активні фільтри
+    const activeFilters = {
+        questionsAsked: document.querySelector('.filter-btn:contains("Questions I asked")').classList.contains('active'),
+        questionsFollowing: document.querySelector('.filter-btn:contains("Questions I\'m following")').classList.contains('active'),
+        questionsWithResponses: document.querySelector('.filter-btn:contains("Questions with responses")').classList.contains('active'),
+        isWholeCourse: document.querySelector('.filter-btn:contains("Whole course")').classList.contains('active'),
+        isRecent: document.querySelector('.filter-btn:contains("Recent")').classList.contains('active')
+    };
+
+    // Застосовуємо фільтри першої групи
+    if (activeFilters.questionsAsked || activeFilters.questionsFollowing || activeFilters.questionsWithResponses) {
+        filteredMessages = filteredMessages.filter(message => {
+            if (activeFilters.questionsAsked && message.user.name === "Current User") return true;
+            if (activeFilters.questionsFollowing && message.isFollowing) return true;
+            if (activeFilters.questionsWithResponses && message.replies && message.replies.length > 0) return true;
+            return false;
+        });
+    }
+
+    // Застосовуємо фільтр курсу (Whole course/Current topic)
+    // Тут можна додати додаткову логіку для фільтрації за поточною темою
+
+    // Застосовуємо сортування за часом
+    filteredMessages.sort((a, b) => {
+        const dateA = new Date(a.date.split('.').reverse().join('-'));
+        const dateB = new Date(b.date.split('.').reverse().join('-'));
+        return activeFilters.isRecent ? dateB - dateA : dateA - dateB;
+    });
+
+    // Оновлюємо відображення повідомлень
+    const discussionThread = document.querySelector('.discussion-thread');
+    discussionThread.innerHTML = '';
+    filteredMessages.forEach(message => {
+        const messageElement = createMessageHTML(message);
+        discussionThread.appendChild(messageElement);
+    });
+    
+    updateMessageStyles();
+};
+
+// Додаємо допоміжний метод для пошуку елементів за текстом
+Element.prototype.querySelector = function(selector) {
+    return Array.from(this.querySelectorAll(selector)).find(el => 
+        selector.startsWith(':contains') ? 
+        el.textContent.includes(selector.match(/"([^"]+)"/)[1]) : 
+        true
+    );
+};
+
 const initializeTabs = () => {
     const tabs = document.querySelectorAll('.tab');
     
@@ -356,11 +599,8 @@ const initializeTabs = () => {
 };
 
 const renderSection = (sectionType) => {
-    // Знаходимо батьківський контейнер головного контенту
     const mainContent = document.querySelector('.main-content');
     const courseView = document.querySelector('.course-view');
-    
-    // Очищаємо попередній вміст основного контенту, але залишаємо відео та навігаційні кнопки
     const videoContainer = document.querySelector('.video-container');
     const tabs = document.querySelector('.tabs');
     
@@ -419,7 +659,7 @@ const renderSection = (sectionType) => {
             });
             keywordSection.innerHTML = `
                 <div class="search-bar">
-                    <input type="text" placeholder="Введіть ключове слово">
+                    <input type="text" placeholder="Type a keyword to search information in the topic">
                     <button class="icon-button search"></button>
                 </div>
                 <div class="search-results">
@@ -495,7 +735,7 @@ const initializeKeywordSearch = () => {
     function displaySearchResults(results) {
         searchResults.innerHTML = '';
         if (results.length === 0) {
-            searchResults.innerHTML = '<p>Жодного результату не знайдено</p>';
+            searchResults.innerHTML = '<p>No result found</p>';
         } else {
             results.forEach(result => {
                 const resultElement = document.createElement('div');
@@ -552,10 +792,10 @@ const initializeDiscussionListeners = () => {
         document.addEventListener('click', function(e) {
             const moreOptions = e.target.closest('.more-options');
             if (moreOptions) {
-                // Існуючий код для меню опцій
                 const message = moreOptions.closest('.message');
                 const messageId = message.dataset.messageId;
                 const username = message.querySelector('.username').textContent;
+                const isReply = message.classList.contains('reply');
 
                 const existingMenu = document.querySelector('.options-menu');
                 if (existingMenu) {
@@ -564,12 +804,23 @@ const initializeDiscussionListeners = () => {
 
                 const optionsMenu = document.createElement('div');
                 optionsMenu.className = 'options-menu';
-                optionsMenu.innerHTML = `
-                    <div class="option" data-action="show-replies">Показати відповіді</div>
-                    <div class="option" data-action="add-reply">Написати відповідь</div>
-                    <div class="option" data-action="follow">Слідкувати за відповідями</div>
-                    <div class="option" data-action="report">Поскаржитися</div>
-                `;
+                
+                // Визначаємо опції меню в залежності від типу повідомлення
+                const menuOptions = isReply ? [
+                    { action: 'add-reply', text: 'Write a reply' },
+                    { action: 'follow', text: 'Follow replies' },
+                    { action: 'report', text: 'Report message' }
+                ] : [
+                    { action: 'show-replies', text: 'Show/Hide replies' },
+                    { action: 'add-reply', text: 'Write a reply' },
+                    { action: 'follow', text: 'Follow replies' },
+                    { action: 'report', text: 'Report message' }
+                ];
+
+                // Створюємо HTML для меню
+                optionsMenu.innerHTML = menuOptions
+                    .map(option => `<div class="option" data-action="${option.action}">${option.text}</div>`)
+                    .join('');
                 
                 // Стилізація меню
                 Object.assign(optionsMenu.style, {
@@ -583,6 +834,7 @@ const initializeDiscussionListeners = () => {
                     zIndex: '1000'
                 });
 
+                // Стилізація опцій меню
                 optionsMenu.querySelectorAll('.option').forEach(option => {
                     Object.assign(option.style, {
                         padding: '8px 16px',
@@ -601,6 +853,7 @@ const initializeDiscussionListeners = () => {
 
                 message.appendChild(optionsMenu);
 
+                // Обробка кліків по опціях меню
                 optionsMenu.addEventListener('click', function(e) {
                     const action = e.target.dataset.action;
                 
@@ -626,6 +879,7 @@ const initializeDiscussionListeners = () => {
                     optionsMenu.remove();
                 });
 
+                // Закриття меню при кліку поза ним
                 document.addEventListener('click', function closeMenu(e) {
                     if (!optionsMenu.contains(e.target) && !moreOptions.contains(e.target)) {
                         optionsMenu.remove();
@@ -657,7 +911,9 @@ const initializeDiscussionListeners = () => {
 
 // Додаємо виклик функції після завантаження DOM
 document.addEventListener('DOMContentLoaded', () => {
+    renderCourseContent();
     renderDiscussion();
+    initializeFilters();
     initializeDiscussionListeners();
     initializeTabs();
 });
