@@ -54,6 +54,87 @@ body {
     gap: 20px;
 }
 
+.toggle-all::after,
+.toggle-module::after {
+    content: "›";
+    display: inline-block;
+    font-size: 24px;
+    font-weight: bold;
+    transform: rotate(0deg);
+    transition: transform 0.3s ease;
+    line-height: 1;
+}
+
+.course-content.collapsed .module {
+    display: none;
+}
+
+.toggle-all,
+.toggle-module {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+}
+
+.toggle-all.collapsed::after {
+    transform: rotate(-90deg);
+}
+
+.toggle-module.collapsed::after {
+    transform: rotate(-90deg);
+}
+
+/* Початково приховуємо модулі */
+.module {
+    display: none;
+}
+
+/* Показуємо модулі, коли контент розгорнутий */
+.course-content:not(.collapsed) .module {
+    display: block;
+}
+
+/* Стилізація заголовка курсу */
+.course-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #E5E5E5;
+    padding-bottom: 20px;
+}
+
+.toggle-all {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+/* Стилізація заголовків модулів */
+.module-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.toggle-module {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.toggle-icon {
+    display: none;
+}
+
 .course-content h1 {
     font-size: 32px;
     font-weight: 500;
@@ -103,11 +184,11 @@ body {
     transform: translateY(-50%);
     width: 18px;
     height: 18px;
-    background: url('icon-default.png') no-repeat center;
+    background: url('') no-repeat center;
 }
 
 .topics li.completed::before {
-    background-image: url('icon-completed.png');
+    background-image: url('');
 }
 
 /* Discussion section */
@@ -328,7 +409,7 @@ body {
     height: 30px;
     border: 2px solid #C7C7C7;
     border-radius: 12px;
-    background: #FFFFFF url('send-icon.png') no-repeat center;
+    background: #FFFFFF;
     cursor: pointer;
 }
 
@@ -346,4 +427,18 @@ body {
     font-size: 14px;
     cursor: pointer;
     display: block;
+}
+
+.icon-button img {
+    width: 18px;
+    height: 18px;
+    display: block;
+    margin: auto;
+}
+
+.send-reply img {
+    width: 18px;
+    height: 18px;
+    display: block;
+    margin: auto;
 }
