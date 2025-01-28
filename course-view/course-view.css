@@ -56,13 +56,15 @@ body {
 
 .toggle-all::after,
 .toggle-module::after {
-    content: "›";
+    content: "";
     display: inline-block;
-    font-size: 24px;
-    font-weight: bold;
-    transform: rotate(0deg);
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid #283044;
+    border-bottom: 2px solid #283044;
+    transform: rotate(45deg);
     transition: transform 0.3s ease;
-    line-height: 1;
+    margin-left: 5px;
 }
 
 .course-content.collapsed .module {
@@ -76,15 +78,15 @@ body {
     cursor: pointer;
     display: flex;
     align-items: center;
-    padding: 5px;
+    gap: 5px;
+    position: relative;
+    margin-right: 12px;
+    margin-top: -5px;
 }
 
-.toggle-all.collapsed::after {
-    transform: rotate(-90deg);
-}
-
+.toggle-all.collapsed::after,
 .toggle-module.collapsed::after {
-    transform: rotate(-90deg);
+    transform: rotate(-45deg);
 }
 
 /* Початково приховуємо модулі */
@@ -99,12 +101,15 @@ body {
 
 /* Стилізація заголовка курсу */
 .course-header {
+    border-bottom: 1px solid #C7C7C7;
+}
+
+.course-header,
+.module-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    border-bottom: 2px solid #E5E5E5;
-    padding-bottom: 20px;
+    padding-right: 8px;
 }
 
 .toggle-all {
@@ -116,12 +121,6 @@ body {
 }
 
 /* Стилізація заголовків модулів */
-.module-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
 
 .toggle-module {
     background: none;
@@ -131,32 +130,43 @@ body {
     align-items: center;
 }
 
-.toggle-icon {
-    display: none;
-}
-
 .course-content h1 {
     font-size: 32px;
     font-weight: 500;
     color: #283044;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
 }
 
 .module {
-    margin-bottom: 30px;
+    border-bottom: 1px solid #C7C7C7;
+    padding: 20px 0;
+    position: relative;
+}
+
+.module:last-child {
+    border-bottom: none;
 }
 
 .module h2 {
     font-size: 20px;
     font-weight: 500;
     color: #283044;
-    margin-bottom: 10px;
 }
 
 .module-progress {
     font-size: 10px;
     color: #000000;
     margin-bottom: 15px;
+    display: block !important;
+    margin-left: 0;
+}
+
+.module-content {
+    display: block !important;
+}
+
+.module.collapsed .topics {
+    display: none;
 }
 
 .module-progress .separator {
@@ -166,7 +176,7 @@ body {
 
 .topics {
     list-style: none;
-    padding-left: 43px;
+    padding-left: 40px;
 }
 
 .topics li {
@@ -174,21 +184,50 @@ body {
     margin-bottom: 10px;
     color: #000000;
     position: relative;
+    padding-right: 30px;
+    gap: 10px;
 }
 
 .topics li::before {
     content: "";
     position: absolute;
-    left: -23px;
+    left: -40px;
     top: 50%;
     transform: translateY(-50%);
     width: 18px;
     height: 18px;
-    background: url('') no-repeat center;
+}
+
+.topics li::after {
+    content: "";
+    position: absolute;
+    left: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.topics li .content-type-icon {
+    position: absolute;
+    left: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    background-size: contain;
+    background-repeat: no-repeat;
 }
 
 .topics li.completed::before {
-    background-image: url('');
+    content: "✓";
+    font-size: 14px;
+    color: #283044;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Discussion section */

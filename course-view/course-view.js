@@ -9,9 +9,9 @@ const COURSE_MODULES = [
             totalTime: 16
         },
         topics: [
-            { id: 1, title: "topic 1 name", completed: true },
-            { id: 2, title: "topic 2 name", completed: true },
-            { id: 3, title: "topic 3 name", completed: true }
+            { id: 1, title: "topic 1 name", completed: true, contentType: "video" },
+            { id: 2, title: "topic 2 name", completed: true, contentType: "text" },
+            { id: 3, title: "topic 3 name", completed: true, contentType: "quiz" }
         ]
     },
     {
@@ -24,9 +24,9 @@ const COURSE_MODULES = [
             totalTime: 11
         },
         topics: [
-            { id: 4, title: "topic 1 name", completed: false },
-            { id: 5, title: "topic 2 name", completed: false },
-            { id: 6, title: "topic 3 name", completed: false }
+            { id: 4, title: "topic 1 name", completed: false, contentType: "video" },
+            { id: 5, title: "topic 2 name", completed: false, contentType: "video" },
+            { id: 6, title: "topic 3 name", completed: false, contentType: "video" }
         ]
     },
     {
@@ -140,13 +140,22 @@ const DISCUSSION_MESSAGES = [
 const createModuleHTML = (module) => {
     const hasContent = module.topics && module.topics.length > 0;
     
+    const getContentTypeIcon = (contentType) => {
+        const icons = {
+            video: "/images/video-icon.svg",
+            text: "/images/text-icon.svg",
+            quiz: "/images/test-icon.svg",
+            audio: "/images/audio-icon.svg"
+        };
+        return icons[contentType] || "";
+    };
+    
     return `
         <section class="module collapsed" data-module-id="${module.id}">
             <div class="module-header">
                 <h2>${module.title}</h2>
                 ${hasContent ? `
                     <button class="toggle-module collapsed" aria-label="Toggle module content">
-                        <img src="chevron-right.svg" alt="Toggle icon" class="toggle-icon">
                     </button>
                 ` : ''}
             </div>
@@ -161,6 +170,11 @@ const createModuleHTML = (module) => {
                     <ul class="topics">
                         ${module.topics.map(topic => `
                             <li class="${topic.completed ? 'completed' : ''}" data-topic-id="${topic.id}">
+                                <img 
+                                    src="${getContentTypeIcon(topic.contentType)}" 
+                                    alt="${topic.contentType}" 
+                                    class="content-type-icon"
+                                >
                                 ${topic.title}
                             </li>
                         `).join('')}
@@ -183,7 +197,6 @@ const renderCourseContent = () => {
         <div class="course-header">
             <h1>Course content</h1>
             <button class="toggle-all collapsed" aria-label="Toggle all content">
-                <img src="chevron-right.svg" alt="Toggle icon" class="toggle-icon">
             </button>
         </div>
     `;
