@@ -196,3 +196,15 @@ CREATE TABLE answers (
   is_correct BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Створення таблиці запису на курс
+CREATE TABLE enrollments (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    course_id INTEGER REFERENCES all_courses(id) ON DELETE CASCADE,
+    enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(20) CHECK (status IN ('active', 'completed', 'archived')) DEFAULT 'active',
+    progress INTEGER DEFAULT 0,
+    last_accessed TIMESTAMP,
+    UNIQUE(user_id, course_id)
+);

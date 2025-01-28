@@ -59,6 +59,13 @@
                 <div class="container-my">
                     <div class="my-courses">
                         <h2 data-lang="myCourses">My courses</h2>
+                        <div class="courses-list" id="enrolled-courses">
+                            <!-- Курси будуть додані з бд -->
+                        </div>
+                        <button class="btn-view-all-1" data-lang="btnViewAll">View all</button>
+                    </div>
+                    <!-- <div class="my-courses">
+                        <h2 data-lang="myCourses">My courses</h2>
                         <div class="courses-list">
                             <div class="course">
                                 <p class="p-1" data-lang="courseName">Course name 1</p>
@@ -89,7 +96,7 @@
                             </div>
                         </div>
                         <button class="btn-view-all-1" data-lang="btnViewAll">View all</button>
-                    </div>
+                    </div> -->
                     <div>
                         <div class="my-certificates">
                             <h2>My certificates</h2>
@@ -668,6 +675,54 @@ async function fetchTeacherProfile() {
         console.error('Error fetching user profile:', err);
     }
 }
+
+// Функція для завантаження записаних курсів
+async function loadEnrolledCourses() {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+
+    try {
+        const response = await fetch(`/api/courses/enrolled/${userId}`);
+        if (!response.ok) throw new Error('Failed to fetch enrolled courses');
+        
+        const courses = await response.json();
+        const coursesContainer = document.getElementById('enrolled-courses');
+        
+        if (courses.length === 0) {
+            coursesContainer.innerHTML = '<p class="no-courses" data-lang="noCourses">You haven\'t enrolled in any courses yet.</p>';
+            return;
+        }
+
+        coursesContainer.innerHTML = courses.map(course => `
+            <div class="course">
+                <p class="p-1">${course.name}</p>
+                <div class="progress-bar">
+                    <span style="width: ${course.progress}%;"></span>
+                </div>
+                <p class="percent">${course.progress}%</p>
+                <img src="${course.image_url || '/images/250x100.png'}" alt="${course.name}">
+                <button class="btn-resume" data-course-id="${course.id}" data-lang="btnResume">Resume</button>
+            </div>
+        `).join('');
+
+        // Додаємо обробники для кнопок "Resume"
+        document.querySelectorAll('.btn-resume').forEach(button => {
+            button.addEventListener('click', () => {
+                const courseId = button.getAttribute('data-course-id');
+                window.location.href = `/course/learn/${courseId}`;
+            });
+        });
+
+        // Оновлюємо переклади для нових елементів
+        applyLanguage(localStorage.getItem('language') || 'en');
+
+    } catch (error) {
+        console.error('Error loading enrolled courses:', error);
+        const coursesContainer = document.getElementById('enrolled-courses');
+        coursesContainer.innerHTML = '<p class="error-message">Failed to load courses. Please try again later.</p>';
+    }
+}
+
 
 // Виклик функції під час завантаження сторінки
 window.addEventListener('DOMContentLoaded', fetchTeacherProfile);
