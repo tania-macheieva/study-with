@@ -42,6 +42,12 @@ const COURSE_MODULES = [
     }
 ];
 
+const VIDEO_SOURCE = {
+    id: 'course-video',
+    src: 'video_example.MP4',
+    type: 'video/mp4'
+};
+
 const DISCUSSION_MESSAGES = [
     {
         id: "1",
@@ -137,9 +143,174 @@ const DISCUSSION_MESSAGES = [
     }
 ];
 
+const createVideoPlayer = () => {
+    const videoContainer = document.querySelector('.video-player');
+    if (!videoContainer) return;
+
+    videoContainer.innerHTML = '';
+
+    const videoWrapper = document.createElement('div');
+    videoWrapper.className = 'video-wrapper';
+    videoWrapper.style.position = 'relative';
+
+    const videoElement = document.createElement('video');
+    videoElement.id = VIDEO_SOURCE.id;
+    videoElement.className = 'video-element';
+    videoElement.controls = true;
+
+    Object.assign(videoElement.style, {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        borderRadius: '12px'
+    });
+
+    const sourceElement = document.createElement('source');
+    sourceElement.src = VIDEO_SOURCE.src;
+    sourceElement.type = VIDEO_SOURCE.type;
+    videoElement.appendChild(sourceElement);
+
+    const customControls = document.createElement('div');
+    customControls.className = 'custom-video-controls';
+    Object.assign(customControls.style, {
+        position: 'absolute',
+        bottom: '80px',
+        right: '20px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+        zIndex: '2',
+        opacity: '0',
+        transition: 'opacity 0.3s ease'
+    });
+
+    const notesButton = document.createElement('button');
+    notesButton.className = 'notes-button';
+    notesButton.innerHTML = `
+        <img src="../images/note-icon.svg" alt="Notes" style="width: 16px; height: 16px; margin-right: 5px;">
+        Add note
+    `;
+    Object.assign(notesButton.style, {
+        background: 'rgba(0, 0, 0, 0.7)',
+        border: 'none',
+        borderRadius: '4px',
+        color: 'white',
+        padding: '8px 12px',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        fontSize: '14px'
+    });
+
+    customControls.appendChild(notesButton);
+
+    videoWrapper.appendChild(videoElement);
+    videoWrapper.appendChild(customControls);
+    videoContainer.appendChild(videoWrapper);
+
+    videoWrapper.addEventListener('mouseenter', () => {
+        customControls.style.opacity = '1';
+    });
+
+    videoWrapper.addEventListener('mouseleave', () => {
+        customControls.style.opacity = '0';
+    });
+
+    notesButton.addEventListener('click', () => {
+        videoElement.pause();
+        const currentTime = formatVideoTime(videoElement.currentTime);
+        showNotesModal(currentTime);
+    });
+
+    videoElement.addEventListener('loadeddata', () => {
+        console.log('Відео успішно завантажено');
+    });
+
+    videoElement.addEventListener('error', (e) => {
+        console.error('Помилка завантаження відео:', e);
+        videoContainer.innerHTML = 'Помилка завантаження відео';
+    });
+};
+
+const saveNote = (noteData) => {
+    const existingNotes = JSON.parse(localStorage.getItem('videoNotes') || '[]');
+    existingNotes.push({
+        ...noteData,
+        id: Date.now(),
+        createdAt: new Date().toISOString()
+    });
+    localStorage.setItem('videoNotes', JSON.stringify(existingNotes));
+    alert('Note saved successfully!');
+};
+
+const formatVideoTime = (timeInSeconds) => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+};
+
+const showNotesModal = (currentTime) => {
+    const existingModal = document.querySelector('.notes-modal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    const modal = document.createElement('div');
+    modal.className = 'notes-modal';
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    `;
+    modal.innerHTML = `
+        <h3 style="margin: 0 0 15px 0; font-size: 18px;">Add note</h3>
+        <p style="margin: 0 0 10px 0;">Video time: <span class="video-timestamp">${currentTime}</span></p>
+        <textarea placeholder="Enter your note..." style="margin-bottom: 15px;"></textarea>
+        <div class="button-group">
+            <button class="cancel-button">Cancel</button>
+            <button class="save-button">Save</button>
+        </div>
+    `;
+    Object.assign(modal.style, {
+        width: '400px',
+        background: 'white',
+        padding: '20px',
+        borderRadius: '12px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        zIndex: '1000'
+    });
+    document.body.appendChild(overlay);
+    document.body.appendChild(modal);
+    modal.querySelector('textarea').focus();
+    const closeModal = () => {
+        modal.remove();
+        overlay.remove();
+        const video = document.querySelector('#course-video');
+        if (video) video.play();
+    };
+    modal.querySelector('.cancel-button').addEventListener('click', closeModal);
+    overlay.addEventListener('click', closeModal);
+    modal.querySelector('.save-button').addEventListener('click', () => {
+        const noteText = modal.querySelector('textarea').value;
+        const timestamp = modal.querySelector('.video-timestamp').textContent;
+        if (noteText.trim()) {
+            saveNote({
+                text: noteText,
+                timestamp: timestamp,
+                videoId: VIDEO_SOURCE.id
+            });
+        }
+        closeModal();
+    });
+};
+
 const createModuleHTML = (module) => {
     const hasContent = module.topics && module.topics.length > 0;
-    
     const getContentTypeIcon = (contentType) => {
         const icons = {
             video: "/images/video-icon.svg",
@@ -159,7 +330,6 @@ const createModuleHTML = (module) => {
                     </button>
                 ` : ''}
             </div>
-            
             ${hasContent ? `
                 <div class="module-content" style="display: none;">
                     <div class="module-progress">
@@ -188,11 +358,7 @@ const createModuleHTML = (module) => {
 const renderCourseContent = () => {
     const courseContent = document.querySelector('.course-content');
     if (!courseContent) return;
-
-    // Очищаємо поточний вміст
     courseContent.innerHTML = '';
-    
-    // Додаємо заголовок і встановлюємо початковий стан як згорнутий
     courseContent.innerHTML = `
         <div class="course-header">
             <h1>Course content</h1>
@@ -200,16 +366,10 @@ const renderCourseContent = () => {
             </button>
         </div>
     `;
-
-    // Додаємо клас collapsed до course-content
     courseContent.classList.add('collapsed');
-
-    // Додаємо модулі
     COURSE_MODULES.forEach(module => {
         courseContent.insertAdjacentHTML('beforeend', createModuleHTML(module));
     });
-
-    // Ініціалізуємо обробники подій
     initializeModuleListeners();
 };
 
@@ -217,12 +377,9 @@ const initializeModuleListeners = () => {
     const toggleAll = document.querySelector('.toggle-all');
     const courseContent = document.querySelector('.course-content');
     const moduleToggles = document.querySelectorAll('.toggle-module');
-
-    // Обробник для згортання/розгортання всього контенту
     toggleAll?.addEventListener('click', () => {
         toggleAll.classList.toggle('collapsed');
         courseContent.classList.toggle('collapsed');
-        
         const modules = document.querySelectorAll('.module');
         if (!courseContent.classList.contains('collapsed')) {
             modules.forEach(module => {
@@ -250,17 +407,13 @@ const initializeModuleListeners = () => {
             });
         }
     });
-
-    // Обробники для згортання/розгортання окремих модулів
     moduleToggles.forEach(toggle => {
         toggle.addEventListener('click', (e) => {
             e.stopPropagation();
             const module = toggle.closest('.module');
             const moduleContent = module.querySelector('.module-content');
-            
             toggle.classList.toggle('collapsed');
             module.classList.toggle('collapsed');
-            
             if (moduleContent) {
                 moduleContent.style.display = moduleContent.style.display === 'none' ? 'block' : 'none';
             }
@@ -268,16 +421,56 @@ const initializeModuleListeners = () => {
     });
 };
 
+const createDiscussionTemplate = () => `
+    <section class="discussion-section">
+        <div class="search-bar">
+            <input type="text" placeholder="ask or search a question">
+            <button class="icon-button send">
+            <img src="../images/send.svg" alt="Send">
+            </button>
+            <button class="icon-button search">
+            <img src="../images/icons8-search-50.png" alt="Search">
+            </button>
+        </div>
+        <div class="filters">
+            <div class="filters-left">
+                <div class="checkbox-filter">
+                    <input type="checkbox" id="questions-asked">
+                    <label for="questions-asked">Questions I asked</label>
+                </div>
+                <div class="checkbox-filter">
+                    <input type="checkbox" id="questions-following">
+                    <label for="questions-following">Questions I'm following</label>
+                </div>
+                <div class="checkbox-filter">
+                    <input type="checkbox" id="questions-responses">
+                    <label for="questions-responses">Questions with responses</label>
+                </div>
+            </div>
+            <div class="filters-right">
+                <div class="filter-group">
+                    <button class="filter-btn active">Whole course</button>
+                    <button class="filter-btn">Current topic</button>
+                </div>
+                <div class="filter-group">
+                    <button class="filter-btn active">Recent</button>
+                    <button class="filter-btn">Oldest</button>
+                </div>
+            </div>
+        </div>
+        <section class="discussion-thread">
+        </section>
+    </section>
+`;
+
 const createMessageHTML = (message, isReply = false) => {
     const messageElement = document.createElement('article');
     messageElement.className = 'message';
     if (isReply) messageElement.classList.add('reply');
     messageElement.dataset.messageId = message.id;
-    
     if (message.id.includes('.')) {
         messageElement.dataset.parentId = message.id.substring(0, message.id.lastIndexOf('.'));
     }
-
     messageElement.innerHTML = `
         <div class="user-info">
             <img src="${message.user.avatar}" alt="User avatar" class="avatar">
@@ -291,20 +484,16 @@ const createMessageHTML = (message, isReply = false) => {
             <button class="send-reply" data-parent-id="${message.id}"></button>
         </div>
     `;
-
     return messageElement;
 };
 
 const updateMessageStyles = () => {
     const mainMessages = document.querySelectorAll('.message:not(.reply)');
-    
     mainMessages.forEach(mainMessage => {
         const messageId = mainMessage.dataset.messageId;
         const replies = document.querySelectorAll(`.message.reply[data-parent-id="${messageId}"]`);
-        
         if (replies.length > 0) {
             mainMessage.classList.add('has-visible-replies');
-            
             replies.forEach((reply, index) => {
                 reply.classList.remove('last-reply');
                 if (index === replies.length - 1) {
@@ -325,25 +514,20 @@ const updateMessageStyles = () => {
 };
 
 const showRepliesButtons = document.querySelectorAll('.Показати відповіді');
-
 showRepliesButtons.forEach(btn => {
   btn.addEventListener('click', function() {
     this.textContent = (this.textContent === 'Показати відповіді') ? 'Приховати відповіді' : 'Показати відповіді';
   });
 });
-
 const showMoreReplies = (messageId, startIndex) => {
     const allReplies = getAllReplies(messageId);
     const remainingReplies = allReplies.slice(startIndex);
     const lastVisibleReply = document.querySelector(`.message.reply[data-parent-id="${messageId}"]:last-of-type`);
-    
     remainingReplies.forEach(reply => {
         const replyElement = createMessageHTML(reply, true);
         lastVisibleReply.after(replyElement);
     });
-    
     updateMessageStyles();
-    
     const showMoreButton = document.querySelector(`#show-more-${messageId}`);
     if (showMoreButton) {
         showMoreButton.remove();
@@ -352,7 +536,6 @@ const showMoreReplies = (messageId, startIndex) => {
 
 const getAllReplies = (messageId, messages = DISCUSSION_MESSAGES) => {
     let allReplies = [];
-    
     function findMessageAndReplies(messages, targetId) {
         for (const message of messages) {
             if (message.id === targetId) {
@@ -365,7 +548,6 @@ const getAllReplies = (messageId, messages = DISCUSSION_MESSAGES) => {
         }
         return [];
     }
-    
     allReplies = findMessageAndReplies(messages, messageId);
     return allReplies;
 };
@@ -373,41 +555,31 @@ const getAllReplies = (messageId, messages = DISCUSSION_MESSAGES) => {
 const toggleReplies = (messageId, show) => {
     const existingReplies = document.querySelectorAll(`.message.reply[data-parent-id^="${messageId}"]`);
     existingReplies.forEach(reply => reply.remove());
-    
     const existingShowMore = document.querySelector(`#show-more-${messageId}`);
     if (existingShowMore) {
         existingShowMore.remove();
     }
-    
     const parentMessage = document.querySelector(`.message[data-message-id="${messageId}"]`);
-    
     if (show) {
         const allReplies = getAllReplies(messageId);
-        
         if (allReplies.length > 0) {
             parentMessage.classList.add('has-visible-replies');
-            
             const visibleReplies = allReplies.slice(0, 4);
             let lastReplyElement;
-            
             visibleReplies.forEach((reply, index) => {
                 const replyElement = createMessageHTML(reply, true);
-                
                 if (lastReplyElement) {
                     lastReplyElement.after(replyElement);
                 } else {
                     parentMessage.after(replyElement);
                 }
-                
                 lastReplyElement = replyElement;
             });
-            
             if (allReplies.length > 4) {
                 const showMoreButton = document.createElement('button');
                 showMoreButton.id = `show-more-${messageId}`;
                 showMoreButton.className = 'show-more-button';
                 showMoreButton.textContent = 'Show more replies';
-                
                 Object.assign(showMoreButton.style, {
                     margin: '10px 0',
                     padding: '8px 16px',
@@ -418,9 +590,7 @@ const toggleReplies = (messageId, show) => {
                     cursor: 'pointer',
                     display: 'block'
                 });
-                
                 lastReplyElement.after(showMoreButton);
-                
                 showMoreButton.addEventListener('click', () => {
                     const remainingReplies = allReplies.slice(4);
                     let lastElement = lastReplyElement;
@@ -430,7 +600,6 @@ const toggleReplies = (messageId, show) => {
                         lastElement.after(replyElement);
                         lastElement = replyElement;
                     });
-                    
                     showMoreButton.remove();
                     updateMessageStyles();
                 });
@@ -499,67 +668,52 @@ const renderDiscussion = () => {
 };
 
 const initializeFilters = () => {
-    // Отримуємо всі групи фільтрів
-    const filterGroups = document.querySelectorAll('.filter-group');
-    
-    filterGroups.forEach((group, groupIndex) => {
+    const checkboxes = document.querySelectorAll('.checkbox-filter input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', filterMessages);
+    });
+    const filterGroups = document.querySelectorAll('.filters-right .filter-group');
+    filterGroups.forEach(group => {
         const buttons = group.querySelectorAll('.filter-btn');
         
         buttons.forEach(button => {
             button.addEventListener('click', () => {
-                // Для першої групи (Questions I asked, Questions I'm following, Questions with responses)
-                if (groupIndex === 0) {
-                    // Перемикаємо клас active для кожної кнопки незалежно
-                    button.classList.toggle('active');
-                    filterMessages();
-                }
-                // Для інших груп (Whole course/Current topic та Recent/Oldest)
-                else {
-                    // Знімаємо active з усіх кнопок в групі
-                    buttons.forEach(btn => btn.classList.remove('active'));
-                    // Додаємо active тільки натиснутій кнопці
-                    button.classList.add('active');
-                    filterMessages();
-                }
+                // Знімаємо active з усіх кнопок в групі
+                buttons.forEach(btn => btn.classList.remove('active'));
+                // Додаємо active натиснутій кнопці
+                button.classList.add('active');
+                filterMessages();
             });
         });
     });
 };
 
-// Функція для фільтрації повідомлень
 const filterMessages = () => {
     let filteredMessages = [...DISCUSSION_MESSAGES];
-    
-    // Отримуємо активні фільтри
-    const activeFilters = {
-        questionsAsked: document.querySelector('.filter-btn:contains("Questions I asked")').classList.contains('active'),
-        questionsFollowing: document.querySelector('.filter-btn:contains("Questions I\'m following")').classList.contains('active'),
-        questionsWithResponses: document.querySelector('.filter-btn:contains("Questions with responses")').classList.contains('active'),
-        isWholeCourse: document.querySelector('.filter-btn:contains("Whole course")').classList.contains('active'),
-        isRecent: document.querySelector('.filter-btn:contains("Recent")').classList.contains('active')
+    const filters = {
+        questionsAsked: document.querySelector('#questions-asked').checked,
+        questionsFollowing: document.querySelector('#questions-following').checked,
+        questionsWithResponses: document.querySelector('#questions-responses').checked
     };
-
-    // Застосовуємо фільтри першої групи
-    if (activeFilters.questionsAsked || activeFilters.questionsFollowing || activeFilters.questionsWithResponses) {
+    const courseFilter = document.querySelector('.filters-right .filter-group:first-child .filter-btn.active').textContent;
+    const timeFilter = document.querySelector('.filters-right .filter-group:last-child .filter-btn.active').textContent;
+    if (filters.questionsAsked || filters.questionsFollowing || filters.questionsWithResponses) {
         filteredMessages = filteredMessages.filter(message => {
-            if (activeFilters.questionsAsked && message.user.name === "Current User") return true;
-            if (activeFilters.questionsFollowing && message.isFollowing) return true;
-            if (activeFilters.questionsWithResponses && message.replies && message.replies.length > 0) return true;
-            return false;
+            return (filters.questionsAsked && message.user.name === "Current User") ||
+                   (filters.questionsFollowing && message.isFollowing) ||
+                   (filters.questionsWithResponses && message.replies && message.replies.length > 0);
         });
     }
-
-    // Застосовуємо фільтр курсу (Whole course/Current topic)
-    // Тут можна додати додаткову логіку для фільтрації за поточною темою
-
-    // Застосовуємо сортування за часом
+    if (courseFilter === 'Current topic') {
+        // Тут додайте логіку фільтрації за поточною темою
+        // Наприклад:
+        filteredMessages = filteredMessages.filter(message => message.currentTopic === true);
+    }
     filteredMessages.sort((a, b) => {
         const dateA = new Date(a.date.split('.').reverse().join('-'));
         const dateB = new Date(b.date.split('.').reverse().join('-'));
-        return activeFilters.isRecent ? dateB - dateA : dateA - dateB;
+        return timeFilter === 'Recent' ? dateB - dateA : dateA - dateB;
     });
-
-    // Оновлюємо відображення повідомлень
     const discussionThread = document.querySelector('.discussion-thread');
     discussionThread.innerHTML = '';
     filteredMessages.forEach(message => {
@@ -569,8 +723,6 @@ const filterMessages = () => {
     
     updateMessageStyles();
 };
-
-// Додаємо допоміжний метод для пошуку елементів за текстом
 Element.prototype.querySelector = function(selector) {
     return Array.from(this.querySelectorAll(selector)).find(el => 
         selector.startsWith(':contains') ? 
@@ -584,13 +736,8 @@ const initializeTabs = () => {
     
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
-            // Видаляємо клас active з усіх вкладок
             tabs.forEach(t => t.classList.remove('active'));
-            
-            // Додаємо клас active до поточної вкладки
             tab.classList.add('active');
-            
-            // Визначаємо, яку секцію треба відобразити
             const tabText = tab.textContent.toLowerCase().replace(/\s+/g, '');
             
             switch(tabText) {
@@ -613,48 +760,17 @@ const initializeTabs = () => {
 
 const renderSection = (sectionType) => {
     const mainContent = document.querySelector('.main-content');
-    const courseView = document.querySelector('.course-view');
     const videoContainer = document.querySelector('.video-container');
     const tabs = document.querySelector('.tabs');
-    
+    const currentFilters = saveCurrentFilters();
     mainContent.innerHTML = '';
     mainContent.appendChild(videoContainer);
     mainContent.appendChild(tabs);
-
     switch(sectionType) {
         case 'discussion':
-            const discussionSection = document.createElement('section');
-            discussionSection.classList.add('discussion-section');
-            discussionSection.innerHTML = `
-                <div class="search-bar">
-                    <input type="text" placeholder="ask or search a question">
-                    <button class="icon-button send"></button>
-                    <button class="icon-button search"></button>
-                </div>
-
-                <div class="filters">
-                    <div class="filter-group">
-                        <button class="filter-btn">Questions I asked</button>
-                        <button class="filter-btn">Questions I'm following</button>
-                        <button class="filter-btn">Questions with responses</button>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <button class="filter-btn active">Whole course</button>
-                        <button class="filter-btn">Current topic</button>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <button class="filter-btn active">Recent</button>
-                        <button class="filter-btn">Oldest</button>
-                    </div>
-                </div>
-
-                <section class="discussion-thread">
-                    <!-- Messages will be dynamically inserted here -->
-                </section>
-            `;
-            mainContent.appendChild(discussionSection);
+            mainContent.insertAdjacentHTML('beforeend', createDiscussionTemplate());
+            restoreFilters(currentFilters);
+            initializeFilters();
             renderDiscussion();
             initializeDiscussionListeners();
             break;
@@ -673,7 +789,9 @@ const renderSection = (sectionType) => {
             keywordSection.innerHTML = `
                 <div class="search-bar">
                     <input type="text" placeholder="Type a keyword to search information in the topic">
-                    <button class="icon-button search"></button>
+                    <button class="icon-button search">
+                    <img src="../images/icons8-search-50.png" alt="Search">
+                    </button>
                 </div>
                 <div class="search-results">
                     <!-- Результати пошуку будуть додані динамічно -->
@@ -715,15 +833,44 @@ const renderSection = (sectionType) => {
     }
 };
 
+const saveCurrentFilters = () => {
+    const filters = {
+        checkboxes: {},
+        courseFilter: '',
+        timeFilter: ''
+    };
+    document.querySelectorAll('.checkbox-filter input[type="checkbox"]').forEach(checkbox => {
+        filters.checkboxes[checkbox.id] = checkbox.checked;
+    });
+    const activeCourseFilter = document.querySelector('.filters-right .filter-group:first-child .filter-btn.active');
+    const activeTimeFilter = document.querySelector('.filters-right .filter-group:last-child .filter-btn.active');
+    if (activeCourseFilter) filters.courseFilter = activeCourseFilter.textContent;
+    if (activeTimeFilter) filters.timeFilter = activeTimeFilter.textContent;
+    return filters;
+};
+const restoreFilters = (filters) => {
+    Object.entries(filters.checkboxes).forEach(([id, checked]) => {
+        const checkbox = document.getElementById(id);
+        if (checkbox) checkbox.checked = checked;
+    });
+    if (filters.courseFilter) {
+        document.querySelectorAll('.filters-right .filter-group:first-child .filter-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.textContent === filters.courseFilter);
+        });
+    }
+
+    if (filters.timeFilter) {
+        document.querySelectorAll('.filters-right .filter-group:last-child .filter-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.textContent === filters.timeFilter);
+        });
+    }
+};
+
 const initializeKeywordSearch = () => {
     const searchInput = document.querySelector('.keyword-section .search-bar input');
     const searchButton = document.querySelector('.keyword-section .search-bar .icon-button.search');
     const searchResults = document.querySelector('.keyword-section .search-results');
-
-    // Обробник події натискання кнопки пошуку
     searchButton.addEventListener('click', performKeywordSearch);
-
-    // Обробник події натискання Enter в полі вводу
     searchInput.addEventListener('keypress', function(event) {
         if (event.key === 'Enter') {
             performKeywordSearch();
@@ -758,8 +905,6 @@ const initializeKeywordSearch = () => {
                     <small>Від користувача: ${result.user.name}</small>
                 `;
                 searchResults.appendChild(resultElement);
-
-                // Додаємо відповіді, якщо вони є
                 if (result.replies && result.replies.length > 0) {
                     result.replies.forEach(reply => {
                         const replyElement = document.createElement('div');
@@ -788,20 +933,13 @@ function renderDiscussionMessages() {
 }
 
 const initializeDiscussionListeners = () => {
-    // Видаляємо попередні обробники подій
     const discussionThread = document.querySelector('.discussion-thread');
-    
     if (discussionThread) {
-        // Очищаємо попередній вміст
         discussionThread.innerHTML = '';
-        
-        // Рендеримо повідомлення
         DISCUSSION_MESSAGES.forEach(message => {
             const messageElement = createMessageHTML(message);
             discussionThread.appendChild(messageElement);
         });
-        
-        // Додаємо обробники подій
         document.addEventListener('click', function(e) {
             const moreOptions = e.target.closest('.more-options');
             if (moreOptions) {
@@ -809,12 +947,10 @@ const initializeDiscussionListeners = () => {
                 const messageId = message.dataset.messageId;
                 const username = message.querySelector('.username').textContent;
                 const isReply = message.classList.contains('reply');
-
                 const existingMenu = document.querySelector('.options-menu');
                 if (existingMenu) {
                     existingMenu.remove();
                 }
-
                 const optionsMenu = document.createElement('div');
                 optionsMenu.className = 'options-menu';
                 
@@ -829,13 +965,9 @@ const initializeDiscussionListeners = () => {
                     { action: 'follow', text: 'Follow replies' },
                     { action: 'report', text: 'Report message' }
                 ];
-
-                // Створюємо HTML для меню
                 optionsMenu.innerHTML = menuOptions
                     .map(option => `<div class="option" data-action="${option.action}">${option.text}</div>`)
                     .join('');
-                
-                // Стилізація меню
                 Object.assign(optionsMenu.style, {
                     position: 'absolute',
                     right: '40px',
@@ -846,30 +978,22 @@ const initializeDiscussionListeners = () => {
                     padding: '10px',
                     zIndex: '1000'
                 });
-
-                // Стилізація опцій меню
                 optionsMenu.querySelectorAll('.option').forEach(option => {
                     Object.assign(option.style, {
                         padding: '8px 16px',
                         cursor: 'pointer',
                         fontSize: '14px'
                     });
-                
                     option.addEventListener('mouseenter', () => {
                         option.style.background = '#F5F9FE';
                     });
-                
                     option.addEventListener('mouseleave', () => {
                         option.style.background = 'transparent';
                     });
                 });
-
                 message.appendChild(optionsMenu);
-
-                // Обробка кліків по опціях меню
                 optionsMenu.addEventListener('click', function(e) {
                     const action = e.target.dataset.action;
-                
                     if (action === 'show-replies') {
                         const areRepliesVisible = document.querySelector(`.message.reply[data-parent-id="${messageId}"]`) !== null;
                         toggleReplies(messageId, !areRepliesVisible);
@@ -888,11 +1012,8 @@ const initializeDiscussionListeners = () => {
                             input.placeholder = `написати відповідь до ${username}`;
                         }
                     }
-                
                     optionsMenu.remove();
                 });
-
-                // Закриття меню при кліку поза ним
                 document.addEventListener('click', function closeMenu(e) {
                     if (!optionsMenu.contains(e.target) && !moreOptions.contains(e.target)) {
                         optionsMenu.remove();
@@ -901,8 +1022,6 @@ const initializeDiscussionListeners = () => {
                 });
             }
         });
-
-        // Додаємо обробники для надсилання відповідей
         discussionThread.addEventListener('click', function(e) {
             if (e.target.classList.contains('send-reply')) {
                 const replyInput = e.target.previousElementSibling;
@@ -916,14 +1035,12 @@ const initializeDiscussionListeners = () => {
                 }
             }
         });
-
-        // Оновлюємо стилі повідомлень
         updateMessageStyles();
     }
 };
 
-// Додаємо виклик функції після завантаження DOM
 document.addEventListener('DOMContentLoaded', () => {
+    createVideoPlayer();
     renderCourseContent();
     renderDiscussion();
     initializeFilters();
