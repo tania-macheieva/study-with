@@ -112,9 +112,11 @@ app.get('/donate', (req, res) => {
 app.get('/course-preview', (req, res) => {
     res.sendFile(path.join(__dirname, 'course-preview/course-preview.html')); 
 });
-
-
-
+app.get('/public-profile', (req, res) => {
+    console.log('Attempting to serve public profile');
+    console.log('Full path:', path.join(__dirname, 'profile-page/public-profile.html'));
+    res.sendFile(path.join(__dirname, 'profile-page/public-profile.html')); 
+});
 
 
 app.use("/pay-page", stripeRoutes);

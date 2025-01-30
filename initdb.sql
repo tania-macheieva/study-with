@@ -18,7 +18,7 @@ CREATE TABLE teachers (
     user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     nickname VARCHAR(150),
     dob DATE,
-    gender VARCHAR(50),
+    gender VARCHAR(50), 
     country VARCHAR(100),
     city VARCHAR(100),
     phone_number VARCHAR(15),
@@ -167,3 +167,20 @@ CREATE TABLE videos (
     language_code VARCHAR(10) DEFAULT 'en',
     FOREIGN KEY (lecture_id) REFERENCES lectures(id) ON DELETE CASCADE
 );
+
+
+-- таблиця з відгуками 
+CREATE TABLE teacher_reviews (
+    id SERIAL PRIMARY KEY,
+    teacher_id INT NOT NULL REFERENCES teachers(user_id) ON DELETE CASCADE,
+    student_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    rating INT CHECK (rating >= 1 AND rating <= 5),
+    comment TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE teachers ADD COLUMN author_stripe_account VARCHAR(255);
+UPDATE teachers
+SET author_stripe_account = 'acct_1QbnQ7GXqLYAoPtN'
+WHERE id = 1;

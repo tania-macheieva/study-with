@@ -147,6 +147,7 @@ body {
 }
 
 
+
 /* Ефект при наведенні */
 .tab-link:hover {
     color: #141821; /* Зміна кольору тексту при наведенні */
@@ -262,8 +263,6 @@ button:hover {
     font-size: 1rem;
 }
 
-
-
 .modal {
     display: none;
     position: fixed;
@@ -289,6 +288,25 @@ button:hover {
     overflow-y: auto;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     animation: fadeIn 0.3s ease; /* Анімація */
+}
+
+/* Public profile specific modal styles */
+.modal-content.public-profile {
+    width: 80%;
+}
+
+/* Ensure iframe takes full width */
+.iframe-container {
+    width: 100%;
+    height: 80vh;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.iframe-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
 }
 /* Анімація для модального вікна */
 @keyframes fadeIn {
@@ -783,3 +801,5 @@ button:hover {
     color: #ffffff;
     transform: translateY(-2px);
 }  
+
+
