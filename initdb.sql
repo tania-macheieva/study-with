@@ -168,7 +168,6 @@ CREATE TABLE videos (
     FOREIGN KEY (lecture_id) REFERENCES lectures(id) ON DELETE CASCADE
 );
 
-
 -- таблиця з відгуками 
 CREATE TABLE teacher_reviews (
     id SERIAL PRIMARY KEY,
@@ -184,3 +183,46 @@ ALTER TABLE teachers ADD COLUMN author_stripe_account VARCHAR(255);
 UPDATE teachers
 SET author_stripe_account = 'acct_1QbnQ7GXqLYAoPtN'
 WHERE id = 1;
+
+CREATE TABLE tests (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE questions (
+  id SERIAL PRIMARY KEY,
+  test_id INTEGER REFERENCES tests(id) ON DELETE CASCADE,
+  type VARCHAR(50) NOT NULL,
+  question_text TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE subquestions (
+  id SERIAL PRIMARY KEY,
+  question_id INTEGER REFERENCES questions(id) ON DELETE CASCADE,
+  subquestion_text TEXT NOT NULL
+);
+
+CREATE TABLE answers (
+  id SERIAL PRIMARY KEY,
+  question_id INTEGER REFERENCES questions(id) ON DELETE CASCADE,
+  subquestion_id INTEGER REFERENCES subquestions(id) ON DELETE CASCADE,
+  answer_text TEXT NOT NULL,
+  is_correct BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Створення таблиці запису на курс
+CREATE TABLE enrollments (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    course_id INTEGER REFERENCES all_courses(id) ON DELETE CASCADE,
+    enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(20) CHECK (status IN ('active', 'completed', 'archived')) DEFAULT 'active',
+    progress INTEGER DEFAULT 0,
+    last_accessed TIMESTAMP,
+    UNIQUE(user_id, course_id)
+);
+
+

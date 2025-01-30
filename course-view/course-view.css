@@ -1,0 +1,483 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: #FFFFFF;
+}
+
+.course-view {
+    width: 100%;
+    max-width: 1920px;
+    margin: 0 auto;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 379px;
+    gap: 20px;
+}
+
+/* Video section */
+.video-container {
+    background: #FFFFFF;
+    border: 2px solid #C7C7C7;
+    border-radius: 12px;
+    padding: 14px;
+    width: 100%;
+    height: fit-content;
+}
+
+.video-player {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #D9D9D9;
+    border-radius: 12px;
+}
+
+/* Course content sidebar */
+.course-content {
+    background: #FFFFFF;
+    border: 2px solid #C7C7C7;
+    border-radius: 12px;
+    padding: 30px 20px;
+    height: calc(100vh - 40px);
+    overflow-y: auto;
+    position: sticky;
+    top: 20px;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.toggle-all::after,
+.toggle-module::after {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid #283044;
+    border-bottom: 2px solid #283044;
+    transform: rotate(45deg);
+    transition: transform 0.3s ease;
+    margin-left: 5px;
+}
+
+.course-content.collapsed .module {
+    display: none;
+}
+
+.toggle-all,
+.toggle-module {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    position: relative;
+    margin-right: 12px;
+    margin-top: -5px;
+}
+
+.toggle-all.collapsed::after,
+.toggle-module.collapsed::after {
+    transform: rotate(-45deg);
+}
+
+/* Початково приховуємо модулі */
+.module {
+    display: none;
+}
+
+/* Показуємо модулі, коли контент розгорнутий */
+.course-content:not(.collapsed) .module {
+    display: block;
+}
+
+/* Стилізація заголовка курсу */
+.course-header {
+    border-bottom: 1px solid #C7C7C7;
+}
+
+.course-header,
+.module-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 8px;
+}
+
+.toggle-all {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+/* Стилізація заголовків модулів */
+
+.toggle-module {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.course-content h1 {
+    font-size: 32px;
+    font-weight: 500;
+    color: #283044;
+    margin-bottom: 10px;
+}
+
+.module {
+    border-bottom: 1px solid #C7C7C7;
+    padding: 20px 0;
+    position: relative;
+}
+
+.module:last-child {
+    border-bottom: none;
+}
+
+.module h2 {
+    font-size: 20px;
+    font-weight: 500;
+    color: #283044;
+}
+
+.module-progress {
+    font-size: 10px;
+    color: #000000;
+    margin-bottom: 15px;
+    display: block !important;
+    margin-left: 0;
+}
+
+.module-content {
+    display: block !important;
+}
+
+.module.collapsed .topics {
+    display: none;
+}
+
+.module-progress .separator {
+    margin: 0 10px;
+    color: #283044;
+}
+
+.topics {
+    list-style: none;
+    padding-left: 40px;
+}
+
+.topics li {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #000000;
+    position: relative;
+    padding-right: 30px;
+    gap: 10px;
+}
+
+.topics li::before {
+    content: "";
+    position: absolute;
+    left: -40px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+}
+
+.topics li::after {
+    content: "";
+    position: absolute;
+    left: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.topics li .content-type-icon {
+    position: absolute;
+    left: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.topics li.completed::before {
+    content: "✓";
+    font-size: 14px;
+    color: #283044;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Discussion section */
+.discussion-section {
+    border: 2px solid #C7C7C7;
+    border-radius: 12px;
+    padding: 20px;
+    width: 100%;
+    background: #FFFFFF;
+}
+
+/* Navigation tabs */
+.tabs {
+    display: inline-flex;
+    margin: 20px 0;
+}
+
+.tab {
+    height: 48px;
+    padding: 0 20px;
+    background: #FFFFFF;
+    border: 2px solid #283044;
+    font-weight: 500;
+    font-size: 16px;
+    color: #283044;
+    cursor: pointer;
+    border-radius: 0;
+    margin-right: -2px;
+    transition: background-color 0.2s ease;
+}
+
+.tab:first-child {
+    border-radius: 12px 0 0 12px;
+}
+
+.tab:last-child {
+    border-radius: 0 12px 12px 0;
+}
+
+.tab:hover {
+    background: #F5F9FE;
+}
+
+.tab.active {
+    background: #DCECFC;
+}
+
+/* Search bar */
+.search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.search-bar input {
+    flex-grow: 1;
+    height: 30px;
+    padding: 0 15px;
+    border: 2px solid #C7C7C7;
+    border-radius: 12px;
+    font-size: 13px;
+    color: #283044;
+}
+
+.icon-button {
+    width: 32px;
+    height: 30px;
+    border: 2px solid #C7C7C7;
+    border-radius: 12px;
+    background: #FFFFFF;
+    cursor: pointer;
+}
+
+/* Filters */
+.filters {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.filter-group {
+    display: inline-flex;
+}
+
+.filter-btn {
+    height: 31px;
+    padding: 0 15px;
+    background: #FFFFFF;
+    border: 2px solid #283044;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: #283044;
+    cursor: pointer;
+    border-radius: 0;
+    margin-right: -2px;
+    transition: background-color 0.2s ease;
+}
+
+.filter-group .filter-btn:first-child {
+    border-radius: 12px 0 0 12px;
+}
+
+.filter-group .filter-btn:last-child {
+    border-radius: 0 12px 12px 0;
+}
+
+.filter-btn:hover {
+    background: #F5F9FE;
+}
+
+.filter-btn.active {
+    background: #DCECFC;
+}
+
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+/* Discussion thread */
+.discussion-thread {
+    margin-top: 20px;
+}
+
+/* Message styling */
+.message {
+    position: relative;
+    border: 2px solid #C7C7C7;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    background: #FFFFFF;
+}
+
+/* Chain of replies styling */
+.message.reply {
+    margin-top: -2px;
+    margin-bottom: 0;
+    border-radius: 0;
+}
+
+.message.has-visible-replies {
+    margin-bottom: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.message.reply:last-of-type {
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    margin-bottom: 16px;
+}
+
+.message .user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.message .avatar {
+    width: 38px;
+    height: 41px;
+}
+
+.message .username {
+    font-size: 12px;
+    font-weight: 500;
+    color: #000000;
+}
+
+.message .date {
+    margin-left: auto;
+    font-size: 13px;
+    color: #666666;
+}
+
+.message .message-text {
+    font-size: 16px;
+    font-weight: 200;
+    color: #000000;
+    margin-left: 48px;
+}
+
+.message .more-options {
+    position: absolute;
+    right: 10px;
+    top: 60px;
+    transform: rotate(90deg);
+    font-size: 36px;
+    color: #000000;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.message .reply-input {
+    display: flex;
+    gap: 10px;
+    padding: 30px;
+    margin-top: 20px;
+}
+
+.message .reply-input input {
+    flex-grow: 1;
+    height: 30px;
+    padding: 0 15px;
+    border: 2px solid #C7C7C7;
+    border-radius: 12px;
+    font-size: 13px;
+    color: #666666;
+}
+
+.message .send-reply {
+    width: 32px;
+    height: 30px;
+    border: 2px solid #C7C7C7;
+    border-radius: 12px;
+    background: #FFFFFF;
+    cursor: pointer;
+}
+
+.message.reply .user-info,
+.message.reply .message-text {
+    margin-left: 48px;
+}
+
+.show-more-button {
+    margin: 10px 0;
+    padding: 8px 16px;
+    background: #FFFFFF;
+    border: 2px solid #283044;
+    border-radius: 12px;
+    font-size: 14px;
+    cursor: pointer;
+    display: block;
+}
+
+.icon-button img {
+    width: 18px;
+    height: 18px;
+    display: block;
+    margin: auto;
+}
+
+.send-reply img {
+    width: 18px;
+    height: 18px;
+    display: block;
+    margin: auto;
+}

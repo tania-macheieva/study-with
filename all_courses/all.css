@@ -378,3 +378,17 @@ h4.filters-apply {
     margin-left: 0; /* Скидаємо відступи */
   }
 }
+
+#pixel-cat {
+  position: fixed;
+  bottom: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: all 5s ease-out;
+}
+
+#pixel-cat img {
+  width: 100px;
+  height: auto;
+}

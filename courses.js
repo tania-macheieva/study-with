@@ -49,62 +49,88 @@ const upload = multer({ storage }).fields([
       let courseId = course_id;  
       let courseToUpdate;
   
-      
       const courseCheckQuery = `
         SELECT id, name, description, price, category_id, image_url, education_level_id, status
         FROM all_courses
-        WHERE author_id = $1 AND (name = $2 OR description = $3) AND status != 'published'
+        WHERE author_id = $1 AND (name = $2 OR description = $3)
       `;
       const courseCheckResult = await pool.query(courseCheckQuery, [author_id, course_title, course_description]);
   
       if (courseCheckResult.rows.length > 0) {
-        
         courseToUpdate = courseCheckResult.rows[0];
   
-        const updateQuery = `
-          UPDATE all_courses
-          SET
-            name = COALESCE($1, name),
-            description = COALESCE($2, description),
-            price = COALESCE($3, price),
-            category_id = COALESCE($4, category_id),
-            image_url = COALESCE($5, image_url),
-            education_level_id = COALESCE($6, education_level_id),
-            status = 'draft'
-          WHERE id = $7;
-        `;
-        const updateValues = [
-          course_title || courseToUpdate.name,
-          course_description || courseToUpdate.description,
-          parsedCoursePrice || courseToUpdate.price,
-          parsedCourseCategory || courseToUpdate.category_id,
-          courseThumbnail || courseToUpdate.image_url,
-          parsedEducationLevel || courseToUpdate.education_level_id,
-          courseToUpdate.id
-        ];
-  
-        await pool.query(updateQuery, updateValues);
-        courseId = courseToUpdate.id;   
-      } else { 
-        if (!courseId) {
-          const query = `
-            INSERT INTO all_courses (name, description, price, category_id, image_url, author_id, education_level_id, status)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, 'draft')
-            RETURNING id;
+        if (courseToUpdate.status === 'published') {
+          // Якщо курс вже опублікований, просто оновлюємо дані без зміни статусу
+          const updateQuery = `
+            UPDATE all_courses
+            SET
+              name = COALESCE($1, name),
+              description = COALESCE($2, description),
+              price = COALESCE($3, price),
+              category_id = COALESCE($4, category_id),
+              image_url = COALESCE($5, image_url),
+              education_level_id = COALESCE($6, education_level_id)
+            WHERE id = $7;
           `;
-          const result = await pool.query(query, [
-            course_title,
-            course_description,
-            parsedCoursePrice,
-            parsedCourseCategory,
-            courseThumbnail,
-            author_id,
-            parsedEducationLevel,
-          ]);
-          courseId = result.rows[0].id;  
+          const updateValues = [
+            course_title || courseToUpdate.name,
+            course_description || courseToUpdate.description,
+            parsedCoursePrice || courseToUpdate.price,
+            parsedCourseCategory || courseToUpdate.category_id,
+            courseThumbnail || courseToUpdate.image_url,
+            parsedEducationLevel || courseToUpdate.education_level_id,
+            courseToUpdate.id
+          ];
+  
+          await pool.query(updateQuery, updateValues);
+          courseId = courseToUpdate.id;
+        } else {
+          // Якщо курс є в чернетці або взагалі відсутній, оновлюємо статус на "draft"
+          const updateQuery = `
+            UPDATE all_courses
+            SET
+              name = COALESCE($1, name),
+              description = COALESCE($2, description),
+              price = COALESCE($3, price),
+              category_id = COALESCE($4, category_id),
+              image_url = COALESCE($5, image_url),
+              education_level_id = COALESCE($6, education_level_id),
+              status = 'draft'
+            WHERE id = $7;
+          `;
+          const updateValues = [
+            course_title || courseToUpdate.name,
+            course_description || courseToUpdate.description,
+            parsedCoursePrice || courseToUpdate.price,
+            parsedCourseCategory || courseToUpdate.category_id,
+            courseThumbnail || courseToUpdate.image_url,
+            parsedEducationLevel || courseToUpdate.education_level_id,
+            courseToUpdate.id
+          ];
+  
+          await pool.query(updateQuery, updateValues);
+          courseId = courseToUpdate.id;
         }
+      } else {
+        // Якщо курсу немає, створюємо новий курс зі статусом "draft"
+        const query = `
+          INSERT INTO all_courses (name, description, price, category_id, image_url, author_id, education_level_id, status)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, 'draft')
+          RETURNING id;
+        `;
+        const result = await pool.query(query, [
+          course_title,
+          course_description,
+          parsedCoursePrice,
+          parsedCourseCategory,
+          courseThumbnail,
+          author_id,
+          parsedEducationLevel,
+        ]);
+        courseId = result.rows[0].id;
       }
   
+      // Update or insert modules
       if (modules && modules !== 'undefined' && modules !== null) {
         let modulesArray = [];
         try {
@@ -112,174 +138,142 @@ const upload = multer({ storage }).fields([
         } catch (err) {
           return res.status(400).json({ success: false, message: 'Invalid modules data!' });
         }
-      
-        
+  
         const existingModulesResult = await pool.query(
           `SELECT id FROM modules WHERE course_id = $1`,
           [courseId]
         );
         const existingModuleIds = existingModulesResult.rows.map(row => row.id);
-      
-        
+  
         const newModuleIds = modulesArray.map(module => module.id).filter(id => id !== undefined);
-      
-        
+  
         const modulesToDelete = existingModuleIds.filter(id => !newModuleIds.includes(id));
-      
+  
         if (modulesToDelete.length > 0) {
-          
           await pool.query(`DELETE FROM lecture_files WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
           await pool.query(`DELETE FROM videos WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
           await pool.query(`DELETE FROM lectures WHERE module_id = ANY($1::int[])`, [modulesToDelete]);
-      
-          
           await pool.query(`DELETE FROM modules WHERE id = ANY($1::int[])`, [modulesToDelete]);
         }
-      
-        
+  
         const modulePromises = modulesArray.map(async (module) => {
           const { id, title, order_num, lectures: moduleLectures } = module;
-      
+  
           if (!title || !order_num) {
             throw new Error('Module must have a title and order_num.');
           }
-          const existingModuleResult = await pool.query(
-            `SELECT id FROM modules WHERE course_id = $1 AND order_num = $2`,
-            [courseId, order_num]
-        );
-        
-        let moduleId = null;
-        if (existingModuleResult.rows.length > 0) {
-            moduleId = existingModuleResult.rows[0].id;
-            await pool.query(
-                `UPDATE modules SET title = $1 WHERE id = $2`,
-                [title, moduleId]
-            );
-        } else {
+          let moduleId = id;
+  
+          if (!moduleId) {
             const moduleResult = await pool.query(
-                `INSERT INTO modules (course_id, title, order_num) VALUES ($1, $2, $3) RETURNING id`,
-                [courseId, title, order_num]
+              `INSERT INTO modules (course_id, title, order_num) VALUES ($1, $2, $3) RETURNING id`,
+              [courseId, title, order_num]
             );
             moduleId = moduleResult.rows[0].id;
-        }
-        
-      
-          
+          } else {
+            await pool.query(
+              `UPDATE modules SET title = $1 WHERE id = $2`,
+              [title, moduleId]
+            );
+          }
+  
           if (moduleLectures && Array.isArray(moduleLectures)) {
             const lecturePromises = moduleLectures.map(async (lecture, index) => {
               const { id: lectureId, title, description } = lecture;
-      
+  
               if (!title) {
                 throw new Error('Lecture must have a title.');
               }
-      
+  
               if (lectureId) {
-                
                 await pool.query(
                   `UPDATE lectures SET title = $1, description = $2 WHERE id = $3`,
                   [title, description, lectureId]
                 );
               } else {
-                
                 const lectureResult = await pool.query(
                     `INSERT INTO lectures (module_id, title, description, order_num) VALUES ($1, $2, $3, $4) RETURNING id`,
                     [moduleId, title, description, index + 1]
                   );
-                  const lectureId = lectureResult.rows[0].id;
-                  
-
-
-                
+                const lectureId = lectureResult.rows[0].id;
+  
                 const filesForThisLecture = req.files['lecture_files']?.slice(index, index + 1); 
-
                 if (filesForThisLecture && filesForThisLecture.length > 0) {
-                    
-                    await pool.query('DELETE FROM lecture_files WHERE lecture_id = $1', [lectureId]);
-
-                    
-                    const file = filesForThisLecture[0]; 
-                    await pool.query(
-                        `INSERT INTO lecture_files (lecture_id, file_name, file_url, file_type)
-                         VALUES ($1, $2, $3, $4)`,
-                        [
-                            lectureId,
-                            file.originalname,
-                            file.path,
-                            file.mimetype,
-                        ]
-                    );
+                  await pool.query('DELETE FROM lecture_files WHERE lecture_id = $1', [lectureId]);
+  
+                  const file = filesForThisLecture[0]; 
+                  await pool.query(
+                      `INSERT INTO lecture_files (lecture_id, file_name, file_url, file_type)
+                       VALUES ($1, $2, $3, $4)`,
+                      [
+                          lectureId,
+                          file.originalname,
+                          file.path,
+                          file.mimetype,
+                      ]
+                  );
                 }
-
-                
+  
                 const videosForThisLecture = req.files['lecture_videos']?.slice(index, index + 1); 
-
                 if (videosForThisLecture && videosForThisLecture.length > 0) {
-                    
-                    await pool.query('DELETE FROM videos WHERE lecture_id = $1', [lectureId]);
-
-                    
-                    const video = videosForThisLecture[0]; 
-                    await pool.query(
-                        `INSERT INTO videos (lecture_id, file_name, file_path, file_size)
-                         VALUES ($1, $2, $3, $4)`,
-                        [
-                            lectureId,
-                            video.originalname,
-                            video.path,
-                            video.size,
-                        ]
-                    );
+                  await pool.query('DELETE FROM videos WHERE lecture_id = $1', [lectureId]);
+  
+                  const video = videosForThisLecture[0]; 
+                  await pool.query(
+                      `INSERT INTO videos (lecture_id, file_name, file_path, file_size)
+                       VALUES ($1, $2, $3, $4)`,
+                      [
+                          lectureId,
+                          video.originalname,
+                          video.path,
+                          video.size,
+                      ]
+                  );
                 }
-            }
-        });
-           
-      
+              }
+            });
+  
             await Promise.all(lecturePromises);
           }
         });
-      
+  
         await Promise.all(modulePromises);
       }
-      
   
-    
-    if (parsedTags && Array.isArray(parsedTags)) {
-        
+      // Update or insert tags
+      if (parsedTags && Array.isArray(parsedTags)) {
         const deleteTagsQuery = `
-        DELETE FROM course_tags
-        WHERE course_id = $1;
+          DELETE FROM course_tags
+          WHERE course_id = $1;
         `;
         await pool.query(deleteTagsQuery, [courseId]);
-    
-        
+  
         const insertTagsQuery = `
-        INSERT INTO tags (name)
-        SELECT * FROM (VALUES ${parsedTags.map((_, i) => `($${i + 1})`).join(', ')}) AS t(name)
-        ON CONFLICT(name) DO NOTHING;
+          INSERT INTO tags (name)
+          SELECT * FROM (VALUES ${parsedTags.map((_, i) => `($${i + 1})`).join(', ')}) AS t(name)
+          ON CONFLICT(name) DO NOTHING;
         `;
         await pool.query(insertTagsQuery, parsedTags);
-    
-        
+  
         const selectTagIdsQuery = `
-        SELECT id FROM tags WHERE name = ANY($1);
+          SELECT id FROM tags WHERE name = ANY($1);
         `;
         const tagIdsResult = await pool.query(selectTagIdsQuery, [parsedTags]);
-    
-        
+  
         const courseTagPromises = tagIdsResult.rows.map(tag => {
-        return pool.query(
+          return pool.query(
             `INSERT INTO course_tags (course_id, tag_id)
             SELECT $1, $2
             WHERE NOT EXISTS (
-            SELECT 1 FROM course_tags WHERE course_id = $1 AND tag_id = $2
+              SELECT 1 FROM course_tags WHERE course_id = $1 AND tag_id = $2
             )`,
             [courseId, tag.id]
-        );
+          );
         });
-    
+  
         await Promise.all(courseTagPromises);
-    }
-    
+      }
+  
       return res.json({
         success: true,
         message: 'Draft saved successfully!',
@@ -654,6 +648,7 @@ router.get('/', async (req, res) => {
       const result = await pool.query(query, queryParams);
       
       const formattedCourses = result.rows.map(course => ({
+          id: course.id,  
           name: course.name,
           description: course.description,
           price: parseFloat(course.price),
@@ -668,6 +663,239 @@ router.get('/', async (req, res) => {
   } catch (err) {
       console.error('Error getting courses:', err);
       res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.get('/:id', async (req, res) => {
+  try {
+      const { id } = req.params;
+      const query = `
+          SELECT c.*, 
+                 cat.name as category_name,
+                 el.name as education_level
+          FROM all_courses c
+          LEFT JOIN categories cat ON c.category_id = cat.id
+          LEFT JOIN education_levels el ON c.education_level_id = el.id
+          WHERE c.id = $1 AND c.status = 'published'
+      `;
+      const result = await pool.query(query, [id]);
+      
+      if (result.rows.length === 0) {
+          return res.status(404).json({ error: 'Course not found' });
+      }
+
+      const course = result.rows[0];
+      res.json({
+          id: course.id,
+          name: course.name,
+          description: course.description,
+          price: parseFloat(course.price),
+          category: course.category_name,
+          level: course.education_level,
+          duration: '6 weeks'
+      });
+  } catch (err) {
+      console.error('Error getting course:', err);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.get('/:id/full', async (req, res) => {
+  try {
+      const { id } = req.params;
+      
+      const query = `
+          SELECT 
+              c.*,
+              cat.name as category_name,
+              el.name as education_level,
+              (
+                  SELECT json_agg(
+                      json_build_object(
+                          'id', m.id,
+                          'title', m.title,
+                          'order_num', m.order_num,
+                          'lectures', (
+                              SELECT json_agg(
+                                  json_build_object(
+                                      'id', l.id,
+                                      'title', l.title,
+                                      'description', l.description,
+                                      'order_num', l.order_num
+                                  )
+                                  ORDER BY l.order_num
+                              )
+                              FROM lectures l
+                              WHERE l.module_id = m.id
+                          )
+                      )
+                      ORDER BY m.order_num
+                  )
+                  FROM modules m
+                  WHERE m.course_id = c.id
+              ) as modules
+          FROM all_courses c
+          LEFT JOIN categories cat ON c.category_id = cat.id
+          LEFT JOIN education_levels el ON c.education_level_id = el.id
+          WHERE c.id = $1 AND c.status = 'published';
+      `;
+
+      const result = await pool.query(query, [id]);
+      
+      if (result.rows.length === 0) {
+          return res.status(404).json({ error: 'Курс не знайдено' });
+      }
+
+      const course = result.rows[0];
+      
+      res.json({
+          id: course.id,
+          name: course.name,
+          description: course.description,
+          price: parseFloat(course.price),
+          category: course.category_name,
+          level: course.education_level,
+          image_url: course.image_url,
+          modules: course.modules || []
+      });
+
+  } catch (err) {
+      console.error('Помилка отримання курсу:', err);
+      res.status(500).json({ error: 'Внутрішня помилка сервера' });
+  }
+});
+
+//-тут
+// Маршрут для перевірки чи користувач записаний на курс
+router.get('/:courseId/enrollment-status', async (req, res) => {
+  const { courseId } = req.params;
+  const { userId } = req.query;
+
+  try {
+      const query = `
+          SELECT * FROM enrollments 
+          WHERE user_id = $1 AND course_id = $2
+      `;
+      const result = await pool.query(query, [userId, courseId]);
+      
+      res.json({
+          isEnrolled: result.rows.length > 0,
+          enrollment: result.rows[0] || null
+      });
+  } catch (error) {
+      console.error('Error checking enrollment status:', error);
+      res.status(500).json({ error: 'Внутрішня помилка сервера' });
+  }
+});
+
+// Маршрут для запису на курс
+router.post('/:courseId/enroll', async (req, res) => {
+  const { courseId } = req.params;
+  const { userId } = req.body;
+
+  if (!userId) {
+      return res.status(400).json({ error: 'Необхідно увійти в систему' });
+  }
+
+  try {
+      // Перевіряємо чи існує курс
+      const courseQuery = `
+          SELECT * FROM all_courses 
+          WHERE id = $1 AND status = 'published'
+      `;
+      const courseResult = await pool.query(courseQuery, [courseId]);
+
+      if (courseResult.rows.length === 0) {
+          return res.status(404).json({ error: 'Курс не знайдено' });
+      }
+
+      const course = courseResult.rows[0];
+
+      // Перевіряємо чи користувач вже записаний
+      const enrollmentCheckQuery = `
+          SELECT * FROM enrollments 
+          WHERE user_id = $1 AND course_id = $2
+      `;
+      const enrollmentCheck = await pool.query(enrollmentCheckQuery, [userId, courseId]);
+
+      if (enrollmentCheck.rows.length > 0) {
+          return res.status(400).json({ error: 'Ви вже записані на цей курс' });
+      }
+
+      // Якщо курс платний
+      if (course.price > 0) {
+          return res.status(402).json({
+              error: 'Потрібна оплата',
+              courseId,
+              price: course.price
+          });
+      }
+
+      // Записуємо користувача на безкоштовний курс
+      const enrollQuery = `
+          INSERT INTO enrollments (user_id, course_id, enrollment_date, status, progress)
+          VALUES ($1, $2, CURRENT_TIMESTAMP, 'active', 0)
+          RETURNING id, enrollment_date
+      `;
+      const enrollResult = await pool.query(enrollQuery, [userId, courseId]);
+
+      res.status(201).json({
+          success: true,
+          message: 'Ви успішно записались на курс',
+          enrollmentId: enrollResult.rows[0].id,
+          enrollmentDate: enrollResult.rows[0].enrollment_date
+      });
+
+  } catch (error) {
+      console.error('Помилка при записі на курс:', error);
+      res.status(500).json({ error: 'Внутрішня помилка сервера' });
+  }
+});
+
+router.get('/enrolled/:userId', async (req, res) => {
+  const { userId } = req.params;
+  try {
+      const query = `
+          SELECT DISTINCT
+              c.id,
+              c.name,
+              c.description,
+              c.image_url,
+              c.price,
+              e.progress,
+              e.enrollment_date,
+              e.status as enrollment_status,
+              cat.name as category_name,
+              el.name as education_level
+          FROM enrollments e
+          INNER JOIN all_courses c ON e.course_id = c.id
+          LEFT JOIN categories cat ON c.category_id = cat.id
+          LEFT JOIN education_levels el ON c.education_level_id = el.id
+          WHERE e.user_id = $1 
+          AND e.status = 'active'
+          AND c.status = 'published'
+          ORDER BY e.enrollment_date DESC
+      `;
+      const result = await pool.query(query, [userId]);
+
+      const courses = result.rows.map(course => ({
+          id: course.id,
+          name: course.name || 'Untitled Course',
+          description: course.description,
+          progress: course.progress || 0,
+          image_url: course.image_url,
+          category: course.category_name,
+          level: course.education_level,
+          price: course.price
+      }));
+
+      res.json(courses);
+  } catch (error) {
+      console.error('Server error:', error);
+      res.status(500).json({ 
+          error: 'Internal server error', 
+          details: error.message 
+      });
   }
 });
 

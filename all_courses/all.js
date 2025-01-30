@@ -69,18 +69,24 @@ document.addEventListener("DOMContentLoaded", async function() {
       coursesContainer.style.gap = '40px';
   
       coursesToShow.forEach(course => {
-          const courseHTML = `
-              <div class="course_group">
-                  <div class="course_name">${course.name}</div>
-                  <div class="description">${course.description}</div>
-                  <div class="group-27">
-                      <div class="price">${course.price === 0 ? 'Free' : '$' + course.price}</div>
-                      <img class="arrow" src="/images/right-arrow.png" alt="Arrow Icon" />
-                  </div>
-              </div>
-          `;
-          coursesContainer.insertAdjacentHTML('beforeend', courseHTML);
-      });
+        const courseElement = document.createElement('div');
+        courseElement.className = 'course_group';
+        courseElement.style.cursor = 'pointer';
+        courseElement.innerHTML = `
+            <div class="course_name">${course.name}</div>
+            <div class="description">${course.description}</div>
+            <div class="group-27">
+                <div class="price">${course.price === 0 ? 'Free' : '$' + course.price}</div>
+                <img class="arrow" src="/images/right-arrow.png" alt="Arrow Icon" />
+            </div>
+        `;
+        
+        courseElement.addEventListener('click', () => {
+            window.location.href = `/course-preview?id=${course.id}`;
+        });
+        
+        coursesContainer.appendChild(courseElement);
+    });
   
       const loadMoreButton = document.querySelector(".more-btn");
       if (loadMoreButton) {

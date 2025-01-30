@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Page</title>
+    <link rel="icon" href="../images/menu-logo.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Jost:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/course-view/course-view.css">
+</head>
+<body>
+    <main class="course-view">
+        <div class="main-content">
+            <section class="video-container">
+                <div class="video-player"></div>
+            </section>
+
+            <nav class="tabs">
+                <button class="tab active">Discussion</button>
+                <button class="tab">Search by keyword</button>
+                <button class="tab">My curriculum</button>
+                <button class="tab">My notes & marks</button>
+            </nav>
+
+            <section class="discussion-section">
+                <div class="search-bar">
+                    <input type="text" placeholder="ask or search a question">
+                    <button class="icon-button send">
+                        <img src="../images/send.svg" alt="Send">
+                    </button>
+                    <button class="icon-button search">
+                        <img src="../images/icons8-search-50.png" alt="Search">
+                    </button>
+                </div>
+
+                <div class="filters">
+                    <div class="filter-group">
+                        <button class="filter-btn">Questions I asked</button>
+                        <button class="filter-btn">Questions I'm following</button>
+                        <button class="filter-btn">Questions with responses</button>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <button class="filter-btn active">Whole course</button>
+                        <button class="filter-btn">Current topic</button>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <button class="filter-btn active">Recent</button>
+                        <button class="filter-btn">Oldest</button>
+                    </div>
+                </div>
+
+                <section class="discussion-thread">
+                    <!-- Повідомлення будуть додані динамічно через JavaScript -->
+                    <article class="message">
+                        <div class="user-info">
+                            <img src="/images/user-avatar.png" alt="User avatar" class="avatar">
+                            <span class="username">question user 1</span>
+                            <span class="date">29.01.2024</span>
+                        </div>
+                        <p class="message-text">question question question question question 1</p>
+                        <button class="more-options">...</button>
+                        <div class="reply-input" style="display: none;">
+                            <input type="text" placeholder="write a reply to question user 1">
+                            <button class="send-reply">
+                                <img src="/images/send.svg" alt="Send reply">
+                            </button>
+                        </div>
+                    </article>
+                    <!-- Додаткові повідомлення будуть динамічно  додані тут -->
+                </section>
+            </section>
+        </div>
+
+        <aside class="course-content">
+        </aside>
+    </main>
+    <script src="/header/auth-header.js"></script>
+    <script src="/footer/footer.js"></script>
+    <script src="/course-view/course-view.js"></script>
+</body>
+</html>

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-lang="testCreation">Test creation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../all_courses/all.css" />
+    <link rel="icon" href="../images/menu-logo.ico">
+  <link rel="stylesheet" href="/tests/test-creation.css">
+</head>
+<body>
+  <header>
+    <h1  data-lang="testCreation">Test creation</h1>
+  </header>
+
+  <main>
+    <form id="test-form">
+        <!-- Введення кількості питань для кожного типу -->
+        <label for="test-title"  data-lang="testTitle">Test Title:</label>
+        <input type="text" id="test-title" data-lang="enterTestTitle" placeholder="Enter test title">
+        
+        <div>
+          <label for="single-choice-count"  data-lang="numQuesOneAnsw">Number of questions with one correct answer:</label>
+          <input type="number" id="single-choice-count" name="single-choice-count" value="0" min="0" required>
+        </div>
+  
+        <div>
+          <label for="multiple-choice-count" data-lang="numQuesMultAnsw">Number of questions with multiple correct answers:</label>
+          <input type="number" id="multiple-choice-count" name="multiple-choice-count" value="0" min="0" required>
+        </div>
+  
+        <div>
+          <label for="matching-count"  data-lang="quesMathing">Number of questions to match:</label>
+          <input type="number" id="matching-count" name="matching-count" value="0" min="0" required>
+        </div>
+  
+        <div>
+          <label for="open-ended-count"  data-lang="quesOpen">Number of questions answered:</label>
+          <input type="number" id="open-ended-count" name="open-ended-count" value="0" min="0" required>
+        </div>
+<!-- Кнопка для генерації блоків питань -->
+<div class="button-container">
+  <button type="button" id="generate-questions-btn"  data-lang="generQuestion">Generate question</button>
+</div>
+
+<!-- Контейнер для динамічних блоків питань -->
+<div id="questions-block"></div>
+
+<!-- Кнопка для збереження тесту -->
+<div class="save-test-container">
+  <button id="save-test-btn" type="submit" data-lang="saveTest">Save test</button>
+</div>
+
+<div class="generate-test">
+  <input type="text" id="test-id-input" data-lang="enterTestId" placeholder="Enter Test ID">
+  <button type="button" id="generate-test-btn" data-lang="generTest">Generate Test</button>
+</div>
+<div id="final-test-block"></div>
+      </form>
+    </main>
+  
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  let testData = { questions: [] }; // Об'єкт для зберігання питань
+
+  // Обробник кнопки "Generate test"
+  document.getElementById('generate-questions-btn').addEventListener('click', function () {
+    const questionsBlock = document.getElementById('questions-block');
+    questionsBlock.innerHTML = ''; // Очистка попередніх питань
+    testData.questions = []; // Очищення даних тесту
+
+    // Отримуємо кількість питань для кожного типу
+    const singleChoiceCount = parseInt(document.getElementById('single-choice-count').value) || 0;
+    const multipleChoiceCount = parseInt(document.getElementById('multiple-choice-count').value) || 0;
+    const matchingCount = parseInt(document.getElementById('matching-count').value) || 0;
+    const openEndedCount = parseInt(document.getElementById('open-ended-count').value) || 0;
+
+    let questionIndex = 1;
+
+    // Генерація питань за типами
+    const generateQuestionsByType = (type, count) => {
+      for (let i = 0; i < count; i++) {
+        const questionBlock = createQuestionBlock(type, questionIndex++);
+        questionsBlock.appendChild(questionBlock.html);
+        testData.questions.push({ ...questionBlock.data, htmlId: questionBlock.html.id });
+      }
+    };
+
+    generateQuestionsByType('Single-choice', singleChoiceCount);
+    generateQuestionsByType('Multiple-choice', multipleChoiceCount);
+    generateQuestionsByType('Matching', matchingCount);
+    generateQuestionsByType('Open-ended', openEndedCount);
+  });
+
+  // Функція для створення блоків для питань
+  function createQuestionBlock(type, index) {
+    const questionData = {
+      type,
+      index,
+      questionText: '',
+      answers: [],
+    };
+    const wrapper = document.createElement('div');
+    wrapper.className = 'question-block';
+    wrapper.id = `question-${index}`;
+    wrapper.innerHTML = `
+      <label data-lang="question">Question ${index}:</label>
+      <textarea data-lang="enterQuesText"  class="question-text" placeholder="Enter question text"></textarea>
+    `;
+
+    if (type === 'Single-choice' || type === 'Multiple-choice') {
+      for (let i = 1; i <= 4; i++) {
+        const answerWrapper = document.createElement('div');
+        answerWrapper.innerHTML = `
+          <input type="${type === 'Single-choice' ? 'radio' : 'checkbox'}" name="answer-${index}">
+          <input data-lang="answer" type="text" placeholder="Answer ${i}">
+        `;
+        wrapper.appendChild(answerWrapper);
+        questionData.answers.push({ answerText: '', isCorrect: false });
+      }
+    } else if (type === 'Matching') {
+      for (let i = 1; i <= 4; i++) {
+        const answerWrapper = document.createElement('div');
+        answerWrapper.innerHTML = `
+          <input data-lang="question" type="text" placeholder="Question ${i}">
+          <input data-lang="answer" type="text" placeholder="Answer ${i}">
+        `;
+        wrapper.appendChild(answerWrapper);
+        questionData.answers.push({ questionText: '', answerText: '' });
+      }
+    } else if (type === 'Open-ended') {
+      const answerWrapper = document.createElement('div');
+      answerWrapper.innerHTML = `
+        <textarea class="open-ended-answer" data-lang="enteropenEndedAnsw" type="text" placeholder="Enter open-ended answer"></textarea>
+      `;
+      wrapper.appendChild(answerWrapper);
+    }
+
+
+    return { html: wrapper, data: questionData };
+  }
+
+ // Обробник кнопки "Save test"
+document.getElementById('save-test-btn').addEventListener('click', (e) => {
+  e.preventDefault();
+  // Отримуємо значення заголовка тесту
+  const testTitleInput = document.getElementById('test-title');
+  const testTitle = testTitleInput ? testTitleInput.value.trim() : '';
+
+  // Перевіряємо, чи введено заголовок
+  if (!testTitle) {
+    alert('Please provide a title for the test!');
+    return;
+  }
+
+  // Додаємо заголовок до об'єкта testData
+  testData.title = testTitle;
+
+  testData.questions.forEach(question => {
+    const questionTextElement = document.querySelector(`#${question.htmlId} textarea`);
+    question.questionText = questionTextElement ? questionTextElement.value : '';
+
+    if (question.type === 'Single-choice' || question.type === 'Multiple-choice') {
+      const answerElements = document.querySelectorAll(`#${question.htmlId} input[type="text"]`);
+      const isCorrectElements = document.querySelectorAll(`#${question.htmlId} input[type="${question.type === 'Single-choice' ? 'radio' : 'checkbox'}"]`);
+      
+      answerElements.forEach((answerElement, index) => {
+        question.answers[index].answerText = answerElement.value;
+        question.answers[index].isCorrect = isCorrectElements[index].checked;
+      });
+    } else if (question.type === 'Matching') {
+      const matchingInputs = document.querySelectorAll(`#${question.htmlId} input[type="text"]`);
+      for (let i = 0; i < matchingInputs.length; i += 2) {
+        question.answers[i / 2].questionText = matchingInputs[i].value;
+        question.answers[i / 2].answerText = matchingInputs[i + 1].value;
+      }
+    } else if (question.type === 'Open-ended') {
+      const answerElement = document.querySelector(`#${question.htmlId} .open-ended-answer`);
+if (answerElement) {
+    console.log('Open-ended answer element found:', answerElement);
+    console.log('Answer value:', answerElement.value.trim());
+    question.answers = [{ answerText: answerElement.value.trim() }];
+} else {
+    console.log('Open-ended answer element NOT found for question:', question.htmlId);
+    question.answers = [{ answerText: '' }];
+}
+}
+});
+
+  // Перевірка зібраних даних
+  console.log('Collected test data:', JSON.stringify(testData, null, 2));
+
+  // Надсилаємо дані на сервер
+  fetch('/tests/save-test', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(testData),
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Failed to save the test');
+    }
+    return response.json(); // Очікуємо JSON-відповідь
+  })
+  .then(data => {
+    if (data.testId) {
+      alert(`Test saved successfully! Your test ID is: ${data.testId}`);
+      console.log('Saved test ID:', data.testId);
+    } else {
+      alert('Test saved, but no ID was returned from the server.');
+    }
+  })
+  .catch(error => {
+    alert('Error saving test!');
+    console.error(error);
+  });
+ });
+  
+// Обробник для кнопки "Generate Test"
+document.getElementById('generate-test-btn').addEventListener('click', async function () {
+  const testId = document.getElementById('test-id-input').value.trim();
+  const finalTestBlock = document.getElementById('final-test-block');
+  finalTestBlock.innerHTML = ''; // Очищуємо блок перед генерацією
+
+  if (!testId) {
+    finalTestBlock.innerHTML = '<p>Please provide a test ID.</p>';
+    return;
+  }
+
+  try {
+    finalTestBlock.innerHTML = '<p>Loading test data...</p>';
+    // Запит на отримання тесту за ID
+    const response = await fetch(`/tests/get-test/${testId}`);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch test: ${response.statusText}`);
+    }
+
+    const testData = await response.json();
+    console.log('Parsed testData:', testData);
+
+    if (testData.error) {
+      throw new Error(testData.error);
+    }
+
+    // Перевіряємо, чи є питання
+    if (testData.questions && testData.questions.length > 0) {
+      testData.questions.forEach((question, index) => {
+        const questionWrapper = document.createElement('div');
+        questionWrapper.classList.add('final-question-block');
+
+        // Текст питання
+        const questionText = document.createElement('p');
+        questionText.textContent = `${index + 1}. ${question.questionText}`;
+        questionWrapper.appendChild(questionText);
+
+        // Обробка типу питання
+        if (question.type === 'Single-choice' || question.type === 'Multiple-choice') {
+          if (question.answers && question.answers.length > 0) {
+            question.answers.forEach(answer => {
+              const answerOption = document.createElement('div');
+              answerOption.classList.add('answer-option');
+
+              const input = document.createElement('input');
+              input.type = question.type === 'Single-choice' ? 'radio' : 'checkbox';
+              input.name = `final-answer-${index + 1}`;
+              input.value = answer.id;
+
+              const label = document.createElement('label');
+              label.textContent = answer.answerText;
+
+              answerOption.appendChild(input);
+              answerOption.appendChild(label);
+              questionWrapper.appendChild(answerOption);
+            });
+          } else {
+            questionWrapper.innerHTML += '<p>No answers available for this question.</p>';
+          }
+        } else if (question.type === 'Matching') {
+  if (question.subquestions && question.subquestions.length > 0) {
+    const matchingContainer = document.createElement('div');
+    matchingContainer.classList.add('matching-container');
+
+    const leftColumn = document.createElement('div');
+    leftColumn.classList.add('matching-left-column');
+    const rightColumn = document.createElement('div');
+    rightColumn.classList.add('matching-right-column');
+
+    // Лівий стовпець (питання)
+    question.subquestions.forEach((subquestion, subIndex) => {
+      const leftItem = document.createElement('div');
+      leftItem.textContent = `${subIndex + 1}. ${subquestion.subquestionText}`;
+      leftItem.setAttribute('data-subquestion-id', subquestion.id);
+      leftItem.classList.add('matching-answer-block');
+      leftColumn.appendChild(leftItem);
+    });
+
+    // Правий стовпець (відповіді)
+    question.subquestions.forEach((subquestion) => {
+      subquestion.answers.forEach((answer) => {
+        const rightItem = document.createElement('div');
+        rightItem.textContent = answer.answerText;
+        rightItem.classList.add('matching-item');
+        rightItem.setAttribute('draggable', 'true');
+        rightItem.setAttribute('data-answer-id', answer.id);
+        rightColumn.appendChild(rightItem);
+      });
+    });
+
+    matchingContainer.appendChild(leftColumn);
+    matchingContainer.appendChild(rightColumn);
+    questionWrapper.appendChild(matchingContainer);
+
+            // Додаємо drag-and-drop функціонал
+            addDragAndDropFunctionality(matchingContainer);
+          } else {
+            questionWrapper.innerHTML += '<p>Matching question is missing subquestions or answers.</p>';
+          }
+        } else if (question.type === 'Open-ended') {
+          // Обробка питань з відкритою відповіддю
+          const openEndedInput = document.createElement('textarea');
+          openEndedInput.name = `final-answer-${index + 1}`;
+          openEndedInput.placeholder = 'Type your answer here...';
+          openEndedInput.classList.add('open-ended-input');
+          questionWrapper.appendChild(openEndedInput);
+        }
+
+        // Додаємо питання до блоку тесту
+        finalTestBlock.appendChild(questionWrapper);
+      });
+
+      // Додаємо кнопки після відображення тесту
+      const buttonsContainer = document.createElement('div');
+      buttonsContainer.classList.add('buttons-container');
+
+      // Кнопка "Скопіювати посилання"
+      const copyLinkButton = document.createElement('button');
+      copyLinkButton.textContent = 'Скопіювати посилання';
+      copyLinkButton.classList.add('copy-link-btn');
+      copyLinkButton.addEventListener('click', async ()  => {
+        // в розробці..
+      });
+      buttonsContainer.appendChild(copyLinkButton);
+
+      // Кнопка "Надіслати цей тест"
+      const sendTestButton = document.createElement('button');
+      sendTestButton.textContent = 'Надіслати цей тест';
+      sendTestButton.classList.add('send-test-btn');
+      sendTestButton.addEventListener('click', () => {
+      // в розробці..
+      });
+      buttonsContainer.appendChild(sendTestButton);
+
+      // Додаємо кнопки в кінці блоку
+      finalTestBlock.appendChild(buttonsContainer);
+    } else {
+      finalTestBlock.innerHTML = '<p>No questions found for this test.</p>';
+    }
+  } catch (error) {
+    finalTestBlock.innerHTML = `<p>Error: ${error.message}</p>`;
+  }
+});
+
+// Функція для додавання drag-and-drop функціональності
+function addDragAndDropFunctionality(container) {
+  const draggableItems = container.querySelectorAll('.matching-item');
+  const answerSlots = container.querySelectorAll('.matching-answer-block');
+
+  draggableItems.forEach(item => {
+    item.addEventListener('dragstart', (e) => {
+      console.log('Drag started:', item.textContent); 
+      if (item.hasAttribute('data-answer-id')) {
+        const answerId = item.getAttribute('data-answer-id');
+    e.dataTransfer.setData('text/plain', answerId);
+    console.log('Data set:', answerId); 
+      }
+    });
+  });
+
+ // Події для зон скидання
+ answerSlots.forEach(slot => {
+    slot.addEventListener('dragover', (e) => {
+      console.log('Drag over slot'); // Лог для перевірки
+      e.preventDefault(); // Дозволяє скидання
+      slot.classList.add('dragover');
+    });
+
+    slot.addEventListener('dragleave', () => {
+      console.log('Drag leave slot'); // Лог для перевірки
+      slot.classList.remove('dragover');
+    });
+
+    slot.addEventListener('drop', (e) => {
+      console.log('Drop event'); // Лог для перевірки
+      e.preventDefault();
+      slot.classList.remove('dragover');
+  const answerId = e.dataTransfer.getData('text/plain');
+  console.log('Received data-answer-id in drop:', answerId); // Лог
+  const draggedItem = container.querySelector(`[data-answer-id="${answerId}"]`);
+  if (draggedItem) {
+    console.log('Dragged item found:', draggedItem.textContent); // Лог
+    while (slot.firstChild) {
+      slot.removeChild(slot.firstChild);
+    }
+    slot.appendChild(draggedItem);
+  } else {
+    console.error('Dragged item not found for answerId:', answerId); // Лог
+  }
+    });
+  });
+}
+
+
+});
+
+
+</script>
+<script src="../footer/footer.js"></script>
+<script src="../header/auth-header.js"></script>
+<script src="../tests/test-lang.js"></script>
+</body>
+</html>

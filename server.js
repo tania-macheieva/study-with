@@ -11,7 +11,8 @@ const passport = require('passport');
 const session = require('express-session');
 const stripeRoutes = require("./pay-page/stripe");
 const coursesRouter = require('./courses'); 
-const courseDraftRouter = require('./courses'); 
+const courseDraftRouter = require('./courses');
+const testRouter = require('./test') 
 
 app.use(cors());
 app.use(express.json());
@@ -43,6 +44,8 @@ app.use((req, res, next) => {
     }
     next();
 });
+
+app.use('/tests', testRouter);
 
 app.use(express.static(path.join(__dirname)));
 
@@ -117,11 +120,16 @@ app.get('/public-profile', (req, res) => {
     console.log('Full path:', path.join(__dirname, 'profile-page/public-profile.html'));
     res.sendFile(path.join(__dirname, 'profile-page/public-profile.html')); 
 });
-
-
 app.use("/pay-page", stripeRoutes);
 app.get('/get-stripe-key', (req, res) => {
-    res.json({ publicKey: process.env.STRIPE_PUBLIC_KEY });
+    const publicKey = process.env.STRIPE_PUBLIC_KEY;
+    console.log('Returning public key:', publicKey ? 'Yes' : 'No');
+    
+    if (!publicKey) {
+        return res.status(500).json({ error: 'Stripe public key not configured' });
+    }
+    
+    res.json({ publicKey });
 });
 app.use("/donate", stripeRoutes);
 

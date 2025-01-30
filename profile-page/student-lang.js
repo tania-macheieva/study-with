@@ -47,7 +47,9 @@ const translations = {
         manageAccount: 'Manage Account Visibility',
         privatePublic: 'You can make your account private or public using the buttons below.',
         closeAccount: 'Close Account',
-        openAccount: 'Open Account'
+        openAccount: 'Open Account',
+        noCourses: 'You haven\'t enrolled in any courses yet.',
+        btnResume: 'Resume'
 
     },
     ua: {
@@ -98,7 +100,9 @@ const translations = {
         manageAccount: 'Управління видимістю акаунту',
         privatePublic: 'Ви можете зробити свій акаунт приватним або публічним за допомогою кнопок нижче.',
         closeAccount: 'Закрити акаунт',
-        openAccount: 'Відкрити акаунт'
+        openAccount: 'Відкрити акаунт',
+        noCourses: 'Ви ще не записались на жодний курс.',
+        btnResume: 'Продовжити'
     },
 };
 // Відкриття модального вікна
@@ -154,4 +158,46 @@ document.addEventListener('DOMContentLoaded', () => {
         applyLanguage(selectedLang);
     });
 });
+
+async function loadEnrolledCourses() {
+    try {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            console.log('No userId found');
+            return;
+        }
+
+        const response = await fetch(`/api/courses/enrolled/${userId}`);
+        const courses = await response.json();
+        console.log('Received courses:', courses);
+
+        const coursesContainer = document.getElementById('enrolled-courses');
+        if (!courses || courses.length === 0) {
+            coursesContainer.innerHTML = '<p class="no-courses">You haven\'t enrolled in any courses yet.</p>';
+            return;
+        }
+
+        coursesContainer.innerHTML = courses.map(course => `
+            <div class="course">
+                <p class="p-1">${course.name}</p>
+                <div class="progress-bar">
+                    <span style="width: ${course.progress}%;"></span>
+                </div>
+                <p class="percent">${course.progress}%</p>
+                <img src="${course.image_url}" alt="${course.name}" onerror="this.src='/images/250x100.png'">
+                <button class="btn-resume" onclick="window.location.href='/course/learn/${course.id}'">
+                    Resume
+                </button>
+            </div>
+        `).join('');
+
+    } catch (error) {
+        console.error('Error loading courses:', error);
+        document.getElementById('enrolled-courses').innerHTML = 
+            '<p class="error-message">Failed to load courses. Please try again later.</p>';
+    }
+}
+
+// Викликаємо функцію при завантаженні сторінки
+document.addEventListener('DOMContentLoaded', loadEnrolledCourses);
 
