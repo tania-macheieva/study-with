@@ -230,12 +230,12 @@ document.getElementById('generate-test-btn').addEventListener('click', async fun
   finalTestBlock.innerHTML = ''; // Очищуємо блок перед генерацією
 
   if (!testId) {
-    finalTestBlock.innerHTML = '<p>Please provide a test ID.</p>';
+    finalTestBlock.innerHTML = '<p data-lang="enterTestId">Please provide a test ID.</p>';
     return;
   }
 
   try {
-    finalTestBlock.innerHTML = '<p>Loading test data...</p>';
+    finalTestBlock.innerHTML = '<p data-lang="loadTestData" >Loading test data...</p>';
     // Запит на отримання тесту за ID
     const response = await fetch(`/tests/get-test/${testId}`);
 
@@ -337,29 +337,47 @@ document.getElementById('generate-test-btn').addEventListener('click', async fun
       });
 
       // Додаємо кнопки після відображення тесту
-      const buttonsContainer = document.createElement('div');
+      /*const buttonsContainer = document.createElement('div');
       buttonsContainer.classList.add('buttons-container');
 
       // Кнопка "Скопіювати посилання"
       const copyLinkButton = document.createElement('button');
-      copyLinkButton.textContent = 'Скопіювати посилання';
+      copyLinkButton.textContent = 'Copy link';
       copyLinkButton.classList.add('copy-link-btn');
-      copyLinkButton.addEventListener('click', async ()  => {
-        // в розробці..
-      });
-      buttonsContainer.appendChild(copyLinkButton);
+      copyLinkButton.addEventListener('click', async () => {
+  const testId = document.getElementById('test-id-input').value.trim();
 
-      // Кнопка "Надіслати цей тест"
-      const sendTestButton = document.createElement('button');
-      sendTestButton.textContent = 'Надіслати цей тест';
-      sendTestButton.classList.add('send-test-btn');
-      sendTestButton.addEventListener('click', () => {
-      // в розробці..
-      });
-      buttonsContainer.appendChild(sendTestButton);
+  if (!testId) {
+    alert('Please enter the test ID.');
+    return;
+  }
+
+  try {
+    // Створюємо посилання на тест (локальне)
+    const testLink = `${window.location.origin}/tests/share/${testId}`;
+
+    // Копіюємо посилання у буфер обміну
+    navigator.clipboard.writeText(testLink).then(() => {
+      alert('Link copied to clipboard!');
+    }).catch((error) => {
+      console.error('Error copying link:', error);
+      alert('Could not copy link. Please try again.');
+    });
+
+    // Виводимо посилання на екран (додатково)
+    const linkDisplay = document.createElement('p');
+    linkDisplay.textContent = `Your link: ${testLink}`;
+    buttonsContainer.appendChild(linkDisplay);
+  } catch (error) {
+    alert('Error: ' + error.message);
+  }
+});
+
+buttonsContainer.appendChild(copyLinkButton);
+document.body.appendChild(buttonsContainer); // Додаємо контейнер до сторінки
 
       // Додаємо кнопки в кінці блоку
-      finalTestBlock.appendChild(buttonsContainer);
+      finalTestBlock.appendChild(buttonsContainer);*/
     } else {
       finalTestBlock.innerHTML = '<p>No questions found for this test.</p>';
     }

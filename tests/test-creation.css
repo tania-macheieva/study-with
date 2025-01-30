@@ -248,6 +248,11 @@ input[type="radio"]:checked {
       width: 100%;
     }
   }
+  .final-question-block p{
+    font-size: 20px;
+    font-weight: 700;
+    text-shadow: 5px 5px 5px #00000091;
+  }
 
   /* Matching Question Styles */
 .matching-container {
@@ -286,6 +291,8 @@ input[type="radio"]:checked {
   border-radius: 12px;
   background-color: #f9f9f9;
   pointer-events: auto;
+  font-size: 18px;
+  font-weight: 500;
 }
 
 .matching-answer-block.dragover {
@@ -314,12 +321,12 @@ input[type="radio"]:checked {
   justify-content: center;
 }
 
-.copy-link-btn, .send-test-btn {
-  background-color: #6200ea;
+.copy-link-btn{
+  background-color: #283044;
   color: white;
   border: none;
   padding: 10px 20px;
-  border-radius: 5px;
+  border-radius: 12px;
   cursor: pointer;
   font-size: 16px;
   transition: transform 0.2s ease-in-out;
