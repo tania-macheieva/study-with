@@ -124,13 +124,23 @@ app.get('/test-creation', (req, res) => {
     res.sendFile(path.join(__dirname, './tests/test-creation.html')); 
 });
 
-
-
-
+app.use('/pay-page', stripeRoutes);
+app.use('/pay-page/webhook', express.raw({type: 'application/json'}));
+app.post('/pay-page/webhook', express.raw({type: 'application/json'}), (req, res) => {
+    req.rawBody = req.body;
+    next();
+});
 
 app.use("/pay-page", stripeRoutes);
 app.get('/get-stripe-key', (req, res) => {
-    res.json({ publicKey: process.env.STRIPE_PUBLIC_KEY });
+    const publicKey = process.env.STRIPE_PUBLIC_KEY;
+    console.log('Returning public key:', publicKey ? 'Yes' : 'No');
+    
+    if (!publicKey) {
+        return res.status(500).json({ error: 'Stripe public key not configured' });
+    }
+    
+    res.json({ publicKey });
 });
 app.use("/donate", stripeRoutes);
 

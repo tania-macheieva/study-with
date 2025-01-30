@@ -448,7 +448,14 @@ document.addEventListener('DOMContentLoaded', async function() {
                 window.location.href = `/login?redirect=${returnUrl}`;
                 return;
             }
-
+    
+            // Перевіряємо чи курс платний
+            if (courseData.price > 0) {
+                // Перенаправляємо на сторінку оплати
+                window.location.href = `/pay-page/pay.html?id=${courseId}`;
+                return;
+            }
+    
             const response = await fetch(`/api/courses/${courseId}/enroll`, {
                 method: 'POST',
                 headers: {
@@ -457,23 +464,19 @@ document.addEventListener('DOMContentLoaded', async function() {
                 },
                 body: JSON.stringify({ userId })
             });
-
+    
             const data = await response.json();
-
+    
             if (!response.ok) {
-                if (response.status === 402) {
-                    window.location.href = `/payment/course/${courseId}`;
-                    return;
-                }
                 throw new Error(data.error || 'Помилка при записі на курс');
             }
-
+    
             showNotification('Ви успішно записались на курс!', 'success');
             
             setTimeout(() => {
                 window.location.href = `/course/learn/${courseId}`;
             }, 1500);
-
+    
         } catch (error) {
             console.error('Помилка:', error);
             showNotification(error.message, 'error');

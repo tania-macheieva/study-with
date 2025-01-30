@@ -854,8 +854,6 @@ router.post('/:courseId/enroll', async (req, res) => {
 
 router.get('/enrolled/:userId', async (req, res) => {
   const { userId } = req.params;
-  console.log('Request for enrolled courses. User ID:', userId);
-
   try {
       const query = `
           SELECT DISTINCT
@@ -878,10 +876,7 @@ router.get('/enrolled/:userId', async (req, res) => {
           AND c.status = 'published'
           ORDER BY e.enrollment_date DESC
       `;
-      
-      console.log('Executing query with userId:', userId);
       const result = await pool.query(query, [userId]);
-      console.log('Query result:', result.rows);
 
       const courses = result.rows.map(course => ({
           id: course.id,
@@ -894,7 +889,6 @@ router.get('/enrolled/:userId', async (req, res) => {
           price: course.price
       }));
 
-      console.log('Sending response:', courses);
       res.json(courses);
   } catch (error) {
       console.error('Server error:', error);
