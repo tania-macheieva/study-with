@@ -119,10 +119,11 @@ app.get('/course-preview', (req, res) => {
 app.get('/course-view', (req, res) => {
     res.sendFile(path.join(__dirname, 'course-view/course-view.html')); 
 });
-
-
 app.get('/test-creation', (req, res) => {
     res.sendFile(path.join(__dirname, './tests/test-creation.html')); 
+});
+app.get('/test-page', (req, res) => {
+    res.sendFile(path.join(__dirname, './tests/test-page.html')); 
 });
 
 app.use('/pay-page', stripeRoutes);

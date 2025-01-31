@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Test Page</title>
+  <title data-lang="testPage">Test Page</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -438,6 +438,7 @@ document.getElementById('generate-test-btn').addEventListener('click', async fun
       sendTestButton.textContent = 'Send test';
       sendTestButton.classList.add('send-test-btn');
       
+      sendTestButton.setAttribute('data-lang', "sendBtn");
       sendTestButton.addEventListener('click', async () => {
         const teacherEmailInput = document.getElementById('teacher-email-input');
         const teacherEmail = teacherEmailInput?.value.trim();
@@ -476,67 +477,46 @@ for (const block of questionBlocks) {
     });
 
   } else if (questionType === 'Matching') {
-    // Обробка Matching питань
-    try {
+      try{
       const matchingContainers = block.querySelectorAll('.matching-container');
       const matches = [];
-
-      for (const container of matchingContainers) {
-        const questionId = container.getAttribute('question-id');
-        console.log('Fetching pairs for question:', questionId);
-        console.log('Sending request to:', 'http://localhost:8000/tests/api/matching-pairs');
-        const response = await fetch('http://localhost:8000/tests/api/matching-pairs', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ questionId}),
-          
-        });
-
-        if (!response.ok) {
-          console.error(`Failed to fetch matching pairs: ${response.status}`);
-          continue;
-        }
-
-        const pairs = await response.json();
-        console.log('Pairs received:', pairs);
-        if (!Array.isArray(pairs)) {
-        console.error('Invalid data format received for matching pairs:', pairs);
-      }
-
+        //const questionId = container.getAttribute('question-id');
+        for (const container of matchingContainers) {
         const leftItems = container.querySelectorAll('.matching-left-column .matching-answer-block');
         const rightItems = container.querySelectorAll('.matching-right-column .matching-item');
 
         for (const leftItem of leftItems) {
-          const subquestionText = leftItem.textContent.trim() || 'Unknown question';
-          const subquestionId = Number(leftItem.getAttribute('data-subquestion-id'));
-          
-          const matchingPair = pairs.find(pair =>Number(pair.subquestion_id) === subquestionId);
-          if (!matchingPair) {
-          console.warn(`No matching pair found for subquestion ID: ${subquestionId}`);
-          continue;
+          const subquestionText = leftItem.getAttribute('data-original-text') 
+          ? leftItem.getAttribute('data-original-text').trim() 
+          : leftItem.textContent.trim();
+          const subquestionId = leftItem.hasAttribute('data-subquestion-id') 
+          ? Number(leftItem.getAttribute('data-subquestion-id')) 
+          : null;
+
+          if (subquestionId === null || isNaN(subquestionId)) {
+            console.warn(`Invalid subquestion ID for question: ${subquestionText}`, leftItem);
+            continue;
           }
-          const matchingAnswer = Array.from(rightItems).find(item => 
-          Number(item.getAttribute('data-answer-id')) === matchingPair.answer_id);
-    
+          console.log(`Processing subquestion: ${subquestionText} (ID: ${subquestionId})`);
           
-          const answerText = matchingAnswer ? matchingAnswer.textContent.trim() : 'No match';
-          // Додаємо пару в окремий масив
+          const answerElement = leftItem.querySelector('.dropped-answer');
+          const answerText = answerElement ? answerElement.textContent.trim() : 'No match';
+            
           matches.push({ subquestion: subquestionText, answer: answerText });
+          }
         }
-      }
         console.log('Final matches:', matches);
         if (matches.length > 0) {
       results.push({
         question: questionText,
-        answers: matches,
+        answers: matches.map(match => `${match.subquestion} → ${match.answer}`).join(', '),
       });
-      } else {
-      console.warn('No matching pairs found for any questions.');
+    } else {
+      console.warn('No matching pairs found for this question.');
     }
   } catch (error) {
-      console.error('Error fetching matching pairs:', error);
-    }
-
+    console.error('Error processing matching questions:', error);
+  }
   } else if (questionType === 'Open-ended') {
     // Обробка Open-ended питань
     const openEndedAnswer = block.querySelector('textarea')?.value.trim() || 'No answer';
@@ -603,6 +583,12 @@ finalTestBlock.appendChild(buttonsContainer);
 function addDragAndDropFunctionality(container) {
   const draggableItems = container.querySelectorAll('.matching-item');
   const answerSlots = container.querySelectorAll('.matching-answer-block');
+   // Зберігаємо оригінальний текст підпитань у data-атрибут
+   answerSlots.forEach(slot => {
+    if (!slot.hasAttribute('data-original-text')) {
+      slot.setAttribute('data-original-text', slot.textContent.trim());
+    }
+  });
 
   draggableItems.forEach(item => {
     item.addEventListener('dragstart', (e) => {
@@ -640,7 +626,20 @@ function addDragAndDropFunctionality(container) {
     while (slot.firstChild) {
       slot.removeChild(slot.firstChild);
     }
-    slot.appendChild(draggedItem);
+    // Додаємо контейнер, щоб залишити текст підпитання та нову відповідь
+    const wrapper = document.createElement('div');
+    wrapper.classList.add('matching-slot-wrapper');
+     // Додаємо текст підпитання
+    const questionText = document.createElement('span');
+    questionText.classList.add('original-question');
+    questionText.textContent = slot.getAttribute('data-original-text'); // Беремо збережений текст
+
+     // Додаємо відповідь
+    const answerElement = draggedItem.cloneNode(true);
+    answerElement.classList.add('dropped-answer');
+    wrapper.appendChild(questionText);
+    wrapper.appendChild(answerElement);
+    slot.appendChild(wrapper);
   } else {
     console.error('Dragged item not found for answerId:', answerId); // Лог
   }

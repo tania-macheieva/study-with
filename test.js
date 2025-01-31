@@ -222,7 +222,7 @@ const transporter = nodemailer.createTransport({
 
 
 // Маршрут для отримання пар відповідей
-router.post('/api/matching-pairs', async (req, res) => {
+/*router.post('/api/matching-pairs', async (req, res) => {
   try {
     console.log('Received request body:', req.body);
     const { questionId } = req.body;
@@ -249,7 +249,7 @@ router.post('/api/matching-pairs', async (req, res) => {
     res.status(500).json({ error: 'Database query failed' });
   }
  
-});
+});*/
 // Маршрут для надсилання результатів тесту
 router.post('/send-test-results', async (req, res) => {
   try {
