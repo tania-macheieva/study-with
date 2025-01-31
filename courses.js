@@ -765,4 +765,138 @@ router.get('/:id/full', async (req, res) => {
   }
 });
 
+//-тут
+// Маршрут для перевірки чи користувач записаний на курс
+router.get('/:courseId/enrollment-status', async (req, res) => {
+  const { courseId } = req.params;
+  const { userId } = req.query;
+
+  try {
+      const query = `
+          SELECT * FROM enrollments 
+          WHERE user_id = $1 AND course_id = $2
+      `;
+      const result = await pool.query(query, [userId, courseId]);
+      
+      res.json({
+          isEnrolled: result.rows.length > 0,
+          enrollment: result.rows[0] || null
+      });
+  } catch (error) {
+      console.error('Error checking enrollment status:', error);
+      res.status(500).json({ error: 'Внутрішня помилка сервера' });
+  }
+});
+
+// Маршрут для запису на курс
+router.post('/:courseId/enroll', async (req, res) => {
+  const { courseId } = req.params;
+  const { userId } = req.body;
+
+  if (!userId) {
+      return res.status(400).json({ error: 'Необхідно увійти в систему' });
+  }
+
+  try {
+      // Перевіряємо чи існує курс
+      const courseQuery = `
+          SELECT * FROM all_courses 
+          WHERE id = $1 AND status = 'published'
+      `;
+      const courseResult = await pool.query(courseQuery, [courseId]);
+
+      if (courseResult.rows.length === 0) {
+          return res.status(404).json({ error: 'Курс не знайдено' });
+      }
+
+      const course = courseResult.rows[0];
+
+      // Перевіряємо чи користувач вже записаний
+      const enrollmentCheckQuery = `
+          SELECT * FROM enrollments 
+          WHERE user_id = $1 AND course_id = $2
+      `;
+      const enrollmentCheck = await pool.query(enrollmentCheckQuery, [userId, courseId]);
+
+      if (enrollmentCheck.rows.length > 0) {
+          return res.status(400).json({ error: 'Ви вже записані на цей курс' });
+      }
+
+      // Якщо курс платний
+      if (course.price > 0) {
+          return res.status(402).json({
+              error: 'Потрібна оплата',
+              courseId,
+              price: course.price
+          });
+      }
+
+      // Записуємо користувача на безкоштовний курс
+      const enrollQuery = `
+          INSERT INTO enrollments (user_id, course_id, enrollment_date, status, progress)
+          VALUES ($1, $2, CURRENT_TIMESTAMP, 'active', 0)
+          RETURNING id, enrollment_date
+      `;
+      const enrollResult = await pool.query(enrollQuery, [userId, courseId]);
+
+      res.status(201).json({
+          success: true,
+          message: 'Ви успішно записались на курс',
+          enrollmentId: enrollResult.rows[0].id,
+          enrollmentDate: enrollResult.rows[0].enrollment_date
+      });
+
+  } catch (error) {
+      console.error('Помилка при записі на курс:', error);
+      res.status(500).json({ error: 'Внутрішня помилка сервера' });
+  }
+});
+
+router.get('/enrolled/:userId', async (req, res) => {
+  const { userId } = req.params;
+  try {
+      const query = `
+          SELECT DISTINCT
+              c.id,
+              c.name,
+              c.description,
+              c.image_url,
+              c.price,
+              e.progress,
+              e.enrollment_date,
+              e.status as enrollment_status,
+              cat.name as category_name,
+              el.name as education_level
+          FROM enrollments e
+          INNER JOIN all_courses c ON e.course_id = c.id
+          LEFT JOIN categories cat ON c.category_id = cat.id
+          LEFT JOIN education_levels el ON c.education_level_id = el.id
+          WHERE e.user_id = $1 
+          AND e.status = 'active'
+          AND c.status = 'published'
+          ORDER BY e.enrollment_date DESC
+      `;
+      const result = await pool.query(query, [userId]);
+
+      const courses = result.rows.map(course => ({
+          id: course.id,
+          name: course.name || 'Untitled Course',
+          description: course.description,
+          progress: course.progress || 0,
+          image_url: course.image_url,
+          category: course.category_name,
+          level: course.education_level,
+          price: course.price
+      }));
+
+      res.json(courses);
+  } catch (error) {
+      console.error('Server error:', error);
+      res.status(500).json({ 
+          error: 'Internal server error', 
+          details: error.message 
+      });
+  }
+});
+
 module.exports = router;

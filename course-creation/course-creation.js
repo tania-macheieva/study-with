@@ -731,36 +731,85 @@ lectureVideos.forEach(input => {
 
 setInterval(saveDraftAutomatically, 10000);  
 
-window.addEventListener('load', function () {
-const savedCourseData = localStorage.getItem('courseDraft');
-if (savedCourseData) {
-  const courseData = JSON.parse(savedCourseData);
-  console.log("Завантажені дані чернетки з localStorage:", courseData);
+// window.addEventListener('load', function () {
+// const savedCourseData = localStorage.getItem('courseDraft');
+// if (savedCourseData) {
+//   const courseData = JSON.parse(savedCourseData);
+//   console.log("Завантажені дані чернетки з localStorage:", courseData);
 
   
-  const courseTitleElement = document.querySelector("input[data-lang='enterCourseTitle']");
-  if (courseTitleElement) courseTitleElement.value = courseData.title || '';
+//   const courseTitleElement = document.querySelector("input[data-lang='enterCourseTitle']");
+//   if (courseTitleElement) courseTitleElement.value = courseData.title || '';
 
-  const courseDescriptionElement = document.querySelector("textarea[data-lang='enterDescription']");
-  if (courseDescriptionElement) courseDescriptionElement.value = courseData.description || '';
+//   const courseDescriptionElement = document.querySelector("textarea[data-lang='enterDescription']");
+//   if (courseDescriptionElement) courseDescriptionElement.value = courseData.description || '';
 
-  const categoryWrapper = document.getElementById('category-wrapper');
-  if (categoryWrapper && courseData.category) {
-      const categoryElement = categoryWrapper.querySelector('.select-trigger');
-      if (categoryElement) categoryElement.dataset.value = courseData.category;
+//   const categoryWrapper = document.getElementById('category-wrapper');
+//   if (categoryWrapper && courseData.category) {
+//       const categoryElement = categoryWrapper.querySelector('.select-trigger');
+//       if (categoryElement) categoryElement.dataset.value = courseData.category;
+//   }
+
+//   const educationWrapper = document.getElementById('education-wrapper');
+//   if (educationWrapper && courseData.educationLevel) {
+//       const educationElement = educationWrapper.querySelector('.select-trigger');
+//       if (educationElement) educationElement.dataset.value = courseData.educationLevel;
+//   }
+
+  
+  
+// } else {
+//   console.log("Чернетки не знайдено в localStorage");
+// }
+// });
+window.addEventListener('beforeunload', () => {
+  localStorage.setItem('lastClosedTime', Date.now());
+});
+
+window.addEventListener('load', () => {
+  const lastClosedTime = localStorage.getItem('lastClosedTime');
+  if (lastClosedTime) {
+      const elapsedTime = Date.now() - parseInt(lastClosedTime, 10);
+      if (elapsedTime > 10000) { // 2 хвилини
+          const authorId = JSON.parse(localStorage.getItem('courseDraft'))?.authorId || null;
+          localStorage.setItem('courseDraft', JSON.stringify({ authorId }));
+      }
   }
 
-  const educationWrapper = document.getElementById('education-wrapper');
-  if (educationWrapper && courseData.educationLevel) {
-      const educationElement = educationWrapper.querySelector('.select-trigger');
-      if (educationElement) educationElement.dataset.value = courseData.educationLevel;
-  }
+  const savedCourseData = JSON.parse(localStorage.getItem('courseDraft')) || {};
+  
+  if (Object.keys(savedCourseData).length === 1 && savedCourseData.authorId !== undefined) {
+      console.log("Чернетка очищена, окрім authorId");
 
-  
-  
-} else {
-  console.log("Чернетки не знайдено в localStorage");
-}
+      document.querySelector("input[data-lang='enterCourseTitle']").value = '';
+      document.querySelector("textarea[data-lang='enterDescription']").value = '';
+
+      const categoryElement = document.getElementById('category-wrapper')?.querySelector('.select-trigger');
+      if (categoryElement) categoryElement.dataset.value = '';
+
+      const educationElement = document.getElementById('education-wrapper')?.querySelector('.select-trigger');
+      if (educationElement) educationElement.dataset.value = '';
+  } else {
+      console.log("Завантажені дані чернетки з localStorage:", savedCourseData);
+
+      const courseTitleElement = document.querySelector("input[data-lang='enterCourseTitle']");
+      if (courseTitleElement) courseTitleElement.value = savedCourseData.title || '';
+
+      const courseDescriptionElement = document.querySelector("textarea[data-lang='enterDescription']");
+      if (courseDescriptionElement) courseDescriptionElement.value = savedCourseData.description || '';
+
+      const categoryWrapper = document.getElementById('category-wrapper');
+      if (categoryWrapper && savedCourseData.category) {
+          const categoryElement = categoryWrapper.querySelector('.select-trigger');
+          if (categoryElement) categoryElement.dataset.value = savedCourseData.category;
+      }
+
+      const educationWrapper = document.getElementById('education-wrapper');
+      if (educationWrapper && savedCourseData.educationLevel) {
+          const educationElement = educationWrapper.querySelector('.select-trigger');
+          if (educationElement) educationElement.dataset.value = savedCourseData.educationLevel;
+      }
+  }
 });
 
 document.getElementById("save-draft-btn").addEventListener("click", function() {   
