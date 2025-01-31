@@ -420,9 +420,13 @@ document.getElementById("course_thumbnail").addEventListener("change", function 
 document.addEventListener('DOMContentLoaded', function () {
   const tagsInput = document.getElementById("course-tags");
   const tagsListContainer = document.getElementById("tags-list");
-  const tagsList = [];
-
   
+  // Завантажуємо теги з localStorage або створюємо порожній масив, якщо їх немає
+  let tagsList = JSON.parse(localStorage.getItem('tagsList')) || [];
+
+  // Оновлюємо відображення тегів
+  updateTagsDisplay();
+
   tagsInput.addEventListener("keydown", function (e) {
     if (e.key === "Enter") {
       e.preventDefault(); 
@@ -432,132 +436,37 @@ document.addEventListener('DOMContentLoaded', function () {
         tagsList.push(tag);
         tagsInput.value = ''; 
         updateTagsDisplay();
+        saveTagsToLocalStorage();  // Зберігаємо теги в localStorage
       }
     }
   });
 
-  
   function updateTagsDisplay() {
     tagsListContainer.innerHTML = ''; 
     tagsList.forEach(tag => {
       const tagDiv = document.createElement('div');
       tagDiv.classList.add('tag');
       tagDiv.textContent = tag;
+      
       const deleteButton = document.createElement('button');
       deleteButton.textContent = '✖';
       deleteButton.classList.add('delete-tag');
       deleteButton.addEventListener('click', () => {
         tagsList.splice(tagsList.indexOf(tag), 1);
-        updateTagsDisplay(); 
+        updateTagsDisplay();  // Оновлюємо відображення тегів
+        saveTagsToLocalStorage();  // Зберігаємо оновлений список в localStorage
       });
+      
       tagDiv.appendChild(deleteButton);
       tagsListContainer.appendChild(tagDiv);
     });
   }
 
-  document.addEventListener('DOMContentLoaded', function () {
-    const saveDraftAutomatically = () => {
-        
-        const courseTitleElement = document.querySelector("input[data-lang='enterCourseTitle']");
-        const courseTitle = courseTitleElement ? courseTitleElement.value : '';
+  function saveTagsToLocalStorage() {
+    localStorage.setItem('tagsList', JSON.stringify(tagsList));
+  } 
 
-        const courseDescriptionElement = document.querySelector("textarea[data-lang='enterDescription']");
-        const courseDescription = courseDescriptionElement ? courseDescriptionElement.value : '';
-
-        const coursePriceElement = document.querySelector("input[data-lang='enterPrice']");
-        const coursePrice = coursePriceElement && coursePriceElement.value ? parseFloat(coursePriceElement.value) : 0;
-
-        const categoryWrapper = document.getElementById('category-wrapper');
-        const courseCategoryElement = categoryWrapper ? categoryWrapper.querySelector('.select-trigger') : null;
-        const courseCategory = courseCategoryElement && courseCategoryElement.dataset.value ? parseInt(courseCategoryElement.dataset.value, 10) : null;
-
-        const educationWrapper = document.getElementById('education-wrapper');
-        const courseEducationLevelElement = educationWrapper ? educationWrapper.querySelector('.select-trigger') : null;
-        const courseEducationLevel = courseEducationLevelElement && courseEducationLevelElement.dataset.value ? parseInt(courseEducationLevelElement.dataset.value, 10) : null;
-
-        const tags = tagsList || [];
-
-        const modules = [];
-        document.querySelectorAll('.module').forEach((moduleDiv, moduleIndex) => {
-            const moduleId = moduleDiv.dataset.id && !moduleDiv.dataset.id.startsWith('module-') 
-                ? parseInt(moduleDiv.dataset.id, 10) 
-                : null; 
-            const moduleTitle = moduleDiv.querySelector('input').value;
-            const lectures = [];
-
-            moduleDiv.querySelectorAll('.lecture').forEach((lectureDiv, lectureIndex) => {
-                const lectureId = lectureDiv.dataset.id && !lectureDiv.dataset.id.startsWith('lecture-')
-                    ? parseInt(lectureDiv.dataset.id, 10)
-                    : null; 
-                const lectureTitle = lectureDiv.querySelector('input').value;
-                const lectureDescription = lectureDiv.querySelector('textarea').value;
-
-                lectures.push({
-                    id: lectureId,
-                    title: lectureTitle,
-                    description: lectureDescription,
-                    order_num: lectureIndex + 1,
-                });
-            });
-
-            modules.push({
-                id: moduleId,
-                title: moduleTitle,
-                order_num: moduleIndex + 1,
-                lectures: lectures,
-            });
-        });
-
-        const courseData = {
-            title: courseTitle,
-            description: courseDescription,
-            price: coursePrice,
-            category: courseCategory,
-            educationLevel: courseEducationLevel,
-            tags: tags,
-            modules: modules,
-        };
-
-        
-        localStorage.setItem('courseDraft', JSON.stringify(courseData));
-        console.log('Draft saved automatically');
-    };
-
-    
-    setInterval(saveDraftAutomatically, 30000);
-
-    
-    const savedCourseData = localStorage.getItem('courseDraft');
-    if (savedCourseData) {
-        const courseData = JSON.parse(savedCourseData);
-        console.log('Loaded course data from localStorage:', courseData);
-
-        
-        const courseTitleElement = document.querySelector("input[data-lang='enterCourseTitle']");
-        if (courseTitleElement) courseTitleElement.value = courseData.title;
-
-        const courseDescriptionElement = document.querySelector("textarea[data-lang='enterDescription']");
-        if (courseDescriptionElement) courseDescriptionElement.value = courseData.description;
-
-        const coursePriceElement = document.querySelector("input[data-lang='enterPrice']");
-        if (coursePriceElement) coursePriceElement.value = courseData.price || '';
-
-        const categoryWrapper = document.getElementById('category-wrapper');
-        const courseCategoryElement = categoryWrapper ? categoryWrapper.querySelector('.select-trigger') : null;
-        if (courseCategoryElement && courseData.category) {
-            courseCategoryElement.dataset.value = courseData.category;
-        }
-
-        const educationWrapper = document.getElementById('education-wrapper');
-        const courseEducationLevelElement = educationWrapper ? educationWrapper.querySelector('.select-trigger') : null;
-        if (courseEducationLevelElement && courseData.educationLevel) {
-            courseEducationLevelElement.dataset.value = courseData.educationLevel;
-        }
-
-        
-    }
-});
-
+  
 function saveDraftAutomatically() {
   console.log("Автозбереження викликано");
  
@@ -625,20 +534,8 @@ function saveDraftAutomatically() {
     
     const removedModules = existingModules.filter(existingModule => !modules.some(module => module.id === existingModule.id));
 
-    const courseData = {
-        title: courseTitle,
-        description: courseDescription,
-        category: courseCategory,
-        authorId: authorId,
-        educationLevel: courseEducationLevel,
-        tags: tags,
-        modules: modules,
-        removedModules: removedModules.map(module => module.id), 
-    };
 
-    
-    localStorage.setItem('courseDraft', JSON.stringify(courseData));
-
+     
     if (courseThumbnail) {
         localStorage.setItem('courseThumbnail', courseThumbnail.name);
     }
@@ -669,22 +566,6 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Elements not found');
   }
 });
-    
-    const formData = new FormData();
-    formData.append('course_data', JSON.stringify(courseData));
-    if (courseThumbnail) {
-        formData.append('course_thumbnail', courseThumbnail);
-    }
-
-    formData.append('course_title', courseTitle);
-    formData.append('course_description', courseDescription);
-    formData.append('course_price', coursePrice);
-    formData.append('course_category', courseCategory);
-    formData.append('education_level', courseEducationLevel);
-    formData.append('author_id', authorId);
-    formData.append('tags', JSON.stringify(tags));
-    formData.append('modules', JSON.stringify(modules)); 
-    formData.append('removed_modules', JSON.stringify(courseData.removedModules)); 
 const addedLectureFiles = [];
 
 const lectureFiles = document.querySelectorAll('.lecture-materials');
@@ -710,6 +591,38 @@ lectureVideos.forEach(input => {
   }
 });
 
+const courseData = {
+  title: courseTitle,
+  description: courseDescription,
+  category: courseCategory,
+  authorId: authorId,
+  educationLevel: courseEducationLevel,
+  price: coursePrice,
+  tags: tags,
+  modules: modules,
+  removedModules: removedModules.map(module => module.id),
+  thumbnail: courseThumbnail ? courseThumbnail.name : null, 
+  lectureFiles: addedLectureFiles.map(file => file.name), 
+};
+
+localStorage.setItem('courseDraft', JSON.stringify(courseData));
+
+    const formData = new FormData();
+    formData.append('course_data', JSON.stringify(courseData));
+    if (courseThumbnail) {
+        formData.append('course_thumbnail', courseThumbnail);
+    }
+
+    formData.append('course_title', courseTitle);
+    formData.append('course_description', courseDescription);
+    formData.append('course_price', coursePrice);
+    formData.append('course_category', courseCategory);
+    formData.append('education_level', courseEducationLevel);
+    formData.append('author_id', authorId);
+    formData.append('tags', JSON.stringify(tags));
+    formData.append('modules', JSON.stringify(modules)); 
+    formData.append('removed_modules', JSON.stringify(courseData.removedModules)); 
+
 
     fetch('/api/courses/save-draft', {
         method: 'POST',
@@ -731,86 +644,205 @@ lectureVideos.forEach(input => {
 
 setInterval(saveDraftAutomatically, 10000);  
 
-// window.addEventListener('load', function () {
-// const savedCourseData = localStorage.getItem('courseDraft');
-// if (savedCourseData) {
-//   const courseData = JSON.parse(savedCourseData);
-//   console.log("Завантажені дані чернетки з localStorage:", courseData);
 
-  
-//   const courseTitleElement = document.querySelector("input[data-lang='enterCourseTitle']");
-//   if (courseTitleElement) courseTitleElement.value = courseData.title || '';
-
-//   const courseDescriptionElement = document.querySelector("textarea[data-lang='enterDescription']");
-//   if (courseDescriptionElement) courseDescriptionElement.value = courseData.description || '';
-
-//   const categoryWrapper = document.getElementById('category-wrapper');
-//   if (categoryWrapper && courseData.category) {
-//       const categoryElement = categoryWrapper.querySelector('.select-trigger');
-//       if (categoryElement) categoryElement.dataset.value = courseData.category;
-//   }
-
-//   const educationWrapper = document.getElementById('education-wrapper');
-//   if (educationWrapper && courseData.educationLevel) {
-//       const educationElement = educationWrapper.querySelector('.select-trigger');
-//       if (educationElement) educationElement.dataset.value = courseData.educationLevel;
-//   }
-
-  
-  
-// } else {
-//   console.log("Чернетки не знайдено в localStorage");
-// }
-// });
 window.addEventListener('beforeunload', () => {
+  // Зберігаємо час закриття сторінки в localStorage
   localStorage.setItem('lastClosedTime', Date.now());
+  
+  // Зберігаємо дані чернетки
+  const courseData = {
+    title: document.querySelector("input[data-lang='enterCourseTitle']").value,
+    description: document.querySelector("textarea[data-lang='enterDescription']").value,
+    price: document.querySelector("input[data-lang='enterPrice']").value,
+    category: document.querySelector('#category-wrapper .select-trigger span').textContent,
+    educationLevel: document.querySelector('#education-wrapper .select-trigger span').textContent,
+    tags: JSON.parse(localStorage.getItem('tags')) || [],
+    modules: [...document.querySelectorAll('#modules-container .module')].map(module => {
+      return {
+        id: module.dataset.id,
+        title: module.querySelector('input[type="text"]').value,
+        lectures: [...module.querySelectorAll('.lecture')].map(lecture => {
+          return {
+            id: lecture.dataset.id,
+            title: lecture.querySelector('input[type="text"]').value,
+            description: lecture.querySelector('textarea').value
+          };
+        })
+      };
+    }),
+    lectureFiles: [...document.querySelectorAll('#file-names-list li')].map(fileItem => fileItem.textContent),
+    lectureVideos: [...document.querySelectorAll('#video-names-list li')].map(videoItem => videoItem.textContent),
+
+  };
+
+  localStorage.setItem('courseDraft', JSON.stringify(courseData));
+  const thumbnail = document.querySelector("#course_thumbnail").files[0] ? document.querySelector("#course_thumbnail").files[0].name : null;
+  if (thumbnail) {
+    localStorage.setItem('courseThumbnail', thumbnail);
+  }
+
 });
 
 window.addEventListener('load', () => {
   const lastClosedTime = localStorage.getItem('lastClosedTime');
   if (lastClosedTime) {
-      const elapsedTime = Date.now() - parseInt(lastClosedTime, 10);
-      if (elapsedTime > 10000) { // 2 хвилини
-          const authorId = JSON.parse(localStorage.getItem('courseDraft'))?.authorId || null;
-          localStorage.setItem('courseDraft', JSON.stringify({ authorId }));
-      }
+    const elapsedTime = Date.now() - parseInt(lastClosedTime, 10);
+    // Якщо минуло більше 10 секунд, очищаємо чернетку, окрім authorId
+    if (elapsedTime > 10000) {
+      const authorId = JSON.parse(localStorage.getItem('courseDraft'))?.authorId || null;
+      localStorage.setItem('courseDraft', JSON.stringify({ authorId }));
+      console.log("Чернетка очищена, окрім authorId");
+    }
   }
 
+  // Завантажуємо дані чернетки з localStorage
   const savedCourseData = JSON.parse(localStorage.getItem('courseDraft')) || {};
-  
-  if (Object.keys(savedCourseData).length === 1 && savedCourseData.authorId !== undefined) {
-      console.log("Чернетка очищена, окрім authorId");
 
-      document.querySelector("input[data-lang='enterCourseTitle']").value = '';
-      document.querySelector("textarea[data-lang='enterDescription']").value = '';
+  // Заповнюємо поля форми
+  const courseTitleElement = document.querySelector("input[data-lang='enterCourseTitle']");
+  if (courseTitleElement) {
+    courseTitleElement.value = savedCourseData.title || '';
+  }
 
-      const categoryElement = document.getElementById('category-wrapper')?.querySelector('.select-trigger');
-      if (categoryElement) categoryElement.dataset.value = '';
+  const courseDescriptionElement = document.querySelector("textarea[data-lang='enterDescription']");
+  if (courseDescriptionElement) {
+    courseDescriptionElement.value = savedCourseData.description || '';
+  }
 
-      const educationElement = document.getElementById('education-wrapper')?.querySelector('.select-trigger');
-      if (educationElement) educationElement.dataset.value = '';
+  const coursePriceElement = document.querySelector("input[data-lang='enterPrice']");
+  if (coursePriceElement) {
+    coursePriceElement.value = savedCourseData.price || '';
+  }
+
+  // Перевірка категорії
+  const categoryWrapper = document.getElementById('category-wrapper');
+  const selectTriggerCategory = categoryWrapper.querySelector('.select-trigger');
+  const optionsCategory = categoryWrapper.querySelectorAll('.option');
+  const savedCategory = savedCourseData.category;
+
+  if (savedCategory) {
+    const selectedOptionCategory = [...optionsCategory].find(option => option.textContent == savedCategory);
+    if (selectedOptionCategory) {
+      selectedOptionCategory.classList.add('selected');
+      selectTriggerCategory.querySelector('span').textContent = selectedOptionCategory.textContent;
+    }
   } else {
-      console.log("Завантажені дані чернетки з localStorage:", savedCourseData);
+    selectTriggerCategory.querySelector('span').textContent = 'Select a category';
+  }
 
-      const courseTitleElement = document.querySelector("input[data-lang='enterCourseTitle']");
-      if (courseTitleElement) courseTitleElement.value = savedCourseData.title || '';
+  // Перевірка рівня освіти
+  const educationWrapper = document.getElementById('education-wrapper');
+  const selectTriggerEducation = educationWrapper.querySelector('.select-trigger');
+  const optionsEducation = educationWrapper.querySelectorAll('.option');
+  const savedEducationLevel = savedCourseData.educationLevel;
 
-      const courseDescriptionElement = document.querySelector("textarea[data-lang='enterDescription']");
-      if (courseDescriptionElement) courseDescriptionElement.value = savedCourseData.description || '';
+  if (savedEducationLevel) {
+    const selectedOptionEducation = [...optionsEducation].find(option => option.textContent == savedEducationLevel);
+    if (selectedOptionEducation) {
+      selectedOptionEducation.classList.add('selected');
+      selectTriggerEducation.querySelector('span').textContent = selectedOptionEducation.textContent;
+    }
+  }
 
-      const categoryWrapper = document.getElementById('category-wrapper');
-      if (categoryWrapper && savedCourseData.category) {
-          const categoryElement = categoryWrapper.querySelector('.select-trigger');
-          if (categoryElement) categoryElement.dataset.value = savedCourseData.category;
+  // Виведення тегів
+  const tagsInput = document.getElementById('course-tags');
+  const tagsList = document.getElementById('tags-list');
+  let existingTags = savedCourseData.tags || [];
+
+  existingTags.forEach(tag => {
+    const tagElement = document.createElement('div');
+    tagElement.textContent = tag;
+    tagElement.classList.add('tag');
+    tagsList.appendChild(tagElement);
+  });
+
+  tagsInput.value = savedCourseData.tags ? savedCourseData.tags.join(', ') : '';
+
+  tagsInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && tagsInput.value.trim()) {
+      const newTag = tagsInput.value.trim();
+
+      if (!existingTags.includes(newTag)) {
+        existingTags.push(newTag);
+        localStorage.setItem('tags', JSON.stringify(existingTags));
+
+        const tagElement = document.createElement('div');
+        tagElement.textContent = newTag;
+        tagElement.classList.add('tag');
+        tagsList.appendChild(tagElement);
+
+        tagsInput.value = '';
       }
+    }
+  });
+  const thumbnailInput = document.querySelector("#course_thumbnail");
+  const fileNameSpan = document.querySelector("#file-name");
 
-      const educationWrapper = document.getElementById('education-wrapper');
-      if (educationWrapper && savedCourseData.educationLevel) {
-          const educationElement = educationWrapper.querySelector('.select-trigger');
-          if (educationElement) educationElement.dataset.value = savedCourseData.educationLevel;
-      }
+  // Відновлення thumbnail з localStorage
+  const savedThumbnail = localStorage.getItem('courseThumbnail');
+  if (savedThumbnail) {
+    fileNameSpan.textContent = savedThumbnail;
+  }
+
+  thumbnailInput.addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      fileNameSpan.textContent = file.name;
+      // Зберігаємо в localStorage
+      localStorage.setItem('courseThumbnail', file.name);
+    }
+  });
+
+
+  // Перевірка та відображення модулів і лекцій
+  const modulesContainer = document.getElementById('modules-container');
+  if (modulesContainer && savedCourseData.modules) {
+    savedCourseData.modules.forEach(module => {
+      const moduleElement = document.createElement('div');
+      moduleElement.classList.add('module');
+      moduleElement.dataset.id = module.id;
+      moduleElement.innerHTML = `
+        <input type="text" value="${module.title}" />
+        <div class="lectures"></div>
+      `;
+
+      const lecturesContainer = moduleElement.querySelector('.lectures');
+      module.lectures.forEach(lecture => {
+        const lectureElement = document.createElement('div');
+        lectureElement.classList.add('lecture');
+        lectureElement.dataset.id = lecture.id;
+        lectureElement.innerHTML = `
+          <input type="text" value="${lecture.title}" />
+          <textarea>${lecture.description}</textarea>
+        `;
+        lecturesContainer.appendChild(lectureElement);
+      });
+
+      modulesContainer.appendChild(moduleElement);
+    });
+  }
+
+  // Виведення файлів лекцій
+  const fileNamesList = document.getElementById('file-names-list');
+  if (fileNamesList && savedCourseData.lectureFiles) {
+    savedCourseData.lectureFiles.forEach(fileName => {
+      const fileItem = document.createElement('li');
+      fileItem.textContent = fileName;
+      fileNamesList.appendChild(fileItem);
+    });
+  }
+
+  // Виведення відео лекцій
+  const videoNamesList = document.getElementById('video-names-list');
+  if (videoNamesList && savedCourseData.lectureVideos) {
+    savedCourseData.lectureVideos.forEach(videoName => {
+      const videoItem = document.createElement('li');
+      videoItem.textContent = videoName;
+      videoNamesList.appendChild(videoItem);
+    });
   }
 });
+
 
 document.getElementById("save-draft-btn").addEventListener("click", function() {   
   saveDraftAutomatically();
