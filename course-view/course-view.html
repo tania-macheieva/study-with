@@ -25,79 +25,68 @@
             <section class="discussion-section">
                 <div class="search-bar">
                     <input type="text" placeholder="ask or search a question">
-                    <button class="icon-button send"></button>
-                    <button class="icon-button search"></button>
+                    <button class="icon-button send">
+                        <img src="../images/send.svg" alt="Send">
+                    </button>
+                    <button class="icon-button search">
+                        <img src="../images/icons8-search-50.png" alt="Search">
+                    </button>
                 </div>
 
                 <div class="filters">
-                    <div class="filter-group">
-                        <button class="filter-btn">Questions I asked</button>
-                        <button class="filter-btn">Questions I'm following</button>
-                        <button class="filter-btn">Questions with responses</button>
+                    <div class="filters-left">
+                        <div class="checkbox-filter">
+                            <input type="checkbox" id="questions-asked">
+                            <label for="questions-asked">Questions I asked</label>
+                        </div>
+                        <div class="checkbox-filter">
+                            <input type="checkbox" id="questions-following">
+                            <label for="questions-following">Questions I'm following</label>
+                        </div>
+                        <div class="checkbox-filter">
+                            <input type="checkbox" id="questions-responses">
+                            <label for="questions-responses">Questions with responses</label>
+                        </div>
                     </div>
                     
-                    <div class="filter-group">
-                        <button class="filter-btn active">Whole course</button>
-                        <button class="filter-btn">Current topic</button>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <button class="filter-btn active">Recent</button>
-                        <button class="filter-btn">Oldest</button>
+                    <div class="filters-right">
+                        <div class="filter-group">
+                            <button class="filter-btn active">Whole course</button>
+                            <button class="filter-btn">Current topic</button>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <button class="filter-btn active">Recent</button>
+                            <button class="filter-btn">Oldest</button>
+                        </div>
                     </div>
                 </div>
 
                 <section class="discussion-thread">
-                    <!-- Messages will be dynamically inserted here -->
+                    <!-- Повідомлення будуть додані динамічно через JavaScript -->
+                    <article class="message">
+                        <div class="user-info">
+                            <img src="/images/user-avatar.png" alt="User avatar" class="avatar">
+                            <span class="username">question user 1</span>
+                            <span class="date">29.01.2024</span>
+                        </div>
+                        <p class="message-text">question question question question question 1</p>
+                        <button class="more-options">...</button>
+                        <div class="reply-input" style="display: none;">
+                            <input type="text" placeholder="write a reply to question user 1">
+                            <button class="send-reply">
+                                <img src="/images/send.svg" alt="Send reply">
+                            </button>
+                        </div>
+                    </article>
+                    <!-- Додаткові повідомлення будуть динамічно  додані тут -->
                 </section>
             </section>
         </div>
 
         <aside class="course-content">
-            <h1>Course content</h1>
-            
-            <section class="module">
-                <h2>Module 1</h2>
-                <div class="module-progress">
-                    <span>3/3 complete</span>
-                    <span class="separator">|</span>
-                    <span>0 hour left out of 16</span>
-                </div>
-                <ul class="topics">
-                    <li class="completed">topic 1 name</li>
-                    <li class="completed">topic 2 name</li>
-                    <li class="completed">topic 3 name</li>
-                </ul>
-            </section>
-
-            <section class="module">
-                <h2>Module 2</h2>
-                <div class="module-progress">
-                    <span>0/3 complete</span>
-                    <span class="separator">|</span>
-                    <span>1 hour left out of 11</span>
-                </div>
-                <ul class="topics">
-                    <li>topic 1 name</li>
-                    <li>topic 2 name</li>
-                    <li>topic 3 name</li>
-                </ul>
-            </section>
-
-            <section class="module">
-                <h2>Module 3</h2>
-            </section>
         </aside>
     </main>
-    <!-- <script>
-        // Видалення існуючого хедера перед ініціалізацією нового
-        document.addEventListener('DOMContentLoaded', () => {
-            const existingHeader = document.querySelector('header');
-            if (existingHeader) {
-                existingHeader.remove();
-            }
-        });
-    </script> -->
     <script src="/header/auth-header.js"></script>
     <script src="/footer/footer.js"></script>
     <script src="/course-view/course-view.js"></script>

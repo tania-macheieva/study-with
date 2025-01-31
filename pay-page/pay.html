@@ -18,8 +18,8 @@
       rel="stylesheet"
     />
     <script src="https://js.stripe.com/v3/"></script>
-    <link rel="stylesheet" href="/pay-page/style.css" />
-    <script src="stripe.js"></script>
+    <link rel="stylesheet" href="../pay-page/style.css" />
+    <script src="../pay-page/stripe.js"></script>
     <link rel="icon" href="../images/menu-logo.ico">
   </head>
 
@@ -31,6 +31,7 @@
       </div>
     </main>
 
+    
     <!-- Модальне вікно для вибору донату -->
     <div id="donation-modal" class="modal">
       <div class="modal-content">
@@ -124,42 +125,124 @@
           });
       }
 
-      function setupCheckoutButton(course) {
-        fetch("/get-stripe-key")
-          .then((response) => response.json())
-          .then((data) => {
+// Модифікуємо функцію setupCheckoutButton
+function setupCheckoutButton(course) {
+    fetch("/get-stripe-key")
+        .then((response) => response.json())
+        .then((data) => {
             const stripe = Stripe(data.publicKey);
+            
+            document.getElementById("checkout-button")
+                .addEventListener("click", async () => {
+                    try {
+                        const response = await fetch("/pay-page/create-checkout-session", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                                courseId,
+                                userId: localStorage.getItem('userId'),
+                                donationAmount: selectedDonation,
+                            }),
+                        });
 
-            document
-              .getElementById("checkout-button")
-              .addEventListener("click", () => {
-                fetch("/pay-page/create-checkout-session", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    courseId,
-                    donationAmount: selectedDonation,
-                  }),
-                })
-                  .then((response) => response.json())
-                  .then((session) => {
-                    window.location.href = session.url;
-                  })
-                  .catch((error) => console.error("Error:", error));
-              });
-          })
-          .catch((error) => console.error("Error fetching public key:", error));
-      }
-
-      fetch(`/pay-page/course/${courseId}`)
-        .then((res) => res.json())
-        .then((course) => updateUI(course))
-        .catch((error) => {
-          console.error("Error:", error);
-          alert("Error loading the course");
+                        const data = await response.json();
+                        
+                        // Перенаправляємо користувача на сторінку оплати Stripe
+                        window.location.href = data.url;
+                        
+                    } catch (error) {
+                        console.error('Checkout error:', error);
+                        alert('Payment initialization failed: ' + error.message);
+                    }
+                });
         });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Отримуємо ID курсу з URL
+    const courseId = new URLSearchParams(window.location.search).get('id');
+    console.log('Course ID:', courseId);
+
+    if (!courseId) {
+        console.error('No course ID provided');
+        return;
+    }
+
+    let selectedDonation = 0;
+
+    // Функція для оновлення UI
+    function updateUI(course) {
+        const courseInfo = document.getElementById('course-info');
+        courseInfo.innerHTML = `
+            <h3>${course.name}</h3>
+            <p>${course.description}</p>
+            <div class="price-section">
+                <div class="total-price">Total: $${(parseFloat(course.price) + selectedDonation).toFixed(2)}</div>
+                <div class="price-breakdown">
+                    Course price: $${parseFloat(course.price).toFixed(2)}
+                    ${selectedDonation > 0 ? `<br>Donation: $${selectedDonation.toFixed(2)}` : ''}
+                </div>
+                <button id="checkout-button" class="checkout-button">
+                    Proceed to Payment
+                </button>
+            </div>
+        `;
+
+        // Налаштовуємо кнопку оплати
+        setupCheckoutButton(course);
+    }
+
+    // Функція для налаштування кнопки оплати
+    function setupCheckoutButton(course) {
+        const checkoutButton = document.getElementById('checkout-button');
+        
+        checkoutButton.addEventListener('click', async () => {
+            console.log('Checkout button clicked');
+            try {
+                const response = await fetch("/pay-page/create-checkout-session", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        courseId: courseId,
+                        userId: localStorage.getItem('userId'),
+                        donationAmount: selectedDonation
+                    })
+                });
+
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (data.url) {
+                    window.location.href = data.url;
+                } else {
+                    throw new Error('No checkout URL received');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to initialize payment: ' + error.message);
+            }
+        });
+    }
+
+    // Завантажуємо інформацію про курс
+    fetch(`/pay-page/course/${courseId}`)
+        .then(response => response.json())
+        .then(course => {
+            console.log('Course data:', course);
+            updateUI(course);
+        })
+        .catch(error => {
+            console.error('Error loading course:', error);
+            alert('Error loading course details');
+        });
+});
+
+    
     </script>
   </body>
 </html>

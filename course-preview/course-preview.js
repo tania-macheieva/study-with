@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', async function() {
+    let courseData = null;
     const urlParams = new URLSearchParams(window.location.search);
     const courseId = urlParams.get('id');
 
@@ -10,18 +11,24 @@ document.addEventListener('DOMContentLoaded', async function() {
     try {
         const response = await fetch(`/api/courses/${courseId}/full`);
         if (!response.ok) throw new Error('Помилка завантаження курсу');
-        const course = await response.json();
+        courseData = await response.json(); // Зберігаємо дані в змінну
         
         // Оновлюємо елементи сторінки даними з API
-        document.querySelector('.course-name').textContent = course.name;
-        document.querySelector('.course-description').textContent = course.description;
-        document.querySelector('.detail-category .detail-value').textContent = course.category;
+        document.querySelector('.course-name').textContent = courseData.name;
+        document.querySelector('.course-description').textContent = courseData.description;
+        document.querySelector('.detail-category .detail-value').textContent = courseData.category;
         
         const detailsMainValues = document.querySelectorAll('.details-main .detail-value');
-        detailsMainValues[0].textContent = course.level;
-        detailsMainValues[1].textContent = '6 weeks'; // Можна додати в API
-        detailsMainValues[2].textContent = course.price === 0 ? 'Безкоштовно' : `$${course.price}`;
+        detailsMainValues[0].textContent = courseData.level;
+        detailsMainValues[1].textContent = '6 weeks';
+        detailsMainValues[2].textContent = courseData.price === 0 ? 'Безкоштовно' : `$${courseData.price}`;
 
+        // Додаємо перевірку статусу запису користувача
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+            const enrollmentStatus = await checkEnrollmentStatus(courseId, userId);
+            updateSignUpButton(enrollmentStatus);
+        }
         // Оновлюємо модулі курсу
         const modulesContainer = document.querySelector('.white-card');
         if (course.modules && course.modules.length > 0) {
@@ -402,6 +409,91 @@ document.addEventListener('DOMContentLoaded', async function() {
             document.body.style.overflow = 'hidden';
         });
     });
+
+    // Функція перевірки статусу запису на курс
+    async function checkEnrollmentStatus(courseId, userId) {
+        try {
+            const response = await fetch(`/api/courses/${courseId}/enrollment-status?userId=${userId}`);
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Помилка перевірки статусу запису:', error);
+            return { isEnrolled: false };
+        }
+    }
+
+    // Функція оновлення кнопки запису
+    function updateSignUpButton(enrollmentStatus) {
+        const signUpButton = document.querySelector('.sign-up');
+        
+        if (enrollmentStatus.isEnrolled) {
+            signUpButton.textContent = 'Перейти до навчання';
+            signUpButton.addEventListener('click', () => {
+                window.location.href = `/course/learn/${courseId}`;
+            });
+        } else {
+            signUpButton.textContent = 'Sign Up';
+            signUpButton.addEventListener('click', handleCourseEnrollment);
+        }
+    }
+
+    // Функція обробки запису на курс
+    async function handleCourseEnrollment() {
+        try {
+            const userId = localStorage.getItem('userId');
+            const token = localStorage.getItem('token');
+            
+            if (!userId || !token) {
+                const returnUrl = encodeURIComponent(window.location.href);
+                window.location.href = `/login?redirect=${returnUrl}`;
+                return;
+            }
+    
+            // Перевіряємо чи курс платний
+            if (courseData.price > 0) {
+                // Перенаправляємо на сторінку оплати
+                window.location.href = `/pay-page/pay.html?id=${courseId}`;
+                return;
+            }
+    
+            const response = await fetch(`/api/courses/${courseId}/enroll`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ userId })
+            });
+    
+            const data = await response.json();
+    
+            if (!response.ok) {
+                throw new Error(data.error || 'Помилка при записі на курс');
+            }
+    
+            showNotification('Ви успішно записались на курс!', 'success');
+            
+            setTimeout(() => {
+                window.location.href = `/course/learn/${courseId}`;
+            }, 1500);
+    
+        } catch (error) {
+            console.error('Помилка:', error);
+            showNotification(error.message, 'error');
+        }
+    }
+
+    // Функція показу повідомлень
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
 
     // Ініціалізація елементів каруселі
     updateReview();

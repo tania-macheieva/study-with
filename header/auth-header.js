@@ -1,6 +1,4 @@
-// header-management.js
-
-// Translations for all headers
+// Переклади для всіх заголовків
 const headerTranslations = {
     en: {
         headerAll: "All Courses",
@@ -30,20 +28,20 @@ const headerTranslations = {
     }
 };
 
-// Language management
+// Керування мовою
 function initializeLanguage() {
     const currentLang = localStorage.getItem('language') || 'en';
     document.documentElement.lang = currentLang;
     
     const langSwitcher = document.querySelector('.lang-switcher');
     if (langSwitcher) {
-        // Set active state for current language
+        // Встановлюємо активний стан для поточної мови
         const buttons = langSwitcher.querySelectorAll('.lang-btn');
         buttons.forEach(btn => {
             btn.classList.toggle('active', btn.getAttribute('data-lang') === currentLang);
         });
 
-        // Add click event listener
+        // Додаємо обробник кліку
         langSwitcher.addEventListener('click', (event) => {
             if (event.target.classList.contains('lang-btn')) {
                 event.preventDefault();
@@ -57,11 +55,11 @@ function initializeLanguage() {
         });
     }
 
-    // Apply translations
+    // Застосовуємо переклади
     applyTranslations(currentLang);
 }
 
-// Apply translations to the page
+// Застосування перекладів до сторінки
 function applyTranslations(lang) {
     const translations = headerTranslations[lang];
     if (!translations) return;
@@ -76,9 +74,20 @@ function applyTranslations(lang) {
             }
         }
     });
+
+    // Оновлюємо дропдаун, якщо він відкритий
+    const existingDropdown = document.querySelector('.user-dropdown');
+    if (existingDropdown) {
+        const authData = getAuthDataFromStorage();
+        if (authData) {
+            existingDropdown.remove();
+            const userContainer = document.querySelector('#user').parentElement;
+            userContainer.appendChild(createUserDropdown(authData));
+        }
+    }
 }
 
-// Authentication management
+// Функції для роботи з авторизацією
 function getAuthDataFromURL() {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
@@ -87,6 +96,8 @@ function getAuthDataFromURL() {
     const name = urlParams.get('name');
 
     if (token && userId && role) {
+        // Відразу зберігаємо дані авторизації з URL
+        saveAuthData({ token, userId, role, name });
         return { token, userId, role, name };
     }
     return null;
@@ -105,10 +116,13 @@ function getAuthDataFromStorage() {
 }
 
 function saveAuthData(authData) {
+    if (!authData) return;
     localStorage.setItem('token', authData.token);
     localStorage.setItem('userId', authData.userId);
     localStorage.setItem('role', authData.role);
-    localStorage.setItem('name', authData.name || '');
+    if (authData.name) {
+        localStorage.setItem('name', authData.name);
+    }
 }
 
 function clearAuthData() {
@@ -118,12 +132,15 @@ function clearAuthData() {
     localStorage.removeItem('name');
 }
 
+// Ініціалізація хедера
 async function initializeHeader() {
-    let authData = getAuthDataFromURL() || getAuthDataFromStorage();
+    // Спочатку перевіряємо URL на наявність даних авторизації, потім сховище
+    const authData = getAuthDataFromURL() || getAuthDataFromStorage();
     const isCourseView = window.location.pathname.includes('course-view');
     
+    // Визначаємо який хедер завантажувати на основі статусу авторизації
     let headerPath;
-    if (!authData) {
+    if (!authData || !authData.token) {
         headerPath = '/header/header-noauth.html';
     } else if (isCourseView) {
         headerPath = '/header/course-header.html';
@@ -134,13 +151,26 @@ async function initializeHeader() {
     }
 
     try {
+        // Завантажуємо та вставляємо хедер
         const response = await fetch(headerPath);
+        if (!response.ok) {
+            throw new Error(`Помилка завантаження хедера: ${response.status}`);
+        }
         const headerHtml = await response.text();
+        
+        // Очищуємо існуючий хедер перед вставкою нового
+        const existingHeader = document.querySelector('header');
+        if (existingHeader) {
+            existingHeader.remove();
+        }
+        
         document.body.insertAdjacentHTML('afterbegin', headerHtml);
         
+        // Ініціалізуємо мову після вставки хедера
         initializeLanguage();
         
-        if (authData) {
+        // Налаштовуємо елементи користувача якщо авторизований
+        if (authData && authData.token) {
             if (authData.name) {
                 const usernameElement = document.querySelector('#user span');
                 if (usernameElement) {
@@ -152,41 +182,15 @@ async function initializeHeader() {
             }
         }
     } catch (error) {
-        console.error('Error loading header:', error);
+        console.error('Помилка завантаження хедера:', error);
+        // Fallback до неавторизованого хедера у випадку помилки
+        const fallbackResponse = await fetch('/header/header-noauth.html');
+        const fallbackHtml = await fallbackResponse.text();
+        document.body.insertAdjacentHTML('afterbegin', fallbackHtml);
     }
 }
 
-// Initialize user dropdown menu
-function initializeUserDropdown(authData) {
-    if (!authData) return;
-
-    const userButton = document.querySelector('#user');
-    if (!userButton) return;
-
-    userButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const existingDropdown = document.querySelector('.user-dropdown');
-        if (existingDropdown) {
-            existingDropdown.remove();
-            return;
-        }
-
-        const dropdown = createUserDropdown(authData);
-        document.body.appendChild(dropdown);
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function closeDropdown(e) {
-            if (!dropdown.contains(e.target) && !userButton.contains(e.target)) {
-                dropdown.remove();
-                document.removeEventListener('click', closeDropdown);
-            }
-        });
-    });
-}
-
-// Оновлена функція створення дропдауну
+// Функція створення випадаючого меню користувача
 function createUserDropdown(authData) {
     const dropdown = document.createElement('div');
     dropdown.className = 'user-dropdown';
@@ -294,7 +298,7 @@ function createUserDropdown(authData) {
     return dropdown;
 }
 
-// Оновлена функція ініціалізації дропдауну
+// Ініціалізація випадаючого меню користувача
 function initializeUserDropdown(authData) {
     if (!authData) return;
 
@@ -329,33 +333,12 @@ function initializeUserDropdown(authData) {
     });
 }
 
-// Оновлена функція застосування перекладів
-function applyTranslations(lang) {
-    const translations = headerTranslations[lang];
-    if (!translations) return;
-
-    document.querySelectorAll('[data-lang]').forEach(element => {
-        const key = element.getAttribute('data-lang');
-        if (translations[key]) {
-            if (element.tagName === 'INPUT') {
-                element.setAttribute('placeholder', translations[key]);
-            } else {
-                element.textContent = translations[key];
-            }
-        }
-    });
-
-    // Оновлюємо дропдаун, якщо він відкритий
-    const existingDropdown = document.querySelector('.user-dropdown');
-    if (existingDropdown) {
-        const authData = getAuthDataFromStorage();
-        if (authData) {
-            existingDropdown.remove();
-            const userContainer = document.querySelector('#user').parentElement;
-            userContainer.appendChild(createUserDropdown(authData));
-        }
-    }
+// Ініціалізація при завантаженні сторінки
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeHeader);
+} else {
+    initializeHeader();
 }
 
-// Initialize everything when DOM is loaded
-document.addEventListener('DOMContentLoaded', initializeHeader);
+// Додаємо слухач подій навігації для оновлення хедера
+window.addEventListener('popstate', initializeHeader);

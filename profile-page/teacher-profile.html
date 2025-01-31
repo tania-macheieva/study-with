@@ -6,23 +6,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Study With</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-    <link rel="stylesheet" href="/profile-page/style.css">
+    <link rel="stylesheet" href="../profile-page/style.css">
     <link rel="icon" href="../images/menu-logo.ico">
 </head>
 
 <body>
-    
 
     <div class="page-container">
         <div class="content">
             <main class="profile-container">
                 <div class="user-info">
                     <label for="upload-image">
-                        <img id="profile-image" class="profile-image" src="/images/profile-picture.png" alt="user image">
+                        <img id="profile-image" class="profile-image" src="/images/profile-picture.png"
+                            alt="user image">
                     </label>
                     <input type="file" id="upload-image" accept="image/*" style="display: none;">
                     <div class="action-buttons">
@@ -33,31 +35,40 @@
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
-                    <p id="username" data-lang="username">username</p> 
-                              <!-- Вкладки -->
-            <div class="tab-container">
-                <div class="tabs">
-                    <button data-lang="publicProf" class="tab-link active" data-tab="public-profile" >Public profile</button>
-                    <button data-lang="profile" class="tab-link" data-tab="profile" >Profile</button>
-                    <button data-lang="security" class="tab-link" data-tab="security">Security</button>
-                    <button data-lang="messages" class="tab-link" data-tab="messages" >Messages</button>
-                    <button data-lang="closeAccount" class="tab-link" data-tab="close-account" >Closing an account</button>
+                    <p id="username" data-lang="username">username</p>
+                    <!-- Вкладки -->
+                    <div class="tab-container">
+                        <div class="tabs">
+                            <button data-lang="publicProf" class="tab-link active" data-tab="public-profile">Public
+                                profile</button>
+                            <button data-lang="profile" class="tab-link" data-tab="profile">Profile</button>
+                            <button data-lang="security" class="tab-link" data-tab="security">Security</button>
+                            <button data-lang="messages" class="tab-link" data-tab="messages">Messages</button>
+                            <button data-lang="closeAccount" class="tab-link" data-tab="close-account">Closing an
+                                account</button>
+                        </div>
+                    </div>
+                    <!-- Модальне вікно -->
+                    <div id="modal" class="modal">
+                        <div class="modal-content">
+                            <span class="close-button">&times;</span>
+                            <div id="modal-content-container"></div>
+                        </div>
+                    </div>
                 </div>
-         </div>
-            <!-- Модальне вікно -->
-            <div id="modal" class="modal">
-                <div class="modal-content">
-                    <span class="close-button">&times;</span>
-                    <div id="modal-content-container"></div>
-                </div>
-            </div>
-                </div>
-         
 
-   
+
+
 
                 <div class="container-my">
                     <div class="my-courses">
+                        <h2 data-lang="myCourses">My courses</h2>
+                        <div class="courses-list" id="enrolled-courses">
+                            <!-- Курси будуть додані з бд -->
+                        </div>
+                        <button class="btn-view-all-1" data-lang="btnViewAll">View all</button>
+                    </div>
+                    <!-- <div class="my-courses">
                         <h2 data-lang="myCourses">My courses</h2>
                         <div class="courses-list">
                             <div class="course">
@@ -89,7 +100,7 @@
                             </div>
                         </div>
                         <button class="btn-view-all-1" data-lang="btnViewAll">View all</button>
-                    </div>
+                    </div> -->
                     <div>
                         <div class="my-certificates">
                             <h2>My certificates</h2>
@@ -142,17 +153,18 @@
                     </div>
             </main>
         </div>
- 
+
 
     </div>
 
 </body>
+
 <script>
+ document.addEventListener('DOMContentLoaded', function () {
     const uploadInput = document.getElementById('upload-image');
     const profileImage = document.getElementById('profile-image');
     const removeImageButton = document.getElementById('remove-image');
     const confirmImageButton = document.getElementById('confirm-image');
-
 
     uploadInput.addEventListener('change', function (event) {
         const file = event.target.files[0];
@@ -190,46 +202,53 @@
     });
 
 
-//бек для завантаження фото профіля в базу
     confirmImageButton.addEventListener('click', async function () {
-    const file = uploadInput.files[0];
-    if (!file) {
-        alert('Please select an image to upload.');
-        return;
-    }
+            const file = uploadInput.files[0];
+            const email = localStorage.getItem('email');
 
-    const email = localStorage.getItem('email'); // Отримання ID користувача
-    if (!email) {
-        alert('User email is not available. Please log in again.');
-        return;
-    }
+            if (!email) {
+                alert('User email is not available. Please log in again.');
+                return;
+            }
 
-    const formData = new FormData();
-    formData.append('profileImage', file);
-    formData.append('email', email);
-    try {
-        const response = await fetch('http://localhost:8000/auth/upload-profile-image', {
-            method: 'POST',
-            body: formData,
+            const formData = new FormData();
+
+            if (!file) {
+                const defaultImagePath = '/images/default-profile.png'; 
+
+                try {
+                    const response = await fetch(defaultImagePath);
+                    const blob = await response.blob();
+                    formData.append('profileImage', blob, 'default-profile.png');
+                } catch (error) {
+                    console.error('Error fetching default image:', error);
+                    alert('Error loading default image.');
+                    return;
+                }
+            } else {
+                formData.append('profileImage', file);
+            }
+
+            formData.append('email', email);
+
+            try {
+                const response = await fetch('http://localhost:8000/auth/upload-profile-image', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert('Profile image updated successfully!');
+                    profileImage.src = `http://localhost:8000${result.filePath}`;
+                } else {
+                    alert(`Error: ${result.error}`);
+                }
+            } catch (error) {
+                console.error('Error uploading profile image:', error);
+                alert('An error occurred while uploading the profile image.');
+            }
         });
-
-        const result = await response.json();
-        if (response.ok) {
-            alert('Profile image updated successfully!');
-            profileImage.src = `http://localhost:8000${result.filePath}`; // Додаємо абсолютний шлях
-        } else {
-            alert(`Error: ${result.error}`);
-        }
-    } catch (error) {
-        console.error('Error uploading profile image:', error);
-        alert('An error occurred while uploading the profile image.');
-    }
-    // Ховаємо кнопки після завантаження
-    removeImageButton.style.display = 'none';
-    confirmImageButton.style.display = 'none';
-});
-
-
 
 
     document.querySelectorAll('.btn-view-all-1').forEach(function (button) {
@@ -315,81 +334,127 @@
         });
     });
     const tabLinks = document.querySelectorAll('.tab-link');
-const modal = document.getElementById('modal');
-const modalContentContainer = document.getElementById('modal-content-container');
-const closeButton = document.querySelector('.close-button');
+    const modal = document.getElementById('modal');
+    const modalContentContainer = document.getElementById('modal-content-container');
+    const closeButton = document.querySelector('.close-button');
+    document.querySelector('.tab-link[data-tab="public-profile"]').addEventListener('click', async () => {
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                alert('User ID not found. Please log in again.');
+                return;
+            }
 
-// Зміст для кожної вкладки
-const tabContents = {
-    "public-profile": `
+            try {
+                const response = await fetch(`http://localhost:8000/profile/teacher/${userId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    modalContentContainer.innerHTML = tabContents["public-profile"];
+                    const modalContent = modalContentContainer.querySelector('.modal-content');
+                    modalContent.classList.add('public-profile');
+                    modal.style.display = "flex";
+                } else {
+                    console.error('Error fetching teacher profile:', response.status);
+                }
+            } catch (error) {
+                console.error('Error while fetching teacher profile:', error);
+            }
+        });
+
+        // Add event listeners for all tab links
+        tabLinks.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.getAttribute('data-tab');
+                    modalContentContainer.innerHTML = tabContents[tabName] || "<p>Content not found.</p>";
+
+                    // Reset modal content class
+                    const modalContent = modal.querySelector('.modal-content');
+                    modalContent.className = 'modal-content';
+
+                    // Add public-profile class only for public profile tab
+                    if (tabName === 'public-profile') {
+                        modalContent.classList.add('public-profile');
+                    }
+
+                    modal.style.display = "flex";
+                });
+            });
+    // Зміст для кожної вкладки
+    const tabContents = {
+        "public-profile": `
         <h2 data-lang="publicProf">Public profile</h2>
-        <p data-lang="infPublicProf">This is your public profile. You can see how it looks to other users.</p>
+        <div class="iframe-container">
+            <iframe 
+                id="public-profile-iframe"
+                src="/profile-page/public-profile.html" 
+                style="width: 100%; height: 800px; border: none;"
+            ></iframe>
+        </div>
     `,
-    "profile": `
-        <h2 data-lang="editProf">Editing your profile</h2>
-        <div class="input-group">
-            <label data-lang="name">Name:</label>
-            <input data-lang="enterName" type="text" placeholder="Enter your real name">
-        </div>
-        <div class="input-group">
-            <label data-lang="nickname">Nickname:</label>
-            <input data-lang="enterNickname" type="text" placeholder="Enter your nickname">
-        </div>
-         <div class="input-group">
-            <label data-lang="dob">Date of birth:</label>
-            <input data-lang="enterDOB" type="date" placeholder="Enter your date of birth">
-        </div>
-        <div class="input-group">
-            <label data-lang="phone">Phone:</label>
-            <input data-lang="enterPhone" type="text" placeholder="Enter your phone number">
-        </div>
-        <div class="input-group">
-            <label data-lang="gender">Gender:</label>
-            <input data-lang="enterGender" type="text" placeholder="Enter your gender">
-        </div>
-        <div class="input-group">
-            <label data-lang="description">Description:</label>
-            <input data-lang="writeDescription" type="text" placeholder="Write some information about yourself">
-        </div>
-        <div class="input-group">
-            <label data-lang="country">Country:</label>
-            <input data-lang="enterCountry" type="text" placeholder="Enter your country">
-        </div>
-        <div class="input-group">
-            <label data-lang="city">City:</label>
-            <input data-lang="enterCity" type="text" placeholder="Enter your city">
-        </div>
-        <div class="input-group">
-            <label data-lang="zipCode">Zip code:</label>
-            <input data-lang="enterzipCode" type="text" placeholder="Enter your zip code">
-        </div>
-         <div class="input-group">
-            <label data-lang="specialty">Specialty:</label>
-            <input data-lang="enterSpecialty" type="text" placeholder="Enter your specialty">
-        </div>
-         <div class="input-group">
-            <label data-lang="DOPE">Beginning of professional experience:</label>
-            <input data-lang="enterDOPE" type="date" placeholder="Enter the start date of your professional experience">
-        </div>
-        <div class="input-group">
-            <label data-lang="experience">Experience:</label>
-            <input data-lang="enterExperience" type="text" placeholder="Write about your teaching experience">
-        </div>
-        <div class="input-group">
-            <label data-lang="education">Education:</label>
-            <input data-lang="writeEducation" type="text" placeholder="Write about your education">
-        </div>
-        <div class="input-group">
-            <label data-lang="hobby">Hobbies:</label>
-            <input data-lang="writeHobby" type="text" placeholder="Write about your hobbies and interests.">
-        </div>
-        <div class="input-group">
-            <label data-lang="language">Language:</label>
-            <input  data-lang="writeLanguage" type="text" placeholder="Write what languages ​​you speak">
-        </div>
-        <button data-lang="saveChanges">Save changes</button>
-    `,
-    "security": `
+        "profile": `
+            <h2 data-lang="editProf">Editing your profile</h2>
+            <div class="input-group">
+                <label data-lang="name">Name:</label>
+                <input id="profile-name" data-lang="enterName" type="text" placeholder="Enter your real name">
+            </div>
+            <div class="input-group">
+                <label data-lang="nickname">Nickname:</label>
+                <input id="profile-nickname" data-lang="enterNickname" type="text" placeholder="Enter your nickname">
+            </div>
+            <div class="input-group">
+                <label data-lang="dob">Date of birth:</label>
+                <input id="profile-dob" data-lang="enterDOB" type="date" placeholder="Enter your date of birth">
+            </div>
+            <div class="input-group">
+                <label data-lang="phone">Phone:</label>
+                <input id="profile-phone" data-lang="enterPhone" type="text" placeholder="Enter your phone number">
+            </div>
+            <div class="input-group">
+                <label data-lang="description">Description:</label>
+                <input id="profile-about" data-lang="writeDescription" type="text" placeholder="Write some information about yourself">
+            </div>
+            <div class="input-group">
+                <label data-lang="country">Country:</label>
+                <input id="profile-country" data-lang="enterCountry" type="text" placeholder="Enter your country">
+            </div>
+            <div class="input-group">
+                <label data-lang="city">City:</label>
+                <input id="profile-city" data-lang="enterCity" type="text" placeholder="Enter your city">
+            </div>
+            <div class="input-group">
+                <label data-lang="zipCode">Zip code:</label>
+                <input id="profile-zipcode" data-lang="enterzipCode" type="text" placeholder="Enter your zip code">
+            </div>
+            <div class="input-group">
+                <label data-lang="specialty">Specialty:</label>
+                <input id="profile-specialty" data-lang="enterSpecialty" type="text" placeholder="Enter your specialty">
+            </div>
+            <div class="input-group">
+                <label data-lang="DOPE">Beginning of professional experience:</label>
+                <input id="profile-experience-date" data-lang="enterDOPE" type="date" placeholder="Enter the start date of your professional experience">
+            </div>
+            <div class="input-group">
+                <label data-lang="experience">Experience:</label>
+                <input id="profile-experience" data-lang="enterExperience" type="text" placeholder="Write about your teaching experience">
+            </div>
+            <div class="input-group">
+                <label data-lang="education">Education:</label>
+                <input id="profile-education" data-lang="writeEducation" type="text" placeholder="Write about your education">
+            </div>
+            <div class="input-group">
+                <label data-lang="hobby">Hobbies:</label>
+                <input id="profile-hobbies" data-lang="writeHobby" type="text" placeholder="Write about your hobbies and interests.">
+            </div>
+            <div class="input-group">
+                <label data-lang="language">Language:</label>
+                <input id="profile-language" data-lang="writeLanguage" type="text" placeholder="Write what languages ​​you speak">
+            </div>
+            <div class="input-group">
+                <label>Stripe Account ID:</label>
+                <input id="profile-stripe-account" type="text" placeholder="Enter your Stripe account ID" readonly>
+            </div>
+            <button data-lang="saveChanges">Save changes</button>
+        `,
+        "security": `
     <h2 data-lang="securitySettings">Security settings</h2>
     <div class="input-group">
         <label data-lang="currentPassword">Current Password:</label>
@@ -421,259 +486,476 @@ const tabContents = {
     <button data-lang="updatePassword">Update password</button>
 `,
 
-    "messages": `
+        "messages": `
         <h2 data-lang="messages">Messages</h2>
         <p data-lang="noMessages">You have no new messages yet.</p>
     `,
-    "close-account": `
+        "close-account": `
    <h2 data-lang="manageAccount">Manage Account Visibility</h2>
     <p data-lang="privatePublic">You can make your account private or public using the buttons below.</p>
     <button data-lang="closeAccount" id="close-account-btn" style="background-color: #f44336; color: white; margin-bottom: 10px;">Close Account</button>
     <button  data-lang="openAccount" id="open-account-btn" style="background-color: #4CAF50; color: white;">Open Account</button>
 `
-};
+    };
+    // Функція для форматування дати
+     function formatDate(dateString) {
+         if (!dateString) return '';
+         try {
+             const date = new Date(dateString);
+             return date.toISOString().split('T')[0];
+         } catch (error) {
+             console.error('Помилка форматування дати:', error);
+             return '';
+         }
+     }
 
-// Відкриття модального вікна
-tabLinks.forEach(tab => {
-    tab.addEventListener('click', () => {
-        const tabName = tab.getAttribute('data-tab');
-        modalContentContainer.innerHTML = tabContents[tabName] || "<p>Content not found.</p>";
-        modal.style.display = "flex";
+     // Головна функція для заповнення форми профілю
+     async function populateProfileForm(userId) {
+         try {
+             const response = await fetch(`http://localhost:8000/auth/profile/teacher/${userId}`);
+             if (!response.ok) {
+                 throw new Error('Не вдалося отримати дані профілю');
+             }
+
+             const data = await response.json();
+
+             // Функція для безпечного встановлення значень полів
+             const setInputValue = (id, value) => {
+                 const element = document.getElementById(id);
+                 if (element) {
+                     if (element.type === 'date' && value) {
+                         element.value = formatDate(value);
+                     } else {
+                         element.value = value || '';
+                     }
+                 }
+             };
+
+             // Заповнюємо поля форми існуючими даними
+             setInputValue('profile-name', data.real_name);
+             setInputValue('profile-nickname', data.nickname);
+             setInputValue('profile-dob', data.dob);
+             setInputValue('profile-phone', data.phone_number);
+             setInputValue('profile-about', data.about);
+             setInputValue('profile-country', data.country);
+             setInputValue('profile-city', data.city);
+             setInputValue('profile-zipcode', data.zip_code);
+             setInputValue('profile-specialty', data.specialty);
+             setInputValue('profile-experience-date', data.professional_experience);
+             setInputValue('profile-experience', data.experience);
+             setInputValue('profile-education', data.education);
+             setInputValue('profile-hobbies', data.hobbies);
+             setInputValue('profile-language', data.language);
+             setInputValue('profile-stripe-account', data.author_stripe_account);
+
+         } catch (error) {
+             console.error('Помилка завантаження даних профілю:', error);
+             alert('Не вдалося завантажити дані профілю');
+         }
+     }
+
+     // Функція для збереження даних форми
+     async function saveProfileData(event) {
+         event.preventDefault();
+
+         const userId = localStorage.getItem('userId');
+         if (!userId) {
+             alert('Користувач не авторизований');
+             return;
+         }
+
+         // Збираємо дані з форми
+         const formData = {
+             name: document.getElementById('profile-name').value.trim(),
+             phone_number: document.getElementById('profile-phone').value.trim(),
+             nickname: document.getElementById('profile-nickname').value.trim(),
+             dob: document.getElementById('profile-dob').value,
+             country: document.getElementById('profile-country').value.trim(),
+             city: document.getElementById('profile-city').value.trim(),
+             zip_code: document.getElementById('profile-zipcode').value.trim(),
+             specialty: document.getElementById('profile-specialty').value.trim(),
+             professional_experience: document.getElementById('profile-experience-date').value,
+             experience: document.getElementById('profile-experience').value.trim(),
+             about: document.getElementById('profile-about').value.trim(),
+             education: document.getElementById('profile-education').value.trim(),
+             hobbies: document.getElementById('profile-hobbies').value.trim(),
+             language: document.getElementById('profile-language').value.trim()
+         };
+
+         try {
+             const response = await fetch(`http://localhost:8000/auth/profile/teacher/${userId}`, {
+                 method: 'PUT',
+                 headers: {
+                     'Content-Type': 'application/json',
+                 },
+                 body: JSON.stringify(formData)
+             });
+
+             const result = await response.json();
+
+             if (response.ok) {
+                 alert('Профіль успішно оновлено!');
+                 // Оновлюємо відображення нікнейму
+                 const usernameElement = document.getElementById('username');
+                 if (usernameElement) {
+                     usernameElement.textContent = formData.nickname;
+                 }
+             } else {
+                 throw new Error(result.error || 'Помилка оновлення профілю');
+             }
+         } catch (error) {
+             console.error('Помилка оновлення профілю:', error);
+             alert('Виникла помилка при оновленні профілю: ' + error.message);
+         }
+     }
+
+     // Ініціалізація обробників подій
+     function initializeProfileHandlers() {
+         document.addEventListener('DOMContentLoaded', () => {
+             const userId = localStorage.getItem('userId');
+             if (userId) {
+                 populateProfileForm(userId);
+             }
+
+             // Додаємо обробник для кнопки збереження
+             const saveButton = document.querySelector('button[data-lang="saveChanges"]');
+             if (saveButton) {
+                 saveButton.addEventListener('click', saveProfileData);
+             }
+         });
+     }
+
+            // Add event listener for profile tab click
+            const profileTab = document.querySelector('.tab-link[data-tab="profile"]');
+            if (profileTab) {
+                profileTab.addEventListener('click', () => {
+                    const userId = localStorage.getItem('userId');
+                    if (userId) {
+                        setTimeout(() => {
+                            populateProfileForm(userId);
+                        }, 100);
+                    }
+                });
+            }
+        
+        // Add event listener for profile tab click
+        document.querySelector('.tab-link[data-tab="profile"]').addEventListener('click', () => {
+            const userId = localStorage.getItem('userId');
+            if (userId) {
+                setTimeout(() => {
+                    populateProfileForm(userId);
+                }, 100); // Small delay to ensure form elements are rendered
+            }
+        });
+
+    closeButton.addEventListener('click', () => {
+            modal.style.display = "none";
+            modalContentContainer.querySelector('.modal-content').classList.remove('public-profile-modal'); // Видаляємо клас
+        });
+    // Відкриття модального вікна
+    tabLinks.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const tabName = tab.getAttribute('data-tab');
+            modalContentContainer.innerHTML = tabContents[tabName] || "<p>Content not found.</p>";
+            modal.style.display = "flex";
+        });
     });
-});
 
-// Закриття модального вікна
-closeButton.addEventListener('click', () => {
-    modal.style.display = "none";
-});
-
-// Закриття модального вікна при кліку за його межами
-window.addEventListener('click', (event) => {
-    if (event.target === modal) {
+    // Закриття модального вікна
+    closeButton.addEventListener('click', () => {
         modal.style.display = "none";
-    }
-});
+    });
 
-document.body.addEventListener('click', async (event) => {
-    if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Save changes') {
-        const name = document.querySelector('input[placeholder="Enter your real name"]').value.trim();
-        const phone_number = document.querySelector('input[placeholder="Enter your phone number"]').value.trim();
-        const nickname = document.querySelector('input[placeholder="Enter your nickname"]').value.trim();
-        const dob = document.querySelector('input[placeholder="Enter your date of birth"]').value.trim();
-        const gender = document.querySelector('input[placeholder="Enter your gender"]').value.trim();
-        const country = document.querySelector('input[placeholder="Enter your country"]').value.trim();
-        const city = document.querySelector('input[placeholder="Enter your city"]').value.trim();
-        const zip_code = document.querySelector('input[placeholder="Enter your zip code"]').value.trim();
-        const specialty = document.querySelector('input[placeholder="Enter your specialty"]').value.trim();
-        const professional_experience = document.querySelector('input[placeholder="Enter the start date of your professional experience"]').value.trim();
-        const experience = document.querySelector('input[placeholder="Write about your teaching experience"]').value.trim();
-        const about = document.querySelector('input[placeholder="Write some information about yourself"]').value.trim();
-        const education = document.querySelector('input[placeholder="Write about your education"]').value.trim();
-        const hobbies = document.querySelector('input[placeholder="Write about your hobbies and interests."]').value.trim();
-        const language = document.querySelector('input[placeholder="Write what languages ​​you speak"]').value.trim();
-        console.log({name, phone_number,nickname,dob,gender,country,city,zip_code,specialty,professional_experience,experience,about,education,hobbies,language,});
+    // Закриття модального вікна при кліку за його межами
+    window.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    });
 
-        const userId = localStorage.getItem('userId'); 
+    document.body.addEventListener('click', async (event) => {
+         if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Save changes') {
+             // Функція безпечного отримання значення з input
+             const getInputValue = (selector) => {
+                 const element = document.querySelector(selector);
+                 return element ? element.value.trim() : '';
+             };
 
-        try {
-            const response = await fetch(`http://localhost:8000/auth/profile/teacher/${userId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    name,
-                    phone_number,
-                    nickname,
-                    dob,
-                    country,
-                    city,
-                    specialty,
-                    professional_experience,
-                    experience,
-                    about,
-                    education,
-                    hobbies,
-                    language,
-                }),
-            });
+             // Безпечно отримуємо значення
+             const formData = {
+                 name: getInputValue('input[placeholder="Enter your real name"]'),
+                 phone_number: getInputValue('input[placeholder="Enter your phone number"]'),
+                 nickname: getInputValue('input[placeholder="Enter your nickname"]'),
+                 dob: getInputValue('input[placeholder="Enter your date of birth"]'),
+                 country: getInputValue('input[placeholder="Enter your country"]'),
+                 city: getInputValue('input[placeholder="Enter your city"]'),
+                 zip_code: getInputValue('input[placeholder="Enter your zip code"]'),
+                 specialty: getInputValue('input[placeholder="Enter your specialty"]'),
+                 professional_experience: getInputValue('input[placeholder="Enter the start date of your professional experience"]'),
+                 experience: getInputValue('input[placeholder="Write about your teaching experience"]'),
+                 about: getInputValue('input[placeholder="Write some information about yourself"]'),
+                 education: getInputValue('input[placeholder="Write about your education"]'),
+                 hobbies: getInputValue('input[placeholder="Write about your hobbies and interests."]'),
+                 language: getInputValue('input[placeholder="Write what languages ​​you speak"]')
+             };
 
-            const result = await response.json();
+             const userId = localStorage.getItem('userId');
 
-            if (response.ok) {
-                alert('Profile updated successfully!');
-                const usernameElement = document.getElementById('username');
-                usernameElement.textContent = nickname; 
-            } else {
-                alert(`Error: ${result.error}`);
+             if (!userId) {
+                 alert('User ID not found. Please log in again.');
+                 return;
+             }
+
+             try {
+                 // Додаємо логування для відстеження даних
+                 console.log('Sending data:', formData);
+
+                 const response = await fetch(`http://localhost:8000/auth/profile/teacher/${userId}`, {
+                     method: 'PUT',
+                     headers: {
+                         'Content-Type': 'application/json',
+                     },
+                     body: JSON.stringify(formData)
+                 });
+
+                 const result = await response.json();
+
+                 if (response.ok) {
+                     alert('Profile updated successfully!');
+                     // Оновлюємо нікнейм на сторінці, якщо елемент існує
+                     const usernameElement = document.getElementById('username');
+                     if (usernameElement && formData.nickname) {
+                         usernameElement.textContent = formData.nickname;
+                     }
+                 } else {
+                     throw new Error(result.error || 'Failed to update profile');
+                 }
+             } catch (error) {
+                 console.error('Error updating profile:', error);
+                 alert('An error occurred while updating the profile: ' + error.message);
+             }
+         }
+     });
+
+
+    document.body.addEventListener('click', async (event) => {
+        if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Update password') {
+            const currentPassword = document.querySelector('input[placeholder="Enter current password"]').value;
+            const newPassword = document.querySelector('input[placeholder="Enter new password"]').value;
+            const confirmPassword = document.querySelector('input[placeholder="Confirm new password"]').value;
+
+            const userId = localStorage.getItem('userId');
+            const token = localStorage.getItem('token'); // Для авторизації
+
+            // Валідація полів
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                alert('Please fill out all fields.');
+                return;
             }
-        } catch (error) {
-            console.error('Error updating profile:', error);
-            alert('An error occurred while updating the profile.');
-        }
-    }
-});
-
-
-document.body.addEventListener('click', async (event) => {
-    if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Update password') {
-        const currentPassword = document.querySelector('input[placeholder="Enter current password"]').value;
-        const newPassword = document.querySelector('input[placeholder="Enter new password"]').value;
-        const confirmPassword = document.querySelector('input[placeholder="Confirm new password"]').value;
-
-        const userId = localStorage.getItem('userId'); 
-        const token = localStorage.getItem('token'); // Для авторизації
-
-       // Валідація полів
-        if (!currentPassword || !newPassword || !confirmPassword) {
-        alert('Please fill out all fields.');
-        return;
-        }
-        if (newPassword !== confirmPassword) {
-            alert('New password and confirmation do not match.');
-            return;
-        }
-
-        if (newPassword.length < 6) { // Приклад мінімальної довжини
-            alert('New password must be at least 6 characters long.');
-            return;
-        }
-
-        try {
-            const response = await fetch('http://localhost:8000/auth/update-password', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    userId,
-                    currentPassword,
-                    newPassword,
-                }),
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                alert('Password updated successfully!');
-            } else {
-                alert(`Error: ${result.error}`);
+            if (newPassword !== confirmPassword) {
+                alert('New password and confirmation do not match.');
+                return;
             }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred while updating the password.');
-        }
-    }
-});
-document.addEventListener('click', (event) => {
-    if (event.target.closest('.toggle-password')) {
-        const toggle = event.target.closest('.toggle-password');
-        const inputId = toggle.getAttribute('data-target');
-        const input = document.getElementById(inputId);
 
-        if (input) {
-            // Перемикання типу поля
-            if (input.type === 'password') {
-                input.type = 'text';
-                toggle.innerHTML = '<i class="fas fa-eye-slash"></i>';
-            } else {
-                input.type = 'password';
-                toggle.innerHTML = '<i class="fas fa-eye"></i>';
+            if (newPassword.length < 6) { // Приклад мінімальної довжини
+                alert('New password must be at least 6 characters long.');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:8000/auth/update-password', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        userId,
+                        currentPassword,
+                        newPassword,
+                    }),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Password updated successfully!');
+                } else {
+                    alert(`Error: ${result.error}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while updating the password.');
             }
         }
-    }
-});
+    });
+    document.addEventListener('click', (event) => {
+        if (event.target.closest('.toggle-password')) {
+            const toggle = event.target.closest('.toggle-password');
+            const inputId = toggle.getAttribute('data-target');
+            const input = document.getElementById(inputId);
 
-
-document.body.addEventListener('click', async (event) => {
-    const userId = localStorage.getItem('userId'); 
-
-    if (event.target.id === 'close-account-btn') {
-        if (!confirm('Are you sure you want to close your account?')) {
-            return;
-        }
-
-        try {
-            const response = await fetch('http://localhost:8000/auth/close-account', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ userId }),
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                alert(result.message);
-            } else {
-                alert(`Error: ${result.error}`);
+            if (input) {
+                // Перемикання типу поля
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    toggle.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                } else {
+                    input.type = 'password';
+                    toggle.innerHTML = '<i class="fas fa-eye"></i>';
+                }
             }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred while closing the account.');
         }
-    }
+    });
 
-    if (event.target.id === 'open-account-btn') {
-        if (!confirm('Are you sure you want to open your account?')) {
-            return;
-        }
 
-        try {
-            const response = await fetch('http://localhost:8000/auth/open-account', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ userId }),
-            });
+    document.body.addEventListener('click', async (event) => {
+        const userId = localStorage.getItem('userId');
 
-            const result = await response.json();
-
-            if (response.ok) {
-                alert(result.message);
-            } else {
-                alert(`Error: ${result.error}`);
+        if (event.target.id === 'close-account-btn') {
+            if (!confirm('Are you sure you want to close your account?')) {
+                return;
             }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred while opening the account.');
+
+            try {
+                const response = await fetch('http://localhost:8000/auth/close-account', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ userId }),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(result.message);
+                } else {
+                    alert(`Error: ${result.error}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while closing the account.');
+            }
         }
-    }
-});
 
-// Приклад API-запиту для отримання профілю користувача
-async function fetchTeacherProfile() {
-    const userId = localStorage.getItem('userId');
+        if (event.target.id === 'open-account-btn') {
+            if (!confirm('Are you sure you want to open your account?')) {
+                return;
+            }
 
-    if (!userId) {
-        console.error('User not logged in!');
-        return;
-    }
+            try {
+                const response = await fetch('http://localhost:8000/auth/open-account', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ userId }),
+                });
 
-    try {
-        const response = await fetch(`http://localhost:8000/auth/profile/${userId}`);
-        const data = await response.json();
+                const result = await response.json();
 
-        if (response.ok) {
-            // Оновлюємо значення в елементі <p id="username">
-            const usernameElement = document.getElementById('username');
-            usernameElement.textContent = data.nickname || 'Default Username';
-        } else {
-            console.error('Failed to fetch user profile:', data.error);
+                if (response.ok) {
+                    alert(result.message);
+                } else {
+                    alert(`Error: ${result.error}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while opening the account.');
+            }
         }
-    } catch (err) {
-        console.error('Error fetching user profile:', err);
-    }
-}
+    });
 
-// Виклик функції під час завантаження сторінки
-window.addEventListener('DOMContentLoaded', fetchTeacherProfile);
+     // Функція для завантаження профілю вчителя
+     async function fetchTeacherProfile() {
+         const userId = localStorage.getItem('userId');
 
+         if (!userId) {
+             console.log('User  not authenticated');
+             return;
+         }
+
+         try {
+             const response = await fetch(`http://localhost:8000/auth/profile/teacher/${userId}`);
+
+             if (!response.ok) {
+                 throw new Error(`HTTP error: ${response.status}`);
+             }
+
+             const data = await response.json();
+
+             // Оновлення зображення профілю, якщо воно існує
+             if (data.profile_image) {
+                 document.getElementById('profile-image').src = data.profile_image;
+             }
+
+             // Оновлення імені користувача, якщо воно існує
+             const username = data.nickname || data.real_name || 'User ';
+             document.getElementById('username').textContent = username;
+
+             return data;
+         } catch (err) {
+             console.warn('Error loading profile:', err);
+         }
+     }
+
+     // Функція для завантаження записаних курсів
+     async function loadEnrolledCourses() {
+         const userId = localStorage.getItem('userId');
+         if (!userId) return;
+
+         try {
+             const response = await fetch(`/api/courses/enrolled/${userId}`);
+             if (!response.ok) throw new Error('Failed to fetch enrolled courses');
+
+             const courses = await response.json();
+             const coursesContainer = document.getElementById('enrolled-courses');
+
+             if (courses.length === 0) {
+                 coursesContainer.innerHTML = '<p class="no-courses" data-lang="noCourses">You haven\'t enrolled in any courses yet.</p>';
+                 return;
+             }
+
+             coursesContainer.innerHTML = courses.map(course => `
+            <div class="course">
+                <p class="p-1">${course.name}</p>
+                <div class="progress-bar">
+                    <span style="width: ${course.progress}%;"></span>
+                </div>
+                <p class="percent">${course.progress}%</p>
+                <img src="${course.image_url || '/images/250x100.png'}" alt="${course.name}">
+                <button class="btn-resume" data-course-id="${course.id}" data-lang="btnResume">Resume</button>
+            </div>
+        `).join('');
+
+             // Додаємо обробники для кнопок "Resume"
+             document.querySelectorAll('.btn-resume').forEach(button => {
+                 button.addEventListener('click', () => {
+                     const courseId = button.getAttribute('data-course-id');
+                     window.location.href = `/course/learn/${courseId}`;
+                 });
+             });
+
+             // Оновлюємо переклади для нових елементів
+             applyLanguage(localStorage.getItem('language') || 'en');
+
+         } catch (error) {
+             console.error('Error loading enrolled courses:', error);
+             const coursesContainer = document.getElementById('enrolled-courses');
+             coursesContainer.innerHTML = '<p class="error-message">Failed to load courses. Please try again later.</p>';
+         }
+     }
+
+     // Виклик функцій під час завантаження сторінки
+     window.addEventListener('DOMContentLoaded', () => {
+         fetchTeacherProfile();
+         loadEnrolledCourses();
+     });
+    });
 </script>
 <script src="../header/auth-header.js"></script>
 <script src="../footer/footer.js"></script>
 <script src="/profile-page/teacher-lang.js"></script>
+
 </html>

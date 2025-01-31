@@ -27,14 +27,151 @@ body {
     padding: 14px;
     width: 100%;
     height: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .video-player {
     width: 100%;
     aspect-ratio: 16/9;
-    background: #D9D9D9;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.video-player video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     border-radius: 12px;
 }
+
+.video-controls {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 2;
+}
+
+/* Стилізація кнопки нотаток */
+.notes-button {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid #FFFFFF;
+    border-radius: 8px;
+    padding: 6px 12px;
+    color: #FFFFFF;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+}
+
+.notes-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.notes-button img {
+    width: 16px;
+    height: 16px;
+}
+
+/* Стилі для модального вікна нотаток */
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.video-element {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.notes-button {
+    background: rgba(0, 0, 0, 0.7);
+    border: none;
+    border-radius: 4px;
+    color: white;
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+}
+
+.notes-button:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.notes-button:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+/* Оновлені стилі для модального вікна */
+.notes-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    background: white;
+    padding: 30px; /* Збільшуємо внутрішні відступи */
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    width: 600px; /* Встановлюємо фіксовану ширину */
+    max-width: 90vw; /* Обмежуємо максимальну ширину для адаптивності */
+}
+.notes-modal.active {
+    display: block;
+}
+
+
+.notes-modal textarea {
+    width: 100%;
+    height: 200px; /* Збільшуємо висоту текстового поля */
+    padding: 15px;
+    border: 2px solid #C7C7C7;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-family: 'Inter', sans-serif;
+    resize: vertical;
+    font-size: 14px;
+}
+
+.notes-modal .button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.notes-modal button {
+    padding: 8px 16px;
+    border: 2px solid #283044;
+    border-radius: 12px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.notes-modal .save-button {
+    background: #283044;
+    color: #FFFFFF;
+}
+
+.notes-modal .cancel-button {
+    background: #FFFFFF;
+    color: #283044;
+}
+
 
 /* Course content sidebar */
 .course-content {
@@ -54,28 +191,119 @@ body {
     gap: 20px;
 }
 
+.toggle-all::after,
+.toggle-module::after {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid #283044;
+    border-bottom: 2px solid #283044;
+    transform: rotate(45deg);
+    transition: transform 0.3s ease;
+    margin-left: 5px;
+}
+
+.course-content.collapsed .module {
+    display: none;
+}
+
+.toggle-all,
+.toggle-module {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    position: relative;
+    margin-right: 12px;
+    margin-top: -5px;
+}
+
+.toggle-all.collapsed::after,
+.toggle-module.collapsed::after {
+    transform: rotate(-45deg);
+}
+
+/* Початково приховуємо модулі */
+.module {
+    display: none;
+}
+
+/* Показуємо модулі, коли контент розгорнутий */
+.course-content:not(.collapsed) .module {
+    display: block;
+}
+
+/* Стилізація заголовка курсу */
+.course-header {
+    border-bottom: 1px solid #C7C7C7;
+}
+
+.course-header,
+.module-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 8px;
+}
+
+.toggle-all {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+/* Стилізація заголовків модулів */
+
+.toggle-module {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
 .course-content h1 {
     font-size: 32px;
     font-weight: 500;
     color: #283044;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
 }
 
 .module {
-    margin-bottom: 30px;
+    border-bottom: 1px solid #C7C7C7;
+    padding: 20px 0;
+    position: relative;
+}
+
+.module:last-child {
+    border-bottom: none;
 }
 
 .module h2 {
     font-size: 20px;
     font-weight: 500;
     color: #283044;
-    margin-bottom: 10px;
 }
 
 .module-progress {
     font-size: 10px;
     color: #000000;
     margin-bottom: 15px;
+    display: block !important;
+    margin-left: 0;
+}
+
+.module-content {
+    display: block !important;
+}
+
+.module.collapsed .topics {
+    display: none;
 }
 
 .module-progress .separator {
@@ -85,7 +313,7 @@ body {
 
 .topics {
     list-style: none;
-    padding-left: 43px;
+    padding-left: 40px;
 }
 
 .topics li {
@@ -93,21 +321,50 @@ body {
     margin-bottom: 10px;
     color: #000000;
     position: relative;
+    padding-right: 30px;
+    gap: 10px;
 }
 
 .topics li::before {
     content: "";
     position: absolute;
-    left: -23px;
+    left: -40px;
     top: 50%;
     transform: translateY(-50%);
     width: 18px;
     height: 18px;
-    background: url('icon-default.png') no-repeat center;
+}
+
+.topics li::after {
+    content: "";
+    position: absolute;
+    left: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.topics li .content-type-icon {
+    position: absolute;
+    left: -22px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    background-size: contain;
+    background-repeat: no-repeat;
 }
 
 .topics li.completed::before {
-    background-image: url('icon-completed.png');
+    content: "✓";
+    font-size: 14px;
+    color: #283044;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Discussion section */
@@ -184,11 +441,47 @@ body {
 /* Filters */
 .filters {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    justify-content: space-between;
     margin-bottom: 20px;
+    gap: 20px;
 }
 
+/* Стилі для лівої частини з чекбоксами */
+.filters-left {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.checkbox-filter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.checkbox-filter input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #283044;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.checkbox-filter label {
+    font-size: 14px;
+    color: #283044;
+    cursor: pointer;
+}
+
+/* Стилі для правої частини з кнопками */
+.filters-right {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+/* Оновлені стилі для груп кнопок */
 .filter-group {
     display: inline-flex;
 }
@@ -222,11 +515,6 @@ body {
 
 .filter-btn.active {
     background: #DCECFC;
-}
-
-.filters {
-    display: flex;
-    flex-wrap: wrap;
 }
 
 /* Discussion thread */
@@ -328,7 +616,7 @@ body {
     height: 30px;
     border: 2px solid #C7C7C7;
     border-radius: 12px;
-    background: #FFFFFF url('send-icon.png') no-repeat center;
+    background: #FFFFFF;
     cursor: pointer;
 }
 
@@ -346,4 +634,18 @@ body {
     font-size: 14px;
     cursor: pointer;
     display: block;
+}
+
+.icon-button img {
+    width: 18px;
+    height: 18px;
+    display: block;
+    margin: auto;
+}
+
+.send-reply img {
+    width: 18px;
+    height: 18px;
+    display: block;
+    margin: auto;
 }
