@@ -416,20 +416,18 @@ document.getElementById("course_thumbnail").addEventListener("change", function 
   const fileName = this.files[0]?.name || "No file chosen";
   fileNameSpan.textContent = fileName;
 });
+
+let tagsList = JSON.parse(localStorage.getItem('tagsList')) || [];
+
 document.addEventListener('DOMContentLoaded', function () {
   const tagsInput = document.getElementById("course-tags");
   const tagsListContainer = document.getElementById("tags-list");
 
-  // Отримуємо список тегів
-  let tagsList = JSON.parse(localStorage.getItem('tagsList')) || [];
-
-  // Оновлюємо відображення тегів
   updateTagsDisplay();
 
   tagsInput.addEventListener("keydown", function (e) {
     if (e.key === "Enter") {
       e.preventDefault();
-
       const tag = tagsInput.value.trim();
       if (tag && !tagsList.includes(tag)) {
         tagsList.push(tag);
@@ -464,6 +462,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function saveTagsToLocalStorage() {
     localStorage.setItem('tagsList', JSON.stringify(tagsList));
   }
+});
 
   // Подія перед закриттям вкладки
   window.addEventListener('beforeunload', function () {
@@ -486,7 +485,7 @@ document.addEventListener('DOMContentLoaded', function () {
     tagsList = [];
     tagsListContainer.innerHTML = ''; // Очищаємо відображення тегів
   }
-});
+
 
 function saveDraftAutomatically() {
   console.log("Автозбереження викликано");
@@ -514,7 +513,7 @@ function saveDraftAutomatically() {
     const courseEducationLevelElement = educationWrapper ? educationWrapper.querySelector('.select-trigger') : null;
     const courseEducationLevel = courseEducationLevelElement && courseEducationLevelElement.dataset.value ? parseInt(courseEducationLevelElement.dataset.value, 10) : null;
 
-    const tags = tagsList;
+    const tags = JSON.parse(localStorage.getItem('tagsList')) || [];
 
     
     const existingCourseData = JSON.parse(localStorage.getItem('courseDraft')) || {};
@@ -619,7 +618,7 @@ const courseData = {
   authorId: authorId,
   educationLevel: courseEducationLevel,
   price: coursePrice,
-  tags: tags,
+  tags: tags, 
   modules: modules,
   removedModules: removedModules.map(module => module.id),
   thumbnail: courseThumbnail ? courseThumbnail.name : null, 
