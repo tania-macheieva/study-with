@@ -386,10 +386,16 @@ document.body.appendChild(buttonsContainer); // Додаємо контейне�
   }
 });
 
-// Функція для додавання drag-and-drop функціональності
+/// Функція для додавання drag-and-drop функціональності
 function addDragAndDropFunctionality(container) {
   const draggableItems = container.querySelectorAll('.matching-item');
   const answerSlots = container.querySelectorAll('.matching-answer-block');
+   // Зберігаємо оригінальний текст підпитань у data-атрибут
+   answerSlots.forEach(slot => {
+    if (!slot.hasAttribute('data-original-text')) {
+      slot.setAttribute('data-original-text', slot.textContent.trim());
+    }
+  });
 
   draggableItems.forEach(item => {
     item.addEventListener('dragstart', (e) => {
@@ -427,13 +433,27 @@ function addDragAndDropFunctionality(container) {
     while (slot.firstChild) {
       slot.removeChild(slot.firstChild);
     }
-    slot.appendChild(draggedItem);
+    // Додаємо контейнер, щоб залишити текст підпитання та нову відповідь
+    const wrapper = document.createElement('div');
+    wrapper.classList.add('matching-slot-wrapper');
+     // Додаємо текст підпитання
+    const questionText = document.createElement('span');
+    questionText.classList.add('original-question');
+    questionText.textContent = slot.getAttribute('data-original-text'); // Беремо збережений текст
+
+     // Додаємо відповідь
+    const answerElement = draggedItem.cloneNode(true);
+    answerElement.classList.add('dropped-answer');
+    wrapper.appendChild(questionText);
+    wrapper.appendChild(answerElement);
+    slot.appendChild(wrapper);
   } else {
     console.error('Dragged item not found for answerId:', answerId); // Лог
   }
     });
   });
 }
+
 
 
 });
