@@ -861,32 +861,45 @@ router.get('/profile/teacher/:id', async (req, res) => {
 
     try {
         const profileResult = await pool.query(
-            `SELECT
-                u.name AS real_name,
-                u.profile_image,
-                u.phone_number,
-                t.nickname,
-                t.about,
-                t.education,
-                t.experience,
-                t.hobbies,
-                t.language,
-                t.certificates,
-                t.dob,
-                t.country,
-                t.city,
-                t.zip_code,
-                t.specialty,
-                t.professional_experience,
-                t.author_stripe_account,
-                ARRAY_AGG(c.name) AS courses  
-            FROM users u
-            LEFT JOIN teachers t ON u.id = t.user_id
-            LEFT JOIN all_courses c ON c.author_id = u.id  
-            WHERE u.id = $1
-            GROUP BY u.id, t.id, u.profile_image`,  
-            [userId]
-        );
+    `SELECT
+        u.name AS real_name,
+        u.profile_image,
+        u.phone_number,
+        t.nickname,
+        t.about,
+        t.education,
+        t.experience,
+        t.hobbies,
+        t.language,
+        t.certificates,
+        t.dob,
+        t.country,
+        t.city,
+        t.zip_code,
+        t.specialty,
+        t.professional_experience,
+        t.author_stripe_account,
+        (
+            SELECT json_agg(
+                json_build_object(
+                    'id', c.id,
+                    'name', c.name,
+                    'price', c.price,
+                    'description', c.description,
+                    'image_url', c.image_url,
+                    'status', c.status,
+                    'created_at', c.created_at
+                )
+            )
+            FROM all_courses c
+            WHERE c.author_id = u.id
+        ) AS courses
+    FROM users u
+    LEFT JOIN teachers t ON u.id = t.user_id
+    WHERE u.id = $1
+    GROUP BY u.id, t.id, u.profile_image`,  
+    [userId]
+);
 
         const reviewsResult = await pool.query(
             `SELECT
@@ -896,7 +909,8 @@ router.get('/profile/teacher/:id', async (req, res) => {
                 tr.created_at
             FROM teacher_reviews tr
             JOIN users u ON tr.student_id = u.id
-            WHERE tr.teacher_id = $1
+            JOIN teachers t ON tr.teacher_id = t.id
+            WHERE t.user_id = $1
             ORDER BY tr.created_at DESC
             LIMIT 10`,
             [userId]

@@ -119,19 +119,19 @@ app.get('/course-preview', (req, res) => {
 app.get('/course-view', (req, res) => {
     res.sendFile(path.join(__dirname, 'course-view/course-view.html')); 
 });
-
-
 app.get('/test-creation', (req, res) => {
     res.sendFile(path.join(__dirname, './tests/test-creation.html')); 
 });
 
+app.get('/public-profile', (req, res) => {
+    res.sendFile(path.join(__dirname, 'profile-page/public-profile.html')); 
+});
 app.use('/pay-page', stripeRoutes);
 app.use('/pay-page/webhook', express.raw({type: 'application/json'}));
 app.post('/pay-page/webhook', express.raw({type: 'application/json'}), (req, res) => {
     req.rawBody = req.body;
     next();
 });
-
 app.use("/pay-page", stripeRoutes);
 app.get('/get-stripe-key', (req, res) => {
     const publicKey = process.env.STRIPE_PUBLIC_KEY;
