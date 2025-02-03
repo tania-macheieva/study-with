@@ -201,24 +201,125 @@ document.addEventListener('DOMContentLoaded', () => {
       closeAllSelects();
     }
   });
-
   const addModuleBtn = document.getElementById("add-module-btn");
   const modulesList = document.getElementById("modules-list");
   let moduleCounter = 1;
   
+// Завантажуємо модулі з localStorage при завантаженні сторінки
+window.addEventListener("load", () => {
+  const storedModules = JSON.parse(localStorage.getItem("modules"));
+  if (storedModules) {
+    moduleCounter = storedModules.length + 1; // Щоб порядкові номери не збивались
+    storedModules.forEach((moduleData) => {
+      addModule(moduleData);
+    });
+  }
+});
+
   addModuleBtn.addEventListener("click", () => {
     const moduleId = `module-${moduleCounter++}`;
+    const moduleData = { id: moduleId, title: "", lectures: [] };  
+    
+    addModule(moduleData);
+    saveModulesToLocalStorage();
+  });
+  
+  
+  // function addModule(moduleData) {
+  //   const moduleDiv = document.createElement("div");
+  //   moduleDiv.classList.add("module");
+  //   moduleDiv.id = moduleData.id;
+  
+  //   const moduleTitle = translations[userLang].moduleTitle;
+  //   const enterModuleTitle = translations[userLang].enterModuleTitle;
+  
+  //   moduleDiv.innerHTML = `
+  //     <p class="title-2">${moduleTitle} ${moduleCounter - 1}</p>
+  //     <input type="text" placeholder="${enterModuleTitle}" value="${moduleData.title}">
+  //     <div class="lectures"></div>
+  //     <button class="add-lecture-btn">${translations[userLang].addLecture}</button>
+  //     <button class="delete-module-btn">${translations[userLang].deleteModule}</button>
+  //   `;
+  
+  //   modulesList.appendChild(moduleDiv);
+  
+  //   const addLectureBtn = moduleDiv.querySelector(".add-lecture-btn");
+  //   const deleteModuleBtn = moduleDiv.querySelector(".delete-module-btn");
+  //   let lectureCounter = 1;
+  
+  //   addLectureBtn.addEventListener("click", (event) => {
+  //     event.preventDefault();
+  //     const lecturesDiv = moduleDiv.querySelector(".lectures");
+  //     const lectureDiv = document.createElement("div");
+  //     lectureDiv.classList.add("lecture");
+  
+  //     const lectureTitle = translations[userLang].lectureTitle;
+  //     const enterLectureDescription = translations[userLang].enterLectureDescription;
+  //     const uploadVideoLabel = translations[userLang].uploadVideo;
+  //     const chooseVideoLabel = translations[userLang].chooseVideo;
+  
+  //     lectureDiv.innerHTML = `
+  //       <div class="container">
+  //         <p class="title-3">${translations[userLang].lecture} ${lectureCounter}</p>
+  //         <button class="delete-lecture-btn"><img src="../images/delete.png" alt=""></button>
+  //       </div>
+  //       <input type="text" placeholder="${lectureTitle}">
+  //       <label class="title-3" for="lecture-description">${translations[userLang].enterLectureDescription}</label>
+  //       <textarea placeholder="${enterLectureDescription}" rows="5"></textarea>
+  //       <label class="upload">${translations[userLang].chooseVideo}</label>
+  //       <div class="custom-file-container">
+  //         <label class="custom-file-upload">
+  //           ${translations[userLang].chooseFile}
+  //           <input class="lecture-video" name="lecture_video" type="file" accept="video/*" />
+  //         </label>
+  //         <div class="file-names-list"></div>
+  //       </div>
+  //       <label class="upload">${translations[userLang].chooseFiles}</label>
+  //       <div class="custom-file-container">
+  //         <label class="custom-file-upload">
+  //           ${translations[userLang].chooseFile}
+  //           <input class="lecture-materials" name="lecture_files" type="file" />
+  //         </label>
+  //         <div class="file-names-list"></div>
+  //       </div>
+  //     `;
+  
+  //     lecturesDiv.appendChild(lectureDiv);
+  
+  //     const deleteLectureBtn = lectureDiv.querySelector(".delete-lecture-btn");
+  //     deleteLectureBtn.addEventListener("click", () => {
+  //       lectureDiv.remove();
+  //       saveModulesToLocalStorage();
+  //     });
+  
+  //     // Обробка завантаження файлів для лекцій
+  //     handleFileInputs(lectureDiv, 'lecture-video');
+  //     handleFileInputs(lectureDiv, 'lecture-materials');
+      
+  //     lectureCounter++;
+  //     updateLectureNumbers(moduleDiv);
+  //     saveModulesToLocalStorage();
+  //   });
+  
+  //   deleteModuleBtn.addEventListener("click", () => {
+  //     if (confirm(translations[userLang].confirmDeleteModule)) {
+  //       moduleDiv.remove();
+  //       saveModulesToLocalStorage();
+  //       updateModuleNumbers();
+  //     }
+  //   });
+  
+  //   updateModuleNumbers();
+  //   saveModulesToLocalStorage();
+  // }
+  function addModule(moduleData) {
     const moduleDiv = document.createElement("div");
     moduleDiv.classList.add("module");
-    moduleDiv.id = moduleId;
-  
-    
-    const moduleTitle = translations[userLang].moduleTitle;
-    const enterModuleTitle = translations[userLang].enterModuleTitle;
+    moduleDiv.id = moduleData.id;
   
     moduleDiv.innerHTML = `
-      <p class="title-2">${moduleTitle} ${moduleCounter - 1}</p>
-      <input type="text" placeholder="${enterModuleTitle}">
+      <p class="title-2">${translations[userLang].moduleTitle} ${moduleCounter - 1}</p>
+      <input type="text" placeholder="${translations[userLang].enterModuleTitle}" value="${moduleData.title}">
       <div class="lectures"></div>
       <button class="add-lecture-btn">${translations[userLang].addLecture}</button>
       <button class="delete-module-btn">${translations[userLang].deleteModule}</button>
@@ -226,140 +327,161 @@ document.addEventListener('DOMContentLoaded', () => {
   
     modulesList.appendChild(moduleDiv);
   
+    const lecturesDiv = moduleDiv.querySelector(".lectures");
+  
+    if (moduleData.lectures && moduleData.lectures.length > 0) {
+      moduleData.lectures.forEach((lectureData) => {
+        addLecture(moduleDiv, lectureData);
+      });
+    }
+  
     const addLectureBtn = moduleDiv.querySelector(".add-lecture-btn");
+    addLectureBtn.addEventListener("click", (event) => {
+      event.preventDefault();
+      addLecture(moduleDiv);
+      saveModulesToLocalStorage();
+    });
+  
     const deleteModuleBtn = moduleDiv.querySelector(".delete-module-btn");
-    let lectureCounter = 1;
-     
- 
- function updateLectureNumbers(moduleDiv) {
-  const lectures = moduleDiv.querySelectorAll('.lecture');
-  lectures.forEach((lecture, index) => {
-    const titleElement = lecture.querySelector('.title-3');
-    if (titleElement) {
-      titleElement.textContent = `${translations[userLang].lecture} ${index + 1}`;
-    }
-  });
-}
-
-addLectureBtn.addEventListener("click", (event) => {
-  event.preventDefault();
-
-  const lecturesDiv = moduleDiv.querySelector(".lectures");
-  const lectureDiv = document.createElement("div");
-  lectureDiv.classList.add("lecture");
-
-  const lectureTitle = translations[userLang].lectureTitle;
-  const enterLectureDescription = translations[userLang].enterLectureDescription;
-  const uploadVideoLabel = translations[userLang].uploadVideo;
-  const chooseVideoLabel = translations[userLang].chooseVideo;
-
-  lectureDiv.innerHTML = `
-    <div class="container">
-      <p class="title-3">${translations[userLang].lecture} ${lectureCounter}</p>
-      <button class="delete-lecture-btn"><img src="../images/delete.png" alt=""></button>
-    </div>
-    <input type="text" placeholder="${lectureTitle}">
-    <label class="title-3" for="lecture-description">${translations[userLang].enterLectureDescription}</label>
-    <textarea placeholder="${enterLectureDescription}" rows="5"></textarea>
-
-    <label class="upload" ">${translations[userLang].chooseVideo}</label>
-    <div class="custom-file-container"  style="margin-bottom: 15px;">
-      <label class="custom-file-upload">
-        ${translations[userLang].chooseFile}
-        <input class="lecture-video" name="lecture_video" id="lecture-video-${lectureCounter}" type="file" accept="video/*" />
-      </label>
-      <div class="file-names-list" id="video-names-list-${lectureCounter}"></div>
-    </div>
-    <label class="upload" >${translations[userLang].chooseFiles}</label>
-    <div class="custom-file-container">
-      <label class="custom-file-upload">
-        ${translations[userLang].chooseFile}
-        <input class="lecture-materials" name="lecture_files" id="lecture-materials-${lectureCounter}" type="file" />
-      </label>
-      <div class="file-names-list" id="file-names-list-${lectureCounter}"></div>
-    </div>
-
-    
-  `;
-
-  lecturesDiv.appendChild(lectureDiv);
-
-  const deleteLectureBtn = lectureDiv.querySelector(".delete-lecture-btn");
-  deleteLectureBtn.addEventListener("click", () => {
-    lectureDiv.remove(); 
-    updateLectureNumbers(moduleDiv); 
-  });
-
-  
-  const lectureMaterialsInput = lectureDiv.querySelector(`#lecture-materials-${lectureCounter}`);
-  const fileNamesList = lectureDiv.querySelector(`#file-names-list-${lectureCounter}`); 
-  lectureMaterialsInput.addEventListener("change", function(event) {
-    const file = event.target.files[0]; 
-    fileNamesList.innerHTML = ''; 
-    if (file) {
-      const fileNameItem = document.createElement("div");
-      fileNameItem.classList.add("file-name-item");
-      fileNameItem.innerHTML = `
-        <span class="file-name">${file.name}</span>
-        <button class="delete-file-btn">✖</button>
-      `;
-      fileNamesList.appendChild(fileNameItem);
-
-      const deleteFileBtn = fileNameItem.querySelector(".delete-file-btn");
-      deleteFileBtn.addEventListener("click", () => {
-        fileNamesList.innerHTML = ''; 
-      });
-    }
-  });
-
-  
-  const lectureVideoInput = lectureDiv.querySelector(`#lecture-video-${lectureCounter}`);
-  const videoNamesList = lectureDiv.querySelector(`#video-names-list-${lectureCounter}`);
-  lectureVideoInput.addEventListener("change", function(event) {
-    const file = event.target.files[0]; 
-    videoNamesList.innerHTML = ''; 
-    if (file) {
-      const fileNameItem = document.createElement("div");
-      fileNameItem.classList.add("file-name-item");
-      fileNameItem.innerHTML = `
-        <span class="file-name">${file.name}</span>
-        <button class="delete-file-btn">✖</button>
-      `;
-      videoNamesList.appendChild(fileNameItem);
-
-      const deleteFileBtn = fileNameItem.querySelector(".delete-file-btn");
-      deleteFileBtn.addEventListener("click", () => {
-        videoNamesList.innerHTML = ''; 
-      });
-    }
-  });
-
-  lectureCounter++;
-  updateLectureNumbers(moduleDiv);
-});
-
-   
     deleteModuleBtn.addEventListener("click", () => {
       if (confirm(translations[userLang].confirmDeleteModule)) {
         moduleDiv.remove();
+        saveModulesToLocalStorage();
         updateModuleNumbers();
       }
     });
-
-    
-    function updateModuleNumbers() {
-      const modules = document.querySelectorAll(".module");
-      modules.forEach((moduleDiv, index) => {
-        const moduleTitle = moduleDiv.querySelector(".title-2");
-        moduleTitle.innerText = `${translations[userLang].moduleTitle} ${index + 1}`;
-      });
-    }
-
+  
     updateModuleNumbers();
-  });
-
+    saveModulesToLocalStorage();
+  }
+  
+  function addLecture(moduleDiv, lectureData = {}) {
+    const lecturesDiv = moduleDiv.querySelector(".lectures");
+    const lectureDiv = document.createElement("div");
+    lectureDiv.classList.add("lecture");
+  
+    lectureDiv.innerHTML = `
+      <div class="container">
+        <p class="title-3">${translations[userLang].lecture} ${lecturesDiv.children.length + 1}</p>
+        <button class="delete-lecture-btn"><img src="../images/delete.png" alt=""></button>
+      </div>
+      <input type="text" placeholder="${translations[userLang].lectureTitle}" value="${lectureData.title || ""}">
+      <label class="title-3">${translations[userLang].enterLectureDescription}</label>
+      <textarea placeholder="${translations[userLang].enterLectureDescription}" rows="5">${lectureData.description || ""}</textarea>
+      <label class="upload">${translations[userLang].chooseVideo}</label>
+      <div class="custom-file-container">
+        <label class="custom-file-upload">
+          ${translations[userLang].chooseFile}
+          <input class="lecture-video" name="lecture_video" type="file" accept="video/*" />
+        </label>
+        <div class="file-names-list">${lectureData.videoFile ? `<span>${lectureData.videoFile}</span>` : ""}</div>
+      </div>
+      <label class="upload">${translations[userLang].chooseFiles}</label>
+      <div class="custom-file-container">
+        <label class="custom-file-upload">
+          ${translations[userLang].chooseFile}
+          <input class="lecture-materials" name="lecture_files" type="file" />
+        </label>
+        <div class="file-names-list">${lectureData.materialsFiles ? lectureData.materialsFiles.map(file => `<span>${file}</span>`).join("") : ""}</div>
+      </div>
+    `;
+  
+    lecturesDiv.appendChild(lectureDiv);
+  
+    const deleteLectureBtn = lectureDiv.querySelector(".delete-lecture-btn");
+    deleteLectureBtn.addEventListener("click", () => {
+      lectureDiv.remove();
+      saveModulesToLocalStorage();
+      updateLectureNumbers(moduleDiv);
+    });
+  
+    updateLectureNumbers(moduleDiv);
+    saveModulesToLocalStorage();
+  }
+  
+  
+  // Функція для обробки файлів (матеріалів та відео)
+  function handleFileInputs(lectureDiv, inputClass) {
+    const input = lectureDiv.querySelector(`.${inputClass}`);
+    const fileNamesList = lectureDiv.querySelector(`.file-names-list`);
+  
+    input.addEventListener("change", function (event) {
+      const files = event.target.files;
+      fileNamesList.innerHTML = ''; 
+  
+      Array.from(files).forEach(file => {
+        const fileNameItem = document.createElement("div");
+        fileNameItem.classList.add("file-name-item");
+        fileNameItem.innerHTML = `
+          <span class="file-name">${file.name}</span>
+          <button class="delete-file-btn">✖</button>
+        `;
+        fileNamesList.appendChild(fileNameItem);
+  
+        const deleteFileBtn = fileNameItem.querySelector(".delete-file-btn");
+        deleteFileBtn.addEventListener("click", () => {
+          fileNamesList.removeChild(fileNameItem);
+        });
+      });
+    });
+  }
+  
+  // Оновлює номера лекцій
+  function updateLectureNumbers(moduleDiv) {
+    const lectures = moduleDiv.querySelectorAll('.lecture');
+    lectures.forEach((lecture, index) => {
+      const titleElement = lecture.querySelector('.title-3');
+      if (titleElement) {
+        titleElement.textContent = `${translations[userLang].lecture} ${index + 1}`;
+      }
+    });
+  }
+  
+  // Оновлює номери модулів
+  function updateModuleNumbers() {
+    const modules = document.querySelectorAll(".module");
+    modules.forEach((moduleDiv, index) => {
+      const moduleTitle = moduleDiv.querySelector(".title-2");
+      moduleTitle.innerText = `${translations[userLang].moduleTitle} ${index + 1}`;
+    });
+  }
+  
+  // Зберігаємо всі модулі в localStorage
+  function saveModulesToLocalStorage() {
+    const modules = [];
+    document.querySelectorAll(".module").forEach((moduleDiv) => {
+      const moduleTitle = moduleDiv.querySelector("input[type='text']").value;
+      const lectures = [];
+  
+      moduleDiv.querySelectorAll(".lecture").forEach((lectureDiv) => {
+        const lectureTitle = lectureDiv.querySelector("input[type='text']").value || "";
+        const lectureDescription = lectureDiv.querySelector("textarea").value || "";
+        const videoFileInput = lectureDiv.querySelector(".lecture-video");
+        const materialsFileInput = lectureDiv.querySelector(".lecture-materials");
+  
+        const videoFile = videoFileInput.files.length > 0 ? videoFileInput.files[0].name : null;
+        const materialsFiles = materialsFileInput.files.length > 0 
+          ? Array.from(materialsFileInput.files).map(file => file.name) 
+          : [];
+  
+        lectures.push({
+          title: lectureTitle,
+          description: lectureDescription,
+          videoFile: videoFile,
+          materialsFiles: materialsFiles
+        });
+      });
+  
+      modules.push({ title: moduleTitle, lectures });
+    });
+  
+    localStorage.setItem("modules", JSON.stringify(modules));
+  }
+  
+  
 });
-
+  
+ 
   const categoryWrapper = document.querySelector('.custom-select-wrapper#category-wrapper');
   const educationWrapper = document.querySelector('.custom-select-wrapper#education-wrapper');
 
@@ -618,7 +740,7 @@ const courseData = {
   authorId: authorId,
   educationLevel: courseEducationLevel,
   price: coursePrice,
-  tags: tags, 
+  tags: tags,
   modules: modules,
   removedModules: removedModules.map(module => module.id),
   thumbnail: courseThumbnail ? courseThumbnail.name : null, 
