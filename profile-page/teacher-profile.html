@@ -885,19 +885,20 @@
 
              const data = await response.json();
 
-        if (response.ok) {
-            // Оновлюємо значення в елементі <p id="username">
-            const usernameElement = document.getElementById('username');
-            usernameElement.textContent = data.nickname || 'Default Username';
-        } else {
-            console.error('Failed to fetch user profile:', data.error);
-        }
-    } catch (err) {
-        console.error('Error fetching user profile:', err);
-    }
-}
+             // Оновлення зображення профілю, якщо воно існує
+             if (data.profile_image) {
+                 document.getElementById('profile-image').src = data.profile_image;
+             }
 
-window.addEventListener('DOMContentLoaded', fetchTeacherProfile);
+             // Оновлення імені користувача, якщо воно існує
+             const username = data.nickname || data.real_name || 'User ';
+             document.getElementById('username').textContent = username;
+
+             return data;
+         } catch (err) {
+             console.warn('Error loading profile:', err);
+         }
+     }
 
      // Функція для завантаження записаних курсів
      async function loadEnrolledCourses() {
@@ -946,31 +947,12 @@ window.addEventListener('DOMContentLoaded', fetchTeacherProfile);
          }
      }
 
-
-window.addEventListener('DOMContentLoaded', () => {
-    fetchTeacherProfile();
-    loadEnrolledCourses();
-    loadSavedBookmarks();
-
-    // Додаємо обробник для кнопки "View all" в закладках
-    document.querySelectorAll('.btn-view-all-4').forEach(function(button) {
-        button.addEventListener('click', function() {
-            const section = button.closest('.container-my');
-            const list = section.querySelector('.bookmarks-list');
-
-            if (list) {
-                if (list.classList.contains('expanded')) {
-                    list.classList.remove('expanded');
-                    button.textContent = translations[localStorage.getItem('language') || 'en'].btnViewAll;
-                } else {
-                    list.classList.add('expanded');
-                    button.textContent = translations[localStorage.getItem('language') || 'en'].btnViewAll;
-                }
-            }
-        });
+     // Виклик функцій під час завантаження сторінки
+     window.addEventListener('DOMContentLoaded', () => {
+         fetchTeacherProfile();
+         loadEnrolledCourses();
+     });
     });
-});
-
 </script>
 <script src="../header/auth-header.js"></script>
 <script src="../footer/footer.js"></script>
