@@ -490,6 +490,24 @@ margin-bottom: 10px;
   content: url('../images/delete-hover.png');
   transform: scale(1.1);  
 }
+.create-test-btn,
+.create-general-test-btn {
+  background-color: #283044;
+  color: #ffffff;
+  border: none;
+  padding: 12px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 12px;
+  transition: background-color 0.3s ease;
+  font-weight: 700;
+  flex-direction: center;
+  margin-right: 20px;
+}
+.create-general-test-btn:hover, .create-test-btn:hover {
+  background-color: #38435e;
+}
+
 /* Стиль для контейнера з тегами */
 .tags-container {
   margin-top: 20px;

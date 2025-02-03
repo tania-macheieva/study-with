@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title data-lang="testCreation">Test creation</title>
+  <h2 id="module-title" class="module-title"></h2> 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -22,7 +23,7 @@
   <main>
     <form id="test-form">
         <!-- Введення кількості питань для кожного типу -->
-        <label for="test-title"  data-lang="testTitle">Test Title:</label>
+        <label for="test-title"  data-lang="testTitle" class="test-title">Test Title:</label>
         <input type="text" id="test-title" data-lang="enterTestTitle" placeholder="Enter test title">
         
         <div>
@@ -67,6 +68,19 @@
   
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+// Функція для отримання параметра з URL
+function getQueryParam(name) {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(name);
+}
+
+// Отримуємо назву модуля з URL
+const moduleTitle = getQueryParam("module");
+
+// Вставляємо назву в елемент #module-title
+if (moduleTitle) {
+    document.getElementById("module-title").textContent = `Module: ${decodeURIComponent(moduleTitle)}`;
+}
 
   let testData = { questions: [] }; // Об'єкт для зберігання питань
 
