@@ -205,16 +205,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const modulesList = document.getElementById("modules-list");
   let moduleCounter = 1;
   
-// Завантажуємо модулі з localStorage при завантаженні сторінки
-window.addEventListener("load", () => {
-  const storedModules = JSON.parse(localStorage.getItem("modules"));
-  if (storedModules) {
-    moduleCounter = storedModules.length + 1;
-    storedModules.forEach((moduleData) => {
-      addModule(moduleData);
-    });
-  }
-});
+  window.addEventListener("beforeunload", () => {
+    localStorage.setItem("lastExitTime", Date.now());
+  });
+  
+  // Перевіряємо, скільки часу минуло з моменту виходу
+  window.addEventListener("load", () => {
+    const lastExitTime = localStorage.getItem("lastExitTime");
+    if (lastExitTime && Date.now() - lastExitTime > 10000) { // 10 секунд
+      localStorage.removeItem("modules"); // Очищаємо дані
+    }
+  
+    // Далі твій код, який завантажує модулі (якщо вони залишились)
+    const storedModules = JSON.parse(localStorage.getItem("modules"));
+    if (storedModules) {
+      moduleCounter = storedModules.length + 1;
+      storedModules.forEach((moduleData) => {
+        addModule(moduleData);
+      });
+    }
+  });
 
   addModuleBtn.addEventListener("click", () => {
     const moduleId = `module-${moduleCounter++}`;
@@ -333,11 +343,12 @@ window.addEventListener("load", () => {
       });
     }
   
-    moduleDiv.querySelector(".add-lecture-btn").addEventListener("click", () => {
+    moduleDiv.querySelector(".add-lecture-btn").addEventListener("click", (e) => {
+      e.preventDefault();  
       addLecture(moduleDiv);
       saveModulesToLocalStorage();
     });
-  
+    
     moduleDiv.querySelector(".delete-module-btn").addEventListener("click", () => {
       if (confirm(translations[userLang].confirmDeleteModule)) {
         moduleDiv.remove();
@@ -1053,7 +1064,7 @@ window.addEventListener('load', () => {
   const lastClosedTime = localStorage.getItem('lastClosedTime'); 
   if (lastClosedTime) {
       const elapsedTime = Date.now() - parseInt(lastClosedTime, 10);
-      if (elapsedTime > 1000) { // 2 хвилини
+      if (elapsedTime > 10000) { // 2 хвилини
           const authorId = JSON.parse(localStorage.getItem('courseDraft'))?.authorId || null;
           localStorage.setItem('courseDraft', JSON.stringify({ authorId }));
       }
