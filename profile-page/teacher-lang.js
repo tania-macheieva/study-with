@@ -235,5 +235,45 @@ async function loadEnrolledCourses() {
     }
 }
 
+async function loadSavedBookmarks() {
+    try {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            console.log('Користувач не авторизований');
+            return;
+        }
+
+        const response = await fetch(`http://localhost:8000/api/courses/saved/${userId}`);
+        if (!response.ok) throw new Error('Помилка завантаження збережених курсів');
+        
+        const courses = await response.json();
+        const bookmarksList = document.querySelector('.bookmarks-list');
+        
+        if (!bookmarksList) return;
+
+        if (courses.length === 0) {
+            bookmarksList.innerHTML = `<p class="no-courses">У вас ще немає збережених курсів</p>`;
+            return;
+        }
+
+        bookmarksList.innerHTML = courses.map(course => `
+            <div class="bookmark">
+                <p class="p-1">${course.name}</p>
+                <img src="${course.image_url || '/images/250x100.png'}" alt="${course.name}">
+                <button class="btn-open" onclick="window.location.href='/course/preview?id=${course.id}'">
+                    ${translations[localStorage.getItem('language') || 'en'].btnOpen}
+                </button>
+            </div>
+        `).join('');
+
+    } catch (error) {
+        console.error('Помилка завантаження збережених курсів:', error);
+        const bookmarksList = document.querySelector('.bookmarks-list');
+        if (bookmarksList) {
+            bookmarksList.innerHTML = '<p class="error-message">Помилка завантаження збережених курсів</p>';
+        }
+    }
+}
+
 // Викликаємо функцію при завантаженні сторінки
 document.addEventListener('DOMContentLoaded', loadEnrolledCourses);

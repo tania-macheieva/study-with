@@ -49,19 +49,164 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 
 
-    // Функціонал для кнопки збереження
+   // Додаємо стилі для сповіщень
+const notificationStyles = document.createElement('style');
+notificationStyles.textContent = `
+    .notification {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 24px;
+        border-radius: 4px;
+        background: white;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        z-index: 1000;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .notification.success {
+        border-left: 4px solid #4CAF50;
+    }
+
+    .notification.error {
+        border-left: 4px solid #f44336;
+    }
+
+    .notification.info {
+        border-left: 4px solid #2196F3;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+`;
+document.head.appendChild(notificationStyles);
+
+// Функція для показу сповіщень
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// Функція для збереження/видалення курсу
+async function toggleSaveCourse(courseId) {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+        showNotification('Будь ласка, увійдіть в систему', 'error');
+        return;
+    }
+
     const saveBtn = document.querySelector('.save-btn');
-    if (saveBtn) {
-        // Перевіряємо, чи був курс збережений раніше
-        const isSaved = localStorage.getItem('courseSaved') === 'true';
-        if (isSaved) {
-            saveBtn.classList.add('saved');
+    const isCurrentlySaved = saveBtn.classList.contains('saved');
+
+    try {
+        const endpoint = isCurrentlySaved ? 'unsave' : 'save';
+        const response = await fetch(`http://localhost:8000/api/courses/${endpoint}`, {
+            method: isCurrentlySaved ? 'DELETE' : 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userId,
+                courseId: parseInt(courseId)
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Помилка при обробці запиту');
         }
 
-        saveBtn.addEventListener('click', function() {
-            this.classList.toggle('saved');
-            // Зберігаємо стан у localStorage
-            localStorage.setItem('courseSaved', this.classList.contains('saved'));
+        const data = await response.json();
+        
+        // Оновлюємо стан кнопки
+        const imgElement = saveBtn.querySelector('img');
+        if (!isCurrentlySaved) {
+            saveBtn.classList.add('saved');
+            imgElement.src = '../images/save_active.svg';
+            showNotification('Курс збережено', 'success');
+        } else {
+            saveBtn.classList.remove('saved');
+            imgElement.src = '../images/save_normal.svg';
+            showNotification('Курс видалено зі збережених', 'info');
+        }
+
+    } catch (error) {
+        console.error('Помилка:', error);
+        showNotification(error.message || 'Сталася помилка', 'error');
+    }
+}
+
+// Ініціалізуємо кнопку збереження при завантаженні сторінки
+async function initializeSaveButton() {
+    const saveBtn = document.querySelector('.save-btn');
+    if (!saveBtn) return;
+
+    const userId = localStorage.getItem('userId');
+    const courseId = new URLSearchParams(window.location.search).get('id');
+
+    if (!userId || !courseId) return;
+
+    try {
+        // Перевіряємо чи курс вже збережений
+        const response = await fetch(`http://localhost:8000/api/courses/is-saved?userId=${userId}&courseId=${courseId}`);
+        const data = await response.json();
+
+        if (data.isSaved) {
+            saveBtn.classList.add('saved');
+            const imgElement = saveBtn.querySelector('img');
+            imgElement.src = '../images/save_active.svg';
+        }
+
+        // Додаємо обробник кліку
+        saveBtn.addEventListener('click', () => toggleSaveCourse(courseId));
+
+    } catch (error) {
+        console.error('Помилка при ініціалізації кнопки збереження:', error);
+    }
+}
+
+// Викликаємо ініціалізацію при завантаженні сторінки
+document.addEventListener('DOMContentLoaded', initializeSaveButton);
+
+    //кнопка поширення
+    const shareBtn = document.querySelector('.share-btn');
+    if (shareBtn) {
+        shareBtn.addEventListener('click', async function() {
+            try {
+                const currentUrl = window.location.href;
+                await navigator.clipboard.writeText(currentUrl);
+                showNotification('URL курсу скопійовано в буфер обміну', 'success');
+            } catch (err) {
+                const textarea = document.createElement('textarea');
+                textarea.value = window.location.href;
+                textarea.style.position = 'fixed';
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    showNotification('URL курсу скопійовано в буфер обміну', 'success');
+                } catch (e) {
+                    showNotification('Не вдалося скопіювати URL', 'error');
+                } finally {
+                    document.body.removeChild(textarea);
+                }
+            }
         });
     }
 
@@ -494,6 +639,8 @@ document.addEventListener('DOMContentLoaded', async function() {
             notification.remove();
         }, 3000);
     }
+
+    
 
     // Ініціалізація елементів каруселі
     updateReview();

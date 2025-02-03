@@ -676,6 +676,8 @@ async function fetchTeacherProfile() {
     }
 }
 
+window.addEventListener('DOMContentLoaded', fetchTeacherProfile);
+
 // Функція для завантаження записаних курсів
 async function loadEnrolledCourses() {
     const userId = localStorage.getItem('userId');
@@ -724,8 +726,29 @@ async function loadEnrolledCourses() {
 }
 
 
-// Виклик функції під час завантаження сторінки
-window.addEventListener('DOMContentLoaded', fetchTeacherProfile);
+window.addEventListener('DOMContentLoaded', () => {
+    fetchTeacherProfile();
+    loadEnrolledCourses();
+    loadSavedBookmarks();
+
+    // Додаємо обробник для кнопки "View all" в закладках
+    document.querySelectorAll('.btn-view-all-4').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const section = button.closest('.container-my');
+            const list = section.querySelector('.bookmarks-list');
+
+            if (list) {
+                if (list.classList.contains('expanded')) {
+                    list.classList.remove('expanded');
+                    button.textContent = translations[localStorage.getItem('language') || 'en'].btnViewAll;
+                } else {
+                    list.classList.add('expanded');
+                    button.textContent = translations[localStorage.getItem('language') || 'en'].btnViewAll;
+                }
+            }
+        });
+    });
+});
 
 </script>
 <script src="../header/auth-header.js"></script>
