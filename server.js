@@ -14,12 +14,16 @@ const coursesRouter = require('./courses');
 const courseDraftRouter = require('./courses');
 const testRouter = require('./test') 
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:8000',
+    credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use("/auth", authRoutes);
 app.use('/tests', testRouter);
+app.use('/courses', coursesRouter); 
 
 
 const searchRouter = require('./searchRouter');
@@ -56,7 +60,7 @@ app.get("/", (req, res) => {
 app.get("/privacypolicy", (req, res) => { 
     res.sendFile(path.join(__dirname, 'private-policy/PrivatePolicy.html')); 
 });
-app.get("/courses", (req, res) => { 
+app.get("/all-courses", (req, res) => { 
     res.sendFile(path.join(__dirname, 'all_courses/all.html')); 
 });
 app.get("/about", (req, res) => { 

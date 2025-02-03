@@ -18,6 +18,7 @@ const translations = {
     educationError: 'Education level is required.',
     modules: 'Modules',
     addModule: 'Add Module',
+    createGenerTest:'Create general test',
     createCourse: 'Publish Course',
     saveAsDraft: 'Save as Draft',
     programming: 'Programming',
@@ -40,6 +41,7 @@ const translations = {
     advancedLevel: 'Advanced Level',
     addLecture: 'Add Lecture',
     deleteModule: 'Delete Module',
+    createTest: 'Create Test',
     moduleTitle: "Module",
     enterModuleTitle: "Enter module title",
     lecture: "Lecture",
@@ -74,6 +76,7 @@ const translations = {
     educationError: 'Рівень освіти є обов’язковим.',
     modules: 'Модулі',
     addModule: 'Додати модуль',
+    createGenerTest:'Створити загальний тест',
     createCourse: 'Опублікувати курс',
     saveAsDraft: 'Зберегти як чернетку',
     programming: 'Програмування',
@@ -96,6 +99,7 @@ const translations = {
     advancedLevel: 'Високий рівень',
     addLecture: 'Додати лекцію',
     deleteModule: 'Видалити модуль',
+    createTest: 'Створити тест',
     moduleTitle: "Модуль",
     enterModuleTitle: "Введіть назву модуля",
     lecture: "Лекція",
@@ -322,6 +326,13 @@ document.addEventListener('DOMContentLoaded', () => {
   //   updateModuleNumbers();
   //   saveModulesToLocalStorage();
   // }
+  //Обробник ля створення загального тесту
+  const createGeneralTestBtn = document.getElementById("create-general-test-btn");
+
+    // Додаємо обробник події для переходу на сторінку створення загального тесту
+    createGeneralTestBtn.addEventListener("click", () => {
+        window.location.href = "/test-creation?general=true";
+    });
   function addModule(moduleData = { title: "", lectures: [] }) {
     const moduleDiv = document.createElement("div");
     moduleDiv.classList.add("module");
@@ -332,6 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="lectures"></div>
       <button class="add-lecture-btn">${translations[userLang].addLecture}</button>
       <button class="delete-module-btn">${translations[userLang].deleteModule}</button>
+      <button class="create-test-btn">${translations[userLang].createTest}</button>
     `;
   
     modulesList.appendChild(moduleDiv);
@@ -354,6 +366,14 @@ document.addEventListener('DOMContentLoaded', () => {
         moduleDiv.remove();
         saveModulesToLocalStorage();
         updateModuleNumbers();
+      }
+    });
+    moduleDiv.querySelector(".create-test-btn").addEventListener("click", () => {
+      const moduleTitle = moduleDiv.querySelector("input").value.trim();
+      if (moduleTitle) {
+          window.location.href = `/test-creation?module=${encodeURIComponent(moduleTitle)}`;
+      } else {
+          alert("Please enter a module title before creating a test.");
       }
     });
   

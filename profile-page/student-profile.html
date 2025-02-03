@@ -1,22 +1,19 @@
 <!DOCTYPE html>
 <html lang="en" data-lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-lang="profileTitle">Study With - Profile</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="../profile-page/style.css">
     <link rel="icon" href="../images/menu-logo.ico">
-    
 </head>
 
 <body>
     <script src="../header/auth-header.js"></script>
-    <script src="student-lang.js"></script>
 
     <div class="page-container">
         <div class="content">
@@ -26,6 +23,7 @@
                         <img id="profile-image" class="profile-image" src="/images/profile-picture.png" alt="user image">
                     </label>
                     <input type="file" id="upload-image" accept="image/*" style="display: none;">
+                    
                     <div class="action-buttons">
                         <button id="confirm-image" style="display: none;" title="Confirm">
                             <i class="fas fa-check"></i>
@@ -34,605 +32,205 @@
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
+
                     <p data-lang="username" id="username">username</p>
                     <button class="btn-teacher" id="become-teacher-btn" data-lang="btnTeacher">Become a teacher</button>
-                <!-- Вкладки -->
-            <div class="tab-container">
-                    <div class="tabs">
-                        <button class="tab-link active" data-tab="public-profile" data-lang="publicProf">Public profile</button>
-                        <button class="tab-link" data-tab="profile" data-lang="profile">Profile</button>
-                        <button class="tab-link" data-tab="security" data-lang="security">Security</button>
-                        <button class="tab-link" data-tab="messages" data-lang="messages">Messages</button>
-                        <button class="tab-link" data-tab="close-account" data-lang="closeAccount">Closing an account</button>
+
+                    <div class="tab-container">
+                        <div class="tabs">
+                            <button class="tab-link active" data-tab="public-profile" data-lang="publicProf">Public profile</button>
+                            <button class="tab-link" data-tab="profile" data-lang="profile">Profile</button>
+                            <button class="tab-link" data-tab="security" data-lang="security">Security</button>
+                            <button class="tab-link" data-tab="messages" data-lang="messages">Messages</button>
+                            <button class="tab-link" data-tab="close-account" data-lang="closeAccount">Closing an account</button>
+                        </div>
                     </div>
-             </div>
-                <!-- Модальне вікно -->
-                <div id="modal" class="modal">
-                    <div class="modal-content">
-                        <span class="close-button">&times;</span>
-                        <div id="modal-content-container"></div>
+
+                    <div id="modal" class="modal">
+                        <div class="modal-content">
+                            <span class="close-button">&times;</span>
+                            <div id="modal-content-container"></div>
+                        </div>
                     </div>
                 </div>
-
-        </div>
-
-        
-
 
                 <div class="container-my">
                     <div class="my-courses">
                         <h2 data-lang="myCourses">My courses</h2>
                         <div class="courses-list" id="enrolled-courses">
-                            <!-- Курси будуть додані з бд -->
                         </div>
                         <button class="btn-view-all-1" data-lang="btnViewAll">View all</button>
                     </div>
-                    <!-- <div class="my-courses">
-                        <h2 data-lang="myCourses">My courses</h2>
-                        <div class="courses-list">
-                            <div class="course">
-                                <p class="p-1" data-lang="courseName">Course name 1</p>
-                                <div class="progress-bar">
-                                    <span style="width: 70%;"></span>
-                                </div>
-                                <p class="percent">70%</p>
-                                <img src="/images/250x100.png" alt="image">
-                                <button class="btn-resume" data-lang="btnResume">Resume</button>
-                            </div>
-                            <div class="course">
-                                <p class="p-1" data-lang="courseName">Course name 2</p>
-                                <div class="progress-bar">
-                                    <span style="width: 40%;"></span>
-                                </div>
-                                <p class="percent">40%</p>
-                                <img src="/images/250x100.png" alt="image">
-                                <button class="btn-resume" data-lang="btnResume">Resume</button>
-                            </div>
-                            <div class="course">
-                                <p class="p-1" data-lang="courseName">Course name 3</p>
-                                <div class="progress-bar">
-                                    <span style="width: 50%;"></span>
-                                </div>
-                                <p class="percent">50%</p>
-                                <img src="/images/250x100.png" alt="image">
-                                <button class="btn-resume" data-lang="btnResume">Resume</button>
+
+                    <div class="my-certificates">
+                        <h2 data-lang="myCertificates">My certificates</h2>
+                        <div class="certificates-list">
+                            <div class="certificate">
+                                <p class="p-1" data-lang="certificateName">Certificate name 1</p>
+                                <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
+                                <button class="btn-download" data-lang="btnDownload">
+                                    <img src="/images/download-certificate.png" alt="download">
+                                </button>
                             </div>
                         </div>
-                        <button class="btn-view-all-1" data-lang="btnViewAll">View all</button>
-                    </div> -->
-                    <div>
-                        <div class="my-certificates">
-                            <h2 data-lang="myCertificates">My certificates</h2>
-                            <div class="certificates-list">
-                                <div class="certificate">
-                                    <p class="p-1" data-lang="certificateName">Certificate name 1</p>
-                                    <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
-                                    <button class="btn-download" data-lang="downloadCertificate">
-                                        <img src="/images/download-certificate.png" alt="">
-                                    </button>
-                                </div>
-                                <div class="certificate">
-                                    <p class="p-1" data-lang="certificateName">Certificate name 2</p>
-                                    <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
-                                    <button class="btn-download" data-lang="downloadCertificate">
-                                        <img src="/images/download-certificate.png" alt="">
-                                    </button>
-                                </div>
-                                <div class="certificate">
-                                    <p class="p-1" data-lang="certificateName">Certificate name 3</p>
-                                    <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
-                                    <button class="btn-download" data-lang="downloadCertificate">
-                                        <img src="/images/download-certificate.png" alt="">
-                                    </button>
-                                </div>
-                            </div>
-                            <button class="btn-view-all-3" data-lang="btnViewAll">View all</button>
-                        </div>
+                        <button class="btn-view-all-3" data-lang="btnViewAll">View all</button>
                     </div>
+
                     <div class="my-bookmarks">
                         <h2 data-lang="myBookmarks">My bookmarks</h2>
                         <div class="bookmarks-list">
-                            <div class="bookmark">
-                                <p class="p-1" data-lang="bookmarkName">Bookmark name 1</p>
-                                <img src="/images/250x100.png" alt="image">
-                                <button class="btn-open" data-lang="btnOpen">Open</button>
-                            </div>
-                            <div class="bookmark">
-                                <p class="p-1" data-lang="bookmarkName">Bookmark name 2</p>
-                                <img src="/images/250x100.png" alt="image">
-                                <button class="btn-open" data-lang="btnOpen">Open</button>
-                            </div>
-                            <div class="bookmark">
-                                <p class="p-1" data-lang="bookmarkName">Bookmark name 3</p>
-                                <img src="/images/250x100.png" alt="image">
-                                <button class="btn-open" data-lang="btnOpen">Open</button>
-                            </div>
                         </div>
                         <button class="btn-view-all-4" data-lang="btnViewAll">View all</button>
                     </div>
+                </div>
             </main>
         </div>
 
         <script src="../footer/footer.js"></script>
-        <script> src="/profile-page/student-lang.js" </script>
+        
+        <script src="../profile-page/student-lang.js"></script>
+        
         <script>
-    const uploadInput = document.getElementById('upload-image');
-    const profileImage = document.getElementById('profile-image');
-    const removeImageButton = document.getElementById('remove-image');
-    const confirmImageButton = document.getElementById('confirm-image');
+            const uploadInput = document.getElementById('upload-image');
+            const profileImage = document.getElementById('profile-image');
+            const removeImageButton = document.getElementById('remove-image');
+            const confirmImageButton = document.getElementById('confirm-image');
 
+            uploadInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    if (file.size > 1 * 1024 * 1024) {
+                        alert('The file size exceeds 1 MB. Please upload a smaller file.');
+                        uploadInput.value = '';
+                        return;
+                    }
 
-    uploadInput.addEventListener('change', function (event) {
-        const file = event.target.files[0];
-        if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        profileImage.src = e.target.result;
+                        removeImageButton.style.display = 'inline-block';
+                        confirmImageButton.style.display = 'inline-block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
 
-            if (file.size > 1 * 1024 * 1024) {
-                alert('The file size exceeds 1 MB. Please upload a smaller file.');
-                uploadInput.value = '';
-                return;
-            }
-
-
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                profileImage.src = e.target.result;
+            profileImage.addEventListener('click', function() {
                 removeImageButton.style.display = 'inline-block';
                 confirmImageButton.style.display = 'inline-block';
-            };
-            reader.readAsDataURL(file);
-        }
-    });
+            });
 
+            removeImageButton.addEventListener('click', function() {
+                profileImage.src = '/images/profile-picture.png';
+                uploadInput.value = '';
+                removeImageButton.style.display = 'none';
+                confirmImageButton.style.display = 'none';
+            });
 
-    profileImage.addEventListener('click', function () {
-        removeImageButton.style.display = 'inline-block';
-        confirmImageButton.style.display = 'inline-block';
-    });
-
-
-    removeImageButton.addEventListener('click', function () {
-        profileImage.src = 'images/profile-picture.png';
-        uploadInput.value = '';
-        removeImageButton.style.display = 'none';
-        confirmImageButton.style.display = 'none';
-    });
-
-
-//бек для завантаження фото профіля в базу
-    confirmImageButton.addEventListener('click', async function () {
-    const file = uploadInput.files[0];
-    if (!file) {
-        alert('Please select an image to upload.');
-        return;
-    }
-
-    const email = localStorage.getItem('email'); // Отримання ID користувача
-    if (!email) {
-        alert('User email is not available. Please log in again.');
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('profileImage', file);
-    formData.append('email', email);
-    try {
-        const response = await fetch('http://localhost:8000/auth/upload-profile-image', {
-            method: 'POST',
-            body: formData,
-        });
-
-        const result = await response.json();
-        if (response.ok) {
-            alert('Profile image updated successfully!');
-            profileImage.src = `http://localhost:8000${result.filePath}`; // Додаємо абсолютний шлях
-        } else {
-            alert(`Error: ${result.error}`);
-        }
-    } catch (error) {
-        console.error('Error uploading profile image:', error);
-        alert('An error occurred while uploading the profile image.');
-    }
-    // Ховаємо кнопки після завантаження
-    removeImageButton.style.display = 'none';
-    confirmImageButton.style.display = 'none';
-});
-
-
-       document.addEventListener('DOMContentLoaded', () => {
-    const becomeTeacherButton = document.getElementById('become-teacher-btn');
-
-    if (becomeTeacherButton) {
-        becomeTeacherButton.addEventListener('click', async () => {
-            const authData = getAuthData();
-
-            if (!authData.token || !authData.email) {
-                alert("Please log in before becoming a teacher.");
-                window.location.href = "/login.html";
-                return;
-            }
-
-            // Додавання підтвердження перед дією
-            const userConfirmed = confirm(
-                "Are you sure you want to become a teacher? If you click 'OK', your role will be updated to 'teacher'."
-            );
-
-            if (!userConfirmed) {
-                return; // Користувач натиснув 'Скасувати'
-            }
-
-            try {
-                // Відправляємо запит для оновлення ролі
-                const response = await fetch("http://localhost:8000/auth/student-to-teacher", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${authData.token}`,
-                    },
-                    body: JSON.stringify({ email: authData.email, role: "teacher" }),
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    alert("You are now a teacher! Please provide the necessary details to create a teacher profile and verify your qualifications.");
-                    sessionStorage.setItem("currentStep", "0");
-                    window.location.href = "/registration_pages/full_reg_teacher.html";
-                } else {
-                    alert(data.error || "Failed to update role.");
+            confirmImageButton.addEventListener('click', async function() {
+                const file = uploadInput.files[0];
+                if (!file) {
+                    alert('Please select an image to upload.');
+                    return;
                 }
-            } catch (error) {
-                console.error("Error updating role:", error);
-                alert("An error occurred. Please try again later.");
-            }
-        });
-    }
-});
 
-// Функція для отримання даних автентифікації (така сама, як у JS-файлі для логіну)
-function getAuthData() {
-    return {
-        token: localStorage.getItem('token'),
-        userId: localStorage.getItem('userId'),
-        role: localStorage.getItem('role'),
-        name: localStorage.getItem('name'),
-        email: localStorage.getItem('email'),
-    };
-}
-/*document.querySelectorAll('.tab-link').forEach(button => {
-    button.addEventListener('click', () => {
-        const tabContainer = button.closest('.tab-container');
-        const tabName = button.getAttribute('data-tab');
-
-        // Знімаємо активний клас з усіх вкладок і панелей
-        tabContainer.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active'));
-        tabContainer.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
-
-        // Додаємо активний клас до вибраної вкладки і панелі
-        button.classList.add('active');
-        tabContainer.querySelector(`#${tabName}`).classList.add('active');
-    });
-});*/
-const tabLinks = document.querySelectorAll('.tab-link');
-const modal = document.getElementById('modal');
-const modalContentContainer = document.getElementById('modal-content-container');
-const closeButton = document.querySelector('.close-button');
-
-// Зміст для кожної вкладки
-const tabContents = {
-    "public-profile": `
-        <h2 data-lang="publicProf">Public profile</h2>
-        <p data-lang="infPublicProf">This is your public profile. You can see how it looks to other users.</p>
-    `,
-    "profile": `
-        <h2 data-lang="editProf">Editing your profile</h2>
-        <div class="input-group">
-            <label data-lang="name">Name:</label>
-            <input data-lang="enterName" type="text" placeholder="Enter your real name">
-        </div>
-        <div class="input-group">
-            <label data-lang="nickname">Nickname:</label>
-            <input data-lang="enterNickname" type="text" placeholder="Enter your nickname">
-        </div>
-         <div class="input-group">
-            <label data-lang="dob">Date of birth:</label>
-            <input data-lang="enterDOB" type="date" placeholder="Enter your date of birth">
-        </div>
-        <div class="input-group">
-            <label data-lang="phone">Phone:</label>
-            <input data-lang="enterPhone" type="text" placeholder="Enter your phone number">
-        </div>
-        <div class="input-group">
-            <label data-lang="description">Description:</label>
-            <input data-lang="writeDescription" type="text" placeholder="Write some information about yourself">
-        </div>
-        <button data-lang="saveChanges">Save changes</button>
-    `,
-    "security": `
-    <h2 data-lang="securitySettings">Security settings</h2>
-    <div class="input-group">
-        <label data-lang="currentPassword">Current Password:</label>
-        <div class="password-container">
-            <input data-lang="enterCurrentPassword" id="current-password" type="password" placeholder="Enter current password">
-            <span class="toggle-password" data-target="current-password">
-                <i class="fas fa-eye"></i>
-            </span>
-        </div>
-    </div>
-    <div class="input-group">
-        <label data-lang="newPassword">New Password:</label>
-        <div class="password-container">
-            <input data-lang="enterNewPassword" id="new-password" type="password" placeholder="Enter new password">
-            <span class="toggle-password" data-target="new-password">
-                <i class="fas fa-eye"></i>
-            </span>
-        </div>
-    </div>
-    <div class="input-group">
-        <label data-lang="confirmNewPassword">Confirm New Password:</label>
-        <div class="password-container">
-            <input data-lang="confirmEnterNewPassword" id="confirm-new-password" type="password" placeholder="Confirm new password">
-            <span class="toggle-password" data-target="confirm-new-password">
-                <i class="fas fa-eye"></i>
-            </span>
-        </div>
-    </div>
-    <button data-lang="updatePassword">Update password</button>
-`,
-    "messages": `
-        <h2 data-lang="messages">Messages</h2>
-        <p data-lang="noMessages">You have no new messages yet.</p>
-    `,
-    "close-account": `
-   <h2 data-lang="manageAccount">Manage Account Visibility</h2>
-    <p data-lang="privatePublic">You can make your account private or public using the buttons below.</p>
-    <button data-lang="closeAccount" id="close-account-btn" style="background-color: #f44336; color: white; margin-bottom: 10px;">Close Account</button>
-    <button  data-lang="openAccount" id="open-account-btn" style="background-color: #4CAF50; color: white;">Open Account</button>
-`
-};
-
-// Відкриття модального вікна
-tabLinks.forEach(tab => {
-    tab.addEventListener('click', () => {
-        const tabName = tab.getAttribute('data-tab');
-        modalContentContainer.innerHTML = tabContents[tabName] || "<p>Content not found.</p>";
-        modal.style.display = "flex";
-    });
-});
-
-// Закриття модального вікна
-closeButton.addEventListener('click', () => {
-    modal.style.display = "none";
-});
-
-// Закриття модального вікна при кліку за його межами
-window.addEventListener('click', (event) => {
-    if (event.target === modal) {
-        modal.style.display = "none";
-    }
-});
-document.body.addEventListener('click', async (event) => {
-    if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Save changes') {
-        const name = document.querySelector('input[placeholder="Enter your real name"]').value;
-        const nickname = document.querySelector('input[placeholder="Enter your nickname"]').value;
-        const dateOfBirth = document.querySelector('input[placeholder="Enter your date of birth"]').value;
-        const phone = document.querySelector('input[placeholder="Enter your phone number"]').value;
-        const description = document.querySelector('input[placeholder="Write some information about yourself"]').value;
-
-        const userId = localStorage.getItem('userId'); 
-
-        try {
-            const response = await fetch(`http://localhost:8000/auth/profile/${userId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    name,
-                    nickname,
-                    date_of_birth: dateOfBirth,
-                    phone_number: phone,
-                    description,
-                }),
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                alert('Profile updated successfully!');
-                const usernameElement = document.getElementById('username');
-                usernameElement.textContent = nickname; 
-            } else {
-                alert(`Error: ${result.error}`);
-            }
-        } catch (err) {
-            console.error('Error:', err);
-            alert('An error occurred while updating the profile.');
-        }
-    }
-});
-document.body.addEventListener('click', async (event) => {
-    if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Update password') {
-        const currentPassword = document.querySelector('input[placeholder="Enter current password"]').value;
-        const newPassword = document.querySelector('input[placeholder="Enter new password"]').value;
-        const confirmPassword = document.querySelector('input[placeholder="Confirm new password"]').value;
-
-        const userId = localStorage.getItem('userId'); 
-        const token = localStorage.getItem('token'); // Для авторизації
-
-       // Валідація полів
-        if (!currentPassword || !newPassword || !confirmPassword) {
-        alert('Please fill out all fields.');
-        return;
-        }
-        if (newPassword !== confirmPassword) {
-            alert('New password and confirmation do not match.');
-            return;
-        }
-
-        if (newPassword.length < 6) { // Приклад мінімальної довжини
-            alert('New password must be at least 6 characters long.');
-            return;
-        }
-
-        try {
-            const response = await fetch('http://localhost:8000/auth/update-password', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    userId,
-                    currentPassword,
-                    newPassword,
-                }),
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                alert('Password updated successfully!');
-            } else {
-                alert(`Error: ${result.error}`);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred while updating the password.');
-        }
-    }
-});
-document.addEventListener('click', (event) => {
-    if (event.target.closest('.toggle-password')) {
-        const toggle = event.target.closest('.toggle-password');
-        const inputId = toggle.getAttribute('data-target');
-        const input = document.getElementById(inputId);
-
-        if (input) {
-            // Перемикання типу поля
-            if (input.type === 'password') {
-                input.type = 'text';
-                toggle.innerHTML = '<i class="fas fa-eye-slash"></i>';
-            } else {
-                input.type = 'password';
-                toggle.innerHTML = '<i class="fas fa-eye"></i>';
-            }
-        }
-    }
-});
-document.body.addEventListener('click', async (event) => {
-    const userId = localStorage.getItem('userId'); 
-
-    if (event.target.id === 'close-account-btn') {
-        if (!confirm('Are you sure you want to close your account?')) {
-            return;
-        }
-
-        try {
-            const response = await fetch('http://localhost:8000/auth/close-account', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ userId }),
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                alert(result.message);
-            } else {
-                alert(`Error: ${result.error}`);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred while closing the account.');
-        }
-    }
-
-    if (event.target.id === 'open-account-btn') {
-        if (!confirm('Are you sure you want to open your account?')) {
-            return;
-        }
-
-        try {
-            const response = await fetch('http://localhost:8000/auth/open-account', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ userId }),
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                alert(result.message);
-            } else {
-                alert(`Error: ${result.error}`);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred while opening the account.');
-        }
-    }
-});
-
-// Приклад API-запиту для отримання профілю користувача
-async function fetchUserProfile() {
-    const userId = localStorage.getItem('userId');
-
-    if (!userId) {
-        console.error('User not logged in!');
-        return;
-    }
-
-    try {
-        const response = await fetch(`http://localhost:8000/auth/profile/${userId}`);
-        const data = await response.json();
-
-        if (response.ok) {
-            // Оновлюємо значення в елементі <p id="username">
-            const usernameElement = document.getElementById('username');
-            usernameElement.textContent = data.nickname || 'Default Username';
-        } else {
-            console.error('Failed to fetch user profile:', data.error);
-        }
-    } catch (err) {
-        console.error('Error fetching user profile:', err);
-    }
-}
-
-// Виклик функції під час завантаження сторінки
-window.addEventListener('DOMContentLoaded', fetchUserProfile);
-
-window.addEventListener('DOMContentLoaded', () => {
-    fetchTeacherProfile();
-    loadEnrolledCourses();
-    loadSavedBookmarks();
-
-    // Додаємо обробник для кнопки "View all" в закладках
-    document.querySelectorAll('.btn-view-all-4').forEach(function(button) {
-        button.addEventListener('click', function() {
-            const section = button.closest('.container-my');
-            const list = section.querySelector('.bookmarks-list');
-
-            if (list) {
-                if (list.classList.contains('expanded')) {
-                    list.classList.remove('expanded');
-                    button.textContent = translations[localStorage.getItem('language') || 'en'].btnViewAll;
-                } else {
-                    list.classList.add('expanded');
-                    button.textContent = translations[localStorage.getItem('language') || 'en'].btnViewAll;
+                const email = localStorage.getItem('email');
+                if (!email) {
+                    alert('User email is not available. Please log in again.');
+                    return;
                 }
+
+                const formData = new FormData();
+                formData.append('profileImage', file);
+                formData.append('email', email);
+
+                try {
+                    const response = await fetch('http://localhost:8000/auth/upload-profile-image', {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    const result = await response.json();
+                    if (response.ok) {
+                        alert('Profile image updated successfully!');
+                        profileImage.src = `http://localhost:8000${result.filePath}`;
+                    } else {
+                        alert(`Error: ${result.error}`);
+                    }
+                } catch (error) {
+                    console.error('Error uploading profile image:', error);
+                    alert('An error occurred while uploading the profile image.');
+                }
+
+                removeImageButton.style.display = 'none';
+                confirmImageButton.style.display = 'none';
+            });
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const becomeTeacherButton = document.getElementById('become-teacher-btn');
+
+                if (becomeTeacherButton) {
+                    becomeTeacherButton.addEventListener('click', async () => {
+                        const authData = getAuthData();
+
+                        if (!authData.token || !authData.email) {
+                            alert("Please log in before becoming a teacher.");
+                            window.location.href = "/login.html";
+                            return;
+                        }
+
+                        const userConfirmed = confirm(
+                            "Are you sure you want to become a teacher? If you click 'OK', your role will be updated to 'teacher'."
+                        );
+
+                        if (!userConfirmed) return;
+
+                        try {
+                            const response = await fetch("http://localhost:8000/auth/student-to-teacher", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "Authorization": `Bearer ${authData.token}`,
+                                },
+                                body: JSON.stringify({ email: authData.email, role: "teacher" }),
+                            });
+
+                            const data = await response.json();
+
+                            if (response.ok) {
+                                alert("You are now a teacher! Please provide the necessary details to create a teacher profile and verify your qualifications.");
+                                sessionStorage.setItem("currentStep", "0");
+                                window.location.href = "/registration_pages/full_reg_teacher.html";
+                            } else {
+                                alert(data.error || "Failed to update role.");
+                            }
+                        } catch (error) {
+                            console.error("Error updating role:", error);
+                            alert("An error occurred. Please try again later.");
+                        }
+                    });
+                }
+            });
+
+            function getAuthData() {
+                return {
+                    token: localStorage.getItem('token'),
+                    userId: localStorage.getItem('userId'),
+                    role: localStorage.getItem('role'),
+                    name: localStorage.getItem('name'),
+                    email: localStorage.getItem('email'),
+                };
             }
-        });
-    });
-});
 
-
+            window.addEventListener('DOMContentLoaded', () => {
+                console.log('Page loaded');
+                loadEnrolledCourses();
+                loadSavedBookmarks();
+                
+                const userLang = localStorage.getItem('language') || 'en';
+                applyLanguage(userLang);
+            });
         </script>
-
     </div>
 </body>
-
 </html>
