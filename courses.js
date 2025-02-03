@@ -854,6 +854,8 @@ router.post('/:courseId/enroll', async (req, res) => {
 
 router.get('/enrolled/:userId', async (req, res) => {
   const { userId } = req.params;
+  console.log('Received request for enrolled courses. UserId:', userId);
+  
   try {
       const query = `
           SELECT DISTINCT
@@ -861,37 +863,25 @@ router.get('/enrolled/:userId', async (req, res) => {
               c.name,
               c.description,
               c.image_url,
-              c.price,
               e.progress,
               e.enrollment_date,
-              e.status as enrollment_status,
-              cat.name as category_name,
-              el.name as education_level
+              e.status as enrollment_status
           FROM enrollments e
           INNER JOIN all_courses c ON e.course_id = c.id
-          LEFT JOIN categories cat ON c.category_id = cat.id
-          LEFT JOIN education_levels el ON c.education_level_id = el.id
           WHERE e.user_id = $1 
           AND e.status = 'active'
           AND c.status = 'published'
           ORDER BY e.enrollment_date DESC
       `;
+      console.log('Executing query:', query);
+      console.log('With userId:', userId);
+
       const result = await pool.query(query, [userId]);
+      console.log('Query result:', result.rows);
 
-      const courses = result.rows.map(course => ({
-          id: course.id,
-          name: course.name || 'Untitled Course',
-          description: course.description,
-          progress: course.progress || 0,
-          image_url: course.image_url,
-          category: course.category_name,
-          level: course.education_level,
-          price: course.price
-      }));
-
-      res.json(courses);
+      res.json(result.rows);
   } catch (error) {
-      console.error('Server error:', error);
+      console.error('Error loading courses:', error);
       res.status(500).json({ 
           error: 'Internal server error', 
           details: error.message 

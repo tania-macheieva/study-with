@@ -14,12 +14,16 @@ const coursesRouter = require('./courses');
 const courseDraftRouter = require('./courses');
 const testRouter = require('./test') 
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:8000',
+    credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use("/auth", authRoutes);
 app.use('/tests', testRouter);
+app.use('/courses', coursesRouter); //
 
 
 const searchRouter = require('./searchRouter');
