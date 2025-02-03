@@ -854,110 +854,195 @@ router.get('/auth/profile/:id', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+// Маршрут для отримання даних профілю
+router.get('/profile/teacher/:id', async (req, res) => {
+    const userId = req.params.id;
+
+    try {
+        const profileResult = await pool.query(
+    `SELECT
+        u.name AS real_name,
+        u.profile_image,
+        u.phone_number,
+        t.nickname,
+        t.about,
+        t.education,
+        t.experience,
+        t.hobbies,
+        t.language,
+        t.certificates,
+        t.dob,
+        t.country,
+        t.city,
+        t.zip_code,
+        t.specialty,
+        t.professional_experience,
+        t.author_stripe_account,
+        (
+            SELECT json_agg(
+                json_build_object(
+                    'id', c.id,
+                    'name', c.name,
+                    'price', c.price,
+                    'description', c.description,
+                    'image_url', c.image_url,
+                    'status', c.status,
+                    'created_at', c.created_at
+                )
+            )
+            FROM all_courses c
+            WHERE c.author_id = u.id
+        ) AS courses
+    FROM users u
+    LEFT JOIN teachers t ON u.id = t.user_id
+    WHERE u.id = $1
+    GROUP BY u.id, t.id, u.profile_image`,  
+    [userId]
+);
+
+        const reviewsResult = await pool.query(
+            `SELECT
+                u.name AS student_name,
+                tr.rating,
+                tr.comment,
+                tr.created_at
+            FROM teacher_reviews tr
+            JOIN users u ON tr.student_id = u.id
+            JOIN teachers t ON tr.teacher_id = t.id
+            WHERE t.user_id = $1
+            ORDER BY tr.created_at DESC
+            LIMIT 10`,
+            [userId]
+        );
+
+        const profile = profileResult.rows[0];
+        const reviews = reviewsResult.rows;
+
+        if (!profile) {
+            return res.status(404).json({ error: 'Profile not found' });
+        }
+
+        if (profile.certificates) {
+            profile.certificates = Buffer.from(profile.certificates).toString('base64');
+        }
+
+        res.status(200).json({
+            ...profile,
+            reviews: reviews
+        });
+    } catch (error) {
+        console.error('Error fetching teacher profile:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Новий маршрут для оновлення даних профілю
 router.put('/profile/teacher/:id', async (req, res) => {
     const userId = req.params.id;
     const {
-        name,
-        phone_number,
-        nickname,
+        name,           
+        phone_number,   
+        nickname,       
+        about,
+        education,
+        experience,
+        hobbies,
+        language,
         dob,
-        gender,
         country,
         city,
         zip_code,
         specialty,
-        professional_experience,
-        experience,
-        about,
-        education,
-        hobbies,
-        language,
+        professional_experience
     } = req.body;
 
-    if (!userId) {
-        return res.status(400).json({ error: 'User ID is required' });
-    }
-
-    // Валідація вхідних даних
-    if (!name || !phone_number || !country || !city) {
-        return res.status(400).json({ error: 'Missing required fields' });
-    }
-
     try {
-        // Початок транзакції
-        await pool.query('BEGIN');
+        await pool.query('BEGIN'); 
 
-        // Оновлення основних даних у таблиці `users`
-        await pool.query(
-            `UPDATE users
-             SET name = $1, phone_number = $2
-             WHERE id = $3`,
+        const updateUserResult = await pool.query(
+            `UPDATE users 
+            SET name = $1, 
+                phone_number = $2
+            WHERE id = $3 
+            RETURNING *`,
             [name, phone_number, userId]
         );
-        // Оновлення таблиці `teachers` для специфічних даних викладача
-        const result = await pool.query(
-            `UPDATE teachers
-             SET nickname = $1, dob = $2, phone_number = $3, gender = $4, country = $5, city = $6, 
-                 zip_code = $7, specialty = $8, professional_experience = $9, 
-                 experience = $10, about = $11, education = $12, hobbies = $13, language = $14
-             WHERE user_id = $15
-             RETURNING id`,
+
+        if (updateUserResult.rows.length === 0) {
+            await pool.query('ROLLBACK');
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const updateTeacherResult = await pool.query(
+            `UPDATE teachers 
+             SET nickname = $1,
+                 about = $2,
+                 education = $3,
+                 experience = $4,
+                 hobbies = $5,
+                 language = $6,
+                 dob = $7,
+                 country = $8,
+                 city = $9,
+                 zip_code = $10,
+                 specialty = $11,
+                 professional_experience = $12
+             WHERE user_id = $13 
+             RETURNING *`,
             [
                 nickname,
+                about,
+                education,
+                experience,
+                hobbies,
+                language,
                 dob,
-                phone_number,
-                gender,
                 country,
                 city,
                 zip_code,
                 specialty,
                 professional_experience,
-                experience,
-                about,
-                education,
-                hobbies,
-                language,
-                userId,
+                userId
             ]
         );
 
-         // Якщо запису у `teachers` немає, створюємо його
-         if (result.rowCount === 0) {
+        if (updateTeacherResult.rows.length === 0) {
+            // Якщо запис вчителя не існує, створюємо новий
             await pool.query(
-                `INSERT INTO teachers (user_id, nickname, dob, phone_number, gender, country, city, zip_code, specialty, 
-                 professional_experience, experience, about, education, hobbies, language)
-                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`,
+                `INSERT INTO teachers (
+                    user_id, nickname, about, education, experience, 
+                    hobbies, language, dob, country, city, 
+                    zip_code, specialty, professional_experience 
+                    
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
                 [
-                    userId,
-                    nickname,
-                    dob,
-                    phone_number,
-                    gender,
-                    country,
-                    city,
-                    zip_code,
-                    specialty,
-                    professional_experience,
-                    experience,
-                    about,
-                    education,
-                    hobbies,
-                    language,
+                    userId, nickname, about, education, experience,
+                    hobbies, language, dob, country, city,
+                    zip_code, specialty, professional_experience
                 ]
             );
         }
 
-        // Завершення транзакції
-        await pool.query('COMMIT');
+        await pool.query('COMMIT'); 
 
-        res.status(200).json({ message: 'Teacher profile updated successfully!' });
-    } catch (err) {
-        // Відкат транзакції у разі помилки
-        await pool.query('ROLLBACK');
-        console.error('Error updating teacher profile:', err.message);
-        res.status(500).json({ error: 'Failed to update teacher profile' });
+        res.status(200).json({
+            message: 'Profile updated successfully',
+            data: {
+                ...updateUserResult.rows[0],
+                ...updateTeacherResult.rows[0]
+            }
+        });
+    } catch (error) {
+        await pool.query('ROLLBACK'); 
+        console.error('Error updating teacher profile:', error.message);
+        res.status(500).json({ 
+            error: 'Failed to update profile',
+            details: error.message 
+        });
     }
 });
+
 // Налаштування multer для завантаження файлів
 const uploadDir = path.join(__dirname, 'uploads/profile-images');
 const storage = multer.diskStorage({
@@ -996,18 +1081,21 @@ const uploads = multer({
 });
 router.post('/upload-profile-image', uploads.single('profileImage'), async (req, res) => {
     try {
-        const email = req.body.email; // Отримуємо email із тіла запиту
+        const email = req.body.email;
         if (!email) {
             return res.status(400).json({ error: 'Email is required.' });
         }
 
-        if (!req.file) {
-            return res.status(400).json({ error: 'No file uploaded.' });
+        let filePath;
+        if (req.file) {
+            // Якщо файл завантажено користувачем
+            filePath = `/uploads/profile-images/${req.file.filename}`;
+        } else {
+            // Використання дефолтного зображення
+            filePath = '/images/profile-picture.png';
         }
 
-        const filePath = `/uploads/profile-images/${req.file.filename}`; // Шлях до завантаженого файлу
-
-        // Оновлення шляху до зображення в таблиці teachers
+        // Оновлення шляху до зображення в таблиці users
         const query = `UPDATE users SET profile_image = $1 WHERE email = $2`;
         const values = [filePath, email];
 
@@ -1017,7 +1105,10 @@ router.post('/upload-profile-image', uploads.single('profileImage'), async (req,
             return res.status(404).json({ error: 'User not found.' });
         }
 
-        res.status(200).json({ message: 'Profile image updated successfully!', filePath });
+        res.status(200).json({ 
+            message: 'Profile image updated successfully!', 
+            filePath 
+        });
     } catch (error) {
         console.error('Error uploading profile image:', error);
         res.status(500).json({ error: 'Failed to upload profile image.' });

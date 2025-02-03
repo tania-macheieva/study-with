@@ -1,105 +1,15 @@
 const express = require('express');
+const path = require('path');
 const router = express.Router();
 const { pool } = require('./db');
+const nodemailer = require('nodemailer');
+const jwt = require('jsonwebtoken');
 
 
-
-// API для збереження тесту
-/*router.post('/save-test', async (req, res) => {
-    const { title, questions } = req.body;
-    if (!title || !questions || questions.length === 0) {
-      return res.status(400).json({ message: 'Title and questions are required' });
-    }
-  
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
-      const existingTest = await client.query(
-        'SELECT id FROM tests WHERE title = $1',
-        [title]
-      );
-      if (existingTest.rows.length > 0) {
-        return res.status(400).json({ message: 'A test with this title already exists' });
-      }
-  
-      const testResult = await client.query(
-        'INSERT INTO tests (title) VALUES ($1) RETURNING id',
-        [title]
-      );
-      const testId = testResult.rows[0].id;
-  
-      const questionsValues = questions.map(
-        (q) => `(${testId}, '${q.type}', '${q.questionText.replace(/'/g, "''")}')`
-      ).join(',');
-  
-      const questionResults = await client.query(
-        `INSERT INTO questions (test_id, type, question_text) VALUES ${questionsValues} RETURNING id`
-      );
-  
-      const answersValues = [];
-      questionResults.rows.forEach((question, index) => {
-        const questionId = question.id;
-        questions[index].answers.forEach(answer => {
-          answersValues.push(`(${questionId}, '${answer.answerText.replace(/'/g, "''")}', ${answer.isCorrect})`);
-        });
-      });
-  
-      if (answersValues.length > 0) {
-        await client.query(
-          `INSERT INTO answers (question_id, answer_text, is_correct) VALUES ${answersValues.join(',')}`
-        );
-      }
-  
-      await client.query('COMMIT');
-      res.status(200).json({ message: 'Test saved successfully' });
-    } catch (error) {
-      await client.query('ROLLBACK');
-      res.status(500).json({ message: 'Error saving test', error: error.message });
-    } finally {
-      client.release();
-    }
-  });
-  
-
-
-// API для отримання тесту
-router.get('/get-test/:id', async (req, res) => {
-    const testId = req.params.id;
-  
-    try {
-      const testResult = await pool.query('SELECT * FROM tests WHERE id = $1', [testId]);
-      if (testResult.rows.length === 0) {
-        return res.status(404).json({ message: 'Test not found' });
-      }
-      const test = testResult.rows[0];
-  
-      const questionsResult = await pool.query('SELECT * FROM questions WHERE test_id = $1', [testId]);
-      const questions = questionsResult.rows;
-  
-      const answersResult = await pool.query(
-        'SELECT * FROM answers WHERE question_id = ANY($1::int[])',
-        [questions.map(q => q.id)]
-      );
-  
-      const answersMap = answersResult.rows.reduce((map, answer) => {
-        if (!map[answer.question_id]) map[answer.question_id] = [];
-        map[answer.question_id].push(answer);
-        return map;
-      }, {});
-  
-      questions.forEach(question => {
-        question.answers = answersMap[question.id] || [];
-      });
-  
-      res.status(200).json({ test, questions });
-    } catch (error) {
-      res.status(500).json({ message: 'Error fetching test', error: error.message });
-    }
-  });*/
 
   // Маршрут для збереження тесту
 router.post('/save-test', async (req, res) => {
-  console.log('Request body:', req.body); 
+  //console.log('Request body:', req.body); 
     const { title, questions } = req.body;
   
     // Перевірка валідності вхідних даних
@@ -189,101 +99,10 @@ router.post('/save-test', async (req, res) => {
   }
 }
 });
-  // Маршрут для отримання тесту за ID
-/*router.get('/get-test/:testId', async (req, res) => {
-  const { testId } = req.params;
 
-  // Перевірка валідності ID
-  if (isNaN(testId)) {
-    return res.status(400).json({ error: 'Invalid test ID' });
-  }
-
-  try {
-    // Отримання тесту за ID
-    const testResult = await pool.query('SELECT * FROM tests WHERE id = $1', [testId]);
-
-    if (testResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Test not found' });
-    }
-
-    const test = testResult.rows[0];
-
-    // Отримання питань тесту
-    const questionsResult = await pool.query(
-      'SELECT * FROM questions WHERE test_id = $1',
-      [testId]
-    );
-
-    // Формуємо питання та їхні відповіді
-    const questions = await Promise.all(
-      questionsResult.rows.map(async (question) => {
-        if (question.type === 'Matching') {
-          // Отримання підпитань для "Matching"
-          const subquestionsResult = await pool.query(
-            'SELECT * FROM subquestions WHERE question_id = $1',
-            [question.id]
-          );
-
-          // Обробка кожного підпитання
-          const subquestions = await Promise.all(
-            subquestionsResult.rows.map(async (subquestion) => {
-              const answersResult = await pool.query(
-                'SELECT * FROM answers WHERE subquestion_id = $1',
-                [subquestion.id]
-              );
-
-              return {
-                id: subquestion.id,
-                subquestionText: subquestion.subquestion_text,
-                answers: answersResult.rows.map((answer) => ({
-                  id: answer.id,
-                  answerText: answer.answer_text,
-                })),
-              };
-            })
-          );
-
-          return {
-            id: question.id,
-            type: question.type,
-            questionText: question.question_text,
-            subquestions,
-          };
-        } else {
-          // Отримання відповідей для інших типів питань
-          const answersResult = await pool.query(
-            'SELECT * FROM answers WHERE question_id = $1 AND subquestion_id IS NULL',
-            [question.id]
-          );
-
-          return {
-            id: question.id,
-            type: question.type,
-            questionText: question.question_text,
-            answers: answersResult.rows.map((answer) => ({
-              id: answer.id,
-              answerText: answer.answer_text,
-            })),
-          };
-        }
-      })
-    );
-
-    // Формування остаточного результату
-    res.status(200).json({
-      id: test.id,
-      title: test.title,
-      createdAt: test.created_at,
-      questions,
-    });
-  } catch (error) {
-    console.error('Error fetching test:', error.message);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});*/
 // Маршрут для отримання даних тесту
 router.get('/get-test/:testId', async (req, res) => {
-  console.log('Request body:', req.params); 
+  //console.log('Request body:', req.params); 
   const { testId } = req.params;
   if (!testId) {
     return res.status(400).json({ error: 'Test ID is required' });
@@ -346,7 +165,7 @@ ORDER BY q.id, sq.id, a.id;
         answer_text,
         is_correct,
       } = row;
-      console.log('Request body:', row); 
+      //console.log('Request body:', row); 
        // Додаємо питання, якщо воно ще не оброблено
        if (!questionMap[question_id]) {
         questionMap[question_id] = {
@@ -391,77 +210,111 @@ ORDER BY q.id, sq.id, a.id;
   }
 });
 
-// Отримання посилання на тест за ID
-/*router.get('/share-link/:testId', async (req, res) => {
-  const { testId } = req.params;
 
-  try {
-    // Перевірка, чи існує тест
-    const test = await TestModel.findById(testId); // Передбачається, що є модель TestModel
-    if (!test) {
-      return res.status(404).json({ error: 'Test not found' });
-    }
-
-    // Генеруємо посилання для тесту
-    const testLink = `${req.protocol}://${req.get('host')}/tests/pass/${testId}`;
-
-    return res.json({ link: testLink });
-  } catch (error) {
-    console.error('Error fetching test link:', error);
-    return res.status(500).json({ error: 'Server error' });
-  }
+// Налаштування Nodemailer для Gmail
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,         // ваша електронна пошта
+    pass: process.env.EMAIL_PASSWORD,// Використовуйте пароль додатку (App Password)
+  },
 });
-router.post('/tests/submit', async (req, res) => {
-  const { testId, answers, teacherEmail } = req.body;
 
-  // Перевірка наявності всіх обов'язкових полів
-  if (!testId || !answers || !teacherEmail) {
-    return res.status(400).json({ error: 'Test ID, answers, and teacher email are required.' });
-  }
 
+// Маршрут для отримання пар відповідей
+/*router.post('/api/matching-pairs', async (req, res) => {
   try {
-    // Знайти тест у базі даних
-    const test = await TestModel.findById(testId);
-    if (!test) {
-      return res.status(404).json({ error: 'Test not found.' });
-    }
+    console.log('Received request body:', req.body);
+    const { questionId } = req.body;
 
-    // Генерація тексту листа
-    const emailContent = `
-      Виконаний тест: ${test.title || 'Без назви'}\n
-      ID тесту: ${testId}\n
-      Відповіді учня:\n
-      ${Object.entries(answers)
-        .map(([question, answer]) => `- ${question}: ${answer}`)
-        .join('\n')}
+    if (!questionId) {
+      return res.status(400).json({ error: 'Missing questionId' });
+    }
+    const query = `
+      SELECT 
+        sq.id AS subquestion_id, 
+        sq.subquestion_text, 
+        a.id AS answer_id, 
+        a.answer_text
+      FROM subquestions sq
+      JOIN answers a ON sq.id = a.subquestion_id
+      WHERE sq.question_id =  $1;
     `;
 
-    // Налаштування Nodemailer
-    const nodemailer = require('nodemailer');
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD, // Використовуйте App Password
-      },
-    });
+    const { rows } = await pool.query(query, [questionId]);
+    console.log('Received request body:', rows);
+    res.json(rows);
+  } catch (error) {
+    console.error('Database error:', error);
+    res.status(500).json({ error: 'Database query failed' });
+  }
+ 
+});*/
+// Маршрут для надсилання результатів тесту
+router.post('/send-test-results', async (req, res) => {
+  try {
+    console.log('Received request:', req.body);
 
-    // Відправити лист вчителю та платформі
+    // Отримуємо токен з заголовків
+    const token = req.headers.authorization?.split(' ')[1];
+    console.log('Authorization header:', req.headers.authorization);
+
+    if (!token) {
+      return res.status(401).json({ error: 'Authorization token is missing.' });
+    }
+
+    // Перевіряємо токен та отримуємо email користувача
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      console.error('JWT verification failed:', err);
+      return res.status(401).json({ error: 'Invalid or expired token.' });
+    }
+
+    const email = decoded.email;
+    console.log('Authorized email:', email);
+
+    if (!email) {
+      return res.status(401).json({ error: 'Failed to extract email from token.' });
+    }
+
+    // Отримуємо дані тесту
+    const { testId, teacherEmail, results } = req.body;
+
+    if (!testId || !teacherEmail || !results) {
+      return res.status(400).json({ error: 'All fields are required.' });
+    }
+
+    console.log('Test ID:', testId);
+    console.log('Teacher Email:', teacherEmail);
+    console.log('Results:', results);
+
+    // Формуємо вміст листа
     const mailOptions = {
-      from: process.env.EMAIL_USER || 'studywith.connect@gmail.com',
-      to: [teacherEmail, 'studywith.connect@gmail.com'], // Надсилається вчителю і на платформу
-      subject: `Виконаний тест: ${test.title || 'Без назви'}`,
-      text: emailContent,
+      from: email,
+      to: [teacherEmail, 'studywith.connect@gmail.com'], // Надсилаємо вчителю та платформі
+      subject: `Test Results for Test ID: ${testId}`,
+      text: `Hello,\n\nHere are the test results for Test ID: ${testId}.\n\n${results}\n\nBest regards,\nStudyWith`
     };
 
-    await transporter.sendMail(mailOptions);
+    console.log('Sending email with options:', mailOptions);
 
-    // Успішна відповідь
-    return res.json({ message: 'Test submitted successfully!' });
+    // Відправляємо лист
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        console.error('Error sending email:', err);
+        return res.status(500).json({ error: 'Failed to send test results.', details: err.message });
+      }
+      console.log('Email sent successfully:', info.response);
+      return res.status(200).json({ message: 'Test results sent successfully.' });
+    });
+
   } catch (error) {
-    console.error('Error submitting test:', error);
-    return res.status(500).json({ error: 'Failed to submit the test.' });
+    console.error('Unexpected server error:', error);
+    res.status(500).json({ error: 'Server error occurred while sending test results.' });
   }
-});*/
+});
+
 
 module.exports = router;

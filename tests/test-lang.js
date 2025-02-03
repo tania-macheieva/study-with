@@ -1,6 +1,7 @@
 const translations = {
     en: {
         testCreation:"Test Creation",
+        testPage:"Test Page",
         testTitle:"Test Title:",
         enterTestTitle:"Enter test title",
         numQuesOneAnsw:"Number of questions with one correct answer:",
@@ -15,10 +16,16 @@ const translations = {
         enterQuesText:"Enter question text",
         answer:"Answer",
         enteropenEndedAnsw:"Enter open-ended answer",
+        enterTestId:"Please provide a test ID.",
+        loadTestData:"Loading test data...",
+        noAnswerAvail:"No answers available for this question.",
+        matchQuesMiss:"Matching question is missing subquestions or answers.",
+        sendBtn:"Send Test",
 
     },
     ua: {
         testCreation:"Створення тесту",
+        testPage:"Сторінка тесту",
         testTitle:"Назва тесту:",
         enterTestTitle:"Введіть назву тесту",
         numQuesOneAnsw:"Кількість запитань з однією правильною відповіддю:",
@@ -33,6 +40,12 @@ const translations = {
         enterQuesText:"Введіть текст запитання",
         відповідь: "Відповідь",
         enteropenEndedAnsw:"Введіть відкриту відповідь",
+        enterTestId:"Надайте ідентифікатор тесту.",
+        loadTestData:"Завантаження тестових даних...",
+        noAnswerAvail:"На це запитання немає відповідей.",
+        matchQuesMiss:"У відповідному питанні відсутні підзапитання або відповіді.",
+        sendBtn:"Відправити тест",
+
 
     },
 };

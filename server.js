@@ -19,6 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use("/auth", authRoutes);
+app.use('/tests', testRouter);
 
 
 const searchRouter = require('./searchRouter');
@@ -45,7 +46,7 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use('/tests', testRouter);
+
 
 app.use(express.static(path.join(__dirname)));
 
@@ -118,19 +119,22 @@ app.get('/course-preview', (req, res) => {
 app.get('/course-view', (req, res) => {
     res.sendFile(path.join(__dirname, 'course-view/course-view.html')); 
 });
-
-
 app.get('/test-creation', (req, res) => {
     res.sendFile(path.join(__dirname, './tests/test-creation.html')); 
 });
+app.get('/test-page', (req, res) => {
+    res.sendFile(path.join(__dirname, './tests/test-page.html')); 
+});
 
+app.get('/public-profile', (req, res) => {
+    res.sendFile(path.join(__dirname, 'profile-page/public-profile.html')); 
+});
 app.use('/pay-page', stripeRoutes);
 app.use('/pay-page/webhook', express.raw({type: 'application/json'}));
 app.post('/pay-page/webhook', express.raw({type: 'application/json'}), (req, res) => {
     req.rawBody = req.body;
     next();
 });
-
 app.use("/pay-page", stripeRoutes);
 app.get('/get-stripe-key', (req, res) => {
     const publicKey = process.env.STRIPE_PUBLIC_KEY;
@@ -148,6 +152,7 @@ app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Something broke!');
 });
+
 
 const HOST = process.env.HOST || "localhost";
 const PORT = process.env.PORT || 8000;
