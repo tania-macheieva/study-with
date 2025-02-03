@@ -899,4 +899,181 @@ router.get('/enrolled/:userId', async (req, res) => {
   }
 });
 
+// Маршрут для збереження курсу
+router.post('/save', async (req, res) => {
+  const { userId, courseId } = req.body;
+
+  try {
+      // Перевіряємо чи курс вже збережений
+      const checkQuery = `
+          SELECT * FROM saved_courses 
+          WHERE user_id = $1 AND course_id = $2
+      `;
+      const checkResult = await pool.query(checkQuery, [userId, courseId]);
+
+      if (checkResult.rows.length > 0) {
+          return res.status(400).json({ 
+              success: false, 
+              message: 'Курс вже збережений' 
+          });
+      }
+
+      // Перевіряємо чи існує курс
+      const courseQuery = `
+          SELECT id FROM all_courses WHERE id = $1
+      `;
+      const courseResult = await pool.query(courseQuery, [courseId]);
+
+      if (courseResult.rows.length === 0) {
+          return res.status(404).json({ 
+              success: false, 
+              message: 'Курс не знайдено' 
+          });
+      }
+
+      // Зберігаємо курс
+      const saveQuery = `
+          INSERT INTO saved_courses (user_id, course_id, saved_at)
+          VALUES ($1, $2, CURRENT_TIMESTAMP)
+      `;
+      await pool.query(saveQuery, [userId, courseId]);
+
+      res.json({ 
+          success: true, 
+          message: 'Курс успішно збережено' 
+      });
+  } catch (error) {
+      console.error('Помилка при збереженні курсу:', error);
+      res.status(500).json({ 
+          success: false, 
+          message: 'Внутрішня помилка сервера' 
+      });
+  }
+});
+
+// Маршрут для видалення курсу зі збережених
+router.delete('/unsave', async (req, res) => {
+  const { userId, courseId } = req.body;
+
+  try {
+      // Видаляємо курс зі збережених
+      const deleteQuery = `
+          DELETE FROM saved_courses 
+          WHERE user_id = $1 AND course_id = $2
+      `;
+      const result = await pool.query(deleteQuery, [userId, courseId]);
+
+      if (result.rowCount === 0) {
+          return res.status(404).json({
+              success: false,
+              message: 'Збережений курс не знайдено'
+          });
+      }
+
+      res.json({ 
+          success: true, 
+          message: 'Курс видалено зі збережених' 
+      });
+  } catch (error) {
+      console.error('Помилка при видаленні курсу зі збережених:', error);
+      res.status(500).json({ 
+          success: false, 
+          message: 'Внутрішня помилка сервера' 
+      });
+  }
+});
+
+// Маршрут для перевірки чи курс збережений
+router.get('/is-saved', async (req, res) => {
+  const { userId, courseId } = req.query;
+
+  try {
+      const query = `
+          SELECT * FROM saved_courses 
+          WHERE user_id = $1 AND course_id = $2
+      `;
+      const result = await pool.query(query, [userId, courseId]);
+
+      res.json({ 
+          success: true, 
+          isSaved: result.rows.length > 0 
+      });
+  } catch (error) {
+      console.error('Помилка при перевірці статусу збереження:', error);
+      res.status(500).json({ 
+          success: false, 
+          message: 'Внутрішня помилка сервера' 
+      });
+  }
+});
+
+// Маршрут для отримання збережених курсів
+router.get('/saved/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+      const query = `
+          SELECT c.* 
+          FROM all_courses c
+          JOIN saved_courses sc ON c.id = sc.course_id
+          WHERE sc.user_id = $1
+          ORDER BY sc.saved_at DESC
+      `;
+      const result = await pool.query(query, [userId]);
+
+      res.json(result.rows);
+  } catch (error) {
+      console.error('Помилка при отриманні збережених курсів:', error);
+      res.status(500).json({ 
+          success: false, 
+          message: 'Внутрішня помилка сервера' 
+      });
+  }
+});
+
+router.get('/saved/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+      const query = `
+          SELECT 
+              c.id,
+              c.name,
+              c.description,
+              c.image_url,
+              c.price,
+              cat.name as category_name,
+              el.name as education_level,
+              sc.saved_at
+          FROM saved_courses sc
+          JOIN all_courses c ON sc.course_id = c.id
+          LEFT JOIN categories cat ON c.category_id = cat.id
+          LEFT JOIN education_levels el ON c.education_level_id = el.id
+          WHERE sc.user_id = $1 AND c.status = 'published'
+          ORDER BY sc.saved_at DESC
+      `;
+
+      const result = await pool.query(query, [userId]);
+      
+      const savedCourses = result.rows.map(course => ({
+          id: course.id,
+          name: course.name || 'Без назви',
+          description: course.description,
+          image_url: course.image_url,
+          price: parseFloat(course.price),
+          category: course.category_name,
+          level: course.education_level,
+          saved_at: course.saved_at
+      }));
+
+      res.json(savedCourses);
+  } catch (error) {
+      console.error('Помилка отримання збережених курсів:', error);
+      res.status(500).json({ 
+          error: 'Внутрішня помилка сервера', 
+          details: error.message 
+      });
+  }
+});
+
 module.exports = router;
