@@ -143,6 +143,327 @@ const DISCUSSION_MESSAGES = [
     }
 ];
 
+const NOTES = {
+    list: [],
+    
+    // Додавання нової нотатки
+    add: function(data) {
+        const note = {
+            id: Date.now(),
+            text: data.text,
+            timestamp: data.timestamp || null,
+            videoTimecode: data.videoTimecode || null,
+            moduleId: data.moduleId || null,
+            topicId: data.topicId || null,
+            contentType: data.contentType || 'general',
+            createdAt: new Date().toISOString()
+        };
+        
+        this.list.push(note);
+        this.saveToLocalStorage();
+        return note;
+    },
+    
+    // Отримання всіх нотаток
+    getAll: function() {
+        return this.list;
+    },
+    
+    // Пошук нотаток за модулем
+    getByModule: function(moduleId) {
+        return this.list.filter(note => note.moduleId === moduleId);
+    },
+    
+    // Пошук нотаток за топіком
+    getByTopic: function(topicId) {
+        return this.list.filter(note => note.topicId === topicId);
+    },
+    
+    // Видалення нотатки
+    remove: function(noteId) {
+        this.list = this.list.filter(note => note.id !== noteId);
+        this.saveToLocalStorage();
+    },
+    
+    // Збереження нотаток у локальному сховищі
+    saveToLocalStorage: function() {
+        localStorage.setItem('courseNotes', JSON.stringify(this.list));
+    },
+    
+    // Завантаження нотаток з локального сховища
+    loadFromLocalStorage: function() {
+        const savedNotes = localStorage.getItem('courseNotes');
+        if (savedNotes) {
+            this.list = JSON.parse(savedNotes);
+        }
+    }
+};
+
+// Завантаження збережених нотаток при ініціалізації
+NOTES.loadFromLocalStorage();
+
+
+
+
+// Отримання всіх нотаток
+const allNotes = NOTES.getAll();
+
+// Отримання нотаток для конкретного модуля
+const moduleNotes = NOTES.getByModule(1);
+
+
+const renderNotes = () => {
+    const notesSection = document.createElement('section');
+    notesSection.classList.add('notes-section');
+    Object.assign(notesSection.style, {
+        fontFamily: 'Inter, sans-serif',
+        boxSizing: 'border-box',
+        width: '100%',
+        background: '#FFFFFF',
+        border: '2px solid #C7C7C7',
+        borderRadius: '12px',
+        padding: '20px',
+        color: '#283044'
+    });
+
+    // Створюємо секцію з фільтрами
+    const filtersSection = document.createElement('div');
+    filtersSection.classList.add('filters');
+    filtersSection.style.fontFamily = 'Inter, sans-serif';
+    filtersSection.innerHTML = `
+        <div class="filters-right">
+            <div class="filter-group">
+                <button class="filter-btn active">Whole course</button>
+                <button class="filter-btn">Current module</button>
+                <button class="filter-btn">Current topic</button>
+            </div>
+        </div>
+    `;
+
+    // Отримуємо всі нотатки
+    const allNotes = NOTES.getAll();
+
+    // Створюємо контейнер для списку нотаток
+    const notesListContainer = document.createElement('div');
+    notesListContainer.className = 'notes-list';
+    notesListContainer.style.marginTop = '20px';
+    notesListContainer.style.fontFamily = 'Inter, sans-serif';
+
+    // Групуємо нотатки за модулями та темами
+    const notesByModules = {};
+    allNotes.forEach(note => {
+        if (note.moduleId) {
+            if (!notesByModules[note.moduleId]) {
+                notesByModules[note.moduleId] = {
+                    moduleTitle: `Module ${note.moduleId}`,
+                    topics: {}
+                };
+            }
+            if (note.topicId) {
+                if (!notesByModules[note.moduleId].topics[note.topicId]) {
+                    notesByModules[note.moduleId].topics[note.topicId] = {
+                        topicTitle: `Topic ${note.topicId}`,
+                        notes: []
+                    };
+                }
+                notesByModules[note.moduleId].topics[note.topicId].notes.push(note);
+            }
+        }
+    });
+
+    const filterNotes = (filter) => {
+        notesListContainer.innerHTML = '';
+        const currentModule = document.querySelector('.module.active')?.dataset.moduleId;
+        const currentTopic = document.querySelector('.topic.active')?.dataset.topicId;
+
+        Object.entries(notesByModules).forEach(([moduleId, moduleData]) => {
+            let shouldShowModule = false;
+
+            switch(filter) {
+                case 'Whole course':
+                    shouldShowModule = Object.values(moduleData.topics).some(topic => topic.notes.length > 0);
+                    break;
+                case 'Current module':
+                    shouldShowModule = moduleId === currentModule;
+                    break;
+            }
+
+            if (shouldShowModule) {
+                const moduleSection = document.createElement('div');
+                moduleSection.classList.add('notes-module');
+                moduleSection.style.marginBottom = '20px';
+
+                const moduleTitle = document.createElement('h3');
+                moduleTitle.textContent = moduleData.moduleTitle;
+                moduleTitle.style.marginBottom = '10px';
+                moduleTitle.style.color = '#283044';
+                moduleTitle.style.fontFamily = 'Inter, sans-serif';
+                moduleSection.appendChild(moduleTitle);
+
+                Object.entries(moduleData.topics).forEach(([topicId, topicData]) => {
+                    let shouldShowTopic = false;
+
+                    switch(filter) {
+                        case 'Whole course':
+                            shouldShowTopic = topicData.notes.length > 0;
+                            break;
+                        case 'Current module':
+                            shouldShowTopic = true;
+                            break;
+                        case 'Current topic':
+                            shouldShowTopic = topicId === currentTopic;
+                            break;
+                    }
+
+                    if (shouldShowTopic) {
+                        const topicSection = document.createElement('div');
+                        topicSection.classList.add('notes-topic');
+                        topicSection.style.marginBottom = '15px';
+
+                        const topicTitle = document.createElement('h4');
+                        topicTitle.textContent = topicData.topicTitle;
+                        topicTitle.style.marginBottom = '10px';
+                        topicTitle.style.color = '#283044';
+                        topicTitle.style.fontFamily = 'Inter, sans-serif';
+                        topicTitle.style.fontWeight = 'normal';
+                        topicSection.appendChild(topicTitle);
+
+                        topicData.notes.forEach(note => {
+                            const noteElement = document.createElement('div');
+                            noteElement.classList.add('note-item');
+                            Object.assign(noteElement.style, {
+                                border: '2px solid #C7C7C7',
+                                padding: '15px',
+                                borderRadius: '8px',
+                                marginBottom: '15px',
+                                fontFamily: 'Inter, sans-serif',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'flex-start'
+                            });
+                    
+                            const noteContent = document.createElement('div');
+                            noteContent.style.flexGrow = '1';
+                            noteContent.style.marginRight = '15px';
+                    
+                            const noteMetadata = document.createElement('div');
+                            noteMetadata.innerHTML = `
+                            <span style="font-size: 12px; color: #666; font-family: 'Inter', sans-serif;">
+                            ${note.videoTimecode ? `Video time: ${note.videoTimecode} ` : ''}
+                            ${note.timestamp ? `Created: ${new Date(note.timestamp).toLocaleString('en-US')} ` : ''}
+                            </span>
+                            `;
+                    
+                            const noteText = document.createElement('div');
+                            noteText.textContent = note.text;
+                            noteText.style.marginTop = '8px';
+                            noteText.style.fontFamily = 'Inter, sans-serif';
+                    
+                            noteContent.appendChild(noteMetadata);
+                            noteContent.appendChild(noteText);
+                    
+                            const noteActions = document.createElement('div');
+                            noteActions.style.display = 'flex';
+                            noteActions.style.flexDirection = 'column';
+                            noteActions.style.gap = '10px';
+                    
+                            const editButton = document.createElement('button');
+                            editButton.textContent = 'Edit';
+                            Object.assign(editButton.style, {
+                                background: 'none',
+                                border: '1px solid #283044',
+                                borderRadius: '4px',
+                                padding: '4px 8px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                color: '#283044'
+                            });
+                    
+                            const deleteButton = document.createElement('button');
+                            deleteButton.textContent = 'Delete';
+                            Object.assign(deleteButton.style, {
+                                background: 'none', 
+                                border: '1px solid  #283044',
+                                borderRadius: '4px',
+                                padding: '4px 8px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                color: ' #283044'
+                            });
+                    
+                            noteActions.appendChild(editButton);
+                            noteActions.appendChild(deleteButton);
+                    
+                            noteElement.appendChild(noteContent);
+                            noteElement.appendChild(noteActions);
+
+                            topicSection.appendChild(noteElement);
+                        });
+
+                        moduleSection.appendChild(topicSection);
+                    }
+                });
+
+                notesListContainer.appendChild(moduleSection);
+            }
+        });
+    };
+
+    // Додаємо обробники подій для кнопок фільтрів
+    filtersSection.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            filtersSection.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            filterNotes(btn.textContent);
+        });
+        
+        btn.style.fontFamily = 'Inter, sans-serif';
+        btn.style.color = '#283044';
+    });
+
+    notesSection.appendChild(filtersSection);
+    notesSection.appendChild(notesListContainer);
+
+    // Початкова фільтрація для відображення всіх нотаток
+    filterNotes('Whole course');
+
+    return notesSection;
+};
+
+NOTES.list = [];
+// Додавання нотатки до відео
+NOTES.add({
+    text: 'tvruertbevercwe',
+    videoTimecode: '0:19',
+    moduleId: 1,
+    topicId: 1,
+    contentType: 'video'
+});
+
+NOTES.add({
+    text: 'tvruertbevercwe',
+    videoTimecode: '0:19',
+    moduleId: 1,
+    topicId: 1,
+    contentType: 'video'
+});
+
+NOTES.add({
+    text: 'retbuijrytv',
+    videoTimecode: '0:12',
+    moduleId: 1,
+    topicId: 1,
+    contentType: 'video'
+});
+
+NOTES.add({
+    text: 'wfertjtwetrct',
+    videoTimecode: '0:11',
+    moduleId: 1,
+    topicId: 2,
+    contentType: 'video'
+});
+
 const createVideoPlayer = () => {
     const videoContainer = document.querySelector('.video-player');
     if (!videoContainer) return;
@@ -156,13 +477,27 @@ const createVideoPlayer = () => {
     const videoElement = document.createElement('video');
     videoElement.id = VIDEO_SOURCE.id;
     videoElement.className = 'video-element';
+    videoElement.controlsList = "nodownload";
     videoElement.controls = true;
 
     Object.assign(videoElement.style, {
         width: '100%',
         height: '100%',
         objectFit: 'cover',
-        borderRadius: '12px'
+        borderRadius: '12px',
+        '-webkit-user-select': 'none',
+    });
+    
+    // Блокуємо контекстне меню, яке містить опцію "Зберегти відео як..."
+    videoElement.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+    });
+    
+    // Блокуємо комбінації клавіш для збереження
+    videoElement.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+        }
     });
 
     const sourceElement = document.createElement('source');
@@ -221,15 +556,6 @@ const createVideoPlayer = () => {
         const currentTime = formatVideoTime(videoElement.currentTime);
         showNotesModal(currentTime);
     });
-
-    videoElement.addEventListener('loadeddata', () => {
-        console.log('Відео успішно завантажено');
-    });
-
-    videoElement.addEventListener('error', (e) => {
-        console.error('Помилка завантаження відео:', e);
-        videoContainer.innerHTML = 'Помилка завантаження відео';
-    });
 };
 
 const saveNote = (noteData) => {
@@ -277,7 +603,7 @@ const showNotesModal = (currentTime) => {
         </div>
     `;
     Object.assign(modal.style, {
-        width: '400px',
+        width: '600px',
         background: 'white',
         padding: '20px',
         borderRadius: '12px',
@@ -322,16 +648,16 @@ const createModuleHTML = (module) => {
     };
     
     return `
-        <section class="module collapsed" data-module-id="${module.id}">
+        <section class="module" data-module-id="${module.id}">
             <div class="module-header">
                 <h2>${module.title}</h2>
                 ${hasContent ? `
-                    <button class="toggle-module collapsed" aria-label="Toggle module content">
+                    <button class="toggle-module" aria-label="Toggle module content">
                     </button>
                 ` : ''}
             </div>
             ${hasContent ? `
-                <div class="module-content" style="display: none;">
+                <div class="module-content">
                     <div class="module-progress">
                         <span>${module.progress.completed}/${module.progress.total} complete</span>
                         <span class="separator">|</span>
@@ -362,11 +688,11 @@ const renderCourseContent = () => {
     courseContent.innerHTML = `
         <div class="course-header">
             <h1>Course content</h1>
-            <button class="toggle-all collapsed" aria-label="Toggle all content">
+            <button class="toggle-all" aria-label="Toggle all content">
             </button>
         </div>
     `;
-    courseContent.classList.add('collapsed');
+    courseContent.classList.remove('collapsed'); // Видаляємо клас collapsed
     COURSE_MODULES.forEach(module => {
         courseContent.insertAdjacentHTML('beforeend', createModuleHTML(module));
     });
@@ -377,23 +703,13 @@ const initializeModuleListeners = () => {
     const toggleAll = document.querySelector('.toggle-all');
     const courseContent = document.querySelector('.course-content');
     const moduleToggles = document.querySelectorAll('.toggle-module');
+    
     toggleAll?.addEventListener('click', () => {
         toggleAll.classList.toggle('collapsed');
         courseContent.classList.toggle('collapsed');
         const modules = document.querySelectorAll('.module');
-        if (!courseContent.classList.contains('collapsed')) {
-            modules.forEach(module => {
-                module.classList.remove('collapsed');
-                const moduleContent = module.querySelector('.module-content');
-                if (moduleContent) {
-                    moduleContent.style.display = 'block';
-                }
-                const toggleButton = module.querySelector('.toggle-module');
-                if (toggleButton) {
-                    toggleButton.classList.remove('collapsed');
-                }
-            });
-        } else {
+        
+        if (courseContent.classList.contains('collapsed')) {
             modules.forEach(module => {
                 module.classList.add('collapsed');
                 const moduleContent = module.querySelector('.module-content');
@@ -405,8 +721,21 @@ const initializeModuleListeners = () => {
                     toggleButton.classList.add('collapsed');
                 }
             });
+        } else {
+            modules.forEach(module => {
+                module.classList.remove('collapsed');
+                const moduleContent = module.querySelector('.module-content');
+                if (moduleContent) {
+                    moduleContent.style.display = 'block';
+                }
+                const toggleButton = module.querySelector('.toggle-module');
+                if (toggleButton) {
+                    toggleButton.classList.remove('collapsed');
+                }
+            });
         }
     });
+
     moduleToggles.forEach(toggle => {
         toggle.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -734,102 +1063,97 @@ Element.prototype.querySelector = function(selector) {
 const initializeTabs = () => {
     const tabs = document.querySelectorAll('.tab');
     
+    // Видаляємо старі обробники подій перед додаванням нових
     tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            tabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            const tabText = tab.textContent.toLowerCase().replace(/\s+/g, '');
-            
-            switch(tabText) {
-                case 'discussion':
-                    renderSection('discussion');
-                    break;
-                case 'searchbykeyword':
-                    renderSection('keyword');
-                    break;
-                case 'mycurriculum':
-                    renderSection('curriculum');
-                    break;
-                case 'mynotesmarks':
-                    renderSection('notes');
-                    break;
-            }
-        });
+        const clonedTab = tab.cloneNode(true);
+        tab.parentNode.replaceChild(clonedTab, tab);
+        
+        clonedTab.addEventListener('click', handleTabClick);
     });
+};
+
+const handleTabClick = (event) => {
+    const tabs = document.querySelectorAll('.tab');
+    const clickedTab = event.target;
+    
+    // Знімаємо активний клас з усіх табів
+    tabs.forEach(t => t.classList.remove('active'));
+    
+    // Додаємо активний клас обраному табу
+    clickedTab.classList.add('active');
+    
+    // Отримуємо текст табу і визначаємо, яку секцію показати
+    const tabText = clickedTab.textContent.trim().toLowerCase();
+    
+    // Визначаємо, яку секцію потрібно показати
+    if (tabText.includes('notes')) {
+        renderSection('notes');
+    } else if (tabText.includes('discussion')) {
+        renderSection('discussion');
+    }
 };
 
 const renderSection = (sectionType) => {
     const mainContent = document.querySelector('.main-content');
     const videoContainer = document.querySelector('.video-container');
     const tabs = document.querySelector('.tabs');
-    const currentFilters = saveCurrentFilters();
-    mainContent.innerHTML = '';
-    mainContent.appendChild(videoContainer);
-    mainContent.appendChild(tabs);
+    
+    // Зберігаємо поточні фільтри якщо це секція обговорень
+    const currentFilters = sectionType === 'discussion' ? saveCurrentFilters() : null;
+    
+    // Створюємо новий контейнер для контенту
+    const contentContainer = document.createElement('div');
+    contentContainer.className = 'content-container';
+    
+    // Додаємо відео контейнер
+    if (videoContainer) {
+        contentContainer.appendChild(videoContainer.cloneNode(true));
+    }
+    
+    // Додаємо таби
+    if (tabs) {
+        const clonedTabs = tabs.cloneNode(true);
+        contentContainer.appendChild(clonedTabs);
+        
+        // Оновлюємо активний таб
+        const allTabs = clonedTabs.querySelectorAll('.tab');
+        allTabs.forEach(tab => {
+            const tabText = tab.textContent.trim().toLowerCase().replace(/\s+/g, '');
+            tab.classList.toggle('active', 
+                (sectionType === 'discussion' && tabText === 'discussion') || 
+                (sectionType === 'notes' && tabText === 'mynotesmarks')
+            );
+        });
+    }
+    
+    // Рендеримо відповідну секцію
     switch(sectionType) {
         case 'discussion':
-            mainContent.insertAdjacentHTML('beforeend', createDiscussionTemplate());
-            restoreFilters(currentFilters);
-            initializeFilters();
-            renderDiscussion();
-            initializeDiscussionListeners();
+            contentContainer.insertAdjacentHTML('beforeend', createDiscussionTemplate());
+            if (currentFilters) {
+                restoreFilters(currentFilters);
+            }
             break;
-
-        case 'keyword':
-            const keywordSection = document.createElement('section');
-            keywordSection.classList.add('keyword-section');
-            Object.assign(keywordSection.style, {
-                boxSizing: 'border-box',
-                width: '100%',
-                background: '#FFFFFF',
-                border: '2px solid #C7C7C7',
-                borderRadius: '12px',
-                padding: '20px'
-            });
-            keywordSection.innerHTML = `
-                <div class="search-bar">
-                    <input type="text" placeholder="Type a keyword to search information in the topic">
-                    <button class="icon-button search">
-                    <img src="../images/icons8-search-50.png" alt="Search">
-                    </button>
-                </div>
-                <div class="search-results">
-                    <!-- Результати пошуку будуть додані динамічно -->
-                </div>
-            `;
-            mainContent.appendChild(keywordSection);
-            initializeKeywordSearch();
-            break;
-
-        case 'curriculum':
-            const curriculumSection = document.createElement('section');
-            curriculumSection.classList.add('curriculum-section');
-            Object.assign(curriculumSection.style, {
-                boxSizing: 'border-box',
-                width: '100%',
-                background: '#FFFFFF',
-                border: '2px solid #C7C7C7',
-                borderRadius: '12px',
-                padding: '20px'
-            });
-            
-            mainContent.appendChild(curriculumSection);
-            break;
-
         case 'notes':
-            const notesSection = document.createElement('section');
-            notesSection.classList.add('notes-section');
-            Object.assign(notesSection.style, {
-                boxSizing: 'border-box',
-                width: '100%',
-                background: '#FFFFFF',
-                border: '2px solid #C7C7C7',
-                borderRadius: '12px',
-                padding: '20px'
-            });
-            
-            mainContent.appendChild(notesSection);
+            const notesSection = renderNotes();
+            if (notesSection) {
+                contentContainer.appendChild(notesSection);
+            }
             break;
+    }
+    
+    // Очищуємо та оновлюємо основний контент
+    mainContent.innerHTML = '';
+    mainContent.appendChild(contentContainer);
+    
+    // Ініціалізуємо всі необхідні компоненти
+    createVideoPlayer();
+    initializeTabs();
+    
+    if (sectionType === 'discussion') {
+        initializeFilters();
+        renderDiscussion();
+        initializeDiscussionListeners();
     }
 };
 
@@ -863,61 +1187,6 @@ const restoreFilters = (filters) => {
         document.querySelectorAll('.filters-right .filter-group:last-child .filter-btn').forEach(btn => {
             btn.classList.toggle('active', btn.textContent === filters.timeFilter);
         });
-    }
-};
-
-const initializeKeywordSearch = () => {
-    const searchInput = document.querySelector('.keyword-section .search-bar input');
-    const searchButton = document.querySelector('.keyword-section .search-bar .icon-button.search');
-    const searchResults = document.querySelector('.keyword-section .search-results');
-    searchButton.addEventListener('click', performKeywordSearch);
-    searchInput.addEventListener('keypress', function(event) {
-        if (event.key === 'Enter') {
-            performKeywordSearch();
-        }
-    });
-
-    function performKeywordSearch() {
-        const keyword = searchInput.value.trim();
-        if (keyword) {
-            const results = DISCUSSION_MESSAGES.filter(message => 
-                // Пошук по тексту повідомлення та відповідей
-                message.text.toLowerCase().includes(keyword.toLowerCase()) || 
-                (message.replies && message.replies.some(reply => 
-                    reply.text.toLowerCase().includes(keyword.toLowerCase())
-                ))
-            );
-
-            displaySearchResults(results);
-        }
-    }
-
-    function displaySearchResults(results) {
-        searchResults.innerHTML = '';
-        if (results.length === 0) {
-            searchResults.innerHTML = '<p>No result found</p>';
-        } else {
-            results.forEach(result => {
-                const resultElement = document.createElement('div');
-                resultElement.classList.add('search-result');
-                resultElement.innerHTML = `
-                    <p>${result.text}</p>
-                    <small>Від користувача: ${result.user.name}</small>
-                `;
-                searchResults.appendChild(resultElement);
-                if (result.replies && result.replies.length > 0) {
-                    result.replies.forEach(reply => {
-                        const replyElement = document.createElement('div');
-                        replyElement.classList.add('search-result', 'reply');
-                        replyElement.innerHTML = `
-                            <p>${reply.text}</p>
-                            <small>Відповідь від: ${reply.user.name}</small>
-                        `;
-                        searchResults.appendChild(replyElement);
-                    });
-                }
-            });
-        }
     }
 };
 
