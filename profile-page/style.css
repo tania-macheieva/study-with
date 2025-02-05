@@ -144,15 +144,19 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
     border-bottom: 4px solid #283044;
     margin-top: 18px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Легка тінь */
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    font-weight: 600;
 }
-
-
+ 
 
 /* Ефект при наведенні */
 .tab-link:hover {
     color: #141821; /* Зміна кольору тексту при наведенні */
     background-color: #e9ecef; /* Світло-сірий фон */
-    transform: translateY(-5px); /* Легкий рух праворуч */
+    transform: translateY(-2px); 
+    box-shadow: 0 4px 10px rgba(0, 86, 179, 0.4);
 }
 
 .tab-content {
@@ -215,7 +219,7 @@ body {
     outline: none;
 }
 /* Кнопки */
-button {
+.modal button {
     padding: 10px 20px;
     font-size: 16px;
     font-weight: 600;
@@ -228,14 +232,12 @@ button {
     transition: all 0.3s ease;
     
 }
-
-button:hover {
+.modal button:hover {
     background-color: #545F7A;
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(0, 86, 179, 0.4); /* Більша тінь */
   
 }
-
 .password-container {
     display: flex;
     align-items: center;

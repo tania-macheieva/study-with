@@ -315,31 +315,29 @@ document.addEventListener('DOMContentLoaded', () => {
       <label class="title-3">${translations[userLang].enterLectureDescription}</label>
       <textarea placeholder="${translations[userLang].enterLectureDescription}" rows="5">${lectureData.description || ""}</textarea>
       <div class="note-container">
-      <label class="upload">${translations[userLang].chooseVideo}</label>
-      <div class="custom-file-container">
-        <label class="custom-file-upload">
-          ${translations[userLang].chooseFile}
-          <input class="lecture-video" name="lecture_video" type="file" accept="video/*" />
-        </label>
-        <div class="file-names-list">${lectureData.videoFile ? `<span>${lectureData.videoFile}</span>` : ""}</div>
-        
-      </div>
-       <div class="file-warning" style="display: none; color: #ff2600; font-size: 14px; margin-top: 5px; font-weight: 430; margin-bottom: 15px;;" data-lang="note"> ${translations[userLang].note}
-        </div></div>
-        <div class="note-container">
-      <label class="upload">${translations[userLang].chooseFiles}</label>
-      <div class="custom-file-container">
-        <label class="custom-file-upload">
-          ${translations[userLang].chooseFile}
-          <input class="lecture-materials" name="lecture_files" type="file" multiple />
-        </label>
-        <div class="file-names-list">
-          ${lectureData.materialsFiles ? lectureData.materialsFiles.map(file => `<span>${file}</span>`).join("") : ""}
+        <label class="upload">${translations[userLang].chooseVideo}</label>
+        <div class="custom-file-container">
+          <label class="custom-file-upload">
+            ${translations[userLang].chooseFile}
+            <input class="lecture-video" name="lecture_video" type="file" accept="video/*" />
+          </label>
+          <div class="file-names-list">${lectureData.videoFile ? `<span>${lectureData.videoFile}</span>` : ""}</div>
         </div>
-        
+        <div class="file-warning" style="display: none; color: #ff2600; font-size: 14px; margin-top: 5px; font-weight: 430; margin-bottom: 15px;;" data-lang="note"> ${translations[userLang].note}</div>
       </div>
-     <div class="file-warning" style="display: none; color: #ff2600; font-size: 14px; margin-top: 5px; font-weight: 430; margin-bottom: 5px;" data-lang="note"> ${translations[userLang].note}
-        </div></div>`;
+      <div class="note-container">
+        <label class="upload">${translations[userLang].chooseFiles}</label>
+        <div class="custom-file-container">
+          <label class="custom-file-upload">
+            ${translations[userLang].chooseFile}
+            <input class="lecture-materials" name="lecture_files" type="file" multiple />
+          </label>
+          <div class="file-names-list">
+            ${lectureData.materialsFiles ? lectureData.materialsFiles.map(file => `<span>${file}</span>`).join("") : ""}
+          </div>
+        </div>
+        <div class="file-warning" style="display: none; color: #ff2600; font-size: 14px; margin-top: 5px; font-weight: 430; margin-bottom: 5px;" data-lang="note"> ${translations[userLang].note}</div>
+      </div>`;
   lecturesDiv.appendChild(lectureDiv);
 
   // Показує попередження, якщо ще не вибрано файлів
