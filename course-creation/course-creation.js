@@ -19,6 +19,7 @@ const translations = {
     modules: 'Modules',
     addModule: 'Add Module',
     createGenerTest:'Create general test',
+    addGenerTest:'Add general test',
     createCourse: 'Publish Course',
     saveAsDraft: 'Save as Draft',
     programming: 'Programming',
@@ -42,6 +43,8 @@ const translations = {
     addLecture: 'Add Lecture',
     deleteModule: 'Delete Module',
     createTest: 'Create Test',
+    addTest:'Add Test',
+    enterTestlink:'Insert link to test',
     moduleTitle: "Module",
     enterModuleTitle: "Enter module title",
     lecture: "Lecture",
@@ -78,6 +81,7 @@ const translations = {
     modules: 'Модулі',
     addModule: 'Додати модуль',
     createGenerTest:'Створити загальний тест',
+    addGenerTest:'Додати загальний тест',
     createCourse: 'Опублікувати курс',
     saveAsDraft: 'Зберегти як чернетку',
     programming: 'Програмування',
@@ -101,6 +105,8 @@ const translations = {
     addLecture: 'Додати лекцію',
     deleteModule: 'Видалити модуль',
     createTest: 'Створити тест',
+    addTest:'Додати тест',
+    enterTestlink:'Вставте посилання на тест',
     moduleTitle: "Модуль",
     enterModuleTitle: "Введіть назву модуля",
     lecture: "Лекція",
@@ -246,7 +252,17 @@ document.addEventListener('DOMContentLoaded', () => {
     createGeneralTestBtn.addEventListener("click", () => {
         window.location.href = "/test-creation?general=true";
     });
-
+  const addGeneralTestBtn = document.getElementById("add-general-test-btn");
+  addGeneralTestBtn.addEventListener("click", () => {
+    if (!document.querySelector(".gener-test-link-input")) {
+        const testInputDiv = document.createElement("div");
+        testInputDiv.innerHTML = `
+            <input type="text" class="gener-test-link-input"  data-lang="enterTestlink" placeholder="Insert link to test">
+        `;
+        // Додаємо поле після кнопки
+        addGeneralTestBtn.after(testInputDiv);
+    }
+    });
   function addModule(moduleData = { title: "", lectures: [] }) {
     const moduleDiv = document.createElement("div");
     moduleDiv.classList.add("module");  
@@ -258,6 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <button class="add-lecture-btn">${translations[userLang].addLecture}</button>
       <button class="delete-module-btn">${translations[userLang].deleteModule}</button>
       <button class="create-test-btn">${translations[userLang].createTest}</button>
+      <button class="add-test-btn">${translations[userLang].addTest}</button>
     `;
   
     modulesList.appendChild(moduleDiv);
@@ -292,6 +309,15 @@ document.addEventListener('DOMContentLoaded', () => {
           alert("Please enter a module title before creating a test.");
       }
     });
+    moduleDiv.querySelector(".add-test-btn").addEventListener("click", () => {
+      if (!moduleDiv.querySelector(".test-link-input")) {
+          const testInputDiv = document.createElement("div");
+          testInputDiv.innerHTML = `
+              <input type="text" class="test-link-input" data-lang="enterTestlink" placeholder="Insert link to test">
+          `;
+          moduleDiv.appendChild(testInputDiv);
+      }
+  });
   
     saveModulesToLocalStorage();
   }
@@ -411,6 +437,8 @@ function updateModuleNumbers() {
     const modules = [];
     document.querySelectorAll(".module").forEach((moduleDiv) => {
       const moduleTitle = moduleDiv.querySelector("input[type='text']").value;
+      const testLinkInput = moduleDiv.querySelector(".test-link-input"); // Отримуємо поле для посилання на тест
+      const testLink = testLinkInput ? testLinkInput.value.trim() : ""; // Беремо значення або порожній рядок
       const lectures = [];
   
       moduleDiv.querySelectorAll(".lecture").forEach((lectureDiv) => {
@@ -424,7 +452,7 @@ function updateModuleNumbers() {
    
       });
   
-      modules.push({ title: moduleTitle, lectures });
+      modules.push({ title: moduleTitle, testLink: testLink,  lectures });
     });
   
     localStorage.setItem("modules", JSON.stringify(modules));
@@ -588,6 +616,9 @@ function saveDraftAutomatically() {
     const courseEducationLevelElement = educationWrapper ? educationWrapper.querySelector('.select-trigger') : null;
     const courseEducationLevel = courseEducationLevelElement && courseEducationLevelElement.dataset.value ? parseInt(courseEducationLevelElement.dataset.value, 10) : null;
 
+    const GenTestLinkInput = document.querySelector(".gener-test-link-input"); 
+    const GenTestLink = GenTestLinkInput ? GenTestLinkInput.value.trim() : ""; 
+
     const tags = JSON.parse(localStorage.getItem('tagsList')) || [];
 
     
@@ -600,6 +631,8 @@ function saveDraftAutomatically() {
           ? parseInt(moduleDiv.dataset.id, 10) 
           : null; 
       const moduleTitle = moduleDiv.querySelector('input').value;
+      const testLinkInput = moduleDiv.querySelector(".test-link-input"); // Отримуємо поле для посилання на тест
+      const testLink = testLinkInput ? testLinkInput.value.trim() : ""; // Беремо значення або порожній рядок
       const lectures = [];
   
       moduleDiv.querySelectorAll('.lecture').forEach((lectureDiv, lectureIndex) => {
@@ -621,6 +654,7 @@ function saveDraftAutomatically() {
           id: moduleId, 
           title: moduleTitle,
           order_num: moduleIndex + 1,
+          test_link: testLink, 
           lectures: lectures,
       });
   });
@@ -697,6 +731,7 @@ const courseData = {
   removedModules: removedModules.map(module => module.id),
   thumbnail: courseThumbnail ? courseThumbnail.name : null, 
   lectureFiles: addedLectureFiles.map(file => file.name), 
+  test_link: GenTestLink,
 };
 
 localStorage.setItem('courseDraft', JSON.stringify(courseData));
@@ -716,6 +751,7 @@ localStorage.setItem('courseDraft', JSON.stringify(courseData));
     formData.append('tags', JSON.stringify(tags));
     formData.append('modules', JSON.stringify(modules)); 
     formData.append('removed_modules', JSON.stringify(courseData.removedModules)); 
+    formData.append('test_link',GenTestLink);
 
 
     fetch('/api/courses/save-draft', {

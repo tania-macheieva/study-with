@@ -307,7 +307,12 @@ button {
 
   <script>
 document.addEventListener('DOMContentLoaded', () => {
-   
+  const storedTestId = localStorage.getItem('testId');
+
+    if (storedTestId) {
+        document.getElementById('test-id-input').value = storedTestId;
+    }
+
     // Обробник для кнопки "Generate Test"
 document.getElementById('generate-test-btn').addEventListener('click', async function () {
   const testId = document.getElementById('test-id-input').value.trim();

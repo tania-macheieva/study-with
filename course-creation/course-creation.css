@@ -491,7 +491,9 @@ margin-bottom: 10px;
   transform: scale(1.1);  
 }
 .create-test-btn,
-.create-general-test-btn {
+.add-test-btn,
+.create-general-test-btn,
+.add-general-test-btn {
   background-color: #283044;
   color: #ffffff;
   border: none;
@@ -504,10 +506,12 @@ margin-bottom: 10px;
   flex-direction: center;
   margin-right: 20px;
 }
-.create-general-test-btn:hover, .create-test-btn:hover {
+.create-general-test-btn:hover,.add-test-btn:hover, .create-test-btn:hover, .add-general-test-btn:hover {
   background-color: #38435e;
 }
-
+.test-link-input, .gener-test-link-input{
+  margin-top: 20px;
+}
 /* Стиль для контейнера з тегами */
 .tags-container {
   margin-top: 20px;

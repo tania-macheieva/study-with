@@ -69,6 +69,7 @@ CREATE TABLE all_courses (
     image_url VARCHAR(1024),
     education_level_id INT,
     status VARCHAR(20) DEFAULT 'draft',  -- Course status: 'draft' or 'published'
+    test_link VARCHAR(255);
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -108,6 +109,7 @@ CREATE TABLE modules (
     course_id INT NOT NULL,
     title VARCHAR(100) NOT NULL,
     order_num INT NOT NULL,
+    test_link VARCHAR(255);
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_course FOREIGN KEY (course_id) REFERENCES all_courses(id) ON DELETE CASCADE
 );
