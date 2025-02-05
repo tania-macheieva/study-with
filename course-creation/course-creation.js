@@ -56,6 +56,7 @@ const translations = {
     courseTags: "Course Tags (hidden from users)",
     enterTags: "Enter tags",
     tagTip: "To add a tag, press ENTER",
+    note: "Note: Uploaded files will not be saved after refreshing or closing the page. Please add them again.",
   },
   ua: {
     pageTitle: 'StudyWith | Створення курсу',
@@ -114,6 +115,7 @@ const translations = {
     courseTags: "Теги курсу (приховані від користувачів)",
     enterTags: "Введіть теги",
     tagTip: "Щоб додати тег, натисніть ENTER",
+    note: "Примітка: Завантажені файли не будуть збережені після оновлення або закриття сторінки. Будь ласка, додайте їх знову.",
   },
 };
 
@@ -238,105 +240,17 @@ document.addEventListener('DOMContentLoaded', () => {
     saveModulesToLocalStorage();
   });
   
-  
-  // function addModule(moduleData) {
-  //   const moduleDiv = document.createElement("div");
-  //   moduleDiv.classList.add("module");
-  //   moduleDiv.id = moduleData.id;
-  
-  //   const moduleTitle = translations[userLang].moduleTitle;
-  //   const enterModuleTitle = translations[userLang].enterModuleTitle;
-  
-  //   moduleDiv.innerHTML = `
-  //     <p class="title-2">${moduleTitle} ${moduleCounter - 1}</p>
-  //     <input type="text" placeholder="${enterModuleTitle}" value="${moduleData.title}">
-  //     <div class="lectures"></div>
-  //     <button class="add-lecture-btn">${translations[userLang].addLecture}</button>
-  //     <button class="delete-module-btn">${translations[userLang].deleteModule}</button>
-  //   `;
-  
-  //   modulesList.appendChild(moduleDiv);
-  
-  //   const addLectureBtn = moduleDiv.querySelector(".add-lecture-btn");
-  //   const deleteModuleBtn = moduleDiv.querySelector(".delete-module-btn");
-  //   let lectureCounter = 1;
-  
-  //   addLectureBtn.addEventListener("click", (event) => {
-  //     event.preventDefault();
-  //     const lecturesDiv = moduleDiv.querySelector(".lectures");
-  //     const lectureDiv = document.createElement("div");
-  //     lectureDiv.classList.add("lecture");
-  
-  //     const lectureTitle = translations[userLang].lectureTitle;
-  //     const enterLectureDescription = translations[userLang].enterLectureDescription;
-  //     const uploadVideoLabel = translations[userLang].uploadVideo;
-  //     const chooseVideoLabel = translations[userLang].chooseVideo;
-  
-  //     lectureDiv.innerHTML = `
-  //       <div class="container">
-  //         <p class="title-3">${translations[userLang].lecture} ${lectureCounter}</p>
-  //         <button class="delete-lecture-btn"><img src="../images/delete.png" alt=""></button>
-  //       </div>
-  //       <input type="text" placeholder="${lectureTitle}">
-  //       <label class="title-3" for="lecture-description">${translations[userLang].enterLectureDescription}</label>
-  //       <textarea placeholder="${enterLectureDescription}" rows="5"></textarea>
-  //       <label class="upload">${translations[userLang].chooseVideo}</label>
-  //       <div class="custom-file-container">
-  //         <label class="custom-file-upload">
-  //           ${translations[userLang].chooseFile}
-  //           <input class="lecture-video" name="lecture_video" type="file" accept="video/*" />
-  //         </label>
-  //         <div class="file-names-list"></div>
-  //       </div>
-  //       <label class="upload">${translations[userLang].chooseFiles}</label>
-  //       <div class="custom-file-container">
-  //         <label class="custom-file-upload">
-  //           ${translations[userLang].chooseFile}
-  //           <input class="lecture-materials" name="lecture_files" type="file" />
-  //         </label>
-  //         <div class="file-names-list"></div>
-  //       </div>
-  //     `;
-  
-  //     lecturesDiv.appendChild(lectureDiv);
-  
-  //     const deleteLectureBtn = lectureDiv.querySelector(".delete-lecture-btn");
-  //     deleteLectureBtn.addEventListener("click", () => {
-  //       lectureDiv.remove();
-  //       saveModulesToLocalStorage();
-  //     });
-  
-  //     // Обробка завантаження файлів для лекцій
-  //     handleFileInputs(lectureDiv, 'lecture-video');
-  //     handleFileInputs(lectureDiv, 'lecture-materials');
-      
-  //     lectureCounter++;
-  //     updateLectureNumbers(moduleDiv);
-  //     saveModulesToLocalStorage();
-  //   });
-  
-  //   deleteModuleBtn.addEventListener("click", () => {
-  //     if (confirm(translations[userLang].confirmDeleteModule)) {
-  //       moduleDiv.remove();
-  //       saveModulesToLocalStorage();
-  //       updateModuleNumbers();
-  //     }
-  //   });
-  
-  //   updateModuleNumbers();
-  //   saveModulesToLocalStorage();
-  // }
-  //Обробник ля створення загального тесту
   const createGeneralTestBtn = document.getElementById("create-general-test-btn");
 
     // Додаємо обробник події для переходу на сторінку створення загального тесту
     createGeneralTestBtn.addEventListener("click", () => {
         window.location.href = "/test-creation?general=true";
     });
+
   function addModule(moduleData = { title: "", lectures: [] }) {
     const moduleDiv = document.createElement("div");
-    moduleDiv.classList.add("module");
-  
+    moduleDiv.classList.add("module");  
+
     moduleDiv.innerHTML = `
       <p class="title-2">${translations[userLang].moduleTitle} ${moduleCounter - 1}</p>
       <input type="text" placeholder="${translations[userLang].enterModuleTitle}" value="${moduleData.title}">
@@ -354,7 +268,9 @@ document.addEventListener('DOMContentLoaded', () => {
         addLecture(moduleDiv, lectureData);
       });
     }
-  
+    const moduleTitleInput = moduleDiv.querySelector("input[type='text']");
+    moduleTitleInput.addEventListener("input", saveModulesToLocalStorage);
+    
     moduleDiv.querySelector(".add-lecture-btn").addEventListener("click", (e) => {
       e.preventDefault();  
       addLecture(moduleDiv);
@@ -398,7 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <input type="text" placeholder="${translations[userLang].lectureTitle}" value="${lectureData.title || ""}">
       <label class="title-3">${translations[userLang].enterLectureDescription}</label>
       <textarea placeholder="${translations[userLang].enterLectureDescription}" rows="5">${lectureData.description || ""}</textarea>
-      
+      <div class="note-container">
       <label class="upload">${translations[userLang].chooseVideo}</label>
       <div class="custom-file-container">
         <label class="custom-file-upload">
@@ -406,8 +322,11 @@ document.addEventListener('DOMContentLoaded', () => {
           <input class="lecture-video" name="lecture_video" type="file" accept="video/*" />
         </label>
         <div class="file-names-list">${lectureData.videoFile ? `<span>${lectureData.videoFile}</span>` : ""}</div>
+        
       </div>
-      
+       <div class="file-warning" style="display: none; color: #ff2600; font-size: 14px; margin-top: 5px; font-weight: 430; margin-bottom: 15px;;" data-lang="note"> ${translations[userLang].note}
+        </div></div>
+        <div class="note-container">
       <label class="upload">${translations[userLang].chooseFiles}</label>
       <div class="custom-file-container">
         <label class="custom-file-upload">
@@ -417,66 +336,55 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="file-names-list">
           ${lectureData.materialsFiles ? lectureData.materialsFiles.map(file => `<span>${file}</span>`).join("") : ""}
         </div>
+        
       </div>
-    `;
-  
-    lecturesDiv.appendChild(lectureDiv);
-  
-    // Оновлення списку файлів при виборі
-    lectureDiv.querySelector(".lecture-video").addEventListener("change", function () {
-      updateFileNamesList(this, lectureDiv.querySelector(".file-names-list"));
-    });
-  
-    lectureDiv.querySelector(".lecture-materials").addEventListener("change", function () {
-      updateFileNamesList(this, lectureDiv.querySelectorAll(".file-names-list")[1]);
-    });
-  
+     <div class="file-warning" style="display: none; color: #ff2600; font-size: 14px; margin-top: 5px; font-weight: 430; margin-bottom: 5px;" data-lang="note"> ${translations[userLang].note}
+        </div></div>`;
+  lecturesDiv.appendChild(lectureDiv);
+
+  // Показує попередження, якщо ще не вибрано файлів
+  function showWarning(warningElement) {
+    warningElement.style.display = "block";
+    setTimeout(() => {
+        warningElement.style.display = "none";
+    }, 10000);
+  }
+
+  // Перевірка на оновлення сторінки та показ попередження
+  const videoWarning = lectureDiv.querySelector(".lecture-video").closest(".note-container").querySelector(".file-warning");
+  const materialsWarning = lectureDiv.querySelector(".lecture-materials").closest(".note-container").querySelector(".file-warning");
+
+  // Показувати попередження тільки після першого завантаження
+  if (!lectureData.videoFile) showWarning(videoWarning);
+  if (!lectureData.materialsFiles || lectureData.materialsFiles.length === 0) showWarning(materialsWarning);
+
+  // Обробники подій для вибору файлів
+  lectureDiv.querySelector(".lecture-video").addEventListener("change", function () {
+    updateFileNamesList(this, lectureDiv.querySelector(".file-names-list"));
+  });
+
+  lectureDiv.querySelector(".lecture-materials").addEventListener("change", function () {
+    updateFileNamesList(this, lectureDiv.querySelectorAll(".file-names-list")[1]);
+  });
+
+
     // Видалення лекції
     lectureDiv.querySelector(".delete-lecture-btn").addEventListener("click", () => {
-      lectureDiv.remove();
-      saveModulesToLocalStorage();
-      updateLectureNumbers(moduleDiv);
+        lectureDiv.remove();
+        saveModulesToLocalStorage();
+        updateLectureNumbers(moduleDiv);
     });
-  
+
     lectureDiv.querySelector("input[type='text']").addEventListener("input", saveModulesToLocalStorage);
     lectureDiv.querySelector("textarea").addEventListener("input", saveModulesToLocalStorage);
-  
-    saveModulesToLocalStorage();
-  }
+ 
+}
   
   function updateFileNamesList(inputElement, fileNamesList) {
     const files = Array.from(inputElement.files).map(file => file.name);
-    fileNamesList.innerHTML = files.length > 0 ? files.map(name => `<span>${name}</span>`).join("") : "";
-    saveModulesToLocalStorage();
+    fileNamesList.innerHTML = files.length > 0 ? files.map(name => `<span>${name}</span>`).join("") : ""; 
   }
-  
-  
-  // // Функція для обробки файлів (матеріалів та відео)
-  // function handleFileInputs(lectureDiv, inputClass) {
-  //   const input = lectureDiv.querySelector(`.${inputClass}`);
-  //   const fileNamesList = lectureDiv.querySelector(`.file-names-list`);
-  
-  //   input.addEventListener("change", function (event) {
-  //     const files = event.target.files;
-  //     fileNamesList.innerHTML = ''; 
-  
-  //     Array.from(files).forEach(file => {
-  //       const fileNameItem = document.createElement("div");
-  //       fileNameItem.classList.add("file-name-item");
-  //       fileNameItem.innerHTML = `
-  //         <span class="file-name">${file.name}</span>
-  //         <button class="delete-file-btn">✖</button>
-  //       `;
-  //       fileNamesList.appendChild(fileNameItem);
-  
-  //       const deleteFileBtn = fileNameItem.querySelector(".delete-file-btn");
-  //       deleteFileBtn.addEventListener("click", () => {
-  //         fileNamesList.removeChild(fileNameItem);
-  //       });
-  //     });
-  //   });
-  // }
-  
+
   // Оновлює номера лекцій
   function updateLectureNumbers(moduleDiv) {
     const lectures = moduleDiv.querySelectorAll('.lecture');
@@ -489,13 +397,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   // Оновлює номери модулів
-  function updateModuleNumbers() {
-    const modules = document.querySelectorAll(".module");
-    modules.forEach((moduleDiv, index) => {
-      const moduleTitle = moduleDiv.querySelector(".title-2");
-      moduleTitle.innerText = `${translations[userLang].moduleTitle} ${index + 1}`;
-    });
-  }
+function updateModuleNumbers() {
+  const modules = document.querySelectorAll(".module");
+  modules.forEach((moduleDiv, index) => {
+    const moduleTitle = moduleDiv.querySelector(".title-2");
+    moduleTitle.innerText = `${translations[userLang].moduleTitle} ${index + 1}`;
+    moduleDiv.dataset.index = index + 1; // Оновлюємо dataset для збереження порядку
+  });
+
+  moduleCounter = modules.length + 1; // Оновлення лічильника модулів
+}
+
   
   function saveModulesToLocalStorage() {
     const modules = [];
@@ -507,26 +419,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const lectureTitle = lectureDiv.querySelector("input[type='text']").value || "";
         const lectureDescription = lectureDiv.querySelector("textarea").value || "";
         
-        // Отримання вибраних файлів
-        const videoFileInput = lectureDiv.querySelector(".lecture-video");
-        const materialsFileInput = lectureDiv.querySelector(".lecture-materials");
-  
-        // Назви файлів для відображення
-        const videoFile = videoFileInput.files.length > 0 ? videoFileInput.files[0].name : lectureDiv.dataset.videoFile || "";
-        const materialsFiles = materialsFileInput.files.length > 0 
-          ? Array.from(materialsFileInput.files).map(file => file.name) 
-          : lectureDiv.dataset.materialsFiles ? JSON.parse(lectureDiv.dataset.materialsFiles) : [];
-  
         lectures.push({
           title: lectureTitle,
-          description: lectureDescription,
-          videoFile: videoFile,
-          materialsFiles: materialsFiles
+          description: lectureDescription, 
         });
-  
-        // Оновлення data-атрибутів
-        lectureDiv.dataset.videoFile = videoFile;
-        lectureDiv.dataset.materialsFiles = JSON.stringify(materialsFiles);
+   
       });
   
       modules.push({ title: moduleTitle, lectures });
@@ -599,13 +496,10 @@ document.addEventListener('DOMContentLoaded', function () {
   const tagsInput = document.getElementById("course-tags");
   const tagsListContainer = document.getElementById("tags-list");
 
-  // Читання часу останнього відвідування
   const lastVisitTime = localStorage.getItem('lastVisitTime');
   const currentTime = new Date().getTime();
 
-  // Перевіряємо, чи пройшло більше 10 секунд після останнього відвідування
   if (lastVisitTime && (currentTime - lastVisitTime > 10000)) {
-    // Якщо так, очищаємо теги
     tagsList = [];
     saveTagsToLocalStorage();
   }
@@ -622,16 +516,16 @@ document.addEventListener('DOMContentLoaded', function () {
         tagsInput.value = '';
         updateTagsDisplay();
         saveTagsToLocalStorage();
-        tagsInput.focus();  // Refocus the input after adding tag
+        tagsInput.focus();  
       }
     }
   });
 
   // Очищення тегів
   function clearTags() {
-    tagsList = [];  // Очистити список тегів
-    updateTagsDisplay();  // Перерендерити відображення тегів
-    saveTagsToLocalStorage();  // Зберегти порожній список в localStorage
+    tagsList = []; 
+    updateTagsDisplay(); 
+    saveTagsToLocalStorage();  
   }
 
   // Оновлення відображення тегів
@@ -659,7 +553,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Збереження тегів в localStorage
   function saveTagsToLocalStorage() {
     localStorage.setItem('tagsList', JSON.stringify(tagsList));
-    localStorage.setItem('lastVisitTime', currentTime);  // Зберігаємо час останнього відвідування
+    localStorage.setItem('lastVisitTime', currentTime);
   }
 
   // Збереження часу при покиданні сторінки
@@ -831,250 +725,10 @@ localStorage.setItem('courseDraft', JSON.stringify(courseData));
         body: formData,
     })
     .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            console.log("Course saved as draft!");
-        } else {
-            alert("Failed to save draft: " + (data.error || 'Unknown error'));
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while saving the draft.');
-    });
+   
   }
 
 setInterval(saveDraftAutomatically, 10000);  
-
-
-// window.addEventListener('beforeunload', () => {
-//   // Зберігаємо час закриття сторінки в localStorage
-//   localStorage.setItem('lastClosedTime', Date.now());
-//   const selectedCategory = localStorage.getItem('selectedCategory');
-
-//   // Зберігаємо дані чернетки
-//   const courseData = {
-//     title: document.querySelector("input[data-lang='enterCourseTitle']").value,
-//     description: document.querySelector("textarea[data-lang='enterDescription']").value,
-//     price: document.querySelector("input[data-lang='enterPrice']").value,
-//     category: courseCategory,
-//     educationLevel: courseEducationLevel,
-//     tags: JSON.parse(localStorage.getItem('tags')) || [],
-//     modules: [...document.querySelectorAll('#modules-container .module')].map(module => {
-//       return {
-//         id: module.dataset.id,
-//         title: module.querySelector('input[type="text"]').value,
-//         lectures: [...module.querySelectorAll('.lecture')].map(lecture => {
-//           return {
-//             id: lecture.dataset.id,
-//             title: lecture.querySelector('input[type="text"]').value,
-//             description: lecture.querySelector('textarea').value
-//           };
-//         })
-//       };
-//     }),
-//     lectureFiles: [...document.querySelectorAll('#file-names-list li')].map(fileItem => fileItem.textContent),
-//     lectureVideos: [...document.querySelectorAll('#video-names-list li')].map(videoItem => videoItem.textContent),
-
-//   };
-
-//   localStorage.setItem('courseDraft', JSON.stringify(courseData));
-//   const thumbnail = document.querySelector("#course_thumbnail").files[0] ? document.querySelector("#course_thumbnail").files[0].name : null;
-//   if (thumbnail) {
-//     localStorage.setItem('courseThumbnail', thumbnail);
-//   }
-
-// });
-
-// window.addEventListener('load', () => {
-//   const lastClosedTime = localStorage.getItem('lastClosedTime');
-//   if (lastClosedTime) {
-//     const elapsedTime = Date.now() - parseInt(lastClosedTime, 10);
-//     // Якщо минуло більше 10 секунд, очищаємо чернетку, окрім authorId
-//     if (elapsedTime > 10000) {
-//       const authorId = JSON.parse(localStorage.getItem('courseDraft'))?.authorId || null;
-//       localStorage.setItem('courseDraft', JSON.stringify({ authorId }));
-//       console.log("Чернетка очищена, окрім authorId");
-//     }
-//   }
-
-//   // Завантажуємо дані чернетки з localStorage
-//   const savedCourseData = JSON.parse(localStorage.getItem('courseDraft')) || {};
-
-//   // Заповнюємо поля форми
-//   const courseTitleElement = document.querySelector("input[data-lang='enterCourseTitle']");
-//   if (courseTitleElement) {
-//     courseTitleElement.value = savedCourseData.title || '';
-//   }
-
-//   const courseDescriptionElement = document.querySelector("textarea[data-lang='enterDescription']");
-//   if (courseDescriptionElement) {
-//     courseDescriptionElement.value = savedCourseData.description || '';
-//   }
-
-//   const coursePriceElement = document.querySelector("input[data-lang='enterPrice']");
-//   if (coursePriceElement) {
-//     coursePriceElement.value = savedCourseData.price || '';
-//   }
-
-//   // Перевірка категорії
-//   const categoryWrapper = document.getElementById('category-wrapper');
-// const selectTriggerCategory = categoryWrapper.querySelector('.select-trigger');
-// const optionsCategory = categoryWrapper.querySelectorAll('.option');
-
-// optionsCategory.forEach(option => {
-//   option.addEventListener('click', () => {
-//     const selectedValue = option.dataset.value;
-//     localStorage.setItem('selectedCategory', selectedValue);
-
-//     // Оновлення тексту вибраної категорії
-//     selectTriggerCategory.querySelector('span').textContent = option.textContent;
-
-//     // Видаляємо клас "selected" з усіх елементів
-//     optionsCategory.forEach(opt => opt.classList.remove('selected'));
-//     option.classList.add('selected');
-//   });
-// });
-// const savedCategory = localStorage.getItem('selectedCategory');
-
-// if (savedCategory) {
-//   const selectedOptionCategory = [...optionsCategory].find(option => option.dataset.value === savedCategory);
-//   if (selectedOptionCategory) {
-//     selectedOptionCategory.classList.add('selected');
-//     selectTriggerCategory.querySelector('span').textContent = selectedOptionCategory.textContent;
-//   }
-// }
-
-
-
-  // // Перевірка рівня освіти
-  // const educationWrapper = document.getElementById('education-wrapper');
-  // const selectTriggerEducation = educationWrapper.querySelector('.select-trigger');
-  // const optionsEducation = educationWrapper.querySelectorAll('.option');
-  
-  // // Збереження вибраного рівня освіти в localStorage
-  // optionsEducation.forEach(option => {
-  //   option.addEventListener('click', () => {
-  //     const selectedValue = option.dataset.value;
-  //     localStorage.setItem('selectedEducationLevel', selectedValue);
-  
-  //     // Оновлюємо текст тригера
-  //     selectTriggerEducation.querySelector('span').textContent = option.textContent;
-  
-  //     // Додаємо клас 'selected' до вибраного елемента
-  //     optionsEducation.forEach(opt => opt.classList.remove('selected'));
-  //     option.classList.add('selected');
-  //   });
-  // });
-  // const savedEducationLevel = localStorage.getItem('selectedEducationLevel');
-
-  // if (savedEducationLevel) {
-  //   const selectedOption = [...optionsEducation].find(option => option.dataset.value === savedEducationLevel);
-  //   if (selectedOption) {
-  //     selectedOption.classList.add('selected');
-  //     selectTriggerEducation.querySelector('span').textContent = selectedOption.textContent;
-  //   }
-  // }
-  
-
-  // // Виведення тегів
-  // const tagsInput = document.getElementById('course-tags');
-  // const tagsList = document.getElementById('tags-list');
-  // let existingTags = savedCourseData.tags || [];
-
-  // existingTags.forEach(tag => {
-  //   const tagElement = document.createElement('div');
-  //   tagElement.textContent = tag;
-  //   tagElement.classList.add('tag');
-  //   tagsList.appendChild(tagElement);
-  // });
-
-  // tagsInput.value = savedCourseData.tags ? savedCourseData.tags.join(', ') : '';
-
-  // tagsInput.addEventListener('keydown', function (e) {
-  //   if (e.key === 'Enter' && tagsInput.value.trim()) {
-  //     const newTag = tagsInput.value.trim();
-
-  //     if (!existingTags.includes(newTag)) {
-  //       existingTags.push(newTag);
-  //       localStorage.setItem('tags', JSON.stringify(existingTags));
-
-  //       const tagElement = document.createElement('div');
-  //       tagElement.textContent = newTag;
-  //       tagElement.classList.add('tag');
-  //       tagsList.appendChild(tagElement);
-
-  //       tagsInput.value = '';
-  //     }
-  //   }
-  // });
-//   const thumbnailInput = document.querySelector("#course_thumbnail");
-//   const fileNameSpan = document.querySelector("#file-name");
-
-//   // Відновлення thumbnail з localStorage
-//   const savedThumbnail = localStorage.getItem('courseThumbnail');
-//   if (savedThumbnail) {
-//     fileNameSpan.textContent = savedThumbnail;
-//   }
-
-//   thumbnailInput.addEventListener('change', (event) => {
-//     const file = event.target.files[0];
-//     if (file) {
-//       fileNameSpan.textContent = file.name;
-//       // Зберігаємо в localStorage
-//       localStorage.setItem('courseThumbnail', file.name);
-//     }
-//   });
-
-
-//   // Перевірка та відображення модулів і лекцій
-//   const modulesContainer = document.getElementById('modules-container');
-//   if (modulesContainer && savedCourseData.modules) {
-//     savedCourseData.modules.forEach(module => {
-//       const moduleElement = document.createElement('div');
-//       moduleElement.classList.add('module');
-//       moduleElement.dataset.id = module.id;
-//       moduleElement.innerHTML = `
-//         <input type="text" value="${module.title}" />
-//         <div class="lectures"></div>
-//       `;
-
-//       const lecturesContainer = moduleElement.querySelector('.lectures');
-//       module.lectures.forEach(lecture => {
-//         const lectureElement = document.createElement('div');
-//         lectureElement.classList.add('lecture');
-//         lectureElement.dataset.id = lecture.id;
-//         lectureElement.innerHTML = `
-//           <input type="text" value="${lecture.title}" />
-//           <textarea>${lecture.description}</textarea>
-//         `;
-//         lecturesContainer.appendChild(lectureElement);
-//       });
-
-//       modulesContainer.appendChild(moduleElement);
-//     });
-//   }
-
-//   // Виведення файлів лекцій
-//   const fileNamesList = document.getElementById('file-names-list');
-//   if (fileNamesList && savedCourseData.lectureFiles) {
-//     savedCourseData.lectureFiles.forEach(fileName => {
-//       const fileItem = document.createElement('li');
-//       fileItem.textContent = fileName;
-//       fileNamesList.appendChild(fileItem);
-//     });
-//   }
-
-//   // Виведення відео лекцій
-//   const videoNamesList = document.getElementById('video-names-list');
-//   if (videoNamesList && savedCourseData.lectureVideos) {
-//     savedCourseData.lectureVideos.forEach(videoName => {
-//       const videoItem = document.createElement('li');
-//       videoItem.textContent = videoName;
-//       videoNamesList.appendChild(videoItem);
-//     });
-//   }
-// });
 
 window.addEventListener('beforeunload', () => {
   localStorage.setItem('lastClosedTime', Date.now());
@@ -1112,7 +766,18 @@ window.addEventListener('load', () => {
 
   const coursePriceElement = document.querySelector("input[data-lang='enterPrice']");
   if (coursePriceElement) coursePriceElement.value = savedCourseData.price || '';
-
+  
+  if (!savedCourseData.thumbnail) {
+    document.getElementById('file-warning').style.display = 'block';
+  }
+  if (!savedCourseData.thumbnail) {
+    const warning = document.getElementById('file-warning');
+    warning.style.display = 'block';
+    setTimeout(() => {
+      warning.style.display = 'none';
+    }, 10000);
+  }
+  
   // Відновлення збереженої категорії
   const savedCategory = localStorage.getItem('selectedCategory');
   if (savedCategory) {
@@ -1186,7 +851,7 @@ document.querySelector("input[data-lang='enterPrice']").addEventListener('input'
   
 document.getElementById("save-draft-btn").addEventListener("click", function() {   
   saveDraftAutomatically();
-  // window.location.href = '/profile-teacher';
+  window.location.href = '/profile-teacher';
 });
 
 
@@ -1321,13 +986,8 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
       .then(response => response.json())
       .then(data => {
         if (data.success) { 
-          // window.location.href = '/profile-teacher';
-        } else {
-          alert('Failed to create the course: ' + (data.error || 'Unknown error'));
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while creating the course.');
+          window.location.href = '/profile-teacher';
+        } 
+        
       });
   });  

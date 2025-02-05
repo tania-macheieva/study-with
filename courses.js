@@ -158,10 +158,6 @@ const upload = multer({ storage }).fields([
   
         const modulePromises = modulesArray.map(async (module) => {
           const { id, title, order_num, lectures: moduleLectures } = module;
-  
-          if (!title || !order_num) {
-            throw new Error('Module must have a title and order_num.');
-          }
           let moduleId = id;
   
           if (!moduleId) {
@@ -180,11 +176,6 @@ const upload = multer({ storage }).fields([
           if (moduleLectures && Array.isArray(moduleLectures)) {
             const lecturePromises = moduleLectures.map(async (lecture, index) => {
               const { id: lectureId, title, description } = lecture;
-  
-              if (!title) {
-                throw new Error('Lecture must have a title.');
-              }
-  
               if (lectureId) {
                 await pool.query(
                   `UPDATE lectures SET title = $1, description = $2 WHERE id = $3`,
@@ -417,10 +408,7 @@ router.post('/create', upload, async (req, res) => {
             
             const modulePromises = modulesArray.map(async (module) => {
               const { id, title, order_num, lectures: moduleLectures } = module;
-          
-              if (!title || !order_num) {
-                throw new Error('Module must have a title and order_num.');
-              }
+
               const existingModuleResult = await pool.query(
                 `SELECT id FROM modules WHERE course_id = $1 AND order_num = $2`,
                 [courseId, order_num]
@@ -440,16 +428,10 @@ router.post('/create', upload, async (req, res) => {
                 );
                 moduleId = moduleResult.rows[0].id;
             }
-            
-          
               
               if (moduleLectures && Array.isArray(moduleLectures)) {
                 const lecturePromises = moduleLectures.map(async (lecture, index) => {
                   const { id: lectureId, title, description } = lecture;
-          
-                  if (!title) {
-                    throw new Error('Lecture must have a title.');
-                  }
           
                   if (lectureId) {
                     
