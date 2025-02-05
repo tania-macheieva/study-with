@@ -115,7 +115,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-    setTimeout(() => {
+
+            setTimeout(() => {
         limitVisibleItems(".courses-list", 3, ".btn-view-all-1");
         limitVisibleItems(".reviews-list", 3, ".btn-view-all-2");
     }, 100);
@@ -290,7 +291,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             `).join('')
                 : '<p>No reviews available</p>';  
             
-            console.log('Reviews HTML:', reviewsList.innerHTML);
         }
         
 

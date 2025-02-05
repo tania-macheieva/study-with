@@ -225,4 +225,5 @@ CREATE TABLE enrollments (
     UNIQUE(user_id, course_id)
 );
 
-
+-- колонка для  stripe акаунту
+ALTER TABLE all_courses ADD COLUMN author_stripe_account VARCHAR(255);

@@ -160,6 +160,21 @@
 </body>
 
 <script>
+    function toggleViewAllButton(containerClass, buttonClass, threshold = 3) {
+            const containers = document.querySelectorAll(`.${containerClass}`);
+            containers.forEach(container => {
+                const items = container.querySelectorAll(':scope > div');
+                const viewAllButton = container.parentElement.querySelector(`.${buttonClass}`);
+
+                if (viewAllButton) {
+                    if (items.length > threshold) {
+                        viewAllButton.style.display = 'block';
+                    } else {
+                        viewAllButton.style.display = 'none';
+                    }
+                }
+            });
+        }
  document.addEventListener('DOMContentLoaded', function () {
     const uploadInput = document.getElementById('upload-image');
     const profileImage = document.getElementById('profile-image');
@@ -867,12 +882,20 @@
         }
     });
 
-     // Функція для завантаження профілю вчителя
+     // Функція для оновлення імені користувача
+     function updateUsername(username) {
+         const usernameElement = document.getElementById('username');
+         if (usernameElement) {
+             usernameElement.textContent = username || 'username';
+         }
+     }
+
+     // Модифікована функція fetchTeacherProfile
      async function fetchTeacherProfile() {
          const userId = localStorage.getItem('userId');
 
          if (!userId) {
-             console.log('User  not authenticated');
+             console.log('User not authenticated');
              return;
          }
 
@@ -885,14 +908,16 @@
 
              const data = await response.json();
 
-             // Оновлення зображення профілю, якщо воно існує
+             // Оновлення зображення профілю
              if (data.profile_image) {
                  document.getElementById('profile-image').src = data.profile_image;
              }
 
-             // Оновлення імені користувача, якщо воно існує
-             const username = data.nickname || data.real_name || 'User ';
-             document.getElementById('username').textContent = username;
+             // Оновлення імені користувача з перевіркою
+             const username = data.nickname || data.real_name;
+             if (username) {
+                 updateUsername(username);
+             }
 
              return data;
          } catch (err) {
@@ -945,6 +970,8 @@
              const coursesContainer = document.getElementById('enrolled-courses');
              coursesContainer.innerHTML = '<p class="error-message">Failed to load courses. Please try again later.</p>';
          }
+             toggleViewAllButton('courses-list', 'btn-view-all-1');
+
      }
 
      // Виклик функцій під час завантаження сторінки
@@ -952,6 +979,9 @@
          fetchTeacherProfile();
          loadEnrolledCourses();
      });
+    toggleViewAllButton('courses-list', 'btn-view-all-1');
+     toggleViewAllButton('certificates-list', 'btn-view-all-3');
+     toggleViewAllButton('bookmarks-list', 'btn-view-all-4');
     });
 </script>
 <script src="../header/auth-header.js"></script>

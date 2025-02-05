@@ -861,7 +861,7 @@ router.get('/profile/teacher/:id', async (req, res) => {
 
     try {
         const profileResult = await pool.query(
-    `SELECT
+            `SELECT
         u.name AS real_name,
         u.profile_image,
         u.phone_number,
@@ -941,9 +941,9 @@ router.get('/profile/teacher/:id', async (req, res) => {
 router.put('/profile/teacher/:id', async (req, res) => {
     const userId = req.params.id;
     const {
-        name,           
-        phone_number,   
-        nickname,       
+        name,
+        phone_number,
+        nickname,
         about,
         education,
         experience,
@@ -954,7 +954,8 @@ router.put('/profile/teacher/:id', async (req, res) => {
         city,
         zip_code,
         specialty,
-        professional_experience
+        professional_experience,
+        author_stripe_account
     } = req.body;
 
     try {
@@ -974,22 +975,23 @@ router.put('/profile/teacher/:id', async (req, res) => {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        const updateTeacherResult = await pool.query(
+                const updateTeacherResult = await pool.query(
             `UPDATE teachers 
-             SET nickname = $1,
-                 about = $2,
-                 education = $3,
-                 experience = $4,
-                 hobbies = $5,
-                 language = $6,
-                 dob = $7,
-                 country = $8,
-                 city = $9,
-                 zip_code = $10,
-                 specialty = $11,
-                 professional_experience = $12
-             WHERE user_id = $13 
-             RETURNING *`,
+            SET nickname = $1,
+                about = $2,
+                education = $3,
+                experience = $4,
+                hobbies = $5,
+                language = $6,
+                dob = $7,
+                country = $8,
+                city = $9,
+                zip_code = $10,
+                specialty = $11,
+                professional_experience = $12,
+                author_stripe_account = $13
+            WHERE user_id = $14 
+            RETURNING *`,
             [
                 nickname,
                 about,
@@ -1003,6 +1005,7 @@ router.put('/profile/teacher/:id', async (req, res) => {
                 zip_code,
                 specialty,
                 professional_experience,
+                author_stripe_account,
                 userId
             ]
         );
@@ -1013,16 +1016,26 @@ router.put('/profile/teacher/:id', async (req, res) => {
                 `INSERT INTO teachers (
                     user_id, nickname, about, education, experience, 
                     hobbies, language, dob, country, city, 
-                    zip_code, specialty, professional_experience 
+                    zip_code, specialty, professional_experience, author_stripe_account
+
                     
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
                 [
                     userId, nickname, about, education, experience,
                     hobbies, language, dob, country, city,
-                    zip_code, specialty, professional_experience
+                    zip_code, specialty, professional_experience, author_stripe_account
                 ]
             );
         }
+
+     if (author_stripe_account) {
+    await pool.query(
+        `UPDATE all_courses 
+        SET author_stripe_account = $1 
+        WHERE author_id = $2`,
+        [author_stripe_account, userId]
+    );
+}
 
         await pool.query('COMMIT'); 
 
@@ -1030,7 +1043,8 @@ router.put('/profile/teacher/:id', async (req, res) => {
             message: 'Profile updated successfully',
             data: {
                 ...updateUserResult.rows[0],
-                ...updateTeacherResult.rows[0]
+                ...updateTeacherResult.rows[0],
+                author_stripe_account
             }
         });
     } catch (error) {
