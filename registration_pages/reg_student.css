@@ -1,4 +1,44 @@
-/* Загальні стилі */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FFFFFF;
+  margin: 5px 2px;
+  margin-top: 60px;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #283044;
+  border-radius: 12px;
+  min-height: 40px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #506088;
+}
+
+::-webkit-scrollbar:horizontal {
+  height: 10px;
+}
+
+::-webkit-scrollbar-track-horizontal {
+  background: #FFFFFF;
+  margin: 2px 5px;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb-horizontal {
+  background: #283044;
+  border-radius: 12px;
+  min-width: 40px;
+}
+
+::-webkit-scrollbar-thumb-horizontal:hover {
+  background: #506088;
+}
+
 body {
   font-family: "Inter", sans-serif;
   margin: 0;
@@ -7,7 +47,6 @@ body {
   color: #333;
 }
 
-/* Контент */
 .content {
   display: flex;
   justify-content: center;
@@ -22,7 +61,6 @@ body {
   transform: translateX(-60px) translateY(-70px);
 }
 
-/* Форма */
 .form-container {
   max-width: 340px;
   height: 560px;
