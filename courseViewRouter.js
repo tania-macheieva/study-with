@@ -7,7 +7,10 @@ router.get('/course/:courseId', async (req, res) => {
         const { courseId } = req.params;
         const userId = req.query.userId;
         
+        console.log('Отримано запит на курс:', { courseId, userId }); // Додаємо логування
+
         if (!courseId || isNaN(courseId)) {
+            console.log('Неправильний ID курсу:', courseId);
             return res.status(400).json({ 
                 error: 'Invalid course ID',
                 details: 'Course ID must be a valid number'
@@ -15,6 +18,7 @@ router.get('/course/:courseId', async (req, res) => {
         }
 
         if (!userId) {
+            console.log('Відсутній ID користувача');
             return res.status(400).json({ 
                 error: 'User ID is required',
                 details: 'Please provide a valid user ID'
@@ -23,17 +27,7 @@ router.get('/course/:courseId', async (req, res) => {
 
         const courseIdNum = parseInt(courseId, 10);
         
-        const enrollmentCheck = await db.query(`
-            SELECT id FROM enrollments 
-            WHERE user_id = $1 AND course_id = $2 AND status = 'active'
-        `, [userId, courseIdNum]);
-
-        if (enrollmentCheck.rows.length === 0) {
-            return res.status(403).json({
-                error: 'Access denied',
-                details: 'User is not enrolled in this course'
-            });
-        }
+        console.log('Виконуємо запит до бази даних...'); // Додаємо логування
 
         const courseQuery = `
             SELECT 
@@ -49,23 +43,29 @@ router.get('/course/:courseId', async (req, res) => {
                 l.title as lecture_title,
                 l.description as lecture_description,
                 l.order_num as lecture_order,
-                lf.file_url as lecture_file_url,
-                lf.file_type as lecture_file_type
+                lf.file_url,
+                lf.file_type,
+                COALESCE(lp.completed, false) as is_completed
             FROM all_courses c
             LEFT JOIN users u ON c.author_id = u.id
             LEFT JOIN modules m ON c.id = m.course_id
             LEFT JOIN lectures l ON m.id = l.module_id
             LEFT JOIN lecture_files lf ON l.id = lf.lecture_id
+            LEFT JOIN lecture_progress lp ON l.id = lp.lecture_id AND lp.user_id = $2
             WHERE c.id = $1
             ORDER BY m.order_num, l.order_num
         `;
 
-        const courseResult = await db.query(courseQuery, [courseIdNum]);
+        const courseResult = await db.query(courseQuery, [courseIdNum, userId]);
+
+        console.log('Результат запиту:', courseResult.rows); // Додаємо логування
 
         if (courseResult.rows.length === 0) {
+            console.log('Курс не знайдено');
             return res.status(404).json({ error: 'Курс не знайдено' });
         }
 
+        // Формуємо дані курсу
         const courseData = {
             id: courseResult.rows[0].id,
             name: courseResult.rows[0].name,
@@ -77,6 +77,7 @@ router.get('/course/:courseId', async (req, res) => {
             modules: []
         };
 
+        // Групуємо лекції по модулях
         const modulesMap = new Map();
 
         courseResult.rows.forEach(row => {
@@ -96,10 +97,9 @@ router.get('/course/:courseId', async (req, res) => {
                         title: row.lecture_title,
                         description: row.lecture_description,
                         order: row.lecture_order,
-                        files: row.lecture_file_url ? [{
-                            url: row.lecture_file_url,
-                            type: row.lecture_file_type
-                        }] : []
+                        completed: row.is_completed,
+                        file_url: row.file_url,
+                        file_type: row.file_type
                     });
                 }
             }
@@ -112,9 +112,11 @@ router.get('/course/:courseId', async (req, res) => {
             module.lectures.sort((a, b) => a.order - b.order);
         });
 
+        console.log('Відправляємо дані курсу:', courseData); // Додаємо логування
+
         res.json(courseData);
     } catch (error) {
-        console.error('Помилка отримання даних курсу:', error);
+        console.error('Детальна помилка отримання даних курсу:', error);
         res.status(500).json({ 
             error: 'Внутрішня помилка сервера',
             details: error.message
@@ -293,6 +295,38 @@ router.get('/lecture/:lectureId/content', async (req, res) => {
     } catch (error) {
         console.error('Помилка отримання контенту лекції:', error);
         res.status(500).json({ error: 'Внутрішня помилка сервера' });
+    }
+});
+
+router.get('/lecture/:lectureId', async (req, res) => {
+    try {
+        const { lectureId } = req.params;
+        const userId = req.query.userId;
+
+        const query = `
+            SELECT 
+                l.id,
+                l.title,
+                l.description,
+                lf.file_url,
+                lf.file_type,
+                COALESCE(lp.completed, false) as is_completed
+            FROM lectures l
+            LEFT JOIN lecture_files lf ON l.id = lf.lecture_id
+            LEFT JOIN lecture_progress lp ON l.id = lp.lecture_id AND lp.user_id = $2
+            WHERE l.id = $1
+        `;
+
+        const result = await db.query(query, [lectureId, userId]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Lecture not found' });
+        }
+
+        res.json(result.rows[0]);
+    } catch (error) {
+        console.error('Error fetching lecture:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 

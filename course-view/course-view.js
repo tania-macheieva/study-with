@@ -1,4 +1,4 @@
-const COURSE_MODULES = [
+let COURSE_MODULES = [
     {
         id: 1,
         title: "Module 1",
@@ -1316,6 +1316,8 @@ async function loadCourseData() {
         const courseId = window.location.pathname.split('/course/').pop();
         const userId = localStorage.getItem('userId');
         
+        console.log('Loading course data:', { courseId, userId });
+
         if (!courseId || isNaN(courseId)) {
             console.error('Invalid course ID:', courseId);
             return;
@@ -1329,37 +1331,49 @@ async function loadCourseData() {
         const response = await fetch(`/api/course/${courseId}?userId=${userId}`);
         
         if (!response.ok) {
-            throw new Error(`Failed to load course data: ${response.statusText}`);
+            const errorData = await response.json();
+            throw new Error(`Failed to load course data: ${errorData.error || response.statusText}`);
         }
         
         const courseData = await response.json();
-        console.log('Loaded course data:', courseData);
+        console.log('Received course data:', courseData);
         
-        const courseTitleElement = document.querySelector('.course-n');
-        if (courseTitleElement && courseData.name) {
-            courseTitleElement.textContent = courseData.name;
+        // Оновлюємо заголовок курсу в хедері
+        const courseNameElement = document.querySelector('.course-n');
+        if (courseNameElement) {
+            courseNameElement.innerHTML = `<img src="../images/save-c.svg" alt="save-course-ico">${courseData.name}`;
+        }
+
+        // Оновлюємо прогрес в хедері
+        const progressBar = document.querySelector('.progress-container .progress-bar span');
+        const progressText = document.querySelector('.progress-container .progress-text .percent');
+        if (progressBar && progressText) {
+            const totalProgress = calculateTotalProgress(courseData.modules);
+            progressBar.style.width = `${totalProgress}%`;
+            progressText.textContent = `${totalProgress}%`;
         }
         
+        // Оновлюємо модулі
         if (courseData.modules && Array.isArray(courseData.modules)) {
             COURSE_MODULES = courseData.modules.map(module => ({
                 id: module.id,
                 title: module.title || 'Untitled Module',
                 progress: {
-                    completed: 0,
-                    total: module.lectures ? module.lectures.length : 0,
+                    completed: module.lectures.filter(l => l.completed).length,
+                    total: module.lectures.length,
                     timeLeft: 0,
-                    totalTime: 0
+                    totalTime: module.lectures.length * 5
                 },
-                topics: module.lectures ? module.lectures.map(lecture => ({
+                topics: module.lectures.map(lecture => ({
                     id: lecture.id,
                     title: lecture.title || 'Untitled Lecture',
-                    completed: false,
-                    contentType: lecture.files && lecture.files.length > 0 ? lecture.files[0].type : 'text'
-                })) : []
+                    completed: lecture.completed,
+                    contentType: lecture.file_type || 'text'
+                }))
             }));
             
+            console.log('Updated COURSE_MODULES:', COURSE_MODULES);
             renderCourseContent();
-            loadProgress(); 
         }
         
     } catch (error) {
@@ -1369,9 +1383,39 @@ async function loadCourseData() {
             courseContent.innerHTML = `
                 <div class="error-message">
                     Failed to load course content: ${error.message}
+                    <br>
+                    Please try refreshing the page.
                 </div>
             `;
         }
+    }
+}
+
+// Функція для розрахунку загального прогресу курсу
+function calculateTotalProgress(modules) {
+    let totalLectures = 0;
+    let completedLectures = 0;
+
+    modules.forEach(module => {
+        if (module.lectures) {
+            totalLectures += module.lectures.length;
+            completedLectures += module.lectures.filter(l => l.completed).length;
+        }
+    });
+
+    return totalLectures > 0 ? Math.round((completedLectures / totalLectures) * 100) : 0;
+}
+
+async function loadCourseHeader() {
+    try {
+        const response = await fetch('/header/course-header.html');
+        const html = await response.text();
+        document.getElementById('courseHeader').innerHTML = html;
+        
+        // Ініціалізуємо обробники подій хедера після його завантаження
+        initializeCourseHeader();
+    } catch (error) {
+        console.error('Error loading course header:', error);
     }
 }
 
@@ -1421,18 +1465,6 @@ async function completeLecture(lectureId) {
     } catch (error) {
         console.error('Error completing lecture:', error);
     }
-}
-
-function initializeTopicListeners() {
-    document.querySelectorAll('.topics li').forEach(topic => {
-        topic.addEventListener('click', async () => {
-            const lectureId = topic.dataset.topicId;
-            if (lectureId) {
-                await completeLecture(lectureId);
-                topic.classList.add('completed');
-            }
-        });
-    });
 }
 
 async function loadProgress() {
@@ -1508,34 +1540,92 @@ function displayLectureContent(lectureData) {
 
 function initializeTopicListeners() {
     document.querySelectorAll('.topics li').forEach(topic => {
-        topic.addEventListener('click', async () => {
-            const lectureId = topic.dataset.topicId;
-            const contentType = topic.dataset.contentType;
+        topic.addEventListener('click', async (event) => {
+            event.preventDefault();
             
-            document.querySelectorAll('.topics li').forEach(t => {
-                t.classList.remove('active');
-            });
+            document.querySelectorAll('.topics li').forEach(t => 
+                t.classList.remove('active')
+            );
             
             topic.classList.add('active');
 
-            if (lectureId) {
-                await loadLectureContent(lectureId);
+            const lectureId = topic.dataset.topicId;
+            const contentType = topic.dataset.contentType;
+            
+            try {
+                const response = await fetch(`/api/lecture/${lectureId}?userId=${localStorage.getItem('userId')}`);
+                if (!response.ok) throw new Error('Failed to load lecture');
                 
-                if (contentType === 'video') {
-                    const videoElement = document.querySelector('video');
-                    if (videoElement) {
-                        videoElement.addEventListener('ended', async () => {
-                            await completeLecture(lectureId);
+                const lectureData = await response.json();
+                
+                const contentContainer = document.querySelector('.video-player');
+                if (contentContainer) {
+                    if (lectureData.file_type === 'video') {
+                        contentContainer.innerHTML = `
+                            <video id="lecture-video" controls>
+                                <source src="${lectureData.file_url}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        `;
+                        
+                        const video = document.getElementById('lecture-video');
+                        video.addEventListener('ended', () => {
+                            completeLecture(lectureId);
                             topic.classList.add('completed');
                         });
+                    } else {
+                        contentContainer.innerHTML = `
+                            <div class="lecture-content">
+                                <h2>${lectureData.title}</h2>
+                                <p>${lectureData.description || 'No description available'}</p>
+                                ${lectureData.file_url ? `
+                                    <a href="${lectureData.file_url}" 
+                                       class="download-link" 
+                                       target="_blank">
+                                        Download material
+                                    </a>
+                                ` : ''}
+                            </div>
+                        `;
                     }
                 }
+            } catch (error) {
+                console.error('Error loading lecture:', error);
             }
         });
     });
 }
 
+function initializeCourseHeader() {
+    const homeButton = document.querySelector('.home');
+    if (homeButton) {
+        homeButton.addEventListener('click', () => {
+            window.location.href = '/';
+        });
+    }
+    const optionsButton = document.querySelector('.oth')?.parentElement;
+    if (optionsButton) {
+        optionsButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const dropdownMenu = this.nextElementSibling;
+            dropdownMenu.classList.toggle('show');
+        });
+    }
+    document.addEventListener('click', function(e) {
+        const dropdownMenus = document.querySelectorAll('.dropdown-menu');
+        dropdownMenus.forEach(menu => {
+            if (!menu.contains(e.target)) {
+                menu.classList.remove('show');
+            }
+        });
+    });
+    if (typeof initializeLanguage === 'function') {
+        initializeLanguage();
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    loadCourseHeader();
     loadCourseData();
     createVideoPlayer();
     renderCourseContent();

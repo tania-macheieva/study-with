@@ -237,3 +237,75 @@ class HeaderComponent extends HTMLElement {
 }
 
 customElements.define('course-header', HeaderComponent);
+
+function initializeLanguage() {
+    const currentLang = localStorage.getItem("language") || "en";
+    document.documentElement.lang = currentLang;
+
+    const langSwitcher = document.querySelector(".lang-switcher");
+    if (langSwitcher) {
+        const buttons = langSwitcher.querySelectorAll(".lang-btn");
+        buttons.forEach((btn) => {
+            btn.classList.toggle("active", btn.getAttribute("data-lang") === currentLang);
+        });
+
+        langSwitcher.addEventListener("click", (event) => {
+            if (event.target.classList.contains("lang-btn")) {
+                event.preventDefault();
+                const selectedLang = event.target.getAttribute("data-lang");
+                
+                if (selectedLang !== currentLang) {
+                    localStorage.setItem("language", selectedLang);
+                    applyTranslations(selectedLang);
+                    
+                    buttons.forEach((btn) => {
+                        btn.classList.toggle("active", btn.getAttribute("data-lang") === selectedLang);
+                    });
+                }
+            }
+        });
+    }
+
+    applyTranslations(currentLang);
+}
+
+function applyTranslations(lang) {
+    const translations = headerTranslations[lang];
+    if (!translations) return;
+
+    document.querySelectorAll("[data-lang]").forEach((element) => {
+        const key = element.getAttribute("data-lang");
+        if (translations[key]) {
+            if (element.querySelector("img")) {
+                let textNode = Array.from(element.childNodes).find(
+                    (node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== ""
+                );
+
+                if (textNode) {
+                    textNode.textContent = ` ${translations[key]}`;
+                } else {
+                    element.appendChild(document.createTextNode(` ${translations[key]}`));
+                }
+            } else {
+                element.textContent = translations[key];
+            }
+        }
+    });
+}
+
+const headerTranslations = {
+    en: {
+        home: "Home",
+        courseName: "Course name",
+        progress: "Progress",
+        shareCourse: "Share this course",
+        unenrollCourse: "Unenroll from this course",
+    },
+    ua: {
+        home: "Головна сторінка",
+        courseName: "Назва курсу",
+        progress: "Прогрес",
+        shareCourse: "Поділитися цим курсом",
+        unenrollCourse: "Відписатися від цього курсу",
+    },
+};

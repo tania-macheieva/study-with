@@ -200,38 +200,55 @@ async function loadEnrolledCourses() {
     try {
         const userId = localStorage.getItem('userId');
         if (!userId) {
-            console.log('No userId found');
+            console.log('User ID not found');
             return;
         }
 
-        const response = await fetch(`/api/courses/enrolled/${userId}`);
+        const response = await fetch(`/courses/enrolled/${userId}`);
+        if (!response.ok) throw new Error('Failed to fetch enrolled courses');
+        
         const courses = await response.json();
-        console.log('Received courses:', courses);
-
         const coursesContainer = document.getElementById('enrolled-courses');
+        
+        if (!coursesContainer) return;
+
         if (!courses || courses.length === 0) {
-            coursesContainer.innerHTML = '<p class="no-courses">You haven\'t enrolled in any courses yet.</p>';
+            coursesContainer.innerHTML = `<p class="no-courses">${translations[localStorage.getItem('language') || 'en'].noCourses}</p>`;
             return;
         }
 
         coursesContainer.innerHTML = courses.map(course => `
             <div class="course">
-                <p class="p-1">${course.name}</p>
+                <p class="p-1">${course.name || 'Без назви'}</p>
                 <div class="progress-bar">
-                    <span style="width: ${course.progress}%;"></span>
+                    <span style="width: ${course.progress || 0}%;"></span>
                 </div>
-                <p class="percent">${course.progress}%</p>
-                <img src="${course.image_url}" alt="${course.name}" onerror="this.src='/images/250x100.png'">
-                <button class="btn-resume" onclick="window.location.href='/course/learn/${course.id}'">
-                    Resume
+                <p class="percent">${course.progress || 0}%</p>
+                <img src="${course.image_url || '/images/250x100.png'}" 
+                     alt="${course.name}" 
+                     onerror="this.src='/images/250x100.png'">
+                <button class="btn-resume" data-course-id="${course.id}">
+                    ${translations[localStorage.getItem('language') || 'en'].btnResume}
                 </button>
             </div>
         `).join('');
 
+        // Додаємо обробники для кнопок Resume
+        document.querySelectorAll('.btn-resume').forEach(button => {
+            button.addEventListener('click', function() {
+                const courseId = this.getAttribute('data-course-id');
+                if (courseId) {
+                    window.location.href = `/course/${courseId}`; // Змінюємо URL
+                }
+            });
+        });
+
     } catch (error) {
-        console.error('Error loading courses:', error);
-        document.getElementById('enrolled-courses').innerHTML = 
-            '<p class="error-message">Failed to load courses. Please try again later.</p>';
+        console.error('Error loading enrolled courses:', error);
+        const coursesContainer = document.getElementById('enrolled-courses');
+        if (coursesContainer) {
+            coursesContainer.innerHTML = '<p class="error-message">Failed to load courses. Please try again later.</p>';
+        }
     }
 }
 

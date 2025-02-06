@@ -105,30 +105,19 @@ const translations = {
 async function loadEnrolledCourses() {
     try {
         const userId = localStorage.getItem('userId');
-        console.log('1. UserId з localStorage:', userId);
-
         if (!userId) {
-            console.log('2. UserId не знайдено');
-            document.getElementById('enrolled-courses').innerHTML = 
-                '<p class="no-courses">Будь ласка, увійдіть в систему для перегляду курсів</p>';
+            console.log('User ID not found');
             return;
         }
 
-        const url = `http://localhost:8000/courses/enrolled/${userId}`;
-        console.log('3. Виконуємо запит до URL:', url);
-
-        const response = await fetch(url);
-        console.log('4. Отримано відповідь:', response);
-
-        if (!response.ok) {
-            throw new Error(`HTTP помилка! статус: ${response.status}`);
-        }
-
+        const response = await fetch(`/courses/enrolled/${userId}`);
+        if (!response.ok) throw new Error('Failed to fetch enrolled courses');
+        
         const courses = await response.json();
-        console.log('5. Отримані дані курсів:', courses);
-
         const coursesContainer = document.getElementById('enrolled-courses');
         
+        if (!coursesContainer) return;
+
         if (!courses || courses.length === 0) {
             coursesContainer.innerHTML = `<p class="no-courses">${translations[localStorage.getItem('language') || 'en'].noCourses}</p>`;
             return;
@@ -144,29 +133,28 @@ async function loadEnrolledCourses() {
                 <img src="${course.image_url || '/images/250x100.png'}" 
                      alt="${course.name}" 
                      onerror="this.src='/images/250x100.png'">
-                <button class="btn-resume" onclick="window.location.href='/course/learn/${course.id}'">
+                <button class="btn-resume" data-course-id="${course.id}">
                     ${translations[localStorage.getItem('language') || 'en'].btnResume}
                 </button>
             </div>
         `).join('');
 
+        // Додаємо обробники для кнопок Resume
         document.querySelectorAll('.btn-resume').forEach(button => {
             button.addEventListener('click', function() {
                 const courseId = this.getAttribute('data-course-id');
-                window.location.href = `/course/${courseId}`;
+                if (courseId) {
+                    window.location.href = `/course/${courseId}`; // Змінюємо URL
+                }
             });
         });
 
-        // Оновлюємо переклади
-        applyLanguage(localStorage.getItem('language') || 'en');
-
     } catch (error) {
-        console.error('Помилка завантаження курсів:', error);
-        const errorDetails = error.stack || error.message;
-        console.log('Деталі помилки:', errorDetails);
-        
-        document.getElementById('enrolled-courses').innerHTML = 
-            `<p class="error-message">Помилка завантаження курсів: ${error.message}</p>`;
+        console.error('Error loading enrolled courses:', error);
+        const coursesContainer = document.getElementById('enrolled-courses');
+        if (coursesContainer) {
+            coursesContainer.innerHTML = '<p class="error-message">Failed to load courses. Please try again later.</p>';
+        }
     }
 }
 
