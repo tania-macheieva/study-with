@@ -954,13 +954,12 @@
             </div>
         `).join('');
 
-             // Додаємо обробники для кнопок "Resume"
-             document.querySelectorAll('.btn-resume').forEach(button => {
-                 button.addEventListener('click', () => {
-                     const courseId = button.getAttribute('data-course-id');
-                     window.location.href = `/course/learn/${courseId}`;
-                 });
-             });
+        document.querySelectorAll('.btn-resume').forEach(button => {
+            button.addEventListener('click', function() {
+                const courseId = this.getAttribute('data-course-id');
+                window.location.href = `/course/${courseId}`;
+            });
+        });
 
              // Оновлюємо переклади для нових елементів
              applyLanguage(localStorage.getItem('language') || 'en');

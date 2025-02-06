@@ -150,6 +150,13 @@ async function loadEnrolledCourses() {
             </div>
         `).join('');
 
+        document.querySelectorAll('.btn-resume').forEach(button => {
+            button.addEventListener('click', function() {
+                const courseId = this.getAttribute('data-course-id');
+                window.location.href = `/course/${courseId}`;
+            });
+        });
+
         // Оновлюємо переклади
         applyLanguage(localStorage.getItem('language') || 'en');
 

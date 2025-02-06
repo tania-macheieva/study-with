@@ -120,9 +120,6 @@ app.get('/donate', (req, res) => {
 app.get('/course-preview', (req, res) => {
     res.sendFile(path.join(__dirname, 'course-preview/course-preview.html')); 
 });
-app.get('/course-view', (req, res) => {
-    res.sendFile(path.join(__dirname, 'course-view/course-view.html')); 
-});
 app.get('/test-creation', (req, res) => {
     res.sendFile(path.join(__dirname, './tests/test-creation.html')); 
 });
@@ -155,6 +152,13 @@ app.use("/donate", stripeRoutes);
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Something broke!');
+});
+
+
+const courseViewRouter = require('./courseViewRouter');
+app.use('/api', courseViewRouter);
+app.get('/course/:courseId', (req, res) => {
+    res.sendFile(path.join(__dirname, 'course-view/course-view.html'));
 });
 
 

@@ -644,7 +644,7 @@ const createModuleHTML = (module) => {
             quiz: "/images/test-icon.svg",
             audio: "/images/audio-icon.svg"
         };
-        return icons[contentType] || "";
+        return icons[contentType] || "/images/text-icon.svg";
     };
     
     return `
@@ -661,17 +661,20 @@ const createModuleHTML = (module) => {
                     <div class="module-progress">
                         <span>${module.progress.completed}/${module.progress.total} complete</span>
                         <span class="separator">|</span>
-                        <span>${module.progress.timeLeft} hour left out of ${module.progress.totalTime}</span>
+                        <span>${module.progress.timeLeft} left</span>
                     </div>
                     <ul class="topics">
                         ${module.topics.map(topic => `
-                            <li class="${topic.completed ? 'completed' : ''}" data-topic-id="${topic.id}">
-                                <img 
-                                    src="${getContentTypeIcon(topic.contentType)}" 
-                                    alt="${topic.contentType}" 
-                                    class="content-type-icon"
-                                >
-                                ${topic.title}
+                            <li class="${topic.completed ? 'completed' : ''}" 
+                                data-topic-id="${topic.id}" 
+                                data-content-type="${topic.contentType}"
+                                data-title="${topic.title}">
+                                <div class="topic-info">
+                                    <img src="${getContentTypeIcon(topic.contentType)}" 
+                                         alt="${topic.contentType}" 
+                                         class="content-type-icon">
+                                    <span class="topic-title">${topic.title}</span>
+                                </div>
                             </li>
                         `).join('')}
                     </ul>
@@ -1308,11 +1311,238 @@ const initializeDiscussionListeners = () => {
     }
 };
 
+async function loadCourseData() {
+    try {
+        const courseId = window.location.pathname.split('/course/').pop();
+        const userId = localStorage.getItem('userId');
+        
+        if (!courseId || isNaN(courseId)) {
+            console.error('Invalid course ID:', courseId);
+            return;
+        }
+
+        if (!userId) {
+            console.error('User ID not found');
+            return;
+        }
+
+        const response = await fetch(`/api/course/${courseId}?userId=${userId}`);
+        
+        if (!response.ok) {
+            throw new Error(`Failed to load course data: ${response.statusText}`);
+        }
+        
+        const courseData = await response.json();
+        console.log('Loaded course data:', courseData);
+        
+        const courseTitleElement = document.querySelector('.course-n');
+        if (courseTitleElement && courseData.name) {
+            courseTitleElement.textContent = courseData.name;
+        }
+        
+        if (courseData.modules && Array.isArray(courseData.modules)) {
+            COURSE_MODULES = courseData.modules.map(module => ({
+                id: module.id,
+                title: module.title || 'Untitled Module',
+                progress: {
+                    completed: 0,
+                    total: module.lectures ? module.lectures.length : 0,
+                    timeLeft: 0,
+                    totalTime: 0
+                },
+                topics: module.lectures ? module.lectures.map(lecture => ({
+                    id: lecture.id,
+                    title: lecture.title || 'Untitled Lecture',
+                    completed: false,
+                    contentType: lecture.files && lecture.files.length > 0 ? lecture.files[0].type : 'text'
+                })) : []
+            }));
+            
+            renderCourseContent();
+            loadProgress(); 
+        }
+        
+    } catch (error) {
+        console.error('Error loading course data:', error);
+        const courseContent = document.querySelector('.course-content');
+        if (courseContent) {
+            courseContent.innerHTML = `
+                <div class="error-message">
+                    Failed to load course content: ${error.message}
+                </div>
+            `;
+        }
+    }
+}
+
+
+
+function updateProgressUI(progressData) {
+    const progressBar = document.querySelector('.progress-bar span');
+    const progressText = document.querySelector('.progress-text .percent');
+    
+    if (progressBar && progressText) {
+        progressBar.style.width = `${progressData.progress}%`;
+        progressText.textContent = `${Math.round(progressData.progress)}%`;
+    }
+
+    const allLectures = document.querySelectorAll('.topics li');
+    allLectures.forEach(lecture => {
+        const lectureId = lecture.dataset.topicId;
+        if (progressData.completedLectures.includes(parseInt(lectureId))) {
+            lecture.classList.add('completed');
+        }
+    });
+}
+
+async function completeLecture(lectureId) {
+    try {
+        const userId = localStorage.getItem('userId');
+        
+        if (!userId) {
+            console.error('User ID not found');
+            return;
+        }
+
+        const response = await fetch(`/api/lecture/${lectureId}/complete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to complete lecture');
+        }
+        
+        await loadProgress(); 
+        
+    } catch (error) {
+        console.error('Error completing lecture:', error);
+    }
+}
+
+function initializeTopicListeners() {
+    document.querySelectorAll('.topics li').forEach(topic => {
+        topic.addEventListener('click', async () => {
+            const lectureId = topic.dataset.topicId;
+            if (lectureId) {
+                await completeLecture(lectureId);
+                topic.classList.add('completed');
+            }
+        });
+    });
+}
+
+async function loadProgress() {
+    try {
+        const courseId = window.location.pathname.split('/course/').pop();
+        const userId = localStorage.getItem('userId');
+
+        if (!userId || !courseId) return;
+
+        const response = await fetch(`/api/course/${courseId}/progress?userId=${userId}`);
+        
+        if (!response.ok) {
+            throw new Error('Failed to load progress');
+        }
+        
+        const progressData = await response.json();
+        updateProgressUI(progressData);
+        
+    } catch (error) {
+        console.error('Error loading progress:', error);
+    }
+}
+
+async function loadLectureContent(lectureId) {
+    try {
+        const userId = localStorage.getItem('userId');
+        const response = await fetch(`/api/lecture/${lectureId}/content?userId=${userId}`);
+        
+        if (!response.ok) {
+            throw new Error('Failed to load lecture content');
+        }
+        
+        const lectureData = await response.json();
+        displayLectureContent(lectureData);
+    } catch (error) {
+        console.error('Error loading lecture content:', error);
+    }
+}
+
+function displayLectureContent(lectureData) {
+    const videoContainer = document.querySelector('.video-player');
+    if (!videoContainer) return;
+
+    const lectureTitle = document.querySelector('.current-lecture-title');
+    if (lectureTitle) {
+        lectureTitle.textContent = lectureData.title;
+    }
+
+    switch(lectureData.contentType) {
+        case 'video':
+            createVideoPlayer(lectureData.videoUrl);
+            break;
+        case 'text':
+            videoContainer.innerHTML = `
+                <div class="text-content">
+                    ${lectureData.content}
+                </div>
+            `;
+            break;
+        case 'quiz':
+            videoContainer.innerHTML = `
+                <div class="quiz-content">
+                    <h3>${lectureData.title}</h3>
+                    <div class="quiz-questions">
+                        ${lectureData.questions.map(q => createQuizQuestion(q)).join('')}
+                    </div>
+                    <button class="submit-quiz">Submit Quiz</button>
+                </div>
+            `;
+            break;
+    }
+}
+
+function initializeTopicListeners() {
+    document.querySelectorAll('.topics li').forEach(topic => {
+        topic.addEventListener('click', async () => {
+            const lectureId = topic.dataset.topicId;
+            const contentType = topic.dataset.contentType;
+            
+            document.querySelectorAll('.topics li').forEach(t => {
+                t.classList.remove('active');
+            });
+            
+            topic.classList.add('active');
+
+            if (lectureId) {
+                await loadLectureContent(lectureId);
+                
+                if (contentType === 'video') {
+                    const videoElement = document.querySelector('video');
+                    if (videoElement) {
+                        videoElement.addEventListener('ended', async () => {
+                            await completeLecture(lectureId);
+                            topic.classList.add('completed');
+                        });
+                    }
+                }
+            }
+        });
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    loadCourseData();
     createVideoPlayer();
     renderCourseContent();
     renderDiscussion();
     initializeFilters();
     initializeDiscussionListeners();
     initializeTabs();
+    initializeModuleListeners();
+    initializeTopicListeners(); 
 });

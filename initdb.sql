@@ -229,3 +229,14 @@ CREATE TABLE enrollments (
 
 -- колонка для  stripe акаунту
 ALTER TABLE all_courses ADD COLUMN author_stripe_account VARCHAR(255);
+
+
+CREATE TABLE lecture_progress (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    lecture_id INTEGER REFERENCES lectures(id) ON DELETE CASCADE,
+    completed BOOLEAN DEFAULT false,
+    completed_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, lecture_id)
+);
