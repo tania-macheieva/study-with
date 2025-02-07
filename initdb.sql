@@ -4,7 +4,7 @@ CREATE TABLE users (
   name VARCHAR(255) NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
   user_password TEXT NOT NULL,
-  phone_number VARCHAR(15),
+  phone_number VARCHAR(30),
   role VARCHAR(50) CHECK (role IN ('student', 'teacher')) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   profile_image VARCHAR(255),
@@ -40,7 +40,7 @@ CREATE TABLE students (
     user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     nickname VARCHAR(150) ,
     date_of_birth DATE,
-    phone_number VARCHAR(15),
+    phone_number VARCHAR(30),
     additional_info TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
