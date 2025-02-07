@@ -21,7 +21,7 @@ CREATE TABLE teachers (
     gender VARCHAR(50), 
     country VARCHAR(100),
     city VARCHAR(100),
-    phone_number VARCHAR(15),
+    phone_number VARCHAR(30),
     zip_code VARCHAR(20),
     specialty VARCHAR(255),
     professional_experience DATE,

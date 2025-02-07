@@ -35,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
         input.setSelectionRange(length, length);
     });
 });
-І
 
     // Таймер для повторної відправки
     let timeLeft = 60;
