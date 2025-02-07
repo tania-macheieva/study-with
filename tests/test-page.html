@@ -18,6 +18,7 @@
       background-color: #f9f9f9;
       margin: 0;
       padding: 20px;
+      min-height: 120vh;
     }
     .generate-test{
   display: flex;
@@ -299,7 +300,7 @@ button {
     
  <form>
   <div class="generate-test">
-    <input type="text" id="test-id-input" data-lang="enterTestId" placeholder="Enter Test ID">
+    <input type="text" id="test-id-input" data-lang="enterTestId" placeholder="Enter Test ID" hidden>
     <button type="button" id="generate-test-btn" data-lang="generTest">Generate Test</button>
   </div>
   <div id="final-test-block"></div>

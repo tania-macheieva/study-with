@@ -16,9 +16,7 @@
   <link rel="stylesheet" href="/tests/test-creation.css">
 </head>
 <body>
-  <header>
-    <h1  data-lang="testCreation">Test creation</h1>
-  </header>
+
 
   <main>
     <form id="test-form">
@@ -60,7 +58,7 @@
 </div>
 
 <div class="generate-test">
-  <input type="text" id="test-id-input" data-lang="enterTestId" placeholder="Enter Test ID">
+  <input type="text" id="test-id-input" data-lang="enterTestId" placeholder="Enter Test ID" hidden>
   <button type="button" id="generate-test-btn" data-lang="generTest">Generate Test</button>
 </div>
 <div id="final-test-block"></div>
@@ -257,6 +255,12 @@ if (answerElement) {
         console.error('Failed to copy: ', err);
     });
 });
+const storedTestId = localStorage.getItem('testId');
+
+if (storedTestId) {
+    document.getElementById('test-id-input').value = storedTestId;
+}
+
   
 // Обробник для кнопки "Generate Test"
 document.getElementById('generate-test-btn').addEventListener('click', async function () {
