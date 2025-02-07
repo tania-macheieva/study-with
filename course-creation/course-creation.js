@@ -349,7 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </label>
           <div class="file-names-list">${lectureData.videoFile ? `<span>${lectureData.videoFile}</span>` : ""}</div>
         </div>
-        <div class="file-warning" style="display: none; color: #ff2600; font-size: 14px; margin-top: 5px; font-weight: 430; margin-bottom: 15px;;" data-lang="note"> ${translations[userLang].note}</div>
+        <div class="file-warning" style="color: #ff2600; font-size: 14px; margin-top: 5px; font-weight: 430; margin-bottom: 15px;;" data-lang="note"> ${translations[userLang].note}</div>
       </div>
       <div class="note-container">
         <label class="upload">${translations[userLang].chooseFiles}</label>
@@ -362,26 +362,11 @@ document.addEventListener('DOMContentLoaded', () => {
             ${lectureData.materialsFiles ? lectureData.materialsFiles.map(file => `<span>${file}</span>`).join("") : ""}
           </div>
         </div>
-        <div class="file-warning" style="display: none; color: #ff2600; font-size: 14px; margin-top: 5px; font-weight: 430; margin-bottom: 5px;" data-lang="note"> ${translations[userLang].note}</div>
+        <div class="file-warning" style="color: #ff2600; font-size: 14px; margin-top: 5px; font-weight: 430; margin-bottom: 5px;" data-lang="note"> ${translations[userLang].note}</div>
       </div>`;
   lecturesDiv.appendChild(lectureDiv);
 
-  // Показує попередження, якщо ще не вибрано файлів
-  function showWarning(warningElement) {
-    warningElement.style.display = "block";
-    setTimeout(() => {
-        warningElement.style.display = "none";
-    }, 10000);
-  }
-
-  // Перевірка на оновлення сторінки та показ попередження
-  const videoWarning = lectureDiv.querySelector(".lecture-video").closest(".note-container").querySelector(".file-warning");
-  const materialsWarning = lectureDiv.querySelector(".lecture-materials").closest(".note-container").querySelector(".file-warning");
-
-  // Показувати попередження тільки після першого завантаження
-  if (!lectureData.videoFile) showWarning(videoWarning);
-  if (!lectureData.materialsFiles || lectureData.materialsFiles.length === 0) showWarning(materialsWarning);
-
+ 
   // Обробники подій для вибору файлів
   lectureDiv.querySelector(".lecture-video").addEventListener("change", function () {
     updateFileNamesList(this, lectureDiv.querySelector(".file-names-list"));
@@ -800,18 +785,7 @@ window.addEventListener('load', () => {
 
   const coursePriceElement = document.querySelector("input[data-lang='enterPrice']");
   if (coursePriceElement) coursePriceElement.value = savedCourseData.price || '';
-  
-  if (!savedCourseData.thumbnail) {
-    document.getElementById('file-warning').style.display = 'block';
-  }
-  if (!savedCourseData.thumbnail) {
-    const warning = document.getElementById('file-warning');
-    warning.style.display = 'block';
-    setTimeout(() => {
-      warning.style.display = 'none';
-    }, 10000);
-  }
-  
+ 
   // Відновлення збереженої категорії
   const savedCategory = localStorage.getItem('selectedCategory');
   if (savedCategory) {
