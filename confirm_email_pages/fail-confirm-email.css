@@ -74,15 +74,16 @@ body {
     max-width: 6000px; 
     max-height: 200px;
     margin: 0 auto; 
+    padding: 48px;
   }
-  .fail-conf-form h3 {
-    font-size: 24px; /* Робимо текст трохи більшим */
-    font-weight: 400; /* Збільшуємо товщину тексту */
+  .description {
+    font-size: 20px; /* Робимо текст трохи більшим */
+    font-weight: 350; /* Збільшуємо товщину тексту */
     margin-bottom: 25px; /* Збільшуємо відступ від заголовка до полів вводу */
   }
-  .fail-conf-form h2 {
-    font-size: 32px; /* Робимо текст трохи більшим */
-    font-weight: 600; /* Збільшуємо товщину тексту */
+  .heading {
+    font-size: 26px; /* Робимо текст трохи більшим */
+    font-weight: 500; /* Збільшуємо товщину тексту */
     margin-bottom: 25px; /* Збільшуємо відступ від заголовка до полів вводу */
   }
 
@@ -91,19 +92,18 @@ body {
     color: #fff;
     border: none;
     padding:  12px 0; 
-    width: 80%;
+    width: 50%;
     border-radius: 12px; 
     cursor: pointer;
     font-size: 16px; /* Збільшуємо текст кнопки */
     font-weight: 300;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    transition: background-color 0.3s ease;
     margin-bottom: 15px;
     font-family: "Inter";
   }
   
   .fail-button:hover {
     background-color: #0c101a;
-    transform: scale(1.05); /* Невелике збільшення при наведенні */
   }
   
   .h2 {
