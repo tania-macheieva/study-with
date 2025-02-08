@@ -31,15 +31,25 @@
           your knowledge with thousands of students!
         </h3>
         <a href="/login">
-          <button class="home_button" data-lang="startButton">Start now</button>
+          <button class="home_button" >
+            <span class="circle1"></span>
+            <span class="circle2"></span>
+            <span class="circle3"></span>
+            <span class="circle4"></span>
+            <span class="circle5"></span>
+            <span data-lang="startButton">Text</span>
+          </button>
         </a>
       </div>
-      <img src="../images/rb_1258.png" alt="Icon" class="img_home" />
+      <img src="../images/schoolboy-sitting-desk-reading-book.png" alt="Icon" class="img_home" />
     </div>
     <div class="popular">
+      <div class="text-animate">
       <h1 class="popular_text" data-lang="popularText">Popular courses</h1>
       <div class="courses"></div>
     </div>
+  </div>
+  <div class="text-animate">
     <div class="Categories">
       <h1 class="Categories_text" data-lang="categoriesText">
         Categories of courses
@@ -78,25 +88,11 @@
         </div>
       </div>
     </div>
-    <h1 class="Fedback_text" data-lang="feedbackText">Feedback</h1>
-    <div class="Feedback">
-      <div class="Feedback_inner">
-        <div class="Feedback_list">
-          <img
-            src="../images/user-avatar.png"
-            alt="user-photo"
-            class="Feed_photo"
-          />
-          <div class="Feed_name_container">
-            <h2 class="Feed_name" data-lang="commname">Name</h2>
-            <h3 class="Feed_comm" data-lang="commtext">Comment</h3>
-          </div>
-        </div>
-      </div>
-    </div>
+  </div>
     <script src="../header/auth-header.js"></script>
     <script src="../footer/footer.js"></script>
     <script src="home.js"></script>
+  <script src="scroll-animations.js"></script>
     <script>
       const translations = {
         en: {
@@ -153,7 +149,7 @@
           categoryBoxChildcare: "Догляд за дiтьми",
           feedName: "Iм’я",
           feedComment: "Коментар",
-          startButton: "Розпочати",
+          startButton: "Розпочніть зараз!",
           Name: "Назва курсу",
           desc: "Тут має бути опис курсу",
           commname: "Ім’я",
