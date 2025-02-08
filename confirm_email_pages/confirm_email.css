@@ -113,26 +113,6 @@ body {
     outline: none;
   }
   
-  .confirm-button {
-    background-color: #283044; /* Темніша кнопка */
-    color: #fff;
-    border: none;
-    padding:  12px 0; 
-    width: 80%;
-    border-radius: 12px; 
-    cursor: pointer;
-    font-size: 16px; /* Збільшуємо текст кнопки */
-    font-weight: 300;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    margin-bottom: 15px;
-    font-family: "Inter";
-  }
-  
-  .confirm-button:hover {
-    background-color: #0c101a;
-    transform: scale(1.05); /* Невелике збільшення при наведенні */
-  }
-  
  .resend-link {
     text-align: left; /* Вирівнюємо текст посилання вліво */
     font-size: 1rem;
@@ -151,4 +131,23 @@ body {
 
 .h2 {
   font-family: "Inter";
+}
+
+.confirm-button {
+  background-color: #283044; /* Темніша кнопка */
+  color: #fff;
+  border: none;
+  padding:  12px 0; 
+  width: 50%;
+  border-radius: 12px; 
+  cursor: pointer;
+  font-size: 16px; /* Збільшуємо текст кнопки */
+  font-weight: 300;
+  transition: background-color 0.3s ease;
+  margin-bottom: 15px;
+  font-family: "Inter";
+}
+
+.confirm-button:hover {
+  background-color: #0c101a;
 }
