@@ -293,22 +293,33 @@ body h3 {
 }
 
 .category_box {
-  box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.20);
   border-radius: 12px;
   width: 300px;
   height: 70px;
   background: #DCECFC;
-  gap: 32px;
+  border: 1px solid #DCECFC;
+  box-shadow: 12px 17px 51px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(6px);
+  border-radius: 17px;
   text-align: center;
-  font-family: "Inter", ExtraLight;
-  font-weight: 300;
-  font-size: 20px;
-  color: #283044;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   cursor: pointer;
-  
+  transition: all 0.5s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  font-weight: bolder;
+  color: black;
+  font-family: "Inter";
+}
+
+.category_box:hover {
+  border: 1px solid black;
+  transform: scale(1.05);
+}
+
+.category_box:active {
+  transform: scale(0.95) rotateZ(1.7deg);
 }
 
 /*Feedback*/
