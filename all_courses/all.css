@@ -108,6 +108,7 @@ body {
 .search-btnn:hover {
   background: #c7e5fd; /* Змінюємо фон */
 }
+
 .filters {
   padding-bottom: 18px;
   position: relative;
@@ -116,11 +117,12 @@ body {
   background: #e8f2fd;
   border-radius: 24px;
   margin-left: 80px; /* Відступ від правого краю фільтрів */
+  font-family: 'Inter', Regular;
 }
 
 h4.filters-clear {
   font-weight: 200;
-  font-size: 1.5rem; /* 24px */
+  font-size: 22px;
   text-decoration: underline;
   text-decoration-skip-ink: none;
   color: #000;
@@ -133,7 +135,7 @@ h4.filters-clear {
 
 h4.filters-apply {
   font-weight: 200;
-  font-size: 1.5rem; /* 24px */
+  font-size: 22px;
   text-decoration: underline;
   text-decoration-skip-ink: none;
   color: #000;
@@ -146,7 +148,7 @@ h4.filters-apply {
 
 .filters-themes {
   font-weight: 400;
-  font-size: 1.5rem; /* 24px */
+  font-size: 22px;
   color: #000;
   margin-left: 2rem; /* 32px */
   font-family: 'Inter';
@@ -155,7 +157,7 @@ h4.filters-apply {
 .checkbox {
   display: flex;
   font-weight: 300;
-  font-size: 1.25rem; /* 20px */
+  font-size: 18px;
   color: #000;
   margin-right: 1.25rem; /* 20px */
   margin-bottom: 0.625rem; /* 10px */
@@ -239,7 +241,7 @@ h4.filters-apply {
 
 .dropdown {
   font-size: 1rem; 
-  border-radius: 12px;
+  border-radius: 6px;
   border: 1px solid #ccc;
   background-color: #fff;
   cursor: pointer;
