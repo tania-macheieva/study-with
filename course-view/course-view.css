@@ -60,7 +60,6 @@ body {
     gap: 20px;
 }
 
-/* Video section */
 .video-container {
     background: #FFFFFF;
     border: 2px solid #C7C7C7;
@@ -97,7 +96,6 @@ body {
     z-index: 2;
 }
 
-/* Стилізація кнопки нотаток */
 .notes-button {
     background: rgba(255, 255, 255, 0.2);
     border: 2px solid #FFFFFF;
@@ -121,7 +119,6 @@ body {
     height: 16px;
 }
 
-/* Стилі для модального вікна нотаток */
 .video-wrapper {
     position: relative;
     width: 100%;
@@ -158,7 +155,6 @@ body {
     background: rgba(0, 0, 0, 0.8);
 }
 
-/* Оновлені стилі для модального вікна */
 .notes-modal {
     position: fixed;
     top: 50%;
@@ -166,11 +162,11 @@ body {
     transform: translate(-50%, -50%);
     z-index: 1000;
     background: white;
-    padding: 30px; /* Збільшуємо внутрішні відступи */
+    padding: 30px;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    width: 600px; /* Встановлюємо фіксовану ширину */
-    max-width: 90vw; /* Обмежуємо максимальну ширину для адаптивності */
+    width: 600px;
+    max-width: 90vw;
 }
 .notes-modal.active {
     display: block;
@@ -179,7 +175,7 @@ body {
 
 .notes-modal textarea {
     width: 100%;
-    height: 200px; /* Збільшуємо висоту текстового поля */
+    height: 200px;
     padding: 15px;
     border: 2px solid #C7C7C7;
     border-radius: 8px;
@@ -213,8 +209,6 @@ body {
     color: #283044;
 }
 
-
-/* Course content sidebar */
 .course-content {
     background: #FFFFFF;
     border: 2px solid #C7C7C7;
@@ -267,17 +261,14 @@ body {
     transform: rotate(-45deg);
 }
 
-/* Початково приховуємо модулі */
 .module {
     display: none;
 }
 
-/* Показуємо модулі, коли контент розгорнутий */
 .course-content:not(.collapsed) .module {
     display: block;
 }
 
-/* Стилізація заголовка курсу */
 .course-header {
     border-bottom: 1px solid #C7C7C7;
 }
@@ -297,9 +288,6 @@ body {
     display: flex;
     align-items: center;
 }
-
-/* Стилізація заголовків модулів */
-
 .toggle-module {
     background: none;
     border: none;
@@ -307,7 +295,6 @@ body {
     display: flex;
     align-items: center;
 }
-
 .course-content h1 {
     font-size: 32px;
     font-weight: 500;
@@ -320,17 +307,14 @@ body {
     padding: 20px 0;
     position: relative;
 }
-
 .module:last-child {
     border-bottom: none;
 }
-
 .module h2 {
     font-size: 20px;
     font-weight: 500;
     color: #283044;
 }
-
 .module-progress {
     font-size: 10px;
     color: #000000;
@@ -338,25 +322,20 @@ body {
     display: block !important;
     margin-left: 0;
 }
-
 .module-content {
     display: block !important;
 }
-
 .module.collapsed .topics {
     display: none;
 }
-
 .module-progress .separator {
     margin: 0 10px;
     color: #283044;
 }
-
 .topics {
     list-style: none;
     padding-left: 40px;
 }
-
 .topics li {
     font-size: 16px;
     margin-bottom: 10px;
@@ -365,7 +344,6 @@ body {
     padding-right: 30px;
     gap: 10px;
 }
-
 .topics li::before {
     content: "";
     position: absolute;
@@ -375,7 +353,6 @@ body {
     width: 18px;
     height: 18px;
 }
-
 .topics li::after {
     content: "";
     position: absolute;
@@ -387,7 +364,6 @@ body {
     background-size: contain;
     background-repeat: no-repeat;
 }
-
 .topics li .content-type-icon {
     position: absolute;
     left: -22px;
@@ -398,7 +374,6 @@ body {
     background-size: contain;
     background-repeat: no-repeat;
 }
-
 .topics li.completed::before {
     content: "✓";
     font-size: 14px;
@@ -408,7 +383,6 @@ body {
     justify-content: center;
 }
 
-/* Discussion section */
 .discussion-section {
     border: 2px solid #C7C7C7;
     border-radius: 12px;
@@ -417,7 +391,6 @@ body {
     background: #FFFFFF;
 }
 
-/* Navigation tabs */
 .tabs {
     display: inline-flex;
     margin: 20px 0;
@@ -453,7 +426,6 @@ body {
     background: #DCECFC;
 }
 
-/* Search bar */
 .search-bar {
     display: flex;
     gap: 10px;
@@ -479,7 +451,6 @@ body {
     cursor: pointer;
 }
 
-/* Filters */
 .filters {
     display: flex;
     justify-content: space-between;
@@ -487,7 +458,6 @@ body {
     gap: 20px;
 }
 
-/* Стилі для лівої частини з чекбоксами */
 .filters-left {
     display: flex;
     flex-direction: column;
@@ -514,7 +484,6 @@ body {
     cursor: pointer;
 }
 
-/* Стилі для правої частини з кнопками */
 .filters-right {
     display: flex;
     flex-direction: column;
@@ -522,7 +491,6 @@ body {
     align-items: flex-end;
 }
 
-/* Оновлені стилі для груп кнопок */
 .filter-group {
     display: inline-flex;
 }
@@ -558,12 +526,10 @@ body {
     background: #DCECFC;
 }
 
-/* Discussion thread */
 .discussion-thread {
     margin-top: 20px;
 }
 
-/* Message styling */
 .message {
     position: relative;
     border: 2px solid #C7C7C7;
@@ -573,7 +539,6 @@ body {
     background: #FFFFFF;
 }
 
-/* Chain of replies styling */
 .message.reply {
     margin-top: -2px;
     margin-bottom: 0;
@@ -691,63 +656,26 @@ body {
     margin: auto;
 }
 
-.checkbox-filter input[type="checkbox"] {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-/* Створюємо кастомний чекбокс */
-.checkbox-filter label {
+input[type="checkbox"] {
+    appearance: none; 
+    width: 20px;
+    height: 20px;
+    border: 1px solid #283044;
+    border-radius: 8px;
     position: relative;
-    padding-left: 30px;
     cursor: pointer;
-    display: inline-block;
-    font-family: 'Inter', sans-serif;
+  }
+  
+  input[type="checkbox"]:checked {
+    background-color: #ffffff;
+    border-color: #283044;
+  }
+  
+  input[type="checkbox"]:checked::before {
+    content: '✔';
+    position: absolute;
+    top: -4px;
+    left: 1px;
     color: #283044;
-}
-
-/* Створюємо круглу форму для чекбоксу */
-.checkbox-filter label:before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 18px;
-    height: 18px;
-    border: 2px solid #283044;
-    border-radius: 50%;
-    transition: all 0.2s ease;
-}
-
-/* Створюємо внутрішнє коло для активного стану */
-.checkbox-filter label:after {
-    content: '';
-    position: absolute;
-    left: 5px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    transition: all 0.2s ease;
-    opacity: 0;
-}
-
-/* Стилізуємо активний стан */
-.checkbox-filter input[type="checkbox"]:checked + label:before {
-    border-color: #283044;
-    background: #FFFFFF;
-}
-
-.checkbox-filter input[type="checkbox"]:checked + label:after {
-    background: #506088;
-    opacity: 1;
-}
-
-/* Ховер ефект */
-.checkbox-filter label:hover:before {
-    border-color: #283044;
-}
+    font-size: 16px;
+  }
