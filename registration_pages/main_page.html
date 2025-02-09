@@ -61,9 +61,8 @@
         }
 
         .hero-image img {
-            width: 100%;
+            width: 130%;
             height: auto;
-            transform: translateX(10%);
         }
 
         .content-right {
@@ -75,11 +74,10 @@
         }
 
         .welcome-text {
-            font-family: "Inter", sans-serif;
-            font-weight: 600;
-            font-size: 40px;
+            font-family: "Inter", Regular;
+            font-weight: 500;
+            font-size: 36px;
             line-height: 46px;
-            color: #000000;
             text-align: center;
         }
 
@@ -87,50 +85,75 @@
             display: flex;
             flex-direction: column;
             gap: 24px;
-            width: 269px;
             align-items: center;
             margin-top: 20px; 
-    
         }
 
-        .btn {
-        width: 400px;
-        height: 120px;
-        display: flex;
-        padding:  20px;
-        background-color: #283044; 
-        color: #EBF5EE; 
-        text-decoration: none; 
-        font-family: "Inter", sans-serif;
-        font-size: 28px;
-        font-weight: 500;
-        line-height: 1.2;
-        border-radius: 12px;
-        border: none; 
-        transition: background-color 0.3s ease;
-        text-align: center;
-        flex-direction: column;
-        justify-content: center;
+.btn1 {
+    width: 400px;
+    height: 80px;
+    font-family: "Inter", Regular;
+  --bg: #283044;
+  --hover-bg: #DCECFC;
+  --hover-text: #000;
+  color: #fff;
+  cursor: pointer;
+  border: 1px solid var(--bg);
+  border-radius: 4px;
+  padding: 0.8em 2em;
+  background: var(--bg);
+  transition: 0.2s;
+text-align: center;
+text-decoration: none;
+display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-/* Ховер-ефект для кнопок */
-.btn:hover {
-    background-color: #0c101a; /* Темніший синій фон при наведенні */
+.btn1:hover {
+  color: var(--hover-text);
+  transform: translate(-0.25rem, -0.25rem);
+  background: var(--hover-bg);
+  box-shadow: 0.25rem 0.25rem var(--bg);
 }
-      
-        .btn span {
-            display: block;
-        }
 
-        .btn .top-text {
-            font-size: 20px;
-            margin-bottom: 4px;
-        }
+.btn1:active {
+  transform: translate(0);
+  box-shadow: none;
+}
 
-        .btn .bottom-text {
-            font-size: 20px;
-        }
+.btn2 {
+     width: 400px;
+    height: 80px;
+    font-family: "Inter", Regular;
+  --bg: #283044;
+  --hover-bg: #fff;
+  --hover-text: #000;
+  color: #fff;
+  cursor: pointer;
+  border: 1px solid var(--bg);
+  border-radius: 4px;
+  padding: 0.8em 2em;
+  background: var(--bg);
+  transition: 0.2s;
+text-align: center;
+  text-decoration: none;
+  display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
+.btn2:hover {
+  color: var(--hover-text);
+  transform: translate(-0.25rem, -0.25rem);
+  background: var(--hover-bg);
+  box-shadow: 0.25rem 0.25rem var(--bg);
+}
+
+.btn2:active {
+  transform: translate(0);
+  box-shadow: none;
+}
     </style>
 </head>
 <body>
@@ -145,8 +168,8 @@
                     Learn, connect, succeed together!
                 </div>
                 <div class="buttons">
-                    <a href="/reg-student" class="btn" data-lang="studentAccount">Create an account as a student</a>
-                    <a href="/reg-teacher" class="btn" data-lang="teacherAccount">Create an account as a teacher</a>
+                    <a href="/reg-student" class="btn1" data-lang="studentAccount">Create an account as a student</a>
+                    <a href="/reg-teacher" class="btn2" data-lang="teacherAccount">Create an account as a teacher</a>
                     </button>
                 </div>
             </div>
