@@ -133,19 +133,27 @@ router.get('/course/:courseId/progress', async (req, res) => {
             return res.status(400).json({ error: 'User ID is required' });
         }
 
+        // Змінюємо запит для отримання загальної кількості лекцій в курсі
         const progressQuery = `
-            SELECT 
-                e.progress,
-                e.last_accessed,
-                COUNT(DISTINCT l.id) as total_lectures,
-                COUNT(DISTINCT CASE WHEN lp.completed = true THEN l.id END) as completed_lectures
-            FROM enrollments e
-            JOIN all_courses c ON e.course_id = c.id
-            JOIN modules m ON c.id = m.course_id
-            JOIN lectures l ON m.id = l.module_id
-            LEFT JOIN lecture_progress lp ON l.id = lp.lecture_id AND lp.user_id = e.user_id
-            WHERE e.course_id = $1 AND e.user_id = $2
-            GROUP BY e.progress, e.last_accessed
+            WITH course_stats AS (
+                SELECT 
+                    COUNT(DISTINCT l.id) as total_lectures,
+                    COUNT(DISTINCT CASE WHEN lp.completed = true THEN l.id END) as completed_lectures
+                FROM all_courses c
+                JOIN modules m ON c.id = m.course_id
+                JOIN lectures l ON m.id = l.module_id
+                LEFT JOIN lecture_progress lp ON l.id = lp.lecture_id AND lp.user_id = $2
+                WHERE c.id = $1
+            )
+            SELECT
+                cs.total_lectures,
+                cs.completed_lectures,
+                CASE 
+                    WHEN cs.total_lectures > 0 
+                    THEN ROUND((cs.completed_lectures::float / cs.total_lectures::float * 100)::numeric, 2)
+                    ELSE 0
+                END as progress_percentage
+            FROM course_stats cs
         `;
 
         const result = await db.query(progressQuery, [courseId, userId]);
@@ -154,12 +162,11 @@ router.get('/course/:courseId/progress', async (req, res) => {
             return res.status(404).json({ error: 'Прогрес не знайдено' });
         }
 
-        const progress = result.rows[0];
+        const progressData = result.rows[0];
         res.json({
-            progress: progress.progress,
-            lastAccessed: progress.last_accessed,
-            totalLectures: progress.total_lectures,
-            completedLectures: progress.completed_lectures
+            progress: progressData.progress_percentage,
+            totalLectures: progressData.total_lectures,
+            completedLectures: progressData.completed_lectures
         });
     } catch (error) {
         console.error('Помилка отримання прогресу:', error);
@@ -308,22 +315,39 @@ router.get('/lecture/:lectureId', async (req, res) => {
                 l.id,
                 l.title,
                 l.description,
+                l.order_num,
                 lf.file_url,
                 lf.file_type,
-                COALESCE(lp.completed, false) as is_completed
+                COALESCE(lp.completed, false) as is_completed,
+                v.file_name as video_name,
+                v.file_path as video_path
             FROM lectures l
             LEFT JOIN lecture_files lf ON l.id = lf.lecture_id
+            LEFT JOIN videos v ON l.id = v.lecture_id
             LEFT JOIN lecture_progress lp ON l.id = lp.lecture_id AND lp.user_id = $2
             WHERE l.id = $1
         `;
 
+        console.log('Executing query for lecture:', lectureId); 
         const result = await db.query(query, [lectureId, userId]);
+        console.log('Query result:', result.rows[0]); 
 
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Lecture not found' });
         }
 
-        res.json(result.rows[0]);
+        const lectureData = {
+            id: result.rows[0].id,
+            title: result.rows[0].title,
+            description: result.rows[0].description,
+            file_type: result.rows[0].file_type,
+            file_url: result.rows[0].file_url,
+            video_path: result.rows[0].video_path, 
+            is_completed: result.rows[0].is_completed
+        };
+
+        console.log('Sending lecture data:', lectureData); 
+        res.json(lectureData);
     } catch (error) {
         console.error('Error fetching lecture:', error);
         res.status(500).json({ error: 'Internal server error' });

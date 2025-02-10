@@ -637,51 +637,139 @@ const showNotesModal = (currentTime) => {
 
 const createModuleHTML = (module) => {
     const hasContent = module.topics && module.topics.length > 0;
-    const getContentTypeIcon = (contentType) => {
-        const icons = {
-            video: "/images/video-icon.svg",
-            text: "/images/text-icon.svg",
-            quiz: "/images/test-icon.svg",
-            audio: "/images/audio-icon.svg"
-        };
-        return icons[contentType] || "/images/text-icon.svg";
-    };
     
     return `
         <section class="module" data-module-id="${module.id}">
             <div class="module-header">
                 <h2>${module.title}</h2>
-                ${hasContent ? `
-                    <button class="toggle-module" aria-label="Toggle module content">
-                    </button>
-                ` : ''}
+                <button class="toggle-module">v</button>
             </div>
-            ${hasContent ? `
-                <div class="module-content">
-                    <div class="module-progress">
-                        <span>${module.progress.completed}/${module.progress.total} complete</span>
-                        <span class="separator">|</span>
-                        <span>${module.progress.timeLeft} left</span>
-                    </div>
-                    <ul class="topics">
-                        ${module.topics.map(topic => `
-                            <li class="${topic.completed ? 'completed' : ''}" 
-                                data-topic-id="${topic.id}" 
-                                data-content-type="${topic.contentType}"
-                                data-title="${topic.title}">
-                                <div class="topic-info">
-                                    <img src="${getContentTypeIcon(topic.contentType)}" 
-                                         alt="${topic.contentType}" 
-                                         class="content-type-icon">
-                                    <span class="topic-title">${topic.title}</span>
-                                </div>
-                            </li>
-                        `).join('')}
-                    </ul>
+            <div class="module-content">
+                <div class="module-progress">
+                    <span>${module.progress.completed}/${module.progress.total} complete | ${module.progress.timeLeft} left</span>
                 </div>
-            ` : ''}
+                <ul class="topics" style="cursor: pointer;">
+                    ${module.topics.map(topic => `
+                        <li onclick="handleLectureClick(${topic.id}, '${topic.contentType}')" 
+                            data-topic-id="${topic.id}" 
+                            data-content-type="${topic.contentType}"
+                            style="padding: 10px; margin: 5px 0;">
+                            <img src="/images/text-icon.svg" style="width: 20px; margin-right: 10px;" />
+                            ${topic.title}
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
         </section>
     `;
+};
+
+
+window.handleLectureClick = async function(lectureId, contentType) {
+    console.log('Lecture clicked:', lectureId, contentType);
+    
+    try {
+        const userId = localStorage.getItem('userId');
+        const response = await fetch(`/api/lecture/${lectureId}?userId=${userId}`);
+        
+        if (!response.ok) {
+            throw new Error('Failed to load lecture');
+        }
+
+        const lectureData = await response.json();
+        console.log('Received lecture data:', lectureData);
+
+        const videoContainer = document.querySelector('.video-player');
+        if (!videoContainer) return;
+
+        // Таймер для автоматичного завершення (для текстових лекцій)
+        let completionTimer;
+
+        // Якщо це відео-лекція
+        if (lectureData.video_path) {
+            const videoPath = lectureData.video_path.replace(/\\/g, '/');
+            videoContainer.innerHTML = `
+                <video controls width="100%" height="100%">
+                    <source src="/${videoPath}" type="video/mp4">
+                    Your browser does not support video.
+                </video>
+            `;
+
+            const video = videoContainer.querySelector('video');
+            
+            // Відмічаємо лекцію як завершену тільки після повного перегляду відео
+            video.addEventListener('ended', async () => {
+                await completeLecture(lectureId);
+                updateProgress();
+            });
+        } 
+        // Якщо це текстова лекція
+        else if (lectureData.description) {
+            videoContainer.innerHTML = `
+                <div style="padding: 20px; background: white; height: 100%; overflow-y: auto;">
+                    <h3>${lectureData.title}</h3>
+                    <p>${lectureData.description}</p>
+                </div>
+            `;
+            
+            // Запускаємо таймер для текстової лекції
+            completionTimer = setTimeout(async () => {
+                await completeLecture(lectureId);
+                updateProgress();
+            }, 5000);
+        }
+
+        // Оновлюємо візуальне відображення
+        const topicElement = document.querySelector(`[data-topic-id="${lectureId}"]`);
+        if (topicElement) {
+            // Знімаємо активний клас з усіх лекцій
+            document.querySelectorAll('[data-topic-id]').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Додаємо активний клас поточній лекції
+            topicElement.classList.add('active');
+            
+            // Якщо лекція вже завершена
+            if (lectureData.is_completed) {
+                topicElement.classList.add('completed');
+            }
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        const videoContainer = document.querySelector('.video-player');
+        if (videoContainer) {
+            videoContainer.innerHTML = `
+                <div style="padding: 20px; color: red;">
+                    Error loading content: ${error.message}
+                </div>
+            `;
+        }
+    }
+};
+
+// Функція для завершення лекції
+window.completeLecture = async function(lectureId) {
+    try {
+        const userId = localStorage.getItem('userId');
+        const response = await fetch(`/api/lecture/${lectureId}/complete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId })
+        });
+
+        if (response.ok) {
+            const topic = document.querySelector(`[data-topic-id="${lectureId}"]`);
+            if (topic) {
+                topic.style.backgroundColor = '#e8f5e9';
+            }
+        }
+    } catch (error) {
+        console.error('Error completing lecture:', error);
+    }
 };
 
 const renderCourseContent = () => {
@@ -1539,61 +1627,135 @@ function displayLectureContent(lectureData) {
 }
 
 function initializeTopicListeners() {
-    document.querySelectorAll('.topics li').forEach(topic => {
-        topic.addEventListener('click', async (event) => {
-            event.preventDefault();
+    const topicItems = document.querySelectorAll('.topics li');
+    console.log('Found topics:', topicItems.length); // Для дебагу
+ 
+    topicItems.forEach(topic => {
+        topic.style.cursor = 'pointer'; // Додаємо курсор для візуальної індикації
+        
+        topic.addEventListener('click', async () => {
+            console.log('Topic clicked:', topic.dataset.topicId); // Для дебагу
             
-            document.querySelectorAll('.topics li').forEach(t => 
-                t.classList.remove('active')
-            );
-            
-            topic.classList.add('active');
-
             const lectureId = topic.dataset.topicId;
-            const contentType = topic.dataset.contentType;
-            
+            if (!lectureId) {
+                console.error('No lecture ID found');
+                return;
+            }
+ 
             try {
-                const response = await fetch(`/api/lecture/${lectureId}?userId=${localStorage.getItem('userId')}`);
-                if (!response.ok) throw new Error('Failed to load lecture');
+                const userId = localStorage.getItem('userId');
+                const response = await fetch(`/api/lecture/${lectureId}?userId=${userId}`);
                 
+                if (!response.ok) {
+                    throw new Error('Failed to load lecture');
+                }
+ 
                 const lectureData = await response.json();
-                
-                const contentContainer = document.querySelector('.video-player');
-                if (contentContainer) {
-                    if (lectureData.file_type === 'video') {
-                        contentContainer.innerHTML = `
-                            <video id="lecture-video" controls>
-                                <source src="${lectureData.file_url}" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
-                        `;
-                        
-                        const video = document.getElementById('lecture-video');
-                        video.addEventListener('ended', () => {
-                            completeLecture(lectureId);
-                            topic.classList.add('completed');
-                        });
-                    } else {
-                        contentContainer.innerHTML = `
-                            <div class="lecture-content">
-                                <h2>${lectureData.title}</h2>
-                                <p>${lectureData.description || 'No description available'}</p>
-                                ${lectureData.file_url ? `
-                                    <a href="${lectureData.file_url}" 
-                                       class="download-link" 
-                                       target="_blank">
-                                        Download material
-                                    </a>
-                                ` : ''}
-                            </div>
-                        `;
-                    }
+                console.log('Lecture data:', lectureData); // Для дебагу
+ 
+                const videoContainer = document.querySelector('.video-player');
+                if (!videoContainer) {
+                    console.error('Video container not found');
+                    return;
+                }
+ 
+                // Відмічаємо активну лекцію
+                document.querySelectorAll('.topics li').forEach(li => {
+                    li.classList.remove('active');
+                });
+                topic.classList.add('active');
+ 
+                // Показуємо контент в залежності від типу
+                if (lectureData.file_type === 'video') {
+                    videoContainer.innerHTML = `
+                        <video controls>
+                            <source src="/uploads/${lectureData.file_url}" type="video/mp4">
+                            Your browser does not support video.
+                        </video>
+                    `;
+ 
+                    const video = videoContainer.querySelector('video');
+                    video.addEventListener('ended', () => {
+                        completeLecture(lectureId);
+                        topic.classList.add('completed');
+                    });
+                } else {
+                    videoContainer.innerHTML = `
+                        <div class="text-content">
+                            <h3>${lectureData.title}</h3>
+                            <p>${lectureData.description}</p>
+                            <button onclick="completeLecture('${lectureId}')">Mark as Complete</button>
+                        </div>
+                    `;
                 }
             } catch (error) {
                 console.error('Error loading lecture:', error);
+                alert('Failed to load lecture content');
             }
         });
     });
+ }
+
+ async function completeLecture(lectureId) {
+    try {
+        const userId = localStorage.getItem('userId');
+        const response = await fetch(`/api/lecture/${lectureId}/complete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId })
+        });
+
+        if (response.ok) {
+            // Позначаємо лекцію як завершену візуально
+            const topic = document.querySelector(`[data-topic-id="${lectureId}"]`);
+            if (topic) {
+                topic.classList.add('completed');
+            }
+            // Оновлюємо загальний прогрес
+            await updateProgress();
+        }
+    } catch (error) {
+        console.error('Error completing lecture:', error);
+    }
+}
+
+async function updateProgress() {
+    try {
+        const courseId = window.location.pathname.split('/course/').pop();
+        const userId = localStorage.getItem('userId');
+        
+        const response = await fetch(`/api/course/${courseId}/progress?userId=${userId}`);
+        if (!response.ok) throw new Error('Failed to fetch progress');
+        
+        const progressData = await response.json();
+        console.log('Progress data:', progressData); // Для дебагу
+        
+        // Оновлюємо прогрес-бар в хедері
+        const progressBar = document.querySelector('.progress-bar span');
+        const progressText = document.querySelector('.progress-text .percent');
+        
+        if (progressBar && progressText) {
+            const progress = progressData.progress || 0;
+            progressBar.style.width = `${progress}%`;
+            progressText.textContent = `${Math.round(progress)}%`;
+        }
+
+        // Оновлюємо прогрес в модулях
+        document.querySelectorAll('.module-progress').forEach(moduleProgress => {
+            const total = progressData.totalLectures;
+            const completed = progressData.completedLectures;
+            moduleProgress.innerHTML = `
+                <span>${completed}/${total} complete</span>
+                <span class="separator">|</span>
+                <span>${total - completed} left</span>
+            `;
+        });
+
+    } catch (error) {
+        console.error('Error updating progress:', error);
+    }
 }
 
 function initializeCourseHeader() {
