@@ -178,7 +178,7 @@ body {
     margin-top: 20px;
 }
 
-#step-2 .prev-btn{
+#step-2 .prev-btn-first{
     padding: 10px 20px;
     background-color: #677BAA;
     color: #fff;
@@ -209,7 +209,7 @@ body {
     transform: scale(1.1);
     
 }
-#step-2 .prev-btn:hover {
+#step-2 .prev-btn-first:hover {
     background-color: #5670ac;
     transform: scale(1.1);
 }
