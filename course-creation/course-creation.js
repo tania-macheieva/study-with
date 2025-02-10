@@ -51,8 +51,8 @@ const translations = {
     lectureTitle: "Enter lecture title",
     enterLectureDescription: "Enter lecture description",
     chooseFiles: "Upload Materials (PDF, DOCX etc.)",
-    uploadVideo: "Upload Video",
-    chooseVideo: "Choose Video",
+    chooseVideo: "Upload Video",
+    chooseAudio: "Upload Audio",
     videoFileChosen: "No video chosen",
     fillRequiredFields: "Please fill all required fields!",
     confirmDeleteModule: 'Are you sure you want to delete this module?',
@@ -113,8 +113,8 @@ const translations = {
     lectureTitle: "Введіть назву лекції",
     enterLectureDescription: "Введіть опис лекції",
     chooseFiles: "Завантажити матеріали (PDF, DOCX тощо)",
-    uploadVideo: "Завантажити відео",
-    chooseVideo: "Оберіть відео",
+    chooseVideo: "Завантажити відео",
+    chooseAudio: "Завантажити аудіо",
     videoFileChosen: "Відео не вибрано",
     fillRequiredFields: "Будь ласка, заповніть усі обов'язкові поля!",
     confirmDeleteModule: 'Ви впевнені, що хочете видалити цей модуль?',
@@ -349,7 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </label>
           <div class="file-names-list">${lectureData.videoFile ? `<span>${lectureData.videoFile}</span>` : ""}</div>
         </div>
-        <div class="file-warning" style="color: #ff2600; font-size: 14px; margin-top: 5px; font-weight: 430; margin-bottom: 15px;;" data-lang="note"> ${translations[userLang].note}</div>
+        <div class="file-warning" style="color: #ff2600; font-size: 13px; margin-top: 0px; font-weight: 430; margin-bottom: 15px;;" data-lang="note"> ${translations[userLang].note}</div>
       </div>
       <div class="note-container">
         <label class="upload">${translations[userLang].chooseFiles}</label>
@@ -362,7 +362,18 @@ document.addEventListener('DOMContentLoaded', () => {
             ${lectureData.materialsFiles ? lectureData.materialsFiles.map(file => `<span>${file}</span>`).join("") : ""}
           </div>
         </div>
-        <div class="file-warning" style="color: #ff2600; font-size: 14px; margin-top: 5px; font-weight: 430; margin-bottom: 5px;" data-lang="note"> ${translations[userLang].note}</div>
+        <div class="file-warning" style="color: #ff2600; font-size: 13px; margin-top: 0px; font-weight: 430; margin-bottom: 15px;" data-lang="note"> ${translations[userLang].note}</div>
+      </div>
+      <div class="note-container">
+        <label class="upload">${translations[userLang].chooseAudio}</label>
+        <div class="custom-file-container">
+          <label class="custom-file-upload">
+            ${translations[userLang].chooseFile}
+            <input class="lecture_audio" name="lecture_audio" type="file" accept="audio/*" />
+          </label>
+          <div class="file-names-list">${lectureData.audioFile ? `<span>${lectureData.audioFile}</span>` : ""}</div>
+        </div>
+        <div class="file-warning" style="color: #ff2600; font-size: 13px; margin-top: 0px; font-weight: 430; margin-bottom: 5px;" data-lang="note"> ${translations[userLang].note}</div>
       </div>`;
   lecturesDiv.appendChild(lectureDiv);
 
