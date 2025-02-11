@@ -507,6 +507,43 @@ try {
 }
 }
 
+async function updateProgress() {
+    try {
+        const courseId = window.location.pathname.split('/course/').pop();
+        const userId = localStorage.getItem('userId');
+        
+        const response = await fetch(`/api/course/${courseId}/progress?userId=${userId}`);
+        if (!response.ok) throw new Error('Failed to fetch progress');
+        
+        const progressData = await response.json();
+        console.log('Progress data:', progressData); // Для дебагу
+        
+        // Оновлюємо прогрес-бар в хедері
+        const progressBar = document.querySelector('.progress-bar span');
+        const progressText = document.querySelector('.progress-text .percent');
+        
+        if (progressBar && progressText) {
+            const progress = progressData.progress || 0;
+            progressBar.style.width = `${progress}%`;
+            progressText.textContent = `${Math.round(progress)}%`;
+        }
+
+        // Оновлюємо прогрес в модулях
+        document.querySelectorAll('.module-progress').forEach(moduleProgress => {
+            const total = progressData.totalLectures;
+            const completed = progressData.completedLectures;
+            moduleProgress.innerHTML = `
+                <span>${completed}/${total} complete</span>
+                <span class="separator">|</span>
+                <span>${total - completed} left</span>
+            `;
+        });
+
+    } catch (error) {
+        console.error('Error updating progress:', error);
+    }
+}
+
 // Обробники для закриття/відкриття акаунту
 document.body.addEventListener('click', async (event) => {
 const userId = localStorage.getItem('userId');

@@ -30,31 +30,42 @@ router.get('/course/:courseId', async (req, res) => {
         console.log('Виконуємо запит до бази даних...'); // Додаємо логування
 
         const courseQuery = `
-            SELECT 
-                c.id,
-                c.name,
-                c.description,
-                c.author_id,
-                u.name as author_name,
-                m.id as module_id,
-                m.title as module_title,
-                m.order_num as module_order,
-                l.id as lecture_id,
-                l.title as lecture_title,
-                l.description as lecture_description,
-                l.order_num as lecture_order,
-                lf.file_url,
-                lf.file_type,
-                COALESCE(lp.completed, false) as is_completed
-            FROM all_courses c
-            LEFT JOIN users u ON c.author_id = u.id
-            LEFT JOIN modules m ON c.id = m.course_id
-            LEFT JOIN lectures l ON m.id = l.module_id
-            LEFT JOIN lecture_files lf ON l.id = lf.lecture_id
-            LEFT JOIN lecture_progress lp ON l.id = lp.lecture_id AND lp.user_id = $2
-            WHERE c.id = $1
-            ORDER BY m.order_num, l.order_num
-        `;
+    SELECT 
+        c.id,
+        c.name,
+        c.description,
+        c.author_id,
+        u.name as author_name,
+        m.id as module_id,
+        m.title as module_title,
+        m.order_num as module_order,
+        l.id as lecture_id,
+        l.title as lecture_title,
+        l.description as lecture_description,
+        l.order_num as lecture_order,
+        lf.file_url,
+        lf.file_type,
+        lp.completed as is_completed,
+        (
+            SELECT COUNT(*)
+            FROM lectures l2
+            WHERE l2.module_id = m.id
+        ) as module_total_lectures,
+        (
+            SELECT COUNT(*)
+            FROM lectures l2
+            JOIN lecture_progress lp2 ON l2.id = lp2.lecture_id
+            WHERE l2.module_id = m.id AND lp2.user_id = $2 AND lp2.completed = true
+        ) as module_completed_lectures
+    FROM all_courses c
+    LEFT JOIN users u ON c.author_id = u.id
+    LEFT JOIN modules m ON c.id = m.course_id
+    LEFT JOIN lectures l ON m.id = l.module_id
+    LEFT JOIN lecture_files lf ON l.id = lf.lecture_id
+    LEFT JOIN lecture_progress lp ON l.id = lp.lecture_id AND lp.user_id = $2
+    WHERE c.id = $1
+    ORDER BY m.order_num, l.order_num
+`;
 
         const courseResult = await db.query(courseQuery, [courseIdNum, userId]);
 

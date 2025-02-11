@@ -1,46 +1,4 @@
-let COURSE_MODULES = [
-    {
-        id: 1,
-        title: "Module 1",
-        progress: {
-            completed: 3,
-            total: 3,
-            timeLeft: 0,
-            totalTime: 16
-        },
-        topics: [
-            { id: 1, title: "topic 1 name", completed: true, contentType: "video" },
-            { id: 2, title: "topic 2 name", completed: true, contentType: "text" },
-            { id: 3, title: "topic 3 name", completed: true, contentType: "quiz" }
-        ]
-    },
-    {
-        id: 2,
-        title: "Module 2",
-        progress: {
-            completed: 0,
-            total: 3,
-            timeLeft: 1,
-            totalTime: 11
-        },
-        topics: [
-            { id: 4, title: "topic 1 name", completed: false, contentType: "video" },
-            { id: 5, title: "topic 2 name", completed: false, contentType: "video" },
-            { id: 6, title: "topic 3 name", completed: false, contentType: "video" }
-        ]
-    },
-    {
-        id: 3,
-        title: "Module 3",
-        progress: {
-            completed: 0,
-            total: 0,
-            timeLeft: 0,
-            totalTime: 0
-        },
-        topics: []
-    }
-];
+let COURSE_MODULES = [];
 
 const VIDEO_SOURCE = {
     id: 'course-video',
@@ -635,34 +593,43 @@ const showNotesModal = (currentTime) => {
     });
 };
 
-const createModuleHTML = (module) => {
-    const hasContent = module.topics && module.topics.length > 0;
+function createModuleHTML(module) {
+    const { completed, total } = module.progress;
+    const remaining = total - completed;
     
     return `
         <section class="module" data-module-id="${module.id}">
             <div class="module-header">
                 <h2>${module.title}</h2>
-                <button class="toggle-module">v</button>
+                ${module.lectures.length > 0 ? `
+                    <button class="toggle-module" aria-label="Toggle module content"></button>
+                ` : ''}
             </div>
-            <div class="module-content">
-                <div class="module-progress">
-                    <span>${module.progress.completed}/${module.progress.total} complete | ${module.progress.timeLeft} left</span>
+            ${module.lectures.length > 0 ? `
+                <div class="module-content">
+                    <div class="module-progress">
+                        <span>${completed}/${total} complete</span>
+                        <span class="separator">|</span>
+                        <span>${remaining} left</span>
+                    </div>
+                    <ul class="topics">
+                        ${module.lectures.map(lecture => `
+                            <li onclick="handleLectureClick(${lecture.id}, '${lecture.contentType}')" 
+                                data-topic-id="${lecture.id}" 
+                                data-content-type="${lecture.contentType}"
+                                class="topic-item ${lecture.completed ? 'completed' : ''}"
+                            >
+                                ${lecture.completed ? '<span class="checkmark">✓</span>' : ''}
+                                <img src="/images/text-icon.svg" class="topic-icon" />
+                                <span class="topic-title">${lecture.title}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
                 </div>
-                <ul class="topics" style="cursor: pointer;">
-                    ${module.topics.map(topic => `
-                        <li onclick="handleLectureClick(${topic.id}, '${topic.contentType}')" 
-                            data-topic-id="${topic.id}" 
-                            data-content-type="${topic.contentType}"
-                            style="padding: 10px; margin: 5px 0;">
-                            <img src="/images/text-icon.svg" style="width: 20px; margin-right: 10px;" />
-                            ${topic.title}
-                        </li>
-                    `).join('')}
-                </ul>
-            </div>
+            ` : ''}
         </section>
     `;
-};
+}
 
 
 window.handleLectureClick = async function(lectureId, contentType) {
@@ -770,24 +737,6 @@ window.completeLecture = async function(lectureId) {
     } catch (error) {
         console.error('Error completing lecture:', error);
     }
-};
-
-const renderCourseContent = () => {
-    const courseContent = document.querySelector('.course-content');
-    if (!courseContent) return;
-    courseContent.innerHTML = '';
-    courseContent.innerHTML = `
-        <div class="course-header">
-            <h1>Course content</h1>
-            <button class="toggle-all" aria-label="Toggle all content">
-            </button>
-        </div>
-    `;
-    courseContent.classList.remove('collapsed'); // Видаляємо клас collapsed
-    COURSE_MODULES.forEach(module => {
-        courseContent.insertAdjacentHTML('beforeend', createModuleHTML(module));
-    });
-    initializeModuleListeners();
 };
 
 const initializeModuleListeners = () => {
@@ -1403,79 +1352,95 @@ async function loadCourseData() {
     try {
         const courseId = window.location.pathname.split('/course/').pop();
         const userId = localStorage.getItem('userId');
-        
-        console.log('Loading course data:', { courseId, userId });
-
-        if (!courseId || isNaN(courseId)) {
-            console.error('Invalid course ID:', courseId);
-            return;
-        }
-
-        if (!userId) {
-            console.error('User ID not found');
-            return;
-        }
 
         const response = await fetch(`/api/course/${courseId}?userId=${userId}`);
-        
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(`Failed to load course data: ${errorData.error || response.statusText}`);
-        }
+        if (!response.ok) throw new Error('Failed to load course data');
         
         const courseData = await response.json();
-        console.log('Received course data:', courseData);
         
-        // Оновлюємо заголовок курсу в хедері
-        const courseNameElement = document.querySelector('.course-n');
-        if (courseNameElement) {
-            courseNameElement.innerHTML = `<img src="../images/save-c.svg" alt="save-course-ico">${courseData.name}`;
-        }
-
-        // Оновлюємо прогрес в хедері
-        const progressBar = document.querySelector('.progress-container .progress-bar span');
-        const progressText = document.querySelector('.progress-container .progress-text .percent');
-        if (progressBar && progressText) {
-            const totalProgress = calculateTotalProgress(courseData.modules);
-            progressBar.style.width = `${totalProgress}%`;
-            progressText.textContent = `${totalProgress}%`;
-        }
-        
-        // Оновлюємо модулі
         if (courseData.modules && Array.isArray(courseData.modules)) {
-            COURSE_MODULES = courseData.modules.map(module => ({
-                id: module.id,
-                title: module.title || 'Untitled Module',
-                progress: {
-                    completed: module.lectures.filter(l => l.completed).length,
-                    total: module.lectures.length,
-                    timeLeft: 0,
-                    totalTime: module.lectures.length * 5
-                },
-                topics: module.lectures.map(lecture => ({
-                    id: lecture.id,
-                    title: lecture.title || 'Untitled Lecture',
-                    completed: lecture.completed,
-                    contentType: lecture.file_type || 'text'
-                }))
-            }));
+            COURSE_MODULES = courseData.modules.map(module => {
+                const lectures = module.lectures || [];
+                const completedLectures = lectures.filter(lecture => lecture.is_completed).length;
+                const totalLectures = lectures.length;
+                
+                return {
+                    id: module.id,
+                    title: module.title,
+                    lectures: lectures.map(lecture => ({
+                        id: lecture.id,
+                        title: lecture.title,
+                        completed: Boolean(lecture.is_completed),
+                        contentType: lecture.file_type || 'text'
+                    })),
+                    progress: {
+                        completed: completedLectures,
+                        total: totalLectures
+                    }
+                };
+            });
             
-            console.log('Updated COURSE_MODULES:', COURSE_MODULES);
             renderCourseContent();
         }
-        
     } catch (error) {
         console.error('Error loading course data:', error);
-        const courseContent = document.querySelector('.course-content');
-        if (courseContent) {
-            courseContent.innerHTML = `
-                <div class="error-message">
-                    Failed to load course content: ${error.message}
-                    <br>
-                    Please try refreshing the page.
-                </div>
-            `;
-        }
+    }
+}
+
+function renderCourseContent() {
+    const courseContent = document.querySelector('.course-content');
+    if (!courseContent) return;
+    
+    courseContent.innerHTML = `
+        <div class="course-header">
+            <h1>Course content</h1>
+            <button class="toggle-all" aria-label="Toggle all content"></button>
+        </div>
+    `;
+    
+    COURSE_MODULES.forEach(module => {
+        courseContent.insertAdjacentHTML('beforeend', createModuleHTML(module));
+    });
+    
+    initializeModuleListeners();
+}
+
+async function completeLecture(lectureId) {
+    try {
+        const userId = localStorage.getItem('userId');
+        const response = await fetch(`/api/lecture/${lectureId}/complete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId })
+        });
+
+        if (!response.ok) throw new Error('Failed to complete lecture');
+
+        // Оновлюємо локальний стан
+        COURSE_MODULES = COURSE_MODULES.map(module => {
+            const updatedLectures = module.lectures.map(lecture => 
+                lecture.id === parseInt(lectureId) 
+                    ? { ...lecture, completed: true }
+                    : lecture
+            );
+            
+            return {
+                ...module,
+                lectures: updatedLectures,
+                progress: {
+                    completed: updatedLectures.filter(l => l.completed).length,
+                    total: updatedLectures.length
+                }
+            };
+        });
+
+        // Перемальовуємо весь контент
+        renderCourseContent();
+
+    } catch (error) {
+        console.error('Error completing lecture:', error);
     }
 }
 
@@ -1525,34 +1490,6 @@ function updateProgressUI(progressData) {
             lecture.classList.add('completed');
         }
     });
-}
-
-async function completeLecture(lectureId) {
-    try {
-        const userId = localStorage.getItem('userId');
-        
-        if (!userId) {
-            console.error('User ID not found');
-            return;
-        }
-
-        const response = await fetch(`/api/lecture/${lectureId}/complete`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ userId })
-        });
-        
-        if (!response.ok) {
-            throw new Error('Failed to complete lecture');
-        }
-        
-        await loadProgress(); 
-        
-    } catch (error) {
-        console.error('Error completing lecture:', error);
-    }
 }
 
 async function loadProgress() {
