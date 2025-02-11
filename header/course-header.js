@@ -238,59 +238,64 @@ class HeaderComponent extends HTMLElement {
 
 customElements.define('course-header', HeaderComponent);
 
-function initializeLanguage() {
-    const currentLang = localStorage.getItem("language") || "en";
-    document.documentElement.lang = currentLang;
 
-    const langSwitcher = document.querySelector(".lang-switcher");
+// Керування мовою
+function initializeLanguage() {
+    const currentLang = localStorage.getItem('language') || 'en';
+    document.documentElement.lang = currentLang;
+    
+    const langSwitcher = document.querySelector('.lang-switcher');
     if (langSwitcher) {
-        const buttons = langSwitcher.querySelectorAll(".lang-btn");
-        buttons.forEach((btn) => {
-            btn.classList.toggle("active", btn.getAttribute("data-lang") === currentLang);
+        // Встановлюємо активний стан для поточної мови
+        const buttons = langSwitcher.querySelectorAll('.lang-btn');
+        buttons.forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-lang') === currentLang);
         });
 
-        langSwitcher.addEventListener("click", (event) => {
-            if (event.target.classList.contains("lang-btn")) {
+        // Додаємо обробник кліку
+        langSwitcher.addEventListener('click', (event) => {
+            if (event.target.classList.contains('lang-btn')) {
                 event.preventDefault();
-                const selectedLang = event.target.getAttribute("data-lang");
+                const selectedLang = event.target.getAttribute('data-lang');
                 
                 if (selectedLang !== currentLang) {
-                    localStorage.setItem("language", selectedLang);
-                    applyTranslations(selectedLang);
-                    
-                    buttons.forEach((btn) => {
-                        btn.classList.toggle("active", btn.getAttribute("data-lang") === selectedLang);
-                    });
+                    localStorage.setItem('language', selectedLang);
+                    location.reload();
                 }
             }
         });
     }
 
+    // Застосовуємо переклади
     applyTranslations(currentLang);
 }
 
+// Застосування перекладів до сторінки
 function applyTranslations(lang) {
     const translations = headerTranslations[lang];
     if (!translations) return;
 
-    document.querySelectorAll("[data-lang]").forEach((element) => {
-        const key = element.getAttribute("data-lang");
+    document.querySelectorAll('[data-lang]').forEach(element => {
+        const key = element.getAttribute('data-lang');
         if (translations[key]) {
-            if (element.querySelector("img")) {
-                let textNode = Array.from(element.childNodes).find(
-                    (node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== ""
-                );
-
-                if (textNode) {
-                    textNode.textContent = ` ${translations[key]}`;
-                } else {
-                    element.appendChild(document.createTextNode(` ${translations[key]}`));
-                }
+            if (element.tagName === 'INPUT') {
+                element.setAttribute('placeholder', translations[key]);
             } else {
                 element.textContent = translations[key];
             }
         }
     });
+
+    // Оновлюємо дропдаун, якщо він відкритий
+    const existingDropdown = document.querySelector('.user-dropdown');
+    if (existingDropdown) {
+        const authData = getAuthDataFromStorage();
+        if (authData) {
+            existingDropdown.remove();
+            const userContainer = document.querySelector('#user').parentElement;
+            userContainer.appendChild(createUserDropdown(authData));
+        }
+    }
 }
 
 const headerTranslations = {
