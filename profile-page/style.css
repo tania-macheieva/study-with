@@ -89,6 +89,11 @@ body {
     margin-bottom: 3px;
 } 
 
+.chapters {
+    display: flex;
+    justify-content: center;
+}
+
 .profile-image {
     width: 130px;
     height: 130px;
@@ -128,6 +133,12 @@ body {
 .action-buttons button:hover {
     transform: scale(1.2);
     transition: transform 0.2s ease-in-out;
+}
+
+p {
+    font-weight: 400;
+    font-size: 17px;
+    text-align: left;
 }
 
 .profile-container .user-info p {
@@ -617,7 +628,7 @@ body {
     border-radius: 100px;    
     font-weight: 640;
     cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
+    transition: background 0.2s ease-in-out;
     margin-top: 10px;
     margin-bottom: 15px;
     margin-left: 70%;
@@ -630,9 +641,8 @@ body {
 }
 
 .btn-download:hover {
-    background-color: #545F7A;
-    color: #ffffff;
-    transform: translateY(-2px);
+    background-color: #a5a5a5;
+
 } 
 
 .btn-download:hover img { 
@@ -711,6 +721,7 @@ body {
     width: 250px;
     border-radius: 12px;
 }
+
 .bookmarks-list {
     display: grid;  
     grid-template-columns: repeat(3, 1fr); 
@@ -718,6 +729,7 @@ body {
     overflow: hidden;
     transition: height 0.5s ease-in-out; 
 }
+
 .btn-open { 
     width: 100%;
     font-family: "Inter", sans-serif;
@@ -801,89 +813,89 @@ body {
 .btn-view-all-1 { 
     width: 150px;
     padding: 8px 10px;
-    font-size: 18px;
+    font-size: 17px;
+    font-weight: 400;
     font-family: "Inter", sans-serif;
-    font-weight: 640;
     background: #283044;
     color: #ffffff;
     border: none;
     border-radius: 12px;
     cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
+    transition: background 0.3s ease;
     margin-top: 10px;
     margin-bottom: 12px;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-view-all-1:hover {
-    background-color: #545F7A;
-    color: #ffffff;
-    transform: translateY(-2px);
+    background-color: #0c101a;
 }  
 
 .btn-view-all-2 { 
     width: 150px;
     padding: 8px 10px;
-    font-size: 18px;
+    font-size: 17px;
+    font-weight: 400;
     font-family: "Inter", sans-serif; 
     background: #283044;
     color: #ffffff;
     border: none;
     border-radius: 12px; 
-    font-weight: 640;
     cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
+    transition: background 0.3s ease;
     margin-top: 10px;
     margin-bottom: 12px;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-view-all-2:hover {
-    background-color: #545F7A;
-    color: #ffffff;
-    transform: translateY(-2px);
+    background-color: #0c101a;
 }  
 
 .btn-view-all-3 { 
     width: 150px;
     padding: 8px 10px;
-    font-size: 18px;  
+    font-size: 17px;
+    font-weight: 400;
     font-family: "Inter", sans-serif; 
     background: #283044;
     color: #ffffff;
     border: none;
     border-radius: 12px; 
-    font-weight: 640;
     cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
+    transition: background 0.3s ease;
     margin-top: 10px;
     margin-bottom: 12px;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-view-all-3:hover {
-    background-color: #545F7A;
-    color: #ffffff;
-    transform: translateY(-2px);
+    background-color: #0c101a;
 }  
 
 .btn-view-all-4 { 
     width: 150px;
     padding: 8px 10px;
-    font-size: 18px;
+    font-size: 17px;
+    font-weight: 400;;
     font-family: "Inter", sans-serif; 
     background: #283044;
     color: #ffffff;
     border: none;
     border-radius: 12px; 
-    font-weight: 640;
     cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
+    transition: background 0.3s ease;
     margin-top: 10px;
     margin-bottom: 12px;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-view-all-4:hover {
-    background-color: #545F7A;
-    color: #ffffff;
-    transform: translateY(-2px);
+    background-color: #0c101a;
 }  
 
 
