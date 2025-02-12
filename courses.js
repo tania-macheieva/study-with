@@ -8,6 +8,7 @@ const upload = multer({ storage }).fields([
     { name: 'course_thumbnail', maxCount: 1 },
     { name: 'lecture_files' },
     { name: 'lecture_videos' },
+    { name: 'lecture_audio' },
   ]);
   
   router.post('/save-draft', upload, async (req, res) => {  
@@ -158,6 +159,7 @@ const upload = multer({ storage }).fields([
         if (modulesToDelete.length > 0) {
           await pool.query(`DELETE FROM lecture_files WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
           await pool.query(`DELETE FROM videos WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
+          await pool.query(`DELETE FROM audio WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
           await pool.query(`DELETE FROM lectures WHERE module_id = ANY($1::int[])`, [modulesToDelete]);
           await pool.query(`DELETE FROM modules WHERE id = ANY($1::int[])`, [modulesToDelete]);
         }
@@ -231,7 +233,24 @@ const upload = multer({ storage }).fields([
                       ]
                   );
                 }
-              }
+
+                  const audiosForThisLecture = req.files['lecture_audio']?.slice(index, index + 1); 
+                  if (audiosForThisLecture && audiosForThisLecture.length > 0) {
+                    await pool.query('DELETE FROM audio WHERE lecture_id = $1', [lectureId]);
+            
+                    const audio = audiosForThisLecture[0]; 
+                    await pool.query(
+                      `INSERT INTO audio (lecture_id, file_name, file_path, file_size)
+                      VALUES ($1, $2, $3, $4)`,
+                      [
+                        lectureId,
+                        audio.originalname,
+                        audio.path,
+                        audio.size,
+                      ]
+                    );
+                  }
+                }
             });
   
             await Promise.all(lecturePromises);
@@ -414,6 +433,7 @@ router.post('/create', upload, async (req, res) => {
               
               await pool.query(`DELETE FROM lecture_files WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
               await pool.query(`DELETE FROM videos WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
+              await pool.query(`DELETE FROM audio WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
               await pool.query(`DELETE FROM lectures WHERE module_id = ANY($1::int[])`, [modulesToDelete]);
           
               
@@ -507,8 +527,24 @@ router.post('/create', upload, async (req, res) => {
                                 video.size,
                             ]
                         );
-                    }
+                    } 
+                const audiosForThisLecture = req.files['lecture_audio']?.slice(index, index + 1); 
+                if (audiosForThisLecture && audiosForThisLecture.length > 0) {
+                  await pool.query('DELETE FROM audio WHERE lecture_id = $1', [lectureId]);
+          
+                  const audio = audiosForThisLecture[0]; 
+                  await pool.query(
+                    `INSERT INTO audio (lecture_id, file_name, file_path, file_size)
+                    VALUES ($1, $2, $3, $4)`,
+                    [
+                      lectureId,
+                      audio.originalname,
+                      audio.path,
+                      audio.size,
+                    ]
+                  );
                 }
+              }
             });
                
           
@@ -855,7 +891,7 @@ router.post('/:courseId/enroll', async (req, res) => {
 router.get('/enrolled/:userId', async (req, res) => {
   const { userId } = req.params;
   console.log('Received request for enrolled courses. UserId:', userId);
-
+  
   try {
       const query = `
           SELECT DISTINCT
@@ -865,20 +901,7 @@ router.get('/enrolled/:userId', async (req, res) => {
               c.image_url,
               e.progress,
               e.enrollment_date,
-              e.status as enrollment_status,
-              (
-                  SELECT COUNT(*) 
-                  FROM modules m 
-                  JOIN lectures l ON m.id = l.module_id 
-                  WHERE m.course_id = c.id
-              ) as total_lectures,
-              (
-                  SELECT COUNT(*) 
-                  FROM modules m 
-                  JOIN lectures l ON m.id = l.module_id 
-                  JOIN lecture_progress lp ON l.id = lp.lecture_id 
-                  WHERE m.course_id = c.id AND lp.user_id = e.user_id AND lp.completed = true
-              ) as completed_lectures
+              e.status as enrollment_status
           FROM enrollments e
           INNER JOIN all_courses c ON e.course_id = c.id
           WHERE e.user_id = $1 
@@ -886,26 +909,18 @@ router.get('/enrolled/:userId', async (req, res) => {
           AND c.status = 'published'
           ORDER BY e.enrollment_date DESC
       `;
-      
       console.log('Executing query:', query);
       console.log('With userId:', userId);
 
       const result = await pool.query(query, [userId]);
       console.log('Query result:', result.rows);
 
-      // Розраховуємо актуальний прогрес для кожного курсу
-      const coursesWithProgress = result.rows.map(course => ({
-          ...course,
-          progress: course.total_lectures > 0 ? 
-              Math.round((course.completed_lectures / course.total_lectures) * 100) : 0
-      }));
-
-      res.json(coursesWithProgress);
+      res.json(result.rows);
   } catch (error) {
       console.error('Error loading courses:', error);
-      res.status(500).json({
-          error: 'Internal server error',
-          details: error.message
+      res.status(500).json({ 
+          error: 'Internal server error', 
+          details: error.message 
       });
   }
 });

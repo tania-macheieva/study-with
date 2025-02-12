@@ -170,6 +170,17 @@ CREATE TABLE videos (
     FOREIGN KEY (lecture_id) REFERENCES lectures(id) ON DELETE CASCADE
 );
 
+CREATE TABLE audio (
+    id SERIAL PRIMARY KEY,
+    lecture_id INT NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    file_path VARCHAR(255) NOT NULL,
+    file_size INT NOT NULL,
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    language_code VARCHAR(10) DEFAULT 'en',
+    FOREIGN KEY (lecture_id) REFERENCES lectures(id) ON DELETE CASCADE
+);
+
 -- таблиця з відгуками 
 CREATE TABLE teacher_reviews (
     id SERIAL PRIMARY KEY,

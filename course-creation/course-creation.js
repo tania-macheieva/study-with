@@ -361,7 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="custom-file-container">
           <label class="custom-file-upload">
             ${translations[userLang].chooseFile}
-            <input class="lecture-materials" name="lecture_files" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg,.gif,.svg,.webp,.zip,.rar,.7z" />
+            <input class="lecture-materials" name="lecture_files" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg,.svg,.webp" />
 
           </label>
           <div class="file-names-list">
@@ -433,6 +433,9 @@ document.addEventListener('DOMContentLoaded', () => {
         saveModulesToLocalStorage();
         updateLectureNumbers(moduleDiv);
     });
+    lectureDiv.querySelector("input[type='text']").addEventListener("input", saveModulesToLocalStorage);
+    lectureDiv.querySelector("textarea").addEventListener("input", saveModulesToLocalStorage);
+
 }
 
   
@@ -751,6 +754,16 @@ lectureVideos.forEach(input => {
   }
 });
 
+const lectureAudio = document.querySelectorAll('.lecture-audio');
+lectureAudio.forEach(input => {
+  if (input.files.length > 0) {
+    Array.from(input.files).forEach(file => {
+      
+      formData.append('lecture_audio', file);
+    });
+  }
+});
+
 const courseData = {
   title: courseTitle,
   description: courseDescription,
@@ -804,7 +817,7 @@ window.addEventListener('load', () => {
   const lastClosedTime = localStorage.getItem('lastClosedTime'); 
   if (lastClosedTime) {
       const elapsedTime = Date.now() - parseInt(lastClosedTime, 10);
-      if (elapsedTime > 10000) { // 2 хвилини
+      if (elapsedTime > 10000) { // змінити
           const authorId = JSON.parse(localStorage.getItem('courseDraft'))?.authorId || null;
           localStorage.setItem('courseDraft', JSON.stringify({ authorId }));
       }
@@ -1033,6 +1046,14 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
       }
     });
   
+    const lectureAudio = document.querySelectorAll('.lecture-audio');
+    lectureAudio.forEach(input => {
+      if (input.files.length > 0) {
+        Array.from(input.files).forEach(file => {
+          formData.append('lecture_audio', file);
+        });
+      }
+    });
     
     fetch('/api/courses/create', {
       method: 'POST',
