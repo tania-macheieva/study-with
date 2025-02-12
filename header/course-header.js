@@ -183,7 +183,7 @@ class HeaderComponent extends HTMLElement {
                 display: block;
             }
         </style>
-        <header>
+         <header>
             <div class="container">
                 <div class="left-s">
                     <h2 class="home">
@@ -197,11 +197,11 @@ class HeaderComponent extends HTMLElement {
                 <div class="right-s">
                     <div class="progress-container">
                         <div class="progress-bar">
-                            <span style="width: 50%;"></span>
+                            <span style="width: 0%;"></span>
                         </div>
                         <div class="progress-text">
                             <span>Progress</span>
-                            <span class="percent">50%</span>
+                            <span class="percent">0%</span>
                         </div>
                     </div>
 
@@ -233,6 +233,15 @@ class HeaderComponent extends HTMLElement {
             </div>
         </header>
         `;
+    }
+    setProgress(progress) {
+        const progressBar = this.querySelector('.progress-bar span');
+        const progressText = this.querySelector('.progress-text .percent');
+        
+        if (progressBar && progressText) {
+            progressBar.style.width = `${progress}%`;
+            progressText.textContent = `${Math.round(progress)}%`;
+        }
     }
 }
 
@@ -298,6 +307,30 @@ function applyTranslations(lang) {
     }
 }
 
+async function initializeCourseProgress() {
+    try {
+        const courseId = window.location.pathname.split('/course/').pop();
+        const userId = localStorage.getItem('userId');
+
+        if (!courseId || !userId) return;
+
+        const response = await fetch(`/api/course/${courseId}/progress?userId=${userId}`);
+        
+        if (!response.ok) {
+            throw new Error('Помилка завантаження прогресу');
+        }
+        
+        const progressData = await response.json();
+        
+        const headerComponent = document.querySelector('course-header');
+        if (headerComponent) {
+            headerComponent.setProgress(progressData.progress);
+        }
+    } catch (error) {
+        console.error('Помилка ініціалізації прогресу:', error);
+    }
+}
+
 const headerTranslations = {
     en: {
         home: "Home",
@@ -314,3 +347,5 @@ const headerTranslations = {
         unenrollCourse: "Відписатися від цього курсу",
     },
 };
+
+document.addEventListener('DOMContentLoaded', initializeCourseProgress);
