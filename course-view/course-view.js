@@ -1,4 +1,9 @@
 let COURSE_MODULES = [];
+let lastCompletedLectureId = null;
+let completedLectures = new Set();
+let currentLectureId = null;
+
+
 
 const VIDEO_SOURCE = {
     id: 'course-video',
@@ -618,8 +623,8 @@ function createModuleHTML(module) {
                                 data-topic-id="${lecture.id}" 
                                 data-content-type="${lecture.contentType}"
                                 class="topic-item ${lecture.completed ? 'completed' : ''}"
+                                style="background-color: ${lecture.completed ? '#e8f5e9' : 'transparent'}"
                             >
-                                ${lecture.completed ? '<span class="checkmark">✓</span>' : ''}
                                 <img src="/images/text-icon.svg" class="topic-icon" />
                                 <span class="topic-title">${lecture.title}</span>
                             </li>
@@ -631,6 +636,34 @@ function createModuleHTML(module) {
     `;
 }
 
+async function initializeLecturesState() {
+    try {
+        const courseId = window.location.pathname.split('/course/').pop();
+        const userId = localStorage.getItem('userId');
+        
+        const response = await fetch(`/api/course/${courseId}/progress?userId=${userId}`);
+        if (!response.ok) throw new Error('Failed to fetch progress');
+        
+        const progressData = await response.json();
+        
+        document.querySelectorAll('.topic-item').forEach(topic => {
+            const lectureId = topic.dataset.topicId;
+            if (completedLectures.has(lectureId)) {
+                topic.classList.add('completed');
+                topic.style.backgroundColor = '#e8f5e9';
+            }
+        });
+        
+        const progressBar = document.querySelector('.progress-bar span');
+        const progressText = document.querySelector('.progress-text .percent');
+        if (progressBar && progressText) {
+            progressBar.style.width = `${progressData.progress}%`;
+            progressText.textContent = `${Math.round(progressData.progress)}%`;
+        }
+    } catch (error) {
+        console.error('Error initializing lectures state:', error);
+    }
+}
 
 window.handleLectureClick = async function(lectureId, contentType) {
     try {
@@ -645,14 +678,35 @@ window.handleLectureClick = async function(lectureId, contentType) {
         const videoContainer = document.querySelector('.video-player');
         if (!videoContainer) return;
 
-        let completionTimer;
+        if (currentLectureId && completedLectures.has(currentLectureId)) {
+            const prevLecture = document.querySelector(`[data-topic-id="${currentLectureId}"]`);
+            if (prevLecture && !prevLecture.classList.contains('completed')) {
+                prevLecture.classList.add('completed');
+                prevLecture.style.backgroundColor = '#e8f5e9';
+                await updateProgress();
+            }
+        }
 
-        const startCompletionTimer = () => {
-            completionTimer = setTimeout(async () => {
-                await completeLecture(lectureId);
-                updateProgress();
-            }, 5000);
-        };
+        document.querySelectorAll('.topic-item').forEach(topic => {
+            topic.classList.remove('active');
+            if (!completedLectures.has(topic.dataset.topicId)) {
+                topic.style.backgroundColor = 'transparent';
+            }
+        });
+
+        const currentTopic = document.querySelector(`[data-topic-id="${lectureId}"]`);
+        if (currentTopic) {
+            currentTopic.classList.add('active');
+            if (!completedLectures.has(lectureId)) {
+                currentTopic.style.backgroundColor = 'transparent';
+            }
+        }
+
+        currentLectureId = lectureId;
+
+        if (window.completionTimer) {
+            clearTimeout(window.completionTimer);
+        }
 
         if (lectureData.video_path) {
             videoContainer.innerHTML = `
@@ -663,13 +717,17 @@ window.handleLectureClick = async function(lectureId, contentType) {
             `;
 
             const video = videoContainer.querySelector('video');
+            
             video.addEventListener('play', () => {
-                clearTimeout(completionTimer);
-                startCompletionTimer();
+                clearTimeout(window.completionTimer);
+                window.completionTimer = setTimeout(async () => {
+                    await completeLecture(lectureId);
+                    completedLectures.add(lectureId);
+                }, 5000);
             });
 
             video.addEventListener('pause', () => {
-                clearTimeout(completionTimer);
+                clearTimeout(window.completionTimer);
             });
         } else {
             videoContainer.innerHTML = `
@@ -682,20 +740,12 @@ window.handleLectureClick = async function(lectureId, contentType) {
                     </div>
                 </div>
             `;
-            
-            startCompletionTimer();
-        }
 
-        const topicElements = document.querySelectorAll('.topic-item');
-        topicElements.forEach(topic => {
-            topic.classList.remove('active');
-            if (topic.dataset.topicId === lectureId) {
-                topic.classList.add('active');
-                if (lectureData.is_completed) {
-                    topic.classList.add('completed');
-                }
-            }
-        });
+            window.completionTimer = setTimeout(async () => {
+                await completeLecture(lectureId);
+                completedLectures.add(lectureId);
+            }, 5000);
+        }
 
     } catch (error) {
         console.error('Error:', error);
@@ -1353,10 +1403,17 @@ async function loadCourseData() {
         const courseData = await response.json();
         
         if (courseData.modules && Array.isArray(courseData.modules)) {
+            completedLectures.clear();
+            
             COURSE_MODULES = courseData.modules.map(module => {
                 const lectures = module.lectures || [];
-                const completedLectures = lectures.filter(lecture => lecture.is_completed).length;
-                const totalLectures = lectures.length;
+                const completedLecturesCount = lectures.filter(lecture => lecture.completed).length;
+                
+                lectures.forEach(lecture => {
+                    if (lecture.completed) {
+                        completedLectures.add(lecture.id.toString());
+                    }
+                });
                 
                 return {
                     id: module.id,
@@ -1364,21 +1421,33 @@ async function loadCourseData() {
                     lectures: lectures.map(lecture => ({
                         id: lecture.id,
                         title: lecture.title,
-                        completed: Boolean(lecture.is_completed),
+                        completed: Boolean(lecture.completed),
                         contentType: lecture.file_type || 'text'
                     })),
                     progress: {
-                        completed: completedLectures,
-                        total: totalLectures
+                        completed: completedLecturesCount,
+                        total: lectures.length
                     }
                 };
             });
             
             renderCourseContent();
+            applyCompletedLecturesStyles();
         }
     } catch (error) {
         console.error('Error loading course data:', error);
     }
+}
+
+function applyCompletedLecturesStyles() {
+    const topics = document.querySelectorAll('.topic-item');
+    topics.forEach(topic => {
+        const lectureId = topic.dataset.topicId;
+        if (completedLectures.has(lectureId)) {
+            topic.classList.add('completed');
+            topic.style.backgroundColor = '#e8f5e9';
+        }
+    });
 }
 
 function renderCourseContent() {
@@ -1412,7 +1481,6 @@ async function completeLecture(lectureId) {
 
         if (!response.ok) throw new Error('Failed to complete lecture');
 
-        // Оновлюємо локальний стан
         COURSE_MODULES = COURSE_MODULES.map(module => {
             const updatedLectures = module.lectures.map(lecture => 
                 lecture.id === parseInt(lectureId) 
@@ -1430,7 +1498,6 @@ async function completeLecture(lectureId) {
             };
         });
 
-        // Перемальовуємо весь контент
         renderCourseContent();
 
     } catch (error) {
@@ -1438,7 +1505,6 @@ async function completeLecture(lectureId) {
     }
 }
 
-// Функція для розрахунку загального прогресу курсу
 function calculateTotalProgress(modules) {
     let totalLectures = 0;
     let completedLectures = 0;
@@ -1459,7 +1525,6 @@ async function loadCourseHeader() {
         const html = await response.text();
         document.getElementById('courseHeader').innerHTML = html;
         
-        // Ініціалізуємо обробники подій хедера після його завантаження
         initializeCourseHeader();
     } catch (error) {
         console.error('Error loading course header:', error);
@@ -1559,13 +1624,13 @@ function displayLectureContent(lectureData) {
 
 function initializeTopicListeners() {
     const topicItems = document.querySelectorAll('.topics li');
-    console.log('Found topics:', topicItems.length); // Для дебагу
+    console.log('Found topics:', topicItems.length); 
  
     topicItems.forEach(topic => {
-        topic.style.cursor = 'pointer'; // Додаємо курсор для візуальної індикації
+        topic.style.cursor = 'pointer'; 
         
         topic.addEventListener('click', async () => {
-            console.log('Topic clicked:', topic.dataset.topicId); // Для дебагу
+            console.log('Topic clicked:', topic.dataset.topicId); 
             
             const lectureId = topic.dataset.topicId;
             if (!lectureId) {
@@ -1582,7 +1647,7 @@ function initializeTopicListeners() {
                 }
  
                 const lectureData = await response.json();
-                console.log('Lecture data:', lectureData); // Для дебагу
+                console.log('Lecture data:', lectureData); 
  
                 const videoContainer = document.querySelector('.video-player');
                 if (!videoContainer) {
@@ -1590,13 +1655,11 @@ function initializeTopicListeners() {
                     return;
                 }
  
-                // Відмічаємо активну лекцію
                 document.querySelectorAll('.topics li').forEach(li => {
                     li.classList.remove('active');
                 });
                 topic.classList.add('active');
  
-                // Показуємо контент в залежності від типу
                 if (lectureData.file_type === 'video') {
                     videoContainer.innerHTML = `
                         <video controls>
@@ -1627,7 +1690,7 @@ function initializeTopicListeners() {
     });
  }
 
- async function completeLecture(lectureId) {
+async function completeLecture(lectureId) {
     try {
         const userId = localStorage.getItem('userId');
         const response = await fetch(`/api/lecture/${lectureId}/complete`, {
@@ -1638,14 +1701,8 @@ function initializeTopicListeners() {
             body: JSON.stringify({ userId })
         });
 
-        if (response.ok) {
-            // Позначаємо лекцію як завершену візуально
-            const topic = document.querySelector(`[data-topic-id="${lectureId}"]`);
-            if (topic) {
-                topic.classList.add('completed');
-            }
-            // Оновлюємо загальний прогрес
-            await updateProgress();
+        if (!response.ok) {
+            throw new Error('Failed to complete lecture');
         }
     } catch (error) {
         console.error('Error completing lecture:', error);
@@ -1661,29 +1718,14 @@ async function updateProgress() {
         if (!response.ok) throw new Error('Failed to fetch progress');
         
         const progressData = await response.json();
-        console.log('Progress data:', progressData); // Для дебагу
         
-        // Оновлюємо прогрес-бар в хедері
         const progressBar = document.querySelector('.progress-bar span');
         const progressText = document.querySelector('.progress-text .percent');
         
         if (progressBar && progressText) {
-            const progress = progressData.progress || 0;
-            progressBar.style.width = `${progress}%`;
-            progressText.textContent = `${Math.round(progress)}%`;
+            progressBar.style.width = `${progressData.progress}%`;
+            progressText.textContent = `${Math.round(progressData.progress)}%`;
         }
-
-        // Оновлюємо прогрес в модулях
-        document.querySelectorAll('.module-progress').forEach(moduleProgress => {
-            const total = progressData.totalLectures;
-            const completed = progressData.completedLectures;
-            moduleProgress.innerHTML = `
-                <span>${completed}/${total} complete</span>
-                <span class="separator">|</span>
-                <span>${total - completed} left</span>
-            `;
-        });
-
     } catch (error) {
         console.error('Error updating progress:', error);
     }

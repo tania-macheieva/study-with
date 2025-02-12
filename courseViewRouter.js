@@ -6,11 +6,8 @@ router.get('/course/:courseId', async (req, res) => {
     try {
         const { courseId } = req.params;
         const userId = req.query.userId;
-        
-        console.log('Отримано запит на курс:', { courseId, userId }); // Додаємо логування
 
         if (!courseId || isNaN(courseId)) {
-            console.log('Неправильний ID курсу:', courseId);
             return res.status(400).json({ 
                 error: 'Invalid course ID',
                 details: 'Course ID must be a valid number'
@@ -18,7 +15,6 @@ router.get('/course/:courseId', async (req, res) => {
         }
 
         if (!userId) {
-            console.log('Відсутній ID користувача');
             return res.status(400).json({ 
                 error: 'User ID is required',
                 details: 'Please provide a valid user ID'
@@ -26,54 +22,50 @@ router.get('/course/:courseId', async (req, res) => {
         }
 
         const courseIdNum = parseInt(courseId, 10);
-        
-        console.log('Виконуємо запит до бази даних...'); // Додаємо логування
 
+        // Оновлений запит з правильною обробкою статусу completed
         const courseQuery = `
-    SELECT 
-        c.id,
-        c.name,
-        c.description,
-        c.author_id,
-        u.name as author_name,
-        m.id as module_id,
-        m.title as module_title,
-        m.order_num as module_order,
-        l.id as lecture_id,
-        l.title as lecture_title,
-        l.description as lecture_description,
-        l.order_num as lecture_order,
-        lf.file_url,
-        lf.file_type,
-        lp.completed as is_completed,
-        (
-            SELECT COUNT(*)
-            FROM lectures l2
-            WHERE l2.module_id = m.id
-        ) as module_total_lectures,
-        (
-            SELECT COUNT(*)
-            FROM lectures l2
-            JOIN lecture_progress lp2 ON l2.id = lp2.lecture_id
-            WHERE l2.module_id = m.id AND lp2.user_id = $2 AND lp2.completed = true
-        ) as module_completed_lectures
-    FROM all_courses c
-    LEFT JOIN users u ON c.author_id = u.id
-    LEFT JOIN modules m ON c.id = m.course_id
-    LEFT JOIN lectures l ON m.id = l.module_id
-    LEFT JOIN lecture_files lf ON l.id = lf.lecture_id
-    LEFT JOIN lecture_progress lp ON l.id = lp.lecture_id AND lp.user_id = $2
-    WHERE c.id = $1
-    ORDER BY m.order_num, l.order_num
-`;
+            SELECT 
+                c.id,
+                c.name,
+                c.description,
+                c.author_id,
+                u.name as author_name,
+                m.id as module_id,
+                m.title as module_title,
+                m.order_num as module_order,
+                l.id as lecture_id,
+                l.title as lecture_title,
+                l.description as lecture_description,
+                l.order_num as lecture_order,
+                lf.file_url,
+                lf.file_type,
+                COALESCE(lp.completed, false) as is_completed,
+                (
+                    SELECT COUNT(*)
+                    FROM lectures l2
+                    WHERE l2.module_id = m.id
+                ) as module_total_lectures,
+                (
+                    SELECT COUNT(*)
+                    FROM lectures l2
+                    JOIN lecture_progress lp2 ON l2.id = lp2.lecture_id
+                    WHERE l2.module_id = m.id AND lp2.user_id = $2 AND lp2.completed = true
+                ) as module_completed_lectures
+            FROM all_courses c
+            LEFT JOIN users u ON c.author_id = u.id
+            LEFT JOIN modules m ON c.id = m.course_id
+            LEFT JOIN lectures l ON m.id = l.module_id
+            LEFT JOIN lecture_files lf ON l.id = lf.lecture_id
+            LEFT JOIN lecture_progress lp ON l.id = lp.lecture_id AND lp.user_id = $2
+            WHERE c.id = $1
+            ORDER BY m.order_num, l.order_num
+        `;
 
         const courseResult = await db.query(courseQuery, [courseIdNum, userId]);
 
-        console.log('Результат запиту:', courseResult.rows); // Додаємо логування
-
         if (courseResult.rows.length === 0) {
-            console.log('Курс не знайдено');
-            return res.status(404).json({ error: 'Курс не знайдено' });
+            return res.status(404).json({ error: 'Course not found' });
         }
 
         // Формуємо дані курсу
@@ -88,7 +80,7 @@ router.get('/course/:courseId', async (req, res) => {
             modules: []
         };
 
-        // Групуємо лекції по модулях
+        // Створюємо Map для модулів
         const modulesMap = new Map();
 
         courseResult.rows.forEach(row => {
@@ -116,6 +108,7 @@ router.get('/course/:courseId', async (req, res) => {
             }
         });
 
+        // Конвертуємо Map в масив і сортуємо модулі та лекції
         courseData.modules = Array.from(modulesMap.values())
             .sort((a, b) => a.order - b.order);
 
@@ -123,13 +116,11 @@ router.get('/course/:courseId', async (req, res) => {
             module.lectures.sort((a, b) => a.order - b.order);
         });
 
-        console.log('Відправляємо дані курсу:', courseData); // Додаємо логування
-
         res.json(courseData);
     } catch (error) {
-        console.error('Детальна помилка отримання даних курсу:', error);
+        console.error('Error loading course data:', error);
         res.status(500).json({ 
-            error: 'Внутрішня помилка сервера',
+            error: 'Internal server error',
             details: error.message
         });
     }
@@ -144,7 +135,6 @@ router.get('/course/:courseId/progress', async (req, res) => {
             return res.status(400).json({ error: 'User ID is required' });
         }
 
-        // Змінюємо запит для отримання загальної кількості лекцій в курсі
         const progressQuery = `
             WITH course_stats AS (
                 SELECT 
