@@ -59,7 +59,8 @@ const translations = {
     courseTags: "Course Tags (hidden from users)",
     enterTags: "Enter tags",
     tagTip: "To add a tag, press ENTER",
-    note: "Note: Uploaded files will not be saved after refreshing or closing the page. Please add them again.",
+    note: "* Note: Uploaded files will not be saved after refreshing or closing the page. Please add them again.",
+    restriction: "* Note: You can only add one type of content: video, audio, materials, or description.",
   },
   ua: {
     pageTitle: 'StudyWith | Створення курсу',
@@ -122,6 +123,7 @@ const translations = {
     enterTags: "Введіть теги",
     tagTip: "Щоб додати тег, натисніть ENTER",
     note: "Примітка: Завантажені файли не будуть збережені після оновлення або закриття сторінки. Будь ласка, додайте їх знову.",
+    restriction: "* Примітка: Ви можете додати лише один тип контенту: відео, аудіо, матеріали або опис.",
   },
 };
 
@@ -324,14 +326,14 @@ document.addEventListener('DOMContentLoaded', () => {
   
   
   function addLecture(moduleDiv, lectureData = {}) {
-    
     const lecturesDiv = moduleDiv.querySelector(".lectures");
     const lectureDiv = document.createElement("div");
     lectureDiv.classList.add("lecture");
-  
+
     if (lectureData.videoFile) lectureDiv.dataset.videoFile = lectureData.videoFile;
     if (lectureData.materialsFiles) lectureDiv.dataset.materialsFiles = JSON.stringify(lectureData.materialsFiles);
-  
+    if (lectureData.audioFile) lectureDiv.dataset.audioFile = lectureData.audioFile;
+
     lectureDiv.innerHTML = `
       <div class="container">
         <p class="title-3">${translations[userLang].lecture} ${lecturesDiv.children.length + 1}</p>
@@ -339,7 +341,10 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
       <input type="text" placeholder="${translations[userLang].lectureTitle}" value="${lectureData.title || ""}">
       <label class="title-3">${translations[userLang].enterLectureDescription}</label>
-      <textarea placeholder="${translations[userLang].enterLectureDescription}" rows="5">${lectureData.description || ""}</textarea>
+      <textarea class="lecture-description" placeholder="${translations[userLang].enterLectureDescription}" rows="5">${lectureData.description || ""}</textarea>
+      <div class="restriction" style="color: #ff2600; font-size:13px; margin-top: 0px; font-weight: 430; margin-bottom: 15px" data-lang="restriction"> ${translations[userLang].restriction}</div>
+
+
       <div class="note-container">
         <label class="upload">${translations[userLang].chooseVideo}</label>
         <div class="custom-file-container">
@@ -349,56 +354,87 @@ document.addEventListener('DOMContentLoaded', () => {
           </label>
           <div class="file-names-list">${lectureData.videoFile ? `<span>${lectureData.videoFile}</span>` : ""}</div>
         </div>
-        <div class="file-warning" style="color: #ff2600; font-size: 13px; margin-top: 0px; font-weight: 430; margin-bottom: 15px;;" data-lang="note"> ${translations[userLang].note}</div>
       </div>
+
       <div class="note-container">
         <label class="upload">${translations[userLang].chooseFiles}</label>
         <div class="custom-file-container">
           <label class="custom-file-upload">
             ${translations[userLang].chooseFile}
-            <input class="lecture-materials" name="lecture_files" type="file" multiple />
+            <input class="lecture-materials" name="lecture_files" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg,.gif,.svg,.webp,.zip,.rar,.7z" />
+
           </label>
           <div class="file-names-list">
             ${lectureData.materialsFiles ? lectureData.materialsFiles.map(file => `<span>${file}</span>`).join("") : ""}
           </div>
         </div>
-        <div class="file-warning" style="color: #ff2600; font-size: 13px; margin-top: 0px; font-weight: 430; margin-bottom: 15px;" data-lang="note"> ${translations[userLang].note}</div>
       </div>
+
       <div class="note-container">
         <label class="upload">${translations[userLang].chooseAudio}</label>
         <div class="custom-file-container">
           <label class="custom-file-upload">
             ${translations[userLang].chooseFile}
-            <input class="lecture_audio" name="lecture_audio" type="file" accept="audio/*" />
+            <input class="lecture-audio" name="lecture_audio" type="file" accept="audio/*" />
           </label>
           <div class="file-names-list">${lectureData.audioFile ? `<span>${lectureData.audioFile}</span>` : ""}</div>
         </div>
-        <div class="file-warning" style="color: #ff2600; font-size: 13px; margin-top: 0px; font-weight: 430; margin-bottom: 5px;" data-lang="note"> ${translations[userLang].note}</div>
+        <div class="file-warning" style="color: #ff2600; font-size:13px; margin-top: 0px; font-weight: 430; margin-bottom: 15px" data-lang="note"> ${translations[userLang].note}</div>     
       </div>`;
-  lecturesDiv.appendChild(lectureDiv);
 
- 
-  // Обробники подій для вибору файлів
-  lectureDiv.querySelector(".lecture-video").addEventListener("change", function () {
-    updateFileNamesList(this, lectureDiv.querySelector(".file-names-list"));
-  });
+    lecturesDiv.appendChild(lectureDiv);
 
-  lectureDiv.querySelector(".lecture-materials").addEventListener("change", function () {
-    updateFileNamesList(this, lectureDiv.querySelectorAll(".file-names-list")[1]);
-  });
+    const inputs = {
+      video: lectureDiv.querySelector(".lecture-video"),
+      materials: lectureDiv.querySelector(".lecture-materials"),
+      audio: lectureDiv.querySelector(".lecture-audio"),
+      description: lectureDiv.querySelector(".lecture-description"),
+    };
 
+    const restrictionMessage = lectureDiv.querySelector(".restriction-message");
 
-    // Видалення лекції
+    function disableOtherInputs(selectedInput) {
+        let isDisabled = selectedInput.files ? selectedInput.files.length > 0 : selectedInput.value.trim().length > 0;
+
+        Object.values(inputs).forEach(input => {
+            if (input !== selectedInput) {
+                input.disabled = isDisabled;
+                input.style.backgroundColor = isDisabled ? "#e0e0e0" : ""; // Сірий фон для заблокованих полів
+                input.style.cursor = isDisabled ? "not-allowed" : ""; // Курсор "заборонено"
+            }
+        });
+
+        restrictionMessage.textContent = isDisabled ? "You can only add one type of content: video, audio, files, or description." : "";
+    }
+
+    function updateFileNamesList(input, fileListDiv) {
+        fileListDiv.innerHTML = Array.from(input.files).map(file => `<span>${file.name}</span>`).join("");
+        disableOtherInputs(input);
+    }
+
+    inputs.video.addEventListener("change", function () {
+        updateFileNamesList(this, lectureDiv.querySelectorAll(".file-names-list")[0]);
+    });
+
+    inputs.materials.addEventListener("change", function () {
+        updateFileNamesList(this, lectureDiv.querySelectorAll(".file-names-list")[1]);
+    });
+
+    inputs.audio.addEventListener("change", function () {
+        updateFileNamesList(this, lectureDiv.querySelectorAll(".file-names-list")[2]);
+    });
+
+    inputs.description.addEventListener("input", function () {
+        disableOtherInputs(this);
+    });
+
     lectureDiv.querySelector(".delete-lecture-btn").addEventListener("click", () => {
         lectureDiv.remove();
         saveModulesToLocalStorage();
         updateLectureNumbers(moduleDiv);
     });
-
-    lectureDiv.querySelector("input[type='text']").addEventListener("input", saveModulesToLocalStorage);
-    lectureDiv.querySelector("textarea").addEventListener("input", saveModulesToLocalStorage);
- 
 }
+
   
   function updateFileNamesList(inputElement, fileNamesList) {
     const files = Array.from(inputElement.files).map(file => file.name);
