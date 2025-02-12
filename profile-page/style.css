@@ -140,25 +140,68 @@ body {
 } 
 
 .profile-container .user-info  .btn-teacher {
-    width: 70%;
-    font-family: "Inter", sans-serif;
+    width: 90%;
+    font-family: "Inter";
     padding: 9px 5px;
-    background: #283044;
-    color: #ffffff;
-    border: none;
+    background: #fff;
+    color: #000;
     border-radius: 12px;
     font-size: 18px;
-    font-weight: 640;
+    font-weight: 300;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
     margin-top: 10px;
     margin-bottom: 12px;
+    border: 1px solid #000;
+    position: relative;
+    overflow: hidden;
 }
 
-.profile-container .user-info .btn-teacher:hover {
-    background-color: #545F7A;
-    transform: translateY(-2px);
-} 
+
+.btn-teacher span:not(:nth-child(6)) {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    height: 30px;
+    width: 30px;
+    background-color: #dceded;
+    border-radius: 50%;
+    transition: .6s ease;
+    
+  }
+  
+  .btn-teacher span:nth-child(6) {
+    position: relative;
+    
+  }
+  
+  .btn-teacher span:nth-child(1) {
+    transform: translate(-3.3em, -4em);
+    
+  }
+  
+  .btn-teacher span:nth-child(2) {
+    transform: translate(-6em, 1.3em);
+  }
+  
+  .btn-teacher span:nth-child(3) {
+    transform: translate(-.2em, 1.8em);
+  }
+  
+  .btn-teacher span:nth-child(4) {
+    transform: translate(3.5em, 1.4em);
+  }
+  
+  .btn-teacher span:nth-child(5) {
+    transform: translate(3.5em, -3.8em);
+  }
+  
+  .btn-teacher:hover span:not(:nth-child(6)) {
+    transform: translate(-50%, -50%) scale(9);
+    transition: 1.5s ease;
+  }
+
 .tab-container {
     margin: 20px;
 }
