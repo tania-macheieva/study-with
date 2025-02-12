@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
             <div class="group-27">
               <div class="price">$</div>
-              <img class="arrow" src="right-arrow.png" alt="" />
+              <img class="arrow" src="../images/right-arrow.png" alt="" />
             </div>
             <div class="rectangle-23"></div>
           </div>
