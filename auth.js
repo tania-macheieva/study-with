@@ -256,7 +256,7 @@ router.post('/forgot-password', async (req, res) => {
         if (!user) return res.status(404).json({ error: 'User not found' });
 
         const resetToken = jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: '15m' });
-        const resetLink = `http://localhost:8000/reset-password.html?token=${resetToken}`;
+        const resetLink = `http://localhost:8000/reset-password?token=${resetToken}`;
 
         transporter.sendMail({
             from: EMAIL_USER,
