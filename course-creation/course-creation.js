@@ -329,11 +329,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const lecturesDiv = moduleDiv.querySelector(".lectures");
     const lectureDiv = document.createElement("div");
     lectureDiv.classList.add("lecture");
-  
+
     if (lectureData.videoFile) lectureDiv.dataset.videoFile = lectureData.videoFile;
     if (lectureData.materialsFiles) lectureDiv.dataset.materialsFiles = JSON.stringify(lectureData.materialsFiles);
     if (lectureData.audioFile) lectureDiv.dataset.audioFile = lectureData.audioFile;
-  
+
     lectureDiv.innerHTML = `
       <div class="container">
         <p class="title-3">${translations[userLang].lecture} ${lecturesDiv.children.length + 1}</p>
@@ -343,7 +343,8 @@ document.addEventListener('DOMContentLoaded', () => {
       <label class="title-3">${translations[userLang].enterLectureDescription}</label>
       <textarea class="lecture-description" placeholder="${translations[userLang].enterLectureDescription}" rows="5">${lectureData.description || ""}</textarea>
       <div class="restriction" style="color: #ff2600; font-size:13px; margin-top: 0px; font-weight: 430; margin-bottom: 15px" data-lang="restriction"> ${translations[userLang].restriction}</div>
-  
+
+
       <div class="note-container">
         <label class="upload">${translations[userLang].chooseVideo}</label>
         <div class="custom-file-container">
@@ -354,20 +355,21 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="file-names-list">${lectureData.videoFile ? `<span>${lectureData.videoFile}</span>` : ""}</div>
         </div>
       </div>
-  
+
       <div class="note-container">
         <label class="upload">${translations[userLang].chooseFiles}</label>
         <div class="custom-file-container">
           <label class="custom-file-upload" id="upload">
             ${translations[userLang].chooseFile}
             <input class="lecture-materials" name="lecture_files" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg,.svg,.webp" />
+
           </label>
           <div class="file-names-list">
             ${lectureData.materialsFiles ? lectureData.materialsFiles.map(file => `<span>${file}</span>`).join("") : ""}
           </div>
         </div>
       </div>
-  
+
       <div class="note-container">
         <label class="upload">${translations[userLang].chooseAudio}</label>
         <div class="custom-file-container">
@@ -377,48 +379,48 @@ document.addEventListener('DOMContentLoaded', () => {
           </label>
           <div class="file-names-list">${lectureData.audioFile ? `<span>${lectureData.audioFile}</span>` : ""}</div>
         </div>
-        <div class="file-warning" style="color: #ff2600; font-size:13px; margin-top: 0px; font-weight: 430; margin-bottom: 15px" data-lang="note"> ${translations[userLang].note}</div>
+        <div class="file-warning" style="color: #ff2600; font-size:13px; margin-top: 0px; font-weight: 430; margin-bottom: 15px" data-lang="note"> ${translations[userLang].note}</div>     
       </div>`;
-  
+
     lecturesDiv.appendChild(lectureDiv);
-  
+
     const inputs = {
       video: lectureDiv.querySelector(".lecture-video"),
       materials: lectureDiv.querySelector(".lecture-materials"),
       audio: lectureDiv.querySelector(".lecture-audio"),
       description: lectureDiv.querySelector(".lecture-description"),
     };
-  
-    function disableLectureInputs() {
-      let isDisabled = !(inputs.description.value.trim() || inputs.video.files.length || inputs.materials.files.length || inputs.audio.files.length);
+ 
+
+    function disableOtherInputs(selectedInput) {
+      let isDisabled = inputs.description.value.trim().length > 0 || inputs.video.files.length > 0 || 
+      inputs.materials.files.length > 0 || inputs.audio.files.length > 0;
+
       Object.values(inputs).forEach(input => {
-        if (!input.disabled) {
-          input.disabled = isDisabled;
-          input.style.backgroundColor = isDisabled ? "#e0e0e0" : "";
-          input.style.cursor = isDisabled ? "not-allowed" : "";
-        }
+          if (input !== selectedInput) {
+              input.disabled = isDisabled;
+              input.style.backgroundColor = isDisabled ? "#e0e0e0" : "";  
+              input.style.cursor = isDisabled ? "not-allowed" : "";  
+          }
       });
   
       document.querySelectorAll("#upload").forEach(label => {
         let input = label.querySelector("input");
-        if (!input.disabled) {
-          label.style.backgroundColor = isDisabled ? "#888888" : "";
-          label.style.cursor = isDisabled ? "not-allowed" : "";
-        }
+        if (input !== selectedInput) {
+            label.style.backgroundColor = isDisabled ? "#888888" : "";  
+            label.style.cursor = isDisabled ? "not-allowed" : "";
+          }
       });
     }
-  
     Object.values(inputs).forEach(input => {
-      input.addEventListener("change", function () {
-        disableLectureInputs();
+      input.addEventListener("change", function() {
+          disableOtherInputs(this);
       });
     });
-  
+
     inputs.description.addEventListener("input", function () {
-      disableLectureInputs();
+      disableOtherInputs(this);
     });
-   
-  
     function validateLectures() {
       const lectureDivs = document.querySelectorAll(".lecture");
       let hasValidLecture = false;
