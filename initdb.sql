@@ -227,3 +227,17 @@ CREATE TABLE enrollments (
 
 -- колонка для  stripe акаунту
 ALTER TABLE all_courses ADD COLUMN author_stripe_account VARCHAR(255);
+
+
+
+CREATE TABLE payments (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    course_id INTEGER REFERENCES all_courses(id),
+    amount INTEGER,
+    platform_fee INTEGER,
+    teacher_amount INTEGER,
+    stripe_session_id TEXT,
+    status TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

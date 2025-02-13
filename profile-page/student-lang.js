@@ -348,12 +348,42 @@ const modal = document.getElementById('modal');
 const modalContentContainer = document.getElementById('modal-content-container');
 const closeButton = document.querySelector('.close-button');
 
+async function loadStudentData() {
+    try {
+        const userId = localStorage.getItem('userId');
+        const response = await fetch(`http://localhost:8000/auth/profile/student/${userId}`);
+        
+        if (!response.ok) {
+            throw new Error('Failed to load profile data');
+        }
+
+        const data = await response.json();
+        
+        // Заповнюємо поля форми отриманими даними
+        document.querySelector('input[placeholder="Enter your real name"]').value = data.name || '';
+        document.querySelector('input[placeholder="Enter your nickname"]').value = data.nickname || '';
+        document.querySelector('input[placeholder="Enter your date of birth"]').value = data.date_of_birth ? data.date_of_birth.split('T')[0] : '';
+        document.querySelector('input[placeholder="Enter your phone number"]').value = data.phone_number || '';
+        document.querySelector('input[placeholder="Write some information about yourself"]').value = data.additional_info || '';
+
+    } catch (error) {
+        console.error('Error loading profile:', error);
+        alert('Failed to load profile data');
+    }
+    }
+    
 // Відкриття модального вікна
 tabLinks.forEach(tab => {
     tab.addEventListener('click', () => {
         const tabName = tab.getAttribute('data-tab');
         modalContentContainer.innerHTML = tabContents[tabName] || "<p>Content not found.</p>";
         modal.style.display = "flex";
+        
+        // Якщо відкрита вкладка profile, завантажуємо дані
+        if (tabName === 'profile') {
+            loadStudentData();
+        }
+        
         applyLanguage(localStorage.getItem('language') || 'en');
     });
 });
@@ -380,43 +410,52 @@ if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Save chan
     const name = document.querySelector('input[placeholder="Enter your real name"]').value;
     const nickname = document.querySelector('input[placeholder="Enter your nickname"]').value;
     const dateOfBirth = document.querySelector('input[placeholder="Enter your date of birth"]').value;
-    const phone = document.querySelector('input[placeholder="Enter your phone number"]').value;
-    const description = document.querySelector('input[placeholder="Write some information about yourself"]').value;
+    const phoneNumber = document.querySelector('input[placeholder="Enter your phone number"]').value;
+    const additionalInfo = document.querySelector('input[placeholder="Write some information about yourself"]').value;
 
     const userId = localStorage.getItem('userId');
 
     try {
-        const response = await fetch(`http://localhost:8000/auth/profile/${userId}`, {
-            method: 'PUT',
+        const response = await fetch('http://localhost:8000/auth/update-student-profile', {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
+                userId,
                 name,
                 nickname,
-                date_of_birth: dateOfBirth,
-                phone_number: phone,
-                description,
-            }),
+                dateOfBirth,
+                phoneNumber,
+                additionalInfo
+            })
         });
 
         const result = await response.json();
 
-        if (response.ok) {
+        if (result.success) {
             alert('Profile updated successfully!');
+        // Оновлюємо відображене ім'я користувача
             const usernameElement = document.getElementById('username');
             if (usernameElement) {
-                usernameElement.textContent = nickname;
+                usernameElement.textContent = nickname || name;
             }
+            
+            // Оновлюємо дані в localStorage
+            localStorage.setItem('name', name);
+            localStorage.setItem('nickname', nickname);
+            
+            // Закриваємо модальне вікно
+            modal.style.display = "none";
         } else {
-            alert(`Error: ${result.error}`);
+            alert('Failed to update profile');
         }
-    } catch (err) {
-        console.error('Error:', err);
-        alert('An error occurred while updating the profile.');
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        alert('Error updating profile');
     }
 }
-
+ 
 // Обробка зміни пароля
 if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Update password') {
     const currentPassword = document.querySelector('input[placeholder="Enter current password"]').value;

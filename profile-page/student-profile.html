@@ -91,80 +91,354 @@
         <script src="../profile-page/student-lang.js"></script>
         
         <script>
-            const uploadInput = document.getElementById('upload-image');
-            const profileImage = document.getElementById('profile-image');
-            const removeImageButton = document.getElementById('remove-image');
-            const confirmImageButton = document.getElementById('confirm-image');
+            // Function to handle profile image upload and display
+              // Замініть поточну функцію handleProfileImage() на цю:
+                function handleProfileImage() {
+                    const uploadInput = document.getElementById('upload-image');
+                    const profileImage = document.getElementById('profile-image');
+                    const removeImageButton = document.getElementById('remove-image');
+                    const confirmImageButton = document.getElementById('confirm-image');
 
-            uploadInput.addEventListener('change', function(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    if (file.size > 1 * 1024 * 1024) {
-                        alert('The file size exceeds 1 MB. Please upload a smaller file.');
-                        uploadInput.value = '';
-                        return;
+                    // Функція для завантаження зображення профілю
+                    async function loadProfileImage() {
+                        const userId = localStorage.getItem('userId');
+                        if (!userId) return;
+
+                        try {
+                            const response = await fetch(`http://localhost:8000/auth/profile-image/${userId}`);
+                            const data = await response.json();
+
+                            if (data.profileImage) {
+                                profileImage.src = data.profileImage.startsWith('http')
+                                    ? data.profileImage
+                                    : `http://localhost:8000${data.profileImage}`;
+                            }
+                        } catch (error) {
+                            console.error('Error loading profile image:', error);
+                            profileImage.src = '/images/profile-picture.png';
+                        }
                     }
 
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        profileImage.src = e.target.result;
-                        removeImageButton.style.display = 'inline-block';
-                        confirmImageButton.style.display = 'inline-block';
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
+                    // Обробник вибору файлу
+                    uploadInput.addEventListener('change', function (event) {
+                        const file = event.target.files[0];
+                        if (file) {
+                            if (file.size > 1 * 1024 * 1024) {
+                                alert('The file size exceeds 1 MB. Please upload a smaller file.');
+                                uploadInput.value = '';
+                                return;
+                            }
 
-            profileImage.addEventListener('click', function() {
+                            const reader = new FileReader();
+                            reader.onload = function (e) {
+                                profileImage.src = e.target.result;
+                                removeImageButton.style.display = 'inline-block';
+                                confirmImageButton.style.display = 'inline-block';
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+
+                    // Обробник підтвердження завантаження
+                    confirmImageButton.addEventListener('click', async function () {
+                        const file = uploadInput.files[0];
+                        if (!file) {
+                            alert('Please select an image to upload.');
+                            return;
+                        }
+
+                        const userId = localStorage.getItem('userId');
+                        if (!userId) {
+                            alert('User not authenticated.');
+                            return;
+                        }
+
+                        const formData = new FormData();
+                        formData.append('profileImage', file);
+                        formData.append('userId', userId);
+
+                        try {
+                            const response = await fetch('http://localhost:8000/auth/upload-student-profile-image', {
+                                method: 'POST',
+                                body: formData
+                            });
+
+                            if (!response.ok) {
+                                throw new Error('Failed to upload image');
+                            }
+
+                            const result = await response.json();
+                            if (result.filePath) {
+                                const imageUrl = result.filePath.startsWith('http')
+                                    ? result.filePath
+                                    : `http://localhost:8000${result.filePath}`;
+                                profileImage.src = imageUrl;
+                                alert('Profile image updated successfully!');
+                            }
+                        } catch (error) {
+                            console.error('Error uploading image:', error);
+                            alert('Failed to upload image. Please try again.');
+                        }
+
+                        removeImageButton.style.display = 'none';
+                        confirmImageButton.style.display = 'none';
+                    });
+
+                    // Обробник видалення зображення
+                    removeImageButton.addEventListener('click', function () {
+                        profileImage.src = '/images/profile-picture.png';
+                        uploadInput.value = '';
+                        removeImageButton.style.display = 'none';
+                        confirmImageButton.style.display = 'none';
+                    });
+
+                    // Завантажуємо зображення при ініціалізації
+                    loadProfileImage();
+                }
+                // Initialize when document is ready
+                document.addEventListener('DOMContentLoaded', () => {
+                    handleProfileImage();
+                });
+            
+                // Функція завантаження профілю з сервера
+                async function loadStudentProfile() {
+                        try {
+                            const userId = localStorage.getItem('userId');
+                            if (!userId) {
+                                console.error('User not authenticated');
+                                return;
+                            }
+
+                            const response = await fetch(`http://localhost:8000/auth/profile/student/${userId}`);
+                            if (!response.ok) {
+                                throw new Error(`HTTP error: ${response.status}`);
+                            }
+
+                            const data = await response.json();
+                            console.log("Received profile data:", data);
+
+                            // Оновлюємо нікнейм на сторінці
+                             const usernameElement = document.getElementById('username');
+                            if (usernameElement) {
+                                const displayName = data.nickname || data.name;
+                                usernameElement.textContent = displayName;
+                                // Update localStorage with the latest data from database
+                                localStorage.setItem('nickname', data.nickname || '');
+                                localStorage.setItem('name', data.name || '');
+                            }
+
+                            // Оновлюємо зображення профілю
+                            const profileImage = document.getElementById('profile-image');
+                            if (profileImage) {
+                                if (data.profile_image) {
+                                    const imageUrl = data.profile_image.startsWith('http')
+                                        ? data.profile_image
+                                        : `http://localhost:8000${data.profile_image}`;
+                                    profileImage.src = imageUrl;
+                                } else {
+                                    profileImage.src = '/images/profile-picture.png';
+                                }
+                            }
+
+                            return data;
+                        } catch (err) {
+                            console.error('Error loading profile:', err);
+                            // Встановлюємо дефолтне зображення у випадку помилки
+                            const profileImage = document.getElementById('profile-image');
+                            if (profileImage) {
+                                profileImage.src = '/images/profile-picture.png';
+                            }
+                        }
+                    }
+                    // Функція для оновлення дефолтного зображення в БД
+                    async function updateDefaultProfileImage(userId) {
+                        try {
+                            const defaultImagePath = '/images/profile-picture.png';
+                            const response = await fetch('http://localhost:8000/auth/update-default-image', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    userId,
+                                    defaultImagePath
+                                })
+                            });
+
+                            if (!response.ok) {
+                                throw new Error('Failed to update default image');
+                            }
+
+                            console.log('Default image path updated in database');
+                        } catch (error) {
+                            console.error('Error updating default image:', error);
+                        }
+                    }
+            
+            
+                    // Обробник зміни файлу
+                uploadInput.addEventListener('change', function (event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        if (file.size > 1 * 1024 * 1024) { // 1MB
+                            alert('The file size exceeds 1 MB. Please upload a smaller file.');
+                            uploadInput.value = '';
+                            return;
+                        }
+
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            profileImage.src = e.target.result;
+                            removeImageButton.style.display = 'inline-block';
+                            confirmImageButton.style.display = 'inline-block';
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+
+                // Обробник підтвердження завантаження
+                // Обробник підтвердження завантаження
+                    confirmImageButton.addEventListener('click', async function () {
+                        const file = uploadInput.files[0];
+                        if (!file) {
+                            alert('Please select an image to upload.');
+                            return;
+                        }
+
+                        const userId = localStorage.getItem('userId');
+                        const email = localStorage.getItem('email');
+                        if (!email || !userId) {
+                            alert('User information is not available. Please log in again.');
+                            return;
+                        }
+
+                        console.log('Starting image upload...');
+
+                        const formData = new FormData();
+                        formData.append('profileImage', file);
+                        formData.append('email', email);
+                        formData.append('userId', userId);
+
+                        try {
+                            const response = await fetch('http://localhost:8000/auth/upload-student-profile-image', {
+                                method: 'POST',
+                                body: formData,
+                            });
+
+                            const result = await response.json();
+                            console.log('Upload response:', result);
+
+                            if (response.ok) {
+                                alert('Profile image updated successfully!');
+                                const imageUrl = result.filePath.startsWith('http')
+                                    ? result.filePath
+                                    : `http://localhost:8000${result.filePath}`;
+                                profileImage.src = imageUrl;
+                            } else {
+                                alert(`Error: ${result.error}`);
+                            }
+                        } catch (error) {
+                            console.error('Error uploading profile image:', error);
+                            alert('An error occurred while uploading the profile image.');
+                        }
+
+                        removeImageButton.style.display = 'none';
+                        confirmImageButton.style.display = 'none';
+                    });
+                // Обробник видалення зображення
+                removeImageButton.addEventListener('click', function () {
+                    profileImage.src = '/images/profile-picture.png';
+                    uploadInput.value = '';
+                    removeImageButton.style.display = 'none';
+                    confirmImageButton.style.display = 'none';
+                }); 
+
+            profileImage.addEventListener('click', function () {
                 removeImageButton.style.display = 'inline-block';
                 confirmImageButton.style.display = 'inline-block';
             });
 
-            removeImageButton.addEventListener('click', function() {
-                profileImage.src = '/images/profile-picture.png';
-                uploadInput.value = '';
-                removeImageButton.style.display = 'none';
-                confirmImageButton.style.display = 'none';
-            });
+            function updateUsername(name) {
+                const usernameElement = document.getElementById('username');
+                if (usernameElement) {
+                    usernameElement.textContent = name;
+                }
+            }
 
-            confirmImageButton.addEventListener('click', async function() {
-                const file = uploadInput.files[0];
-                if (!file) {
-                    alert('Please select an image to upload.');
-                    return;
+            async function updateStudentProfile(profileData) {
+                const userId = localStorage.getItem('userId');
+                if (!profileData) {
+                    // Якщо дані не передані, використовуємо збережені дані
+                    profileData = {
+                        name: localStorage.getItem('name'),
+                        nickname: localStorage.getItem('nickname'),
+                        dateOfBirth: localStorage.getItem('dateOfBirth'),
+                        phoneNumber: localStorage.getItem('phoneNumber'),
+                        additionalInfo: localStorage.getItem('additionalInfo')
+                    };
                 }
 
-                const email = localStorage.getItem('email');
-                if (!email) {
-                    alert('User email is not available. Please log in again.');
-                    return;
-                }
-
-                const formData = new FormData();
-                formData.append('profileImage', file);
-                formData.append('email', email);
+                // Форматуємо дату в формат YYYY-MM-DD для PostgreSQL
+                const formattedDate = profileData.dateOfBirth ? new Date(profileData.dateOfBirth).toISOString().split('T')[0] : null;
 
                 try {
-                    const response = await fetch('http://localhost:8000/auth/upload-profile-image', {
+                    const response = await fetch('http://localhost:8000/auth/update-student-profile', {
                         method: 'POST',
-                        body: formData,
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            userId,
+                            name: profileData.name,
+                            nickname: profileData.nickname,
+                            dateOfBirth: formattedDate,
+                            phoneNumber: profileData.phoneNumber,
+                            additionalInfo: profileData.additionalInfo
+                        })
                     });
 
+                    if (!response.ok) {
+                        throw new Error('Failed to update profile');
+                    }
+
                     const result = await response.json();
-                    if (response.ok) {
-                        alert('Profile image updated successfully!');
-                        profileImage.src = `http://localhost:8000${result.filePath}`;
-                    } else {
-                        alert(`Error: ${result.error}`);
+
+                    if (result.success) {
+                        // Оновлюємо локальні дані
+                        localStorage.setItem('name', profileData.name);
+                        localStorage.setItem('nickname', profileData.nickname);
+                        localStorage.setItem('dateOfBirth', formattedDate);
+                        localStorage.setItem('phoneNumber', profileData.phoneNumber);
+                        localStorage.setItem('additionalInfo', profileData.additionalInfo);
+
+                        // Оновлюємо відображення на сторінці
+                        updateUsername(profileData.nickname || profileData.name);
+
+                        // Оновлюємо інші поля на сторінці
+                        const phoneElement = document.getElementById('phone-number');
+                        if (phoneElement) {
+                            phoneElement.textContent = profileData.phoneNumber;
+                        }
+
+                        const birthDateElement = document.getElementById('birth-date');
+                        if (birthDateElement) {
+                            birthDateElement.textContent = formattedDate;
+                        }
+
+                        const additionalInfoElement = document.getElementById('additional-info');
+                        if (additionalInfoElement) {
+                            additionalInfoElement.textContent = profileData.additionalInfo;
+                        }
+
+                        if (profileData.name !== localStorage.getItem('name')) {
+                            alert('Profile updated successfully!');
+                        }
                     }
                 } catch (error) {
-                    console.error('Error uploading profile image:', error);
-                    alert('An error occurred while uploading the profile image.');
+                    console.error('Error updating profile:', error);
+                    alert('Failed to update profile. Please try again.');
                 }
-
-                removeImageButton.style.display = 'none';
-                confirmImageButton.style.display = 'none';
-            });
+            }
 
             document.addEventListener('DOMContentLoaded', () => {
                 const becomeTeacherButton = document.getElementById('become-teacher-btn');
@@ -222,14 +496,43 @@
                 };
             }
 
-            window.addEventListener('DOMContentLoaded', () => {
-                console.log('Page loaded');
-                loadEnrolledCourses();
-                loadSavedBookmarks();
-                
-                const userLang = localStorage.getItem('language') || 'en';
-                applyLanguage(userLang);
-            });
+                // // При завантаженні сторінки
+                //     window.addEventListener('DOMContentLoaded', async () => {
+                //         console.log('Page loaded, initializing...');
+                //         try {
+                //             // Завантажуємо профіль
+                //             await loadStudentProfile();
+                //             console.log('Profile loaded successfully');
+
+                //             // Завантажуємо інші дані
+                //             loadEnrolledCourses();
+                //             loadSavedBookmarks();
+
+                //             // Оновлюємо мову
+                //             const userLang = localStorage.getItem('language') || 'en';
+                //             applyLanguage(userLang);
+                //         } catch (error) {
+                //             console.error('Error during initialization:', error);
+                //         }
+                //     });
+
+                document.addEventListener('DOMContentLoaded', () => {
+
+                    
+                        // Ініціалізуємо обробник зображення профілю
+                        handleProfileImage();
+
+                        // Завантажуємо профіль
+                        loadStudentProfile();
+
+                        // Завантажуємо інші дані
+                        loadEnrolledCourses();
+                        loadSavedBookmarks();
+
+                        // Застосовуємо переклади
+                        const userLang = localStorage.getItem('language') || 'en';
+                        applyLanguage(userLang);
+                    });
         </script>
     </div>
 </body>
