@@ -78,10 +78,9 @@ body {
     padding-left: 50px;
     justify-content: flex-start;  
     align-items: flex-start;
-    padding-right: 100px;
+    padding-right: 200px;
     font-family: "Inter", sans-serif;
     font-weight: 100;
-    
 }
 
 
@@ -92,6 +91,7 @@ body {
 .chapters {
     display: flex;
     justify-content: center;
+
 }
 
 .profile-image {
@@ -151,14 +151,15 @@ p {
 } 
 
 .profile-container .user-info  .btn-teacher {
-    width: 90%;
+    width: 70%;
+    max-width: 200px;
     font-family: "Inter";
     padding: 9px 5px;
     background: #fff;
     color: #000;
     border-radius: 12px;
-    font-size: 18px;
-    font-weight: 300;
+    font-size: 17px;
+    font-weight: 600;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
     margin-top: 10px;
@@ -176,10 +177,9 @@ p {
     transform: translate(-50%, -50%);
     height: 30px;
     width: 30px;
-    background-color: #dceded;
+    background-color: #283044;
     border-radius: 50%;
-    transition: .6s ease;
-    
+    transition: all 0.6s ease;  
   }
   
   .btn-teacher span:nth-child(6) {
@@ -213,6 +213,10 @@ p {
     transition: 1.5s ease;
   }
 
+  .profile-container .user-info  .btn-teacher:hover {
+    color: #fff;
+  }
+
 .tab-container {
     margin: 20px;
 }
@@ -220,7 +224,6 @@ p {
 .tabs {
     display: flex;
     flex-direction: column;
-    border-bottom: 1px solid #ccc;
 }
 
 .tab-link {
@@ -232,25 +235,23 @@ p {
     font-size: 20px;
     font-weight: 500;
     font-family: "Inter", sans-serif;
-    text-align: left; /* Вирівнювання тексту ліворуч */
-    color: #283044; /* Колір тексту вкладки */
-    background-color: transparent; 
-    transition: background-color 0.3s ease, color 0.3s ease;
-    border-bottom: 4px solid #283044;
-    margin-top: 18px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Легка тінь */
-    transition: all 0.3s ease;
+    text-align: left; 
+    color: #283044;
+    transition: color 0.3s ease-in-out;
+    margin-top: 12px;
     border-radius: 12px;
-    font-weight: 600;
+    font-weight: 500;
+    display: flex;
 }
- 
 
-/* Ефект при наведенні */
+.tab-icon {
+    width: 22px;
+    height: 22px;
+    margin-right: 6px;
+}
+
 .tab-link:hover {
-    color: #141821; /* Зміна кольору тексту при наведенні */
-    background-color: #e9ecef; /* Світло-сірий фон */
-    transform: translateY(-2px); 
-    box-shadow: 0 4px 10px rgba(0, 86, 179, 0.4);
+    color: #747474; /* Зміна кольору тексту при наведенні */
 }
 
 .tab-content {
@@ -741,7 +742,7 @@ p {
     font-size: 18px;
     font-weight: 640;
     cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
+    transition: background 0.3s ease;
     margin-top: 10px;
     margin-bottom: 15px;
 }
@@ -751,9 +752,8 @@ p {
 }
 
 .btn-open:hover {
-    background-color: #545F7A;
+    background-color: #a5a5a5;
     color: #ffffff;
-    transform: translateY(-2px);
 }
 
 .bookmarks-list.expanded {
