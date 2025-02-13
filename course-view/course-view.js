@@ -665,7 +665,7 @@ async function initializeLecturesState() {
     }
 }
 
-window.handleLectureClick = async function(lectureId, contentType) {
+window.handleLectureClick = async function(lectureId) {
     try {
         const userId = localStorage.getItem('userId');
         const response = await fetch(`/api/lecture/${lectureId}?userId=${userId}`);
@@ -675,40 +675,62 @@ window.handleLectureClick = async function(lectureId, contentType) {
         }
 
         const lectureData = await response.json();
+        console.log('Lecture data:', lectureData);
+
         const videoContainer = document.querySelector('.video-player');
         if (!videoContainer) return;
 
-        if (currentLectureId && completedLectures.has(currentLectureId)) {
-            const prevLecture = document.querySelector(`[data-topic-id="${currentLectureId}"]`);
-            if (prevLecture && !prevLecture.classList.contains('completed')) {
-                prevLecture.classList.add('completed');
-                prevLecture.style.backgroundColor = '#e8f5e9';
-                await updateProgress();
-            }
-        }
-
-        document.querySelectorAll('.topic-item').forEach(topic => {
-            topic.classList.remove('active');
-            if (!completedLectures.has(topic.dataset.topicId)) {
-                topic.style.backgroundColor = 'transparent';
-            }
-        });
-
-        const currentTopic = document.querySelector(`[data-topic-id="${lectureId}"]`);
-        if (currentTopic) {
-            currentTopic.classList.add('active');
-            if (!completedLectures.has(lectureId)) {
-                currentTopic.style.backgroundColor = 'transparent';
-            }
-        }
-
-        currentLectureId = lectureId;
+        updateActiveAndCompletedStates(lectureId);
 
         if (window.completionTimer) {
             clearTimeout(window.completionTimer);
         }
 
-        if (lectureData.video_path) {
+        if (lectureData.audio_path) {
+            videoContainer.innerHTML = `
+                <div style="padding: 20px; background: white; height: 100%; border-radius: 12px;">
+                    <h2 style="margin-bottom: 20px; color: #283044; font-family: Inter, sans-serif;">
+                        ${lectureData.title}
+                    </h2>
+                    <audio controls style="width: 100%; margin-bottom: 20px;">
+                        <source src="/${lectureData.audio_path}" type="audio/mpeg">
+                        Your browser does not support audio.
+                    </audio>
+                    ${lectureData.description ? 
+                        `<div style="color: #283044; font-family: Inter, sans-serif; line-height: 1.6;">
+                            ${lectureData.description}
+                         </div>` : ''}
+                </div>
+            `;
+
+            const audio = videoContainer.querySelector('audio');
+            setupAudioListeners(audio, lectureId);
+        } 
+        else if (lectureData.file_url) {
+            videoContainer.innerHTML = `
+                <div style="padding: 20px; background: white; height: 100%; border-radius: 12px;">
+                    <h2 style="margin-bottom: 20px; color: #283044; font-family: Inter, sans-serif;">
+                        ${lectureData.title}
+                    </h2>
+                    <a href="/${lectureData.file_url}" 
+                       target="_blank"
+                       class="download-button"
+                       style="display: inline-block; padding: 12px 24px; 
+                              background: #283044; color: white; text-decoration: none; 
+                              border-radius: 8px; margin-bottom: 20px;
+                              font-family: Inter, sans-serif;">
+                        Завантажити матеріал
+                    </a>
+                    ${lectureData.description ? 
+                        `<div style="color: #283044; font-family: Inter, sans-serif; line-height: 1.6;">
+                            ${lectureData.description}
+                         </div>` : ''}
+                </div>
+            `;
+
+            window.completionTimer = setTimeout(() => completeLecture(lectureId), 5000);
+        }
+        else if (lectureData.video_path) {
             videoContainer.innerHTML = `
                 <video controls width="100%" height="100%">
                     <source src="/${lectureData.video_path}" type="video/mp4">
@@ -717,48 +739,75 @@ window.handleLectureClick = async function(lectureId, contentType) {
             `;
 
             const video = videoContainer.querySelector('video');
-            
-            video.addEventListener('play', () => {
-                clearTimeout(window.completionTimer);
-                window.completionTimer = setTimeout(async () => {
-                    await completeLecture(lectureId);
-                    completedLectures.add(lectureId);
-                }, 5000);
-            });
-
-            video.addEventListener('pause', () => {
-                clearTimeout(window.completionTimer);
-            });
-        } else {
+            setupVideoListeners(video, lectureId);
+        }
+        else {
             videoContainer.innerHTML = `
                 <div style="padding: 20px; background: white; height: 100%; overflow-y: auto; border-radius: 12px;">
                     <h2 style="color: #283044; margin-bottom: 16px; font-family: Inter, sans-serif;">
                         ${lectureData.title}
                     </h2>
                     <div style="color: #283044; font-family: Inter, sans-serif; line-height: 1.6;">
-                        ${lectureData.description}
+                        ${lectureData.description || 'Опис відсутній'}
                     </div>
                 </div>
             `;
 
-            window.completionTimer = setTimeout(async () => {
-                await completeLecture(lectureId);
-                completedLectures.add(lectureId);
-            }, 5000);
+            window.completionTimer = setTimeout(() => completeLecture(lectureId), 5000);
         }
 
     } catch (error) {
         console.error('Error:', error);
-        const videoContainer = document.querySelector('.video-player');
-        if (videoContainer) {
-            videoContainer.innerHTML = `
-                <div style="padding: 20px; color: red;">
-                    Error loading content: ${error.message}
-                </div>
-            `;
-        }
+        showErrorMessage(error);
     }
 };
+
+function updateActiveAndCompletedStates(lectureId) {
+    document.querySelectorAll('.topic-item').forEach(topic => {
+        topic.classList.remove('active');
+        if (!completedLectures.has(topic.dataset.topicId)) {
+            topic.style.backgroundColor = 'transparent';
+        }
+    });
+
+    const currentTopic = document.querySelector(`[data-topic-id="${lectureId}"]`);
+    if (currentTopic) {
+        currentTopic.classList.add('active');
+    }
+}
+
+function setupVideoListeners(video, lectureId) {
+    video.addEventListener('play', () => {
+        clearTimeout(window.completionTimer);
+        window.completionTimer = setTimeout(() => completeLecture(lectureId), 5000);
+    });
+
+    video.addEventListener('pause', () => {
+        clearTimeout(window.completionTimer);
+    });
+}
+
+function setupAudioListeners(audio, lectureId) {
+    audio.addEventListener('play', () => {
+        clearTimeout(window.completionTimer);
+        window.completionTimer = setTimeout(() => completeLecture(lectureId), 5000);
+    });
+
+    audio.addEventListener('pause', () => {
+        clearTimeout(window.completionTimer);
+    });
+}
+
+function showErrorMessage(error) {
+    const videoContainer = document.querySelector('.video-player');
+    if (videoContainer) {
+        videoContainer.innerHTML = `
+            <div style="padding: 20px; background: white; color: red; border-radius: 12px;">
+                Помилка завантаження контенту: ${error.message}
+            </div>
+        `;
+    }
+}
 
 // Функція для завершення лекції
 window.completeLecture = async function(lectureId) {
