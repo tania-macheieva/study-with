@@ -421,7 +421,63 @@ document.addEventListener('DOMContentLoaded', () => {
     inputs.description.addEventListener("input", function () {
       disableOtherInputs(this);
     });
-
+    function validateLectures() {
+      const lectureDivs = document.querySelectorAll(".lecture");
+      let hasValidLecture = false;
+  
+      lectureDivs.forEach(lecture => {
+          const video = lecture.querySelector(".lecture-video").files.length > 0;
+          const audio = lecture.querySelector(".lecture-audio").files.length > 0;
+          const materials = lecture.querySelector(".lecture-materials").files.length > 0;
+          const description = lecture.querySelector(".lecture-description").value.trim().length > 0;
+  
+          if (video || audio || materials || description) {
+              hasValidLecture = true;
+          }
+      });
+  
+      const submitBtn = document.querySelector(".btn-сreate");
+      submitBtn.disabled = !hasValidLecture;
+      if (hasValidLecture) {
+        submitBtn.disabled = false;
+        submitBtn.style.backgroundColor = "";  
+        submitBtn.style.cursor = "pointer";  
+    } else {
+        submitBtn.disabled = true;
+        submitBtn.style.backgroundColor = "#888888";  
+        submitBtn.style.cursor = "not-allowed";  
+    }
+  }
+  
+  // Виконуємо перевірку при введенні тексту або виборі файлу
+  document.addEventListener("input", validateLectures);
+  document.addEventListener("change", validateLectures);
+  
+  // Блокуємо сабміт форми, якщо немає жодної заповненої лекції
+  document.querySelector("#create-course").addEventListener("submit", function(event) {
+      const lectureDivs = document.querySelectorAll(".lecture");
+      let hasValidLecture = false;
+  
+      lectureDivs.forEach(lecture => {
+          const video = lecture.querySelector(".lecture-video").files.length > 0;
+          const audio = lecture.querySelector(".lecture-audio").files.length > 0;
+          const materials = lecture.querySelector(".lecture-materials").files.length > 0;
+          const description = lecture.querySelector(".lecture-description").value.trim().length > 0;
+  
+          if (video || audio || materials || description) {
+              hasValidLecture = true;
+          }
+      });
+  
+      if (!hasValidLecture) {
+          event.preventDefault(); // Блокуємо відправку форми
+          alert("Будь ласка, додайте хоча б одне відео, аудіо, файл або опис до лекції перед створенням курсу!");
+      }
+  });
+  
+    document.addEventListener("input", validateLectures);
+    document.addEventListener("change", validateLectures);
+    
     function updateFileNamesList(input, fileListDiv) {
         fileListDiv.innerHTML = Array.from(input.files).map(file => `<span>${file.name}</span>`).join("");
         disableOtherInputs(input);
