@@ -59,7 +59,7 @@ const translations = {
     courseTags: "Course Tags (hidden from users)",
     enterTags: "Enter tags",
     tagTip: "To add a tag, press ENTER",
-    note: "* Note: Lecture description or uploaded files will not be saved after refreshing or closing the page. Please add them again.",
+    note: "* Note: Uploaded files will not be saved after refreshing or closing the page. Please add them again.",
     restriction: "* Note: You can only add one type of content: video, audio, materials, or description.",
   },
   ua: {
@@ -122,7 +122,7 @@ const translations = {
     courseTags: "Теги курсу (приховані від користувачів)",
     enterTags: "Введіть теги",
     tagTip: "Щоб додати тег, натисніть ENTER",
-    note: "Примітка: Опис лекції або завантажені файли не будуть збережені після оновлення або закриття сторінки. Будь ласка, додайте їх знову.",
+    note: "Примітка: Завантажені файли не будуть збережені після оновлення або закриття сторінки. Будь ласка, додайте їх знову.",
     restriction: "* Примітка: Ви можете додати лише один тип контенту: відео, аудіо, матеріали або опис.",
   },
 };
@@ -348,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="note-container">
         <label class="upload">${translations[userLang].chooseVideo}</label>
         <div class="custom-file-container">
-          <label class="custom-file-upload" id="upload">
+          <label class="custom-file-upload">
             ${translations[userLang].chooseFile}
             <input class="lecture-video" name="lecture_video" type="file" accept="video/*" />
           </label>
@@ -359,7 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="note-container">
         <label class="upload">${translations[userLang].chooseFiles}</label>
         <div class="custom-file-container">
-          <label class="custom-file-upload" id="upload">
+          <label class="custom-file-upload">
             ${translations[userLang].chooseFile}
             <input class="lecture-materials" name="lecture_files" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg,.svg,.webp" />
 
@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="note-container">
         <label class="upload">${translations[userLang].chooseAudio}</label>
         <div class="custom-file-container">
-          <label class="custom-file-upload" id="upload">
+          <label class="custom-file-upload">
             ${translations[userLang].chooseFile}
             <input class="lecture-audio" name="lecture_audio" type="file" accept="audio/*" />
           </label>
@@ -390,69 +390,23 @@ document.addEventListener('DOMContentLoaded', () => {
       audio: lectureDiv.querySelector(".lecture-audio"),
       description: lectureDiv.querySelector(".lecture-description"),
     };
- 
 
-    function disableOtherInputs(lectureDiv) {
-      const inputs = {
-        video: lectureDiv.querySelector(".lecture-video"),
-        materials: lectureDiv.querySelector(".lecture-materials"),
-        audio: lectureDiv.querySelector(".lecture-audio"),
-        description: lectureDiv.querySelector(".lecture-description"),
-      };
-    
-      // Check if any content has been added
-      let isDisabled = inputs.description.value.trim().length > 0 || 
-                      inputs.video.files.length > 0 || 
-                      inputs.materials.files.length > 0 || 
-                      inputs.audio.files.length > 0;
-    
-      // Disable/enable all other inputs and file upload buttons based on content
-      Object.values(inputs).forEach(input => {
-        input.disabled = isDisabled;
-        input.style.backgroundColor = isDisabled ? "#e0e0e0" : "";
-        input.style.cursor = isDisabled ? "not-allowed" : "";
-      });
-    
-      // Handle the upload buttons as well
-      document.querySelectorAll("#upload").forEach(label => {
-        let input = label.querySelector("input");
-        label.style.backgroundColor = isDisabled ? "#888888" : "";
-        label.style.cursor = isDisabled ? "not-allowed" : "";
-      });
-    }
-    
-    // Add a lecture and attach event listeners
-    function addLecture(moduleDiv, lectureData = {}) {
-      const lecturesDiv = moduleDiv.querySelector(".lectures");
-      const lectureDiv = document.createElement("div");
-      lectureDiv.classList.add("lecture");
-    
-      // Your code for setting up the lecture goes here (unchanged)
-    
-      lecturesDiv.appendChild(lectureDiv);
-    
-      const inputs = {
-        video: lectureDiv.querySelector(".lecture-video"),
-        materials: lectureDiv.querySelector(".lecture-materials"),
-        audio: lectureDiv.querySelector(".lecture-audio"),
-        description: lectureDiv.querySelector(".lecture-description"),
-      };
-    
-      // Set up event listeners to handle changes in content and enable/disable inputs
-      Object.values(inputs).forEach(input => {
-        input.addEventListener("change", function () {
-          disableOtherInputs(lectureDiv); // Update this lecture's inputs based on content
+    const restrictionMessage = lectureDiv.querySelector(".restriction-message");
+
+    function disableOtherInputs(selectedInput) {
+        let isDisabled = selectedInput.files ? selectedInput.files.length > 0 : selectedInput.value.trim().length > 0;
+
+        Object.values(inputs).forEach(input => {
+            if (input !== selectedInput) {
+                input.disabled = isDisabled;
+                input.style.backgroundColor = isDisabled ? "#e0e0e0" : ""; // Сірий фон для заблокованих полів
+                input.style.cursor = isDisabled ? "not-allowed" : ""; // Курсор "заборонено"
+            }
         });
-      });
-    
-      inputs.description.addEventListener("input", function () {
-        disableOtherInputs(lectureDiv); // Handle description input changes
-      });
-    
-      // Initial check in case there is already content when adding a lecture
-      disableOtherInputs(lectureDiv);
+
+        restrictionMessage.textContent = isDisabled ? "You can only add one type of content: video, audio, files, or description." : "";
     }
-        
+
     function updateFileNamesList(input, fileListDiv) {
         fileListDiv.innerHTML = Array.from(input.files).map(file => `<span>${file.name}</span>`).join("");
         disableOtherInputs(input);
@@ -523,10 +477,12 @@ function updateModuleNumbers() {
       const lectures = [];
   
       moduleDiv.querySelectorAll(".lecture").forEach((lectureDiv) => {
-        const lectureTitle = lectureDiv.querySelector("input[type='text']").value || ""; 
+        const lectureTitle = lectureDiv.querySelector("input[type='text']").value || "";
+        const lectureDescription = lectureDiv.querySelector("textarea").value || "";
         
         lectures.push({
-          title: lectureTitle, 
+          title: lectureTitle,
+          description: lectureDescription, 
         });
    
       });
@@ -616,7 +572,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (e.key === "Enter") {
       e.preventDefault();
       const tag = tagsInput.value.trim();
-      if (tag && !tagsList.includes(tag) && tagsList.length < 5) {  
+      if (tag && !tagsList.includes(tag) && tagsList.length < 10) {  
         tagsList.push(tag);
         tagsInput.value = '';
         updateTagsDisplay();
