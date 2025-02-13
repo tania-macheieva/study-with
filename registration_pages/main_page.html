@@ -86,7 +86,48 @@
             margin-top: 20px;
         }
 
-        .btn {
+        .btn1 {
+            position: relative;
+            width: 300px;
+            height: 90px;
+            background: #fff;
+            border-radius: 12px;
+            text-decoration: none;
+            border: 1px solid #283044;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+        }
+
+        .btn1:hover {
+            color: #000000;
+            transform: translate(-0.25rem, -0.25rem);
+            background: #DCECFC;
+            box-shadow: 0.25rem 0.25rem #283044;
+        }
+
+        .btn1-text {
+            font-weight: 500;
+            font-size: 18px;
+            line-height: 19px;
+            color: #000000;
+            text-align: center;
+        }
+
+        .btn1:hover .btn1-text {
+            color: #283044;
+        }
+
+        .highlight-word {
+            font-size: 18px;
+            font-weight: 500;
+            margin-top: 6px;
+        }
+
+        .btn2 {
             position: relative;
             width: 300px;
             height: 90px;
@@ -102,31 +143,34 @@
             padding: 0 20px;
         }
 
-        .btn:hover {
-            color: #FFFFFF;
+        .btn2:hover {
+            color: #000000;
             transform: translate(-0.25rem, -0.25rem);
             background: #DCECFC;
             box-shadow: 0.25rem 0.25rem #283044;
         }
 
-        .btn-text {
+        .btn2-text {
             font-weight: 500;
             font-size: 18px;
             line-height: 19px;
-            color: #FFFFFF;
+            color: #ffffff;
             text-align: center;
         }
 
-        .btn:hover .btn-text {
+        .btn2:hover .btn2-text {
             color: #283044;
         }
 
-        .highlight-word {
-            display: block;
-            font-size: 24px;
-            font-weight: 530;
-            margin-top: 6px;
-        }
+        .btn1:active {
+  transform: translate(0);
+  box-shadow: none;
+}
+
+.btn2:active {
+  transform: translate(0);
+  box-shadow: none;
+}
     </style>
 </head>
 <body>
@@ -141,14 +185,14 @@
                     Learn, connect, succeed together!
                 </div>
                 <div class="buttons">
-                    <a href="/reg-student" class="btn">
-                        <div class="btn-text">
+                    <a href="/reg-student" class="btn1">
+                        <div class="btn1-text">
                             Create an account as a
                             <span class="highlight-word">Student</span>
                         </div>
                     </a>
-                    <a href="/reg-teacher" class="btn">
-                        <div class="btn-text">
+                    <a href="/reg-teacher" class="btn2">
+                        <div class="btn2-text">
                             Create an account as a
                             <span class="highlight-word">Teacher</span>
                         </div>
