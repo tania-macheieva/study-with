@@ -131,7 +131,7 @@ CREATE TABLE lecture_files (
     lecture_id INT NOT NULL,
     file_name VARCHAR(255) NOT NULL,
     file_url VARCHAR(1024) NOT NULL,
-    file_type VARCHAR(50),
+    file_type VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_lecture FOREIGN KEY (lecture_id) REFERENCES lectures(id) ON DELETE CASCADE
 );

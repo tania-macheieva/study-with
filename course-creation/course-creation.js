@@ -59,7 +59,7 @@ const translations = {
     courseTags: "Course Tags (hidden from users)",
     enterTags: "Enter tags",
     tagTip: "To add a tag, press ENTER",
-    note: "* Note: Uploaded files will not be saved after refreshing or closing the page. Please add them again.",
+    note: "* Note: Lecture description or uploaded files will not be saved after refreshing or closing the page. Please add them again.",
     restriction: "* Note: You can only add one type of content: video, audio, materials, or description.",
   },
   ua: {
@@ -122,7 +122,7 @@ const translations = {
     courseTags: "Теги курсу (приховані від користувачів)",
     enterTags: "Введіть теги",
     tagTip: "Щоб додати тег, натисніть ENTER",
-    note: "Примітка: Завантажені файли не будуть збережені після оновлення або закриття сторінки. Будь ласка, додайте їх знову.",
+    note: "Примітка: Опис лекції або завантажені файли не будуть збережені після оновлення або закриття сторінки. Будь ласка, додайте їх знову.",
     restriction: "* Примітка: Ви можете додати лише один тип контенту: відео, аудіо, матеріали або опис.",
   },
 };
@@ -348,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="note-container">
         <label class="upload">${translations[userLang].chooseVideo}</label>
         <div class="custom-file-container">
-          <label class="custom-file-upload">
+          <label class="custom-file-upload" id="upload">
             ${translations[userLang].chooseFile}
             <input class="lecture-video" name="lecture_video" type="file" accept="video/*" />
           </label>
@@ -359,7 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="note-container">
         <label class="upload">${translations[userLang].chooseFiles}</label>
         <div class="custom-file-container">
-          <label class="custom-file-upload">
+          <label class="custom-file-upload" id="upload">
             ${translations[userLang].chooseFile}
             <input class="lecture-materials" name="lecture_files" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg,.svg,.webp" />
 
@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="note-container">
         <label class="upload">${translations[userLang].chooseAudio}</label>
         <div class="custom-file-container">
-          <label class="custom-file-upload">
+          <label class="custom-file-upload" id="upload">
             ${translations[userLang].chooseFile}
             <input class="lecture-audio" name="lecture_audio" type="file" accept="audio/*" />
           </label>
@@ -390,22 +390,42 @@ document.addEventListener('DOMContentLoaded', () => {
       audio: lectureDiv.querySelector(".lecture-audio"),
       description: lectureDiv.querySelector(".lecture-description"),
     };
-
-    const restrictionMessage = lectureDiv.querySelector(".restriction-message");
+ 
 
     function disableOtherInputs(selectedInput) {
-        let isDisabled = selectedInput.files ? selectedInput.files.length > 0 : selectedInput.value.trim().length > 0;
+      let isDisabled = inputs.description.value.trim().length > 0 || inputs.video.files.length > 0 || 
+      inputs.materials.files.length > 0 || inputs.audio.files.length > 0;
 
-        Object.values(inputs).forEach(input => {
-            if (input !== selectedInput) {
-                input.disabled = isDisabled;
-                input.style.backgroundColor = isDisabled ? "#e0e0e0" : ""; // Сірий фон для заблокованих полів
-                input.style.cursor = isDisabled ? "not-allowed" : ""; // Курсор "заборонено"
-            }
-        });
-
-        restrictionMessage.textContent = isDisabled ? "You can only add one type of content: video, audio, files, or description." : "";
+      Object.values(inputs).forEach(input => {
+          if (input !== selectedInput) {
+              input.disabled = isDisabled;
+              input.style.backgroundColor = isDisabled ? "#e0e0e0" : "";  
+              input.style.cursor = isDisabled ? "not-allowed" : "";  
+          }
+      });
+  
+      document.querySelectorAll("#upload").forEach(label => {
+        let input = label.querySelector("input");
+        if (input !== selectedInput) {
+            label.style.backgroundColor = isDisabled ? "#888888" : "";  
+            label.style.cursor = isDisabled ? "not-allowed" : "";
+          }
+      });
     }
+    Object.values(inputs).forEach(input => {
+      input.addEventListener("change", function() {
+          disableOtherInputs(this);
+      });
+    });
+
+    inputs.description.addEventListener("input", function () {
+      disableOtherInputs(this);
+    });
+    
+    // Перевіряємо textarea після завантаження сторінки
+    document.addEventListener("DOMContentLoaded", function() {
+        disableOtherInputs(inputs.description);
+    });
 
     function updateFileNamesList(input, fileListDiv) {
         fileListDiv.innerHTML = Array.from(input.files).map(file => `<span>${file.name}</span>`).join("");
@@ -477,12 +497,10 @@ function updateModuleNumbers() {
       const lectures = [];
   
       moduleDiv.querySelectorAll(".lecture").forEach((lectureDiv) => {
-        const lectureTitle = lectureDiv.querySelector("input[type='text']").value || "";
-        const lectureDescription = lectureDiv.querySelector("textarea").value || "";
+        const lectureTitle = lectureDiv.querySelector("input[type='text']").value || ""; 
         
         lectures.push({
-          title: lectureTitle,
-          description: lectureDescription, 
+          title: lectureTitle, 
         });
    
       });
@@ -572,7 +590,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (e.key === "Enter") {
       e.preventDefault();
       const tag = tagsInput.value.trim();
-      if (tag && !tagsList.includes(tag) && tagsList.length < 10) {  
+      if (tag && !tagsList.includes(tag) && tagsList.length < 5) {  
         tagsList.push(tag);
         tagsInput.value = '';
         updateTagsDisplay();
