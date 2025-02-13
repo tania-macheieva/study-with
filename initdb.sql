@@ -121,9 +121,11 @@ CREATE TABLE lectures (
     title VARCHAR(100) NOT NULL,
     description TEXT,
     order_num INT NOT NULL,
+    content_type VARCHAR(20) NOT NULL DEFAULT 'description',  
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_module FOREIGN KEY (module_id) REFERENCES modules(id) ON DELETE CASCADE
 );
+
 
 -- Створення таблиці файлів лекцій
 CREATE TABLE lecture_files (
