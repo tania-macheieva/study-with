@@ -320,11 +320,12 @@ router.get('/lecture/:lectureId', async (req, res) => {
                 lf.file_url,
                 lf.file_type,
                 COALESCE(lp.completed, false) as is_completed,
-                v.file_name as video_name,
-                v.file_path as video_path
+                v.file_path as video_path,
+                a.file_path as audio_path
             FROM lectures l
             LEFT JOIN lecture_files lf ON l.id = lf.lecture_id
             LEFT JOIN videos v ON l.id = v.lecture_id
+            LEFT JOIN audio a ON l.id = a.lecture_id
             LEFT JOIN lecture_progress lp ON l.id = lp.lecture_id AND lp.user_id = $2
             WHERE l.id = $1
         `;
@@ -343,7 +344,8 @@ router.get('/lecture/:lectureId', async (req, res) => {
             description: result.rows[0].description,
             file_type: result.rows[0].file_type,
             file_url: result.rows[0].file_url,
-            video_path: result.rows[0].video_path, 
+            video_path: result.rows[0].video_path,
+            audio_path: result.rows[0].audio_path,
             is_completed: result.rows[0].is_completed
         };
 
