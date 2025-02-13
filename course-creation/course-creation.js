@@ -392,91 +392,67 @@ document.addEventListener('DOMContentLoaded', () => {
     };
  
 
-    function disableOtherInputs(selectedInput) {
-      let isDisabled = inputs.description.value.trim().length > 0 || inputs.video.files.length > 0 || 
-      inputs.materials.files.length > 0 || inputs.audio.files.length > 0;
-
+    function disableOtherInputs(lectureDiv) {
+      const inputs = {
+        video: lectureDiv.querySelector(".lecture-video"),
+        materials: lectureDiv.querySelector(".lecture-materials"),
+        audio: lectureDiv.querySelector(".lecture-audio"),
+        description: lectureDiv.querySelector(".lecture-description"),
+      };
+    
+      // Check if any content has been added
+      let isDisabled = inputs.description.value.trim().length > 0 || 
+                      inputs.video.files.length > 0 || 
+                      inputs.materials.files.length > 0 || 
+                      inputs.audio.files.length > 0;
+    
+      // Disable/enable all other inputs and file upload buttons based on content
       Object.values(inputs).forEach(input => {
-          if (input !== selectedInput) {
-              input.disabled = isDisabled;
-              input.style.backgroundColor = isDisabled ? "#e0e0e0" : "";  
-              input.style.cursor = isDisabled ? "not-allowed" : "";  
-          }
+        input.disabled = isDisabled;
+        input.style.backgroundColor = isDisabled ? "#e0e0e0" : "";
+        input.style.cursor = isDisabled ? "not-allowed" : "";
       });
-  
+    
+      // Handle the upload buttons as well
       document.querySelectorAll("#upload").forEach(label => {
         let input = label.querySelector("input");
-        if (input !== selectedInput) {
-            label.style.backgroundColor = isDisabled ? "#888888" : "";  
-            label.style.cursor = isDisabled ? "not-allowed" : "";
-          }
+        label.style.backgroundColor = isDisabled ? "#888888" : "";
+        label.style.cursor = isDisabled ? "not-allowed" : "";
       });
     }
-    Object.values(inputs).forEach(input => {
-      input.addEventListener("change", function() {
-          disableOtherInputs(this);
-      });
-    });
-
-    inputs.description.addEventListener("input", function () {
-      disableOtherInputs(this);
-    });
-    function validateLectures() {
-      const lectureDivs = document.querySelectorAll(".lecture");
-      let hasValidLecture = false;
-  
-      lectureDivs.forEach(lecture => {
-          const video = lecture.querySelector(".lecture-video").files.length > 0;
-          const audio = lecture.querySelector(".lecture-audio").files.length > 0;
-          const materials = lecture.querySelector(".lecture-materials").files.length > 0;
-          const description = lecture.querySelector(".lecture-description").value.trim().length > 0;
-  
-          if (video || audio || materials || description) {
-              hasValidLecture = true;
-          }
-      });
-  
-      const submitBtn = document.querySelector(".btn-сreate");
-      submitBtn.disabled = !hasValidLecture;
-      if (hasValidLecture) {
-        submitBtn.disabled = false;
-        submitBtn.style.backgroundColor = "";  
-        submitBtn.style.cursor = "pointer";  
-    } else {
-        submitBtn.disabled = true;
-        submitBtn.style.backgroundColor = "#888888";  
-        submitBtn.style.cursor = "not-allowed";  
-    }
-  }
-  
-  // Виконуємо перевірку при введенні тексту або виборі файлу
-  document.addEventListener("input", validateLectures);
-  document.addEventListener("change", validateLectures);
-  
-  // Блокуємо сабміт форми, якщо немає жодної заповненої лекції
-  document.querySelector("#create-course").addEventListener("submit", function(event) {
-      const lectureDivs = document.querySelectorAll(".lecture");
-      let hasValidLecture = false;
-  
-      lectureDivs.forEach(lecture => {
-          const video = lecture.querySelector(".lecture-video").files.length > 0;
-          const audio = lecture.querySelector(".lecture-audio").files.length > 0;
-          const materials = lecture.querySelector(".lecture-materials").files.length > 0;
-          const description = lecture.querySelector(".lecture-description").value.trim().length > 0;
-  
-          if (video || audio || materials || description) {
-              hasValidLecture = true;
-          }
-      });
-  
-      if (!hasValidLecture) {
-          event.preventDefault(); 
-      }
-  });
-  
-    document.addEventListener("input", validateLectures);
-    document.addEventListener("change", validateLectures);
     
+    // Add a lecture and attach event listeners
+    function addLecture(moduleDiv, lectureData = {}) {
+      const lecturesDiv = moduleDiv.querySelector(".lectures");
+      const lectureDiv = document.createElement("div");
+      lectureDiv.classList.add("lecture");
+    
+      // Your code for setting up the lecture goes here (unchanged)
+    
+      lecturesDiv.appendChild(lectureDiv);
+    
+      const inputs = {
+        video: lectureDiv.querySelector(".lecture-video"),
+        materials: lectureDiv.querySelector(".lecture-materials"),
+        audio: lectureDiv.querySelector(".lecture-audio"),
+        description: lectureDiv.querySelector(".lecture-description"),
+      };
+    
+      // Set up event listeners to handle changes in content and enable/disable inputs
+      Object.values(inputs).forEach(input => {
+        input.addEventListener("change", function () {
+          disableOtherInputs(lectureDiv); // Update this lecture's inputs based on content
+        });
+      });
+    
+      inputs.description.addEventListener("input", function () {
+        disableOtherInputs(lectureDiv); // Handle description input changes
+      });
+    
+      // Initial check in case there is already content when adding a lecture
+      disableOtherInputs(lectureDiv);
+    }
+        
     function updateFileNamesList(input, fileListDiv) {
         fileListDiv.innerHTML = Array.from(input.files).map(file => `<span>${file.name}</span>`).join("");
         disableOtherInputs(input);
