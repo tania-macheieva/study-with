@@ -48,7 +48,7 @@ function authenticate(req, res, next) {
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: process.env.EMAIL_USER,         // ваша електронна пошта
+        user: process.env.EMAIL_USER, // ваша електронна пошта
         pass: process.env.EMAIL_PASSWORD,
     },
 });

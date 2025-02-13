@@ -102,7 +102,7 @@ app.get('/forgot-password', (req, res) => {
 app.get('/reset-password', (req, res) => {
     res.sendFile(path.join(__dirname, 'log-in-page/reset-password.html'));
 });
-app.get('/reset-password', (req, res) => {
+app.get('/sending_email', (req, res) => {
     res.sendFile(path.join(__dirname, 'log-in-page/sending_email.html'));
 });
 app.get('/profile-student', (req, res) => {
