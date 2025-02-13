@@ -421,11 +421,6 @@ document.addEventListener('DOMContentLoaded', () => {
     inputs.description.addEventListener("input", function () {
       disableOtherInputs(this);
     });
-    
-    // Перевіряємо textarea після завантаження сторінки
-    document.addEventListener("DOMContentLoaded", function() {
-        disableOtherInputs(inputs.description);
-    });
 
     function updateFileNamesList(input, fileListDiv) {
         fileListDiv.innerHTML = Array.from(input.files).map(file => `<span>${file.name}</span>`).join("");
