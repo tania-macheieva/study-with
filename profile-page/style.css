@@ -10,6 +10,46 @@ body {
     min-height: 100vh; 
 } 
 
+::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #FFFFFF;
+    margin: 5px 2px;
+    margin-top: 60px;
+    border-radius: 2px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #283044;
+    border-radius: 12px;
+    min-height: 40px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #506088;
+  }
+  
+  ::-webkit-scrollbar:horizontal {
+    height: 10px;
+  }
+  
+  ::-webkit-scrollbar-track-horizontal {
+    background: #FFFFFF;
+    margin: 2px 5px;
+    border-radius: 2px;
+  }
+  
+  ::-webkit-scrollbar-thumb-horizontal {
+    background: #283044;
+    border-radius: 12px;
+    min-width: 40px;
+  }
+  
+  ::-webkit-scrollbar-thumb-horizontal:hover {
+    background: #506088;
+  }
 
 /* Profile Container */
 .profile-container {
@@ -48,6 +88,11 @@ body {
 .profile-container .container-my div {
     margin-bottom: 3px;
 } 
+
+.chapters {
+    display: flex;
+    justify-content: center;
+}
 
 .profile-image {
     width: 130px;
@@ -90,6 +135,12 @@ body {
     transition: transform 0.2s ease-in-out;
 }
 
+p {
+    font-weight: 400;
+    font-size: 17px;
+    text-align: left;
+}
+
 .profile-container .user-info p {
     font-family: "Inter", sans-serif;
     font-weight: 500;
@@ -100,25 +151,68 @@ body {
 } 
 
 .profile-container .user-info  .btn-teacher {
-    width: 70%;
-    font-family: "Inter", sans-serif;
+    width: 90%;
+    font-family: "Inter";
     padding: 9px 5px;
-    background: #283044;
-    color: #ffffff;
-    border: none;
+    background: #fff;
+    color: #000;
     border-radius: 12px;
     font-size: 18px;
-    font-weight: 640;
+    font-weight: 300;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
     margin-top: 10px;
     margin-bottom: 12px;
+    border: 1px solid #000;
+    position: relative;
+    overflow: hidden;
 }
 
-.profile-container .user-info .btn-teacher:hover {
-    background-color: #545F7A;
-    transform: translateY(-2px);
-} 
+
+.btn-teacher span:not(:nth-child(6)) {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    height: 30px;
+    width: 30px;
+    background-color: #dceded;
+    border-radius: 50%;
+    transition: .6s ease;
+    
+  }
+  
+  .btn-teacher span:nth-child(6) {
+    position: relative;
+    
+  }
+  
+  .btn-teacher span:nth-child(1) {
+    transform: translate(-3.3em, -4em);
+    
+  }
+  
+  .btn-teacher span:nth-child(2) {
+    transform: translate(-6em, 1.3em);
+  }
+  
+  .btn-teacher span:nth-child(3) {
+    transform: translate(-.2em, 1.8em);
+  }
+  
+  .btn-teacher span:nth-child(4) {
+    transform: translate(3.5em, 1.4em);
+  }
+  
+  .btn-teacher span:nth-child(5) {
+    transform: translate(3.5em, -3.8em);
+  }
+  
+  .btn-teacher:hover span:not(:nth-child(6)) {
+    transform: translate(-50%, -50%) scale(9);
+    transition: 1.5s ease;
+  }
+
 .tab-container {
     margin: 20px;
 }
@@ -534,7 +628,7 @@ body {
     border-radius: 100px;    
     font-weight: 640;
     cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
+    transition: background 0.2s ease-in-out;
     margin-top: 10px;
     margin-bottom: 15px;
     margin-left: 70%;
@@ -547,14 +641,12 @@ body {
 }
 
 .btn-download:hover {
-    background-color: #545F7A;
-    color: #ffffff;
-    transform: translateY(-2px);
+    background-color: #a5a5a5;
+
 } 
 
 .btn-download:hover img { 
     color: #ffffff; 
-    content: url('images/download-certificate-hover.png'); 
 } 
 
 
@@ -629,6 +721,7 @@ body {
     width: 250px;
     border-radius: 12px;
 }
+
 .bookmarks-list {
     display: grid;  
     grid-template-columns: repeat(3, 1fr); 
@@ -636,6 +729,7 @@ body {
     overflow: hidden;
     transition: height 0.5s ease-in-out; 
 }
+
 .btn-open { 
     width: 100%;
     font-family: "Inter", sans-serif;
@@ -719,89 +813,89 @@ body {
 .btn-view-all-1 { 
     width: 150px;
     padding: 8px 10px;
-    font-size: 18px;
+    font-size: 17px;
+    font-weight: 400;
     font-family: "Inter", sans-serif;
-    font-weight: 640;
     background: #283044;
     color: #ffffff;
     border: none;
     border-radius: 12px;
     cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
+    transition: background 0.3s ease;
     margin-top: 10px;
     margin-bottom: 12px;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-view-all-1:hover {
-    background-color: #545F7A;
-    color: #ffffff;
-    transform: translateY(-2px);
+    background-color: #0c101a;
 }  
 
 .btn-view-all-2 { 
     width: 150px;
     padding: 8px 10px;
-    font-size: 18px;
+    font-size: 17px;
+    font-weight: 400;
     font-family: "Inter", sans-serif; 
     background: #283044;
     color: #ffffff;
     border: none;
     border-radius: 12px; 
-    font-weight: 640;
     cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
+    transition: background 0.3s ease;
     margin-top: 10px;
     margin-bottom: 12px;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-view-all-2:hover {
-    background-color: #545F7A;
-    color: #ffffff;
-    transform: translateY(-2px);
+    background-color: #0c101a;
 }  
 
 .btn-view-all-3 { 
     width: 150px;
     padding: 8px 10px;
-    font-size: 18px;  
+    font-size: 17px;
+    font-weight: 400;
     font-family: "Inter", sans-serif; 
     background: #283044;
     color: #ffffff;
     border: none;
     border-radius: 12px; 
-    font-weight: 640;
     cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
+    transition: background 0.3s ease;
     margin-top: 10px;
     margin-bottom: 12px;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-view-all-3:hover {
-    background-color: #545F7A;
-    color: #ffffff;
-    transform: translateY(-2px);
+    background-color: #0c101a;
 }  
 
 .btn-view-all-4 { 
     width: 150px;
     padding: 8px 10px;
-    font-size: 18px;
+    font-size: 17px;
+    font-weight: 400;;
     font-family: "Inter", sans-serif; 
     background: #283044;
     color: #ffffff;
     border: none;
     border-radius: 12px; 
-    font-weight: 640;
     cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
+    transition: background 0.3s ease;
     margin-top: 10px;
     margin-bottom: 12px;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-view-all-4:hover {
-    background-color: #545F7A;
-    color: #ffffff;
-    transform: translateY(-2px);
+    background-color: #0c101a;
 }  
 
 

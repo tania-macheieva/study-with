@@ -9,6 +9,49 @@ body {
     background: #FFFFFF;
 }
 
+/* Scrollbar styles */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #FFFFFF;
+    margin: 5px 2px;
+    margin-top: 60px;
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #283044;
+    border-radius: 12px;
+    min-height: 40px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #506088;
+}
+
+::-webkit-scrollbar:horizontal {
+    height: 10px;
+}
+
+::-webkit-scrollbar-track-horizontal {
+    background: #FFFFFF;
+    margin: 2px 5px;
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb-horizontal {
+    background: #283044;
+    border-radius: 12px;
+    min-width: 40px;
+}
+
+::-webkit-scrollbar-thumb-horizontal:hover {
+    background: #506088;
+}
+
+/* Course View Layout */
 .course-view {
     width: 100%;
     max-width: 1920px;
@@ -19,7 +62,7 @@ body {
     gap: 20px;
 }
 
-/* Video section */
+/* Video Container */
 .video-container {
     background: #FFFFFF;
     border: 2px solid #C7C7C7;
@@ -56,31 +99,6 @@ body {
     z-index: 2;
 }
 
-/* Стилізація кнопки нотаток */
-.notes-button {
-    background: rgba(255, 255, 255, 0.2);
-    border: 2px solid #FFFFFF;
-    border-radius: 8px;
-    padding: 6px 12px;
-    color: #FFFFFF;
-    font-size: 14px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    transition: all 0.3s ease;
-}
-
-.notes-button:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.notes-button img {
-    width: 16px;
-    height: 16px;
-}
-
-/* Стилі для модального вікна нотаток */
 .video-wrapper {
     position: relative;
     width: 100%;
@@ -95,6 +113,7 @@ body {
     object-fit: cover;
 }
 
+/* Notes Button */
 .notes-button {
     background: rgba(0, 0, 0, 0.7);
     border: none;
@@ -113,11 +132,12 @@ body {
     background: rgba(0, 0, 0, 0.8);
 }
 
-.notes-button:hover {
-    background: rgba(0, 0, 0, 0.8);
+.notes-button img {
+    width: 16px;
+    height: 16px;
 }
 
-/* Оновлені стилі для модального вікна */
+/* Notes Modal */
 .notes-modal {
     position: fixed;
     top: 50%;
@@ -125,20 +145,20 @@ body {
     transform: translate(-50%, -50%);
     z-index: 1000;
     background: white;
-    padding: 30px; /* Збільшуємо внутрішні відступи */
+    padding: 30px;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    width: 600px; /* Встановлюємо фіксовану ширину */
-    max-width: 90vw; /* Обмежуємо максимальну ширину для адаптивності */
+    width: 600px;
+    max-width: 90vw;
 }
+
 .notes-modal.active {
     display: block;
 }
 
-
 .notes-modal textarea {
     width: 100%;
-    height: 200px; /* Збільшуємо висоту текстового поля */
+    height: 200px;
     padding: 15px;
     border: 2px solid #C7C7C7;
     border-radius: 8px;
@@ -172,8 +192,7 @@ body {
     color: #283044;
 }
 
-
-/* Course content sidebar */
+/* Course Content */
 .course-content {
     background: #FFFFFF;
     border: 2px solid #C7C7C7;
@@ -191,90 +210,55 @@ body {
     gap: 20px;
 }
 
-.toggle-all::after,
-.toggle-module::after {
-    content: "";
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-right: 2px solid #283044;
-    border-bottom: 2px solid #283044;
-    transform: rotate(45deg);
-    transition: transform 0.3s ease;
-    margin-left: 5px;
+/* Topic Styles */
+.topics {
+    list-style: none;
+    padding-left: 40px;
 }
 
-.course-content.collapsed .module {
-    display: none;
-}
-
-.toggle-all,
-.toggle-module {
-    background: none;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    position: relative;
-    margin-right: 12px;
-    margin-top: -5px;
-}
-
-.toggle-all.collapsed::after,
-.toggle-module.collapsed::after {
-    transform: rotate(-45deg);
-}
-
-/* Початково приховуємо модулі */
-.module {
-    display: none;
-}
-
-/* Показуємо модулі, коли контент розгорнутий */
-.course-content:not(.collapsed) .module {
-    display: block;
-}
-
-/* Стилізація заголовка курсу */
-.course-header {
-    border-bottom: 1px solid #C7C7C7;
-}
-
-.course-header,
-.module-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-right: 8px;
-}
-
-.toggle-all {
-    background: none;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-}
-
-/* Стилізація заголовків модулів */
-
-.toggle-module {
-    background: none;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-}
-
-.course-content h1 {
-    font-size: 32px;
-    font-weight: 500;
-    color: #283044;
+.topics li,
+.topic-item {
+    font-size: 16px;
     margin-bottom: 10px;
+    color: #000000;
+    position: relative;
+    padding-right: 30px;
+    gap: 10px;
+    cursor: pointer;
+    background-color: transparent !important;
+    transition: none !important;
 }
 
+.topics li.completed::before {
+    content: "✓";
+    position: absolute;
+    left: -40px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    font-size: 14px;
+    color: #283044;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.topic-item:hover,
+.topic-item:focus,
+.topic-item.active,
+.topic-item.active:hover,
+.topic-item.active:focus {
+    background-color: transparent !important;
+}
+
+.topic-item.completed {
+    background-color: #e8f5e9 !important;
+}
+
+/* Module Styles */
 .module {
+    display: none;
     border-bottom: 1px solid #C7C7C7;
     padding: 20px 0;
     position: relative;
@@ -282,6 +266,10 @@ body {
 
 .module:last-child {
     border-bottom: none;
+}
+
+.course-content:not(.collapsed) .module {
+    display: block;
 }
 
 .module h2 {
@@ -311,63 +299,59 @@ body {
     color: #283044;
 }
 
-.topics {
-    list-style: none;
-    padding-left: 40px;
-}
-
-.topics li {
-    font-size: 16px;
-    margin-bottom: 10px;
-    color: #000000;
-    position: relative;
-    padding-right: 30px;
-    gap: 10px;
-}
-
-.topics li::before {
+/* Toggle Buttons */
+.toggle-all::after,
+.toggle-module::after {
     content: "";
-    position: absolute;
-    left: -40px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 18px;
-    height: 18px;
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid #283044;
+    border-bottom: 2px solid #283044;
+    transform: rotate(45deg);
+    transition: transform 0.3s ease;
+    margin-left: 5px;
 }
 
-.topics li::after {
-    content: "";
-    position: absolute;
-    left: -20px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 20px;
-    height: 20px;
-    background-size: contain;
-    background-repeat: no-repeat;
+.toggle-all.collapsed::after,
+.toggle-module.collapsed::after {
+    transform: rotate(-45deg);
 }
 
-.topics li .content-type-icon {
-    position: absolute;
-    left: -22px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 18px;
-    height: 18px;
-    background-size: contain;
-    background-repeat: no-repeat;
-}
-
-.topics li.completed::before {
-    content: "✓";
-    font-size: 14px;
-    color: #283044;
+.toggle-all,
+.toggle-module {
+    background: none;
+    border: none;
+    cursor: pointer;
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 5px;
+    position: relative;
+    margin-right: 12px;
+    margin-top: -5px;
 }
 
-/* Discussion section */
+/* Headers */
+.course-header {
+    border-bottom: 1px solid #C7C7C7;
+}
+
+.course-header,
+.module-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 8px;
+}
+
+.course-content h1 {
+    font-size: 32px;
+    font-weight: 500;
+    color: #283044;
+    margin-bottom: 10px;
+}
+
+/* Discussion Section */
 .discussion-section {
     border: 2px solid #C7C7C7;
     border-radius: 12px;
@@ -376,7 +360,7 @@ body {
     background: #FFFFFF;
 }
 
-/* Navigation tabs */
+/* Tabs */
 .tabs {
     display: inline-flex;
     margin: 20px 0;
@@ -412,7 +396,7 @@ body {
     background: #DCECFC;
 }
 
-/* Search bar */
+/* Search Bar */
 .search-bar {
     display: flex;
     gap: 10px;
@@ -438,6 +422,14 @@ body {
     cursor: pointer;
 }
 
+.icon-button img,
+.send-reply img {
+    width: 18px;
+    height: 18px;
+    display: block;
+    margin: auto;
+}
+
 /* Filters */
 .filters {
     display: flex;
@@ -446,7 +438,6 @@ body {
     gap: 20px;
 }
 
-/* Стилі для лівої частини з чекбоксами */
 .filters-left {
     display: flex;
     flex-direction: column;
@@ -473,7 +464,6 @@ body {
     cursor: pointer;
 }
 
-/* Стилі для правої частини з кнопками */
 .filters-right {
     display: flex;
     flex-direction: column;
@@ -481,7 +471,6 @@ body {
     align-items: flex-end;
 }
 
-/* Оновлені стилі для груп кнопок */
 .filter-group {
     display: inline-flex;
 }
@@ -517,12 +506,11 @@ body {
     background: #DCECFC;
 }
 
-/* Discussion thread */
+/* Message Styles */
 .discussion-thread {
     margin-top: 20px;
 }
 
-/* Message styling */
 .message {
     position: relative;
     border: 2px solid #C7C7C7;
@@ -532,7 +520,6 @@ body {
     background: #FFFFFF;
 }
 
-/* Chain of replies styling */
 .message.reply {
     margin-top: -2px;
     margin-bottom: 0;
@@ -594,6 +581,32 @@ body {
     cursor: pointer;
 }
 
+/* Checkbox Styles */
+input[type="checkbox"] {
+    appearance: none; 
+    width: 20px;
+    height: 20px;
+    border: 1px solid #283044;
+    border-radius: 8px;
+    position: relative;
+    cursor: pointer;
+}
+
+input[type="checkbox"]:checked {
+    background-color: #ffffff;
+    border-color: #283044;
+}
+  
+input[type="checkbox"]:checked::before {
+    content: '✔';
+    position: absolute;
+    top: -4px;
+    left: 1px;
+    color: #283044;
+    font-size: 16px;
+}
+
+/* Reply Input Styles */
 .message .reply-input {
     display: flex;
     gap: 10px;
@@ -625,6 +638,7 @@ body {
     margin-left: 48px;
 }
 
+/* Show More Button */
 .show-more-button {
     margin: 10px 0;
     padding: 8px 16px;
@@ -636,16 +650,26 @@ body {
     display: block;
 }
 
-.icon-button img {
-    width: 18px;
-    height: 18px;
-    display: block;
-    margin: auto;
+/* Topic Icons */
+.topics li::after {
+    content: "";
+    position: absolute;
+    left: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    background-size: contain;
+    background-repeat: no-repeat;
 }
 
-.send-reply img {
+.topics li .content-type-icon {
+    position: absolute;
+    left: -22px;
+    top: 50%;
+    transform: translateY(-50%);
     width: 18px;
     height: 18px;
-    display: block;
-    margin: auto;
+    background-size: contain;
+    background-repeat: no-repeat;
 }

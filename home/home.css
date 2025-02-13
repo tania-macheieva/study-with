@@ -1,8 +1,58 @@
 body {
   font-family: "Inter", serif;
+  animation: fadeIn 0.5s ease-in-out;
 }
 
-/*Home*/
+@keyframes fadeIn {
+  from {
+      opacity: 0;
+  }
+
+  to {
+      opacity: 1;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FFFFFF;
+  margin: 5px 2px;
+  margin-top: 60px;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #283044;
+  border-radius: 12px;
+  min-height: 40px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #506088;
+}
+
+::-webkit-scrollbar:horizontal {
+  height: 10px;
+}
+
+::-webkit-scrollbar-track-horizontal {
+  background: #FFFFFF;
+  margin: 2px 5px;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb-horizontal {
+  background: #283044;
+  border-radius: 12px;
+  min-width: 40px;
+}
+
+::-webkit-scrollbar-thumb-horizontal:hover {
+  background: #506088;
+}
 
 .container {
   display: flex;
@@ -34,22 +84,71 @@ body h3 {
 }
 
 .home_button {
-  border-radius: 12px;
-  width: 200px;
-  height: 40px;
-  background: #283044;
-  font-size: 18px;
-  font-weight: 400;
-  color: #fff;
-  font-family: "Inter", Regular;
-  border: none;
-  margin-left: 64px;
-  cursor: pointer;
   margin-top: 32px;
+  margin-left: 64px;
+  border: none;
+  position: relative;
+  overflow: hidden;
+  background-color: #283044;
+  color: #fff;
+  padding:  12px 0; 
+  width: 40%;
+  border-radius: 12px; 
+  cursor: pointer;
+  font-size: 16px; 
+  font-weight: 300;
+  transition: background-color 0.3s ease, transform 0.2s ease, color 0.3s ease;
+  margin-bottom: 15px;
+  font-family: "Inter";
 }
 
+.home_button span:not(:nth-child(6)) {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  height: 30px;
+  width: 30px;
+  background-color: #656d82;
+  border-radius: 50%;
+  transition: .6s ease;
+  
+}
+
+.home_button span:nth-child(6) {
+  position: relative;
+  
+}
+
+.home_button span:nth-child(1) {
+  transform: translate(-3.3em, -4em);
+  
+}
+
+.home_button span:nth-child(2) {
+  transform: translate(-6em, 1.3em);
+}
+
+.home_button span:nth-child(3) {
+  transform: translate(-.2em, 1.8em);
+}
+
+.home_button span:nth-child(4) {
+  transform: translate(3.5em, 1.4em);
+}
+
+.home_button span:nth-child(5) {
+  transform: translate(3.5em, -3.8em);
+}
+
+.home_button:hover span:not(:nth-child(6)) {
+  transform: translate(-50%, -50%) scale(9);
+  transition: 1.5s ease;
+}
+
+
 .img_home {
-  width: 65%; 
+  width: 45%; 
   height: auto; 
   margin-top: 22px;
 }
@@ -65,7 +164,45 @@ body h3 {
   overflow-x: auto;
   padding: 10px;
   justify-content: flex-start;
-  overflow: auto;
+  overflow: hidden;
+}
+
+.course_group,
+.course_group * {
+  box-sizing: border-box;
+}
+
+.course_group {
+  width: 240px;
+  height: 398px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.carousel-btn {
+  background: none;
+  color: #012035;
+  border: none;
+  border-radius: 60%;
+  font-size: 3rem;
+  padding: 10px;
+  cursor: pointer;
+  position: absolute;
+  top: 55%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 40px;
+  height: 40px;
+  margin-right: 12px;
+  margin-left: 12px;
+}
+
+.carousel-btn.prev-btn {
+  left: -10px;
+}
+
+.carousel-btn.next-btn {
+  right: 25px;
 }
 
 .popular_text{
@@ -74,18 +211,7 @@ body h3 {
   font-size: 32px;
 }
 
-.course_group,
-.course_group * {
-  box-sizing: border-box;
-  
-}
 
-.course_group {
-  width: 240px;
-  height: 398px;
-  position: relative;
-  flex-shrink: 0; 
-}
 
 .rectangle-1 {
   width: 240px;
@@ -194,22 +320,33 @@ body h3 {
 }
 
 .category_box {
-  box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.25);
   border-radius: 12px;
   width: 300px;
   height: 70px;
   background: #DCECFC;
-  gap: 32px;
+  border: 1px solid #DCECFC;
+  box-shadow: 12px 17px 51px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(6px);
+  border-radius: 17px;
   text-align: center;
-  font-family: "Inter", ExtraLight;
-  font-weight: 300;
-  font-size: 20px;
-  color: #283044;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   cursor: pointer;
-  
+  transition: all 0.5s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  font-weight: bolder;
+  color: black;
+  font-family: "Inter";
+}
+
+.category_box:hover {
+  border: 1px solid black;
+  transform: scale(1.05);
+}
+
+.category_box:active {
+  transform: scale(0.95) rotateZ(1.7deg);
 }
 
 /*Feedback*/
@@ -434,6 +571,29 @@ footer .logo span {
   color: white;
 }
 
+/* Базова анімація fade-in */
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Анімація для тексту */
+.text-animate {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.text-animate.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
 
 
 

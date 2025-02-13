@@ -199,16 +199,20 @@ document.addEventListener('DOMContentLoaded', () => {
 async function loadEnrolledCourses() {
     try {
         const userId = localStorage.getItem('userId');
+        console.log('Loading courses for user:', userId);
+        
         if (!userId) {
             console.log('No userId found');
             return;
         }
 
-        const response = await fetch(`/api/courses/enrolled/${userId}`);
+        const response = await fetch(`/courses/enrolled/${userId}`);
         const courses = await response.json();
         console.log('Received courses:', courses);
 
         const coursesContainer = document.getElementById('enrolled-courses');
+        if (!coursesContainer) return;
+
         if (!courses || courses.length === 0) {
             coursesContainer.innerHTML = '<p class="no-courses">You haven\'t enrolled in any courses yet.</p>';
             return;
@@ -218,20 +222,69 @@ async function loadEnrolledCourses() {
             <div class="course">
                 <p class="p-1">${course.name}</p>
                 <div class="progress-bar">
-                    <span style="width: ${course.progress}%;"></span>
+                    <span style="width: ${course.progress || 0}%;"></span>
                 </div>
-                <p class="percent">${course.progress}%</p>
-                <img src="${course.image_url}" alt="${course.name}" onerror="this.src='/images/250x100.png'">
-                <button class="btn-resume" onclick="window.location.href='/course/learn/${course.id}'">
-                    Resume
-                </button>
+                <p class="percent">${course.progress || 0}%</p>
+                <img src="${course.image_url || '/images/250x100.png'}" 
+                     alt="${course.name}" 
+                     onerror="this.src='/images/250x100.png'">
+                <button class="btn-resume" data-course-id="${course.id}">Resume</button>
             </div>
         `).join('');
 
+        // Додаємо обробники для кнопок Resume
+        document.querySelectorAll('.btn-resume').forEach(button => {
+            button.addEventListener('click', function() {
+                const courseId = this.getAttribute('data-course-id');
+                if (courseId) {
+                    window.location.href = `/course/${courseId}`;
+                }
+            });
+        });
+
     } catch (error) {
         console.error('Error loading courses:', error);
-        document.getElementById('enrolled-courses').innerHTML = 
-            '<p class="error-message">Failed to load courses. Please try again later.</p>';
+        const coursesContainer = document.getElementById('enrolled-courses');
+        if (coursesContainer) {
+            coursesContainer.innerHTML = '<p class="error-message">Failed to load courses. Please try again later.</p>';
+        }
+    }
+}
+
+async function updateProgress() {
+    try {
+        const courseId = window.location.pathname.split('/course/').pop();
+        const userId = localStorage.getItem('userId');
+        
+        const response = await fetch(`/api/course/${courseId}/progress?userId=${userId}`);
+        if (!response.ok) throw new Error('Failed to fetch progress');
+        
+        const progressData = await response.json();
+        console.log('Progress data:', progressData); // Для дебагу
+        
+        // Оновлюємо прогрес-бар в хедері
+        const progressBar = document.querySelector('.progress-bar span');
+        const progressText = document.querySelector('.progress-text .percent');
+        
+        if (progressBar && progressText) {
+            const progress = progressData.progress || 0;
+            progressBar.style.width = `${progress}%`;
+            progressText.textContent = `${Math.round(progress)}%`;
+        }
+
+        // Оновлюємо прогрес в модулях
+        document.querySelectorAll('.module-progress').forEach(moduleProgress => {
+            const total = progressData.totalLectures;
+            const completed = progressData.completedLectures;
+            moduleProgress.innerHTML = `
+                <span>${completed}/${total} complete</span>
+                <span class="separator">|</span>
+                <span>${total - completed} left</span>
+            `;
+        });
+
+    } catch (error) {
+        console.error('Error updating progress:', error);
     }
 }
 

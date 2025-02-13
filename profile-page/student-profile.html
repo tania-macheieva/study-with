@@ -20,7 +20,7 @@
             <main class="profile-container">
                 <div class="user-info">
                     <label for="upload-image">
-                        <img id="profile-image" class="profile-image" src="/images/profile-picture.png" alt="user image">
+                        <img id="profile-image" class="profile-image" src="/images/user-avatar.png" alt="user image">
                     </label>
                     <input type="file" id="upload-image" accept="image/*" style="display: none;">
                     
@@ -34,7 +34,13 @@
                     </div>
 
                     <p data-lang="username" id="username">username</p>
-                    <button class="btn-teacher" id="become-teacher-btn" data-lang="btnTeacher">Become a teacher</button>
+                    <button class="btn-teacher" id="become-teacher-btn">
+                        <span class="circle1"></span>
+                        <span class="circle2"></span>
+                        <span class="circle3"></span>
+                        <span class="circle4"></span>
+                        <span class="circle5"></span>
+                        <span data-lang="btnTeacher">Become a teacher</span></button>
 
                     <div class="tab-container">
                         <div class="tabs">
@@ -53,7 +59,7 @@
                         </div>
                     </div>
                 </div>
-
+<div class="chapters">
                 <div class="container-my">
                     <div class="my-courses">
                         <h2 data-lang="myCourses">My courses</h2>
@@ -68,8 +74,8 @@
                             <div class="certificate">
                                 <p class="p-1" data-lang="certificateName">Certificate name 1</p>
                                 <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
-                                <button class="btn-download" data-lang="btnDownload">
-                                    <img src="/images/download-certificate.png" alt="download">
+                                <button class="btn-download">
+                                    <img src="/images/download-certificate.png">
                                 </button>
                             </div>
                         </div>
@@ -85,7 +91,7 @@
                 </div>
             </main>
         </div>
-
+</div>
         <script src="../footer/footer.js"></script>
         
         <script src="../profile-page/student-lang.js"></script>
@@ -139,58 +145,17 @@
                         }
                     });
 
-                    // Обробник підтвердження завантаження
-                    confirmImageButton.addEventListener('click', async function () {
-                        const file = uploadInput.files[0];
-                        if (!file) {
-                            alert('Please select an image to upload.');
-                            return;
-                        }
+            profileImage.addEventListener('click', function() {
+                removeImageButton.style.display = 'inline-block';
+                confirmImageButton.style.display = 'inline-block';
+            });
 
-                        const userId = localStorage.getItem('userId');
-                        if (!userId) {
-                            alert('User not authenticated.');
-                            return;
-                        }
-
-                        const formData = new FormData();
-                        formData.append('profileImage', file);
-                        formData.append('userId', userId);
-
-                        try {
-                            const response = await fetch('http://localhost:8000/auth/upload-student-profile-image', {
-                                method: 'POST',
-                                body: formData
-                            });
-
-                            if (!response.ok) {
-                                throw new Error('Failed to upload image');
-                            }
-
-                            const result = await response.json();
-                            if (result.filePath) {
-                                const imageUrl = result.filePath.startsWith('http')
-                                    ? result.filePath
-                                    : `http://localhost:8000${result.filePath}`;
-                                profileImage.src = imageUrl;
-                                alert('Profile image updated successfully!');
-                            }
-                        } catch (error) {
-                            console.error('Error uploading image:', error);
-                            alert('Failed to upload image. Please try again.');
-                        }
-
-                        removeImageButton.style.display = 'none';
-                        confirmImageButton.style.display = 'none';
-                    });
-
-                    // Обробник видалення зображення
-                    removeImageButton.addEventListener('click', function () {
-                        profileImage.src = '/images/profile-picture.png';
-                        uploadInput.value = '';
-                        removeImageButton.style.display = 'none';
-                        confirmImageButton.style.display = 'none';
-                    });
+            removeImageButton.addEventListener('click', function() {
+                profileImage.src = '/images/profile-picture.png';
+                uploadInput.value = '';
+                removeImageButton.style.display = 'none';
+                confirmImageButton.style.display = 'none';
+            });
 
                     // Завантажуємо зображення при ініціалізації
                     loadProfileImage();

@@ -166,12 +166,11 @@ a.lang-btn {
     width: 25px;
     height: 25px;
     border-radius: 50%; 
-    transition: transform 0.3s ease, box-shadow 0.3s ease;  
+    transition: box-shadow 0.3s ease;  
 }  
 
 .right-section .btn:hover a {
     color: #545F7A; 
-    transform: scale(1.04); 
 }
 
 .right-section a:hover  {

@@ -138,7 +138,11 @@ function validateStep(stepIndex) {
             }
         });
     });
-
+    document.querySelectorAll(".prev-btn-first").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            window.location.href = "/registration_pages/reg_teacher.html";
+        });
+    });
     // Слухачі для кнопок "Previous"
     document.querySelectorAll(".prev-btn").forEach((btn) => {
         btn.addEventListener("click", () => {

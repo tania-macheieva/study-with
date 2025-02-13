@@ -8,6 +8,7 @@ const upload = multer({ storage }).fields([
     { name: 'course_thumbnail', maxCount: 1 },
     { name: 'lecture_files' },
     { name: 'lecture_videos' },
+    { name: 'lecture_audio' },
   ]);
   
   router.post('/save-draft', upload, async (req, res) => {  
@@ -21,8 +22,9 @@ const upload = multer({ storage }).fields([
       modules,
       tags,
       course_id, 
+      test_link = '',
     } = req.body;
-  
+    console.log('Course_data:', req.body);
     let parsedCoursePrice = course_price ? parseFloat(course_price) : null;
     let parsedCourseCategory = course_category ? parseInt(course_category, 10) : null;
     let parsedEducationLevel = education_level ? parseInt(education_level, 10) : null;
@@ -50,7 +52,7 @@ const upload = multer({ storage }).fields([
       let courseToUpdate;
   
       const courseCheckQuery = `
-        SELECT id, name, description, price, category_id, image_url, education_level_id, status
+        SELECT id, name, description, price, category_id, image_url, education_level_id, status, test_link
         FROM all_courses
         WHERE author_id = $1 AND (name = $2 OR description = $3)
       `;
@@ -69,8 +71,9 @@ const upload = multer({ storage }).fields([
               price = COALESCE($3, price),
               category_id = COALESCE($4, category_id),
               image_url = COALESCE($5, image_url),
-              education_level_id = COALESCE($6, education_level_id)
-            WHERE id = $7;
+              education_level_id = COALESCE($6, education_level_id),
+              test_link = COALESCE($7, test_link)
+            WHERE id = $8;
           `;
           const updateValues = [
             course_title || courseToUpdate.name,
@@ -79,6 +82,7 @@ const upload = multer({ storage }).fields([
             parsedCourseCategory || courseToUpdate.category_id,
             courseThumbnail || courseToUpdate.image_url,
             parsedEducationLevel || courseToUpdate.education_level_id,
+            test_link || courseToUpdate.test_link,
             courseToUpdate.id
           ];
   
@@ -95,8 +99,9 @@ const upload = multer({ storage }).fields([
               category_id = COALESCE($4, category_id),
               image_url = COALESCE($5, image_url),
               education_level_id = COALESCE($6, education_level_id),
-              status = 'draft'
-            WHERE id = $7;
+              status = 'draft',
+              test_link =  COALESCE($7, test_link)
+            WHERE id = $8;
           `;
           const updateValues = [
             course_title || courseToUpdate.name,
@@ -105,6 +110,7 @@ const upload = multer({ storage }).fields([
             parsedCourseCategory || courseToUpdate.category_id,
             courseThumbnail || courseToUpdate.image_url,
             parsedEducationLevel || courseToUpdate.education_level_id,
+            test_link || courseToUpdate.test_link,
             courseToUpdate.id
           ];
   
@@ -114,8 +120,8 @@ const upload = multer({ storage }).fields([
       } else {
         // Якщо курсу немає, створюємо новий курс зі статусом "draft"
         const query = `
-          INSERT INTO all_courses (name, description, price, category_id, image_url, author_id, education_level_id, status)
-          VALUES ($1, $2, $3, $4, $5, $6, $7, 'draft')
+          INSERT INTO all_courses (name, description, price, category_id, image_url, author_id, education_level_id, status, test_link)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, 'draft', $8)
           RETURNING id;
         `;
         const result = await pool.query(query, [
@@ -126,6 +132,7 @@ const upload = multer({ storage }).fields([
           courseThumbnail,
           author_id,
           parsedEducationLevel,
+          test_link,
         ]);
         courseId = result.rows[0].id;
       }
@@ -152,18 +159,23 @@ const upload = multer({ storage }).fields([
         if (modulesToDelete.length > 0) {
           await pool.query(`DELETE FROM lecture_files WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
           await pool.query(`DELETE FROM videos WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
+          await pool.query(`DELETE FROM audio WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
           await pool.query(`DELETE FROM lectures WHERE module_id = ANY($1::int[])`, [modulesToDelete]);
           await pool.query(`DELETE FROM modules WHERE id = ANY($1::int[])`, [modulesToDelete]);
         }
   
         const modulePromises = modulesArray.map(async (module) => {
           const { id, title, order_num, lectures: moduleLectures } = module;
+  
+          if (!title || !order_num) {
+            throw new Error('Module must have a title and order_num.');
+          }
           let moduleId = id;
   
           if (!moduleId) {
             const moduleResult = await pool.query(
-              `INSERT INTO modules (course_id, title, order_num) VALUES ($1, $2, $3) RETURNING id`,
-              [courseId, title, order_num]
+              `INSERT INTO modules (course_id, title, order_num, test_link) VALUES ($1, $2, $3, $4) RETURNING id`,
+              [courseId, title, order_num, test_link]
             );
             moduleId = moduleResult.rows[0].id;
           } else {
@@ -221,7 +233,24 @@ const upload = multer({ storage }).fields([
                       ]
                   );
                 }
-              }
+
+                  const audiosForThisLecture = req.files['lecture_audio']?.slice(index, index + 1); 
+                  if (audiosForThisLecture && audiosForThisLecture.length > 0) {
+                    await pool.query('DELETE FROM audio WHERE lecture_id = $1', [lectureId]);
+            
+                    const audio = audiosForThisLecture[0]; 
+                    await pool.query(
+                      `INSERT INTO audio (lecture_id, file_name, file_path, file_size)
+                      VALUES ($1, $2, $3, $4)`,
+                      [
+                        lectureId,
+                        audio.originalname,
+                        audio.path,
+                        audio.size,
+                      ]
+                    );
+                  }
+                }
             });
   
             await Promise.all(lecturePromises);
@@ -286,8 +315,9 @@ router.post('/create', upload, async (req, res) => {
         education_level,
         author_id,
         modules, 
+        test_link,
     } = req.body;
-
+    console.log('Create_course_data:', req.body);
     const courseThumbnail = req.files['course_thumbnail']
         ? req.files['course_thumbnail'][0].filename
         : null;
@@ -338,8 +368,9 @@ router.post('/create', upload, async (req, res) => {
                     category_id = COALESCE($4, category_id),
                     image_url = COALESCE($5, image_url),
                     education_level_id = COALESCE($6, education_level_id),
-                    status = 'published'
-                WHERE id = $7
+                    status = 'published',
+                    test_link = COALESCE($7, test_link)
+                WHERE id = $8
                 RETURNING id;
             `;
             const updateValues = [
@@ -349,15 +380,17 @@ router.post('/create', upload, async (req, res) => {
                 categoryResult.rows[0].id,
                 courseThumbnail,
                 educationLevelResult.rows[0].id,
-                courseId
+                test_link,
+                courseId,
+                
             ];
 
             await pool.query(updateQuery, updateValues);
         } else {
             
             const query = `
-                INSERT INTO all_courses (name, description, price, category_id, image_url, author_id, education_level_id, status)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, 'published')
+                INSERT INTO all_courses (name, description, price, category_id, image_url, author_id, education_level_id, status, test_link)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, 'published', $8)
                 RETURNING id;
             `;
             const result = await pool.query(query, [
@@ -368,6 +401,7 @@ router.post('/create', upload, async (req, res) => {
                 courseThumbnail,
                 author_id,
                 educationLevelResult.rows[0].id,
+                test_link,
             ]);
 
             courseId = result.rows[0].id;
@@ -399,6 +433,7 @@ router.post('/create', upload, async (req, res) => {
               
               await pool.query(`DELETE FROM lecture_files WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
               await pool.query(`DELETE FROM videos WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
+              await pool.query(`DELETE FROM audio WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
               await pool.query(`DELETE FROM lectures WHERE module_id = ANY($1::int[])`, [modulesToDelete]);
           
               
@@ -408,7 +443,10 @@ router.post('/create', upload, async (req, res) => {
             
             const modulePromises = modulesArray.map(async (module) => {
               const { id, title, order_num, lectures: moduleLectures } = module;
-
+              console.log('Module_data:', module);
+              if (!title || !order_num) {
+                throw new Error('Module must have a title and order_num.');
+              }
               const existingModuleResult = await pool.query(
                 `SELECT id FROM modules WHERE course_id = $1 AND order_num = $2`,
                 [courseId, order_num]
@@ -423,8 +461,8 @@ router.post('/create', upload, async (req, res) => {
                 );
             } else {
                 const moduleResult = await pool.query(
-                    `INSERT INTO modules (course_id, title, order_num) VALUES ($1, $2, $3) RETURNING id`,
-                    [courseId, title, order_num]
+                    `INSERT INTO modules (course_id, title, order_num, test_link) VALUES ($1, $2, $3, $4) RETURNING id`,
+                    [courseId, title, order_num, test_link]
                 );
                 moduleId = moduleResult.rows[0].id;
             }
@@ -489,8 +527,24 @@ router.post('/create', upload, async (req, res) => {
                                 video.size,
                             ]
                         );
-                    }
+                    } 
+                const audiosForThisLecture = req.files['lecture_audio']?.slice(index, index + 1); 
+                if (audiosForThisLecture && audiosForThisLecture.length > 0) {
+                  await pool.query('DELETE FROM audio WHERE lecture_id = $1', [lectureId]);
+          
+                  const audio = audiosForThisLecture[0]; 
+                  await pool.query(
+                    `INSERT INTO audio (lecture_id, file_name, file_path, file_size)
+                    VALUES ($1, $2, $3, $4)`,
+                    [
+                      lectureId,
+                      audio.originalname,
+                      audio.path,
+                      audio.size,
+                    ]
+                  );
                 }
+              }
             });
                
           

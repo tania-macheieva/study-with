@@ -183,7 +183,7 @@ class HeaderComponent extends HTMLElement {
                 display: block;
             }
         </style>
-        <header>
+         <header>
             <div class="container">
                 <div class="left-s">
                     <h2 class="home">
@@ -197,11 +197,11 @@ class HeaderComponent extends HTMLElement {
                 <div class="right-s">
                     <div class="progress-container">
                         <div class="progress-bar">
-                            <span style="width: 50%;"></span>
+                            <span style="width: 0%;"></span>
                         </div>
                         <div class="progress-text">
                             <span>Progress</span>
-                            <span class="percent">50%</span>
+                            <span class="percent">0%</span>
                         </div>
                     </div>
 
@@ -234,6 +234,118 @@ class HeaderComponent extends HTMLElement {
         </header>
         `;
     }
+    setProgress(progress) {
+        const progressBar = this.querySelector('.progress-bar span');
+        const progressText = this.querySelector('.progress-text .percent');
+        
+        if (progressBar && progressText) {
+            progressBar.style.width = `${progress}%`;
+            progressText.textContent = `${Math.round(progress)}%`;
+        }
+    }
 }
 
 customElements.define('course-header', HeaderComponent);
+
+
+// Керування мовою
+function initializeLanguage() {
+    const currentLang = localStorage.getItem('language') || 'en';
+    document.documentElement.lang = currentLang;
+    
+    const langSwitcher = document.querySelector('.lang-switcher');
+    if (langSwitcher) {
+        // Встановлюємо активний стан для поточної мови
+        const buttons = langSwitcher.querySelectorAll('.lang-btn');
+        buttons.forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-lang') === currentLang);
+        });
+
+        // Додаємо обробник кліку
+        langSwitcher.addEventListener('click', (event) => {
+            if (event.target.classList.contains('lang-btn')) {
+                event.preventDefault();
+                const selectedLang = event.target.getAttribute('data-lang');
+                
+                if (selectedLang !== currentLang) {
+                    localStorage.setItem('language', selectedLang);
+                    location.reload();
+                }
+            }
+        });
+    }
+
+    // Застосовуємо переклади
+    applyTranslations(currentLang);
+}
+
+// Застосування перекладів до сторінки
+function applyTranslations(lang) {
+    const translations = headerTranslations[lang];
+    if (!translations) return;
+
+    document.querySelectorAll('[data-lang]').forEach(element => {
+        const key = element.getAttribute('data-lang');
+        if (translations[key]) {
+            if (element.tagName === 'INPUT') {
+                element.setAttribute('placeholder', translations[key]);
+            } else {
+                element.textContent = translations[key];
+            }
+        }
+    });
+
+    // Оновлюємо дропдаун, якщо він відкритий
+    const existingDropdown = document.querySelector('.user-dropdown');
+    if (existingDropdown) {
+        const authData = getAuthDataFromStorage();
+        if (authData) {
+            existingDropdown.remove();
+            const userContainer = document.querySelector('#user').parentElement;
+            userContainer.appendChild(createUserDropdown(authData));
+        }
+    }
+}
+
+async function initializeCourseProgress() {
+    try {
+        const courseId = window.location.pathname.split('/course/').pop();
+        const userId = localStorage.getItem('userId');
+
+        if (!courseId || !userId) return;
+
+        const response = await fetch(`/api/course/${courseId}/progress?userId=${userId}`);
+        
+        if (!response.ok) {
+            throw new Error('Помилка завантаження прогресу');
+        }
+        
+        const progressData = await response.json();
+        
+        const headerComponent = document.querySelector('course-header');
+        if (headerComponent) {
+            headerComponent.setProgress(progressData.progress);
+        }
+    } catch (error) {
+        console.error('Помилка ініціалізації прогресу:', error);
+    }
+}
+
+const headerTranslations = {
+    en: {
+        home: "Home",
+        courseName: "Course name",
+        progress: "Progress",
+        shareCourse: "Share this course",
+        unenrollCourse: "Unenroll from this course",
+    },
+    ua: {
+        home: "Головна сторінка",
+        courseName: "Назва курсу",
+        progress: "Прогрес",
+        shareCourse: "Поділитися цим курсом",
+        unenrollCourse: "Відписатися від цього курсу",
+    },
+};
+
+document.addEventListener('DOMContentLoaded', initializeCourseProgress);

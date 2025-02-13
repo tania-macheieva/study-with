@@ -4,7 +4,7 @@ CREATE TABLE users (
   name VARCHAR(255) NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
   user_password TEXT NOT NULL,
-  phone_number VARCHAR(15),
+  phone_number VARCHAR(30),
   role VARCHAR(50) CHECK (role IN ('student', 'teacher')) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   profile_image VARCHAR(255),
@@ -15,13 +15,13 @@ CREATE TABLE users (
 -- Створення таблиці викладачів
 CREATE TABLE teachers (
     id SERIAL PRIMARY KEY,
-    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id INT NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
     nickname VARCHAR(150),
     dob DATE,
     gender VARCHAR(50), 
     country VARCHAR(100),
     city VARCHAR(100),
-    phone_number VARCHAR(15),
+    phone_number VARCHAR(30),
     zip_code VARCHAR(20),
     specialty VARCHAR(255),
     professional_experience DATE,
@@ -40,7 +40,7 @@ CREATE TABLE students (
     user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     nickname VARCHAR(150) ,
     date_of_birth DATE,
-    phone_number VARCHAR(15),
+    phone_number VARCHAR(30),
     additional_info TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -69,6 +69,7 @@ CREATE TABLE all_courses (
     image_url VARCHAR(1024),
     education_level_id INT,
     status VARCHAR(20) DEFAULT 'draft',  -- Course status: 'draft' or 'published'
+    test_link VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -108,6 +109,7 @@ CREATE TABLE modules (
     course_id INT NOT NULL,
     title VARCHAR(100) NOT NULL,
     order_num INT NOT NULL,
+    test_link VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_course FOREIGN KEY (course_id) REFERENCES all_courses(id) ON DELETE CASCADE
 );
@@ -119,9 +121,11 @@ CREATE TABLE lectures (
     title VARCHAR(100) NOT NULL,
     description TEXT,
     order_num INT NOT NULL,
+    content_type VARCHAR(20) NOT NULL DEFAULT 'description',  
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_module FOREIGN KEY (module_id) REFERENCES modules(id) ON DELETE CASCADE
 );
+
 
 -- Створення таблиці файлів лекцій
 CREATE TABLE lecture_files (
@@ -129,7 +133,7 @@ CREATE TABLE lecture_files (
     lecture_id INT NOT NULL,
     file_name VARCHAR(255) NOT NULL,
     file_url VARCHAR(1024) NOT NULL,
-    file_type VARCHAR(50),
+    file_type VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_lecture FOREIGN KEY (lecture_id) REFERENCES lectures(id) ON DELETE CASCADE
 );
@@ -158,6 +162,17 @@ INSERT INTO education_levels (id, name, description) VALUES
 
 
 CREATE TABLE videos (
+    id SERIAL PRIMARY KEY,
+    lecture_id INT NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    file_path VARCHAR(255) NOT NULL,
+    file_size INT NOT NULL,
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    language_code VARCHAR(10) DEFAULT 'en',
+    FOREIGN KEY (lecture_id) REFERENCES lectures(id) ON DELETE CASCADE
+);
+
+CREATE TABLE audio (
     id SERIAL PRIMARY KEY,
     lecture_id INT NOT NULL,
     file_name VARCHAR(255) NOT NULL,
@@ -228,7 +243,15 @@ CREATE TABLE enrollments (
 -- колонка для  stripe акаунту
 ALTER TABLE all_courses ADD COLUMN author_stripe_account VARCHAR(255);
 
-
+CREATE TABLE lecture_progress (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    lecture_id INTEGER REFERENCES lectures(id) ON DELETE CASCADE,
+    completed BOOLEAN DEFAULT false,
+    completed_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, lecture_id)
+);
 
 CREATE TABLE payments (
     id SERIAL PRIMARY KEY,
@@ -241,3 +264,9 @@ CREATE TABLE payments (
     status TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE all_courses ADD COLUMN author_stripe_account VARCHAR(255);
+
+
+ALTER TABLE students
+ADD COLUMN profile_image VARCHAR(255) DEFAULT '/images/profile-picture.png';

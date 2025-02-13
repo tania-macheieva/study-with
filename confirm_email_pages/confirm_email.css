@@ -1,3 +1,44 @@
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FFFFFF;
+  margin: 5px 2px;
+  margin-top: 60px;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #283044;
+  border-radius: 12px;
+  min-height: 40px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #506088;
+}
+
+::-webkit-scrollbar:horizontal {
+  height: 10px;
+}
+
+::-webkit-scrollbar-track-horizontal {
+  background: #FFFFFF;
+  margin: 2px 5px;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb-horizontal {
+  background: #283044;
+  border-radius: 12px;
+  min-width: 40px;
+}
+
+::-webkit-scrollbar-thumb-horizontal:hover {
+  background: #506088;
+}
+
 /* General styles */
 body {
     font-family: "Inter", sans-serif;
@@ -72,26 +113,6 @@ body {
     outline: none;
   }
   
-  .confirm-button {
-    background-color: #283044; /* Темніша кнопка */
-    color: #fff;
-    border: none;
-    padding:  12px 0; 
-    width: 80%;
-    border-radius: 12px; 
-    cursor: pointer;
-    font-size: 16px; /* Збільшуємо текст кнопки */
-    font-weight: 300;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    margin-bottom: 15px;
-    font-family: "Inter";
-  }
-  
-  .confirm-button:hover {
-    background-color: #0c101a;
-    transform: scale(1.05); /* Невелике збільшення при наведенні */
-  }
-  
  .resend-link {
     text-align: left; /* Вирівнюємо текст посилання вліво */
     font-size: 1rem;
@@ -110,4 +131,23 @@ body {
 
 .h2 {
   font-family: "Inter";
+}
+
+.confirm-button {
+  background-color: #283044; /* Темніша кнопка */
+  color: #fff;
+  border: none;
+  padding:  12px 0; 
+  width: 50%;
+  border-radius: 12px; 
+  cursor: pointer;
+  font-size: 16px; /* Збільшуємо текст кнопки */
+  font-weight: 300;
+  transition: background-color 0.3s ease;
+  margin-bottom: 15px;
+  font-family: "Inter";
+}
+
+.confirm-button:hover {
+  background-color: #0c101a;
 }

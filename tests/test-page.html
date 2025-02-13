@@ -18,6 +18,7 @@
       background-color: #f9f9f9;
       margin: 0;
       padding: 20px;
+      min-height: 120vh;
     }
     .generate-test{
   display: flex;
@@ -299,15 +300,20 @@ button {
     
  <form>
   <div class="generate-test">
-    <input type="text" id="test-id-input" data-lang="enterTestId" placeholder="Enter Test ID">
-    <button type="button" id="generate-test-btn" data-lang="generTest">Generate Test</button>
+    <input type="text" id="test-id-input" data-lang="enterTestId" placeholder="Enter Test ID" hidden>
+    <button type="button" id="generate-test-btn" data-lang="startTest">Start Test</button>
   </div>
   <div id="final-test-block"></div>
  </form>
 
   <script>
 document.addEventListener('DOMContentLoaded', () => {
-   
+  const storedTestId = localStorage.getItem('testId');
+
+    if (storedTestId) {
+        document.getElementById('test-id-input').value = storedTestId;
+    }
+
     // Обробник для кнопки "Generate Test"
 document.getElementById('generate-test-btn').addEventListener('click', async function () {
   const testId = document.getElementById('test-id-input').value.trim();

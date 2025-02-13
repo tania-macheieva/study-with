@@ -1,3 +1,44 @@
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FFFFFF;
+  margin: 5px 2px;
+  margin-top: 60px;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #283044;
+  border-radius: 12px;
+  min-height: 40px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #506088;
+}
+
+::-webkit-scrollbar:horizontal {
+  height: 10px;
+}
+
+::-webkit-scrollbar-track-horizontal {
+  background: #FFFFFF;
+  margin: 2px 5px;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb-horizontal {
+  background: #283044;
+  border-radius: 12px;
+  min-width: 40px;
+}
+
+::-webkit-scrollbar-thumb-horizontal:hover {
+  background: #506088;
+}
+
 body {
   font-family: "Inter", sans-serif;
   margin: 0;
@@ -491,7 +532,9 @@ margin-bottom: 10px;
   transform: scale(1.1);  
 }
 .create-test-btn,
-.create-general-test-btn {
+.add-test-btn,
+.create-general-test-btn,
+.add-general-test-btn {
   background-color: #283044;
   color: #ffffff;
   border: none;
@@ -504,10 +547,12 @@ margin-bottom: 10px;
   flex-direction: center;
   margin-right: 20px;
 }
-.create-general-test-btn:hover, .create-test-btn:hover {
+.create-general-test-btn:hover,.add-test-btn:hover, .create-test-btn:hover, .add-general-test-btn:hover {
   background-color: #38435e;
 }
-
+.test-link-input, .gener-test-link-input{
+  margin-top: 20px;
+}
 /* Стиль для контейнера з тегами */
 .tags-container {
   margin-top: 20px;

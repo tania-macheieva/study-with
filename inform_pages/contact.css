@@ -1,3 +1,44 @@
+::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #FFFFFF;
+    margin: 5px 2px;
+    margin-top: 60px;
+    border-radius: 2px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #283044;
+    border-radius: 12px;
+    min-height: 40px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #506088;
+  }
+  
+  ::-webkit-scrollbar:horizontal {
+    height: 10px;
+  }
+  
+  ::-webkit-scrollbar-track-horizontal {
+    background: #FFFFFF;
+    margin: 2px 5px;
+    border-radius: 2px;
+  }
+  
+  ::-webkit-scrollbar-thumb-horizontal {
+    background: #283044;
+    border-radius: 12px;
+    min-width: 40px;
+  }
+  
+  ::-webkit-scrollbar-thumb-horizontal:hover {
+    background: #506088;
+  }
+
 body {
     font-family: "Inter", sans-serif;
     margin: 0;
@@ -25,7 +66,7 @@ body {
 
 .illustration img {
     max-width: 600px;
-    display: block; /* Зображення займає всю ширину контейнера */
+    display: block;
     margin-left: 0; 
     transform: translateX(-10%);
 }
@@ -43,9 +84,9 @@ body {
 }
 
 .contact-line {
-    width: 100%; /* Лінія займатиме всю ширину контейнера */
-    height: 3px; /* Товщина лінії */
-    background-color: #333; /* Колір лінії */
+    width: 100%;
+    height: 3px;
+    background-color: #333;
   }
   
 
@@ -66,13 +107,11 @@ body {
     line-height: 1.4;
 }
 
-
-/* Email button */
 .email-button {
-    display: inline-block; /* Дозволяє кнопці виглядати як блок */
+    display: inline-block;
     background-color: #283044;
     color: #fff;
-    text-decoration: none; /* Забирає підкреслення */
+    text-decoration: none;
     padding: 10px 20px;
     font-size: 18px;
     font-weight: 400px;
@@ -81,15 +120,15 @@ body {
 }
 
 .email-button:hover {
-    background-color: #101318; /* Темніший синій для ефекту наведення */
+    background-color: #101318;
 }
-/* Small boxes */
+
 .small-boxes {
     display: flex;
-    flex-direction: column; /* Змінюємо напрямок на вертикальний */
-    gap: 20px; /* Задаємо відступи між елементами */
+    flex-direction: column;
+    gap: 20px;
     width: 640px;
-    margin: 0 auto; /* Центруємо бокс */
+    margin: 0 auto;
 }
 
 
@@ -111,7 +150,6 @@ body {
     font-family: "Inter", sans-serif;
 }
 
-/* Контейнер для поля вводу і кнопки */
 .phone-container {
     display: flex;
     justify-content: center;
@@ -120,7 +158,6 @@ body {
     margin-top: 10px;
 }
 
-/* Поле для вводу номеру */
 .phone-input {
     flex: 1;
     width: 200px;
@@ -137,7 +174,7 @@ body {
 .phone-input::placeholder {
     color: #bbb;
 }
-/* Зміна кольору обрамлення під час фокусу */
+
 .phone-input:focus {
   border-color: #101318;;
   box-shadow: 0 0 5px rgba(8, 10, 11, 0.5);
@@ -158,13 +195,12 @@ body {
 .email-input::placeholder {
   color: #bbb;
 }
-/* Зміна кольору обрамлення під час фокусу */
+
 .email-input:focus {
     border-color: #101318;;
     box-shadow: 0 0 5px rgba(8, 10, 11, 0.5);
 }
 
-/* Кнопка для надсилання */
 .submit-button {
     display: flex;
     align-items: center;
@@ -182,7 +218,7 @@ body {
 }
 
 .submit-button:hover {
-    background-color: #1A1D26; /* Трохи світліший чорний */
+    background-color: #1A1D26;
 }
 
 .submit-button span {
@@ -192,10 +228,9 @@ body {
     transform: scale(1.1, 2.0);
 }
 
-
 /* Анімація стрілки на наведенні */
 .submit-button:hover span {
-    transform: translateX(3px); /* Зсуваємо стрілку трохи праворуч */
+    transform: translateX(3px);
 }
 
  .email-box p {

@@ -16,9 +16,7 @@
   <link rel="stylesheet" href="/tests/test-creation.css">
 </head>
 <body>
-  <header>
-    <h1  data-lang="testCreation">Test creation</h1>
-  </header>
+
 
   <main>
     <form id="test-form">
@@ -56,11 +54,12 @@
 <!-- Кнопка для збереження тесту -->
 <div class="save-test-container">
   <button id="save-test-btn" type="submit" data-lang="saveTest">Save test</button>
+  <button id="copy-test-link-btn" type="button">Copy Test Link</button>
 </div>
 
 <div class="generate-test">
-  <input type="text" id="test-id-input" data-lang="enterTestId" placeholder="Enter Test ID">
-  <button type="button" id="generate-test-btn" data-lang="generTest">Generate Test</button>
+  <input type="text" id="test-id-input" data-lang="enterTestId" placeholder="Enter Test ID" hidden>
+  <button type="button" id="generate-test-btn" data-lang="showTest">Show Test</button>
 </div>
 <div id="final-test-block"></div>
       </form>
@@ -221,12 +220,24 @@ if (answerElement) {
     if (!response.ok) {
       throw new Error('Failed to save the test');
     }
+    
     return response.json(); // Очікуємо JSON-відповідь
   })
+  
   .then(data => {
     if (data.testId) {
       alert(`Test saved successfully! Your test ID is: ${data.testId}`);
       console.log('Saved test ID:', data.testId);
+      // Зберігаємо testId в localStorage
+      localStorage.setItem('testId', data.testId);
+       // Генеруємо посилання на тест
+    const testLink = `http://localhost:8000/test-page/`;
+
+    
+    // Зберігаємо посилання у кнопку для копіювання
+    document.getElementById('copy-test-link-btn').setAttribute('data-link', testLink);
+
+    console.log('Saved test link:', testLink);
     } else {
       alert('Test saved, but no ID was returned from the server.');
     }
@@ -236,6 +247,20 @@ if (answerElement) {
     console.error(error);
   });
  });
+ document.getElementById('copy-test-link-btn').addEventListener('click', function () {
+    const testLink = 'http://localhost:8000/test-page/';
+    navigator.clipboard.writeText(testLink).then(() => {
+        alert('Test link copied to clipboard!');
+    }).catch(err => {
+        console.error('Failed to copy: ', err);
+    });
+});
+const storedTestId = localStorage.getItem('testId');
+
+if (storedTestId) {
+    document.getElementById('test-id-input').value = storedTestId;
+}
+
   
 // Обробник для кнопки "Generate Test"
 document.getElementById('generate-test-btn').addEventListener('click', async function () {

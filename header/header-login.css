@@ -186,13 +186,12 @@ body {
     border-radius: 9px;
     cursor: pointer;
     font-family: 'Inter', sans-serif;
+    transition: background-color 0.3s ease;
 }
 
 .sign-in-btn:hover {
     background-color: #545F7A;
     color: #fff;
-    transform: scale(1.05);
-    transition: all 0.1s ease;
 }
 
 .sign-up-btn {
@@ -204,13 +203,12 @@ body {
     border-radius: 9px;
     cursor: pointer;
     font-family: 'Inter', sans-serif;
+    transition: background-color 0.3s ease;
 }
 
 .sign-up-btn:hover {
     background-color: rgb(145, 193, 223);
     color: #fff;
-    transform: scale(1.05);
-    transition: all 0.1s ease;
 }
 
 a.lang-btn {
