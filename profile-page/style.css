@@ -317,20 +317,17 @@ p {
 .modal button {
     padding: 10px 20px;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 370;
+    font-family: Inter;
     color: #fff;
     background-color: #283044;
     border: none;
     border-radius: 12px; /* Заокруглення кнопки */
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Легка тінь */
     transition: all 0.3s ease;
-    
 }
 .modal button:hover {
-    background-color: #545F7A;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0, 86, 179, 0.4); /* Більша тінь */
+    background-color: #0c101a;
   
 }
 .password-container {
