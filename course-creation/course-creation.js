@@ -338,7 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="custom-file-container">
           <label class="custom-file-upload">
             ${translations[userLang].chooseFile}
-            <input class="lecture-materials" name="lecture_files" type="file" multiple" />
+            <input class="lecture-materials" name="lecture_files" type="file" multiple" required/>
           </label>
           <div class="file-names-list">
             ${lectureData.materialsFiles ? lectureData.materialsFiles.map(file => `<span>${file}</span>`).join("") : ""}
@@ -512,7 +512,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (e.key === "Enter") {
       e.preventDefault();
       const tag = tagsInput.value.trim();
-      if (tag && !tagsList.includes(tag) && tagsList.length < 10) {  
+      if (tag && !tagsList.includes(tag) && tagsList.length < 5) {  
         tagsList.push(tag);
         tagsInput.value = '';
         updateTagsDisplay();
