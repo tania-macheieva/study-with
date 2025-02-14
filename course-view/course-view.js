@@ -599,6 +599,21 @@ const showNotesModal = (currentTime) => {
 };
 
 function createModuleHTML(module) {
+    const getIconByFileType = (fileType) => {
+        if (!fileType) return '/images/text-icon.svg';
+        
+        if (fileType.startsWith('video/') || fileType === 'video/quicktime') {
+            return '/images/video-icon.svg';
+        }
+        if (fileType === 'audio/mpeg') {
+            return '/images/audio-icon.svg';
+        }
+        if (fileType === 'text/plain') {
+            return '/images/text-icon.svg';
+        }
+        return '/images/file-icon.svg';
+    };
+
     const { completed, total } = module.progress;
     const remaining = total - completed;
     
@@ -625,7 +640,7 @@ function createModuleHTML(module) {
                                 class="topic-item ${lecture.completed ? 'completed' : ''}"
                                 style="background-color: ${lecture.completed ? '#e8f5e9' : 'transparent'}"
                             >
-                                <img src="/images/text-icon.svg" class="topic-icon" />
+                                <img src="${getIconByFileType(lecture.file_type)}" class="topic-icon" alt="lecture type icon" />
                                 <span class="topic-title">${lecture.title}</span>
                             </li>
                         `).join('')}
@@ -671,12 +686,12 @@ window.handleLectureClick = async function(lectureId) {
         const response = await fetch(`/api/lecture/${lectureId}?userId=${userId}`);
         
         if (!response.ok) {
-            throw new Error('Failed to load lecture');
+            throw new Error('Помилка завантаження лекції');
         }
 
         const lectureData = await response.json();
         console.log('Lecture data:', lectureData);
-
+        
         const videoContainer = document.querySelector('.video-player');
         if (!videoContainer) return;
 
@@ -686,68 +701,70 @@ window.handleLectureClick = async function(lectureId) {
             clearTimeout(window.completionTimer);
         }
 
-        if (lectureData.audio_path) {
+        // Аудіо
+        if (lectureData.file_type === 'audio/mpeg') {
             videoContainer.innerHTML = `
-                <div style="padding: 20px; background: white; height: 100%; border-radius: 12px;">
-                    <h2 style="margin-bottom: 20px; color: #283044; font-family: Inter, sans-serif;">
-                        ${lectureData.title}
-                    </h2>
-                    <audio controls style="width: 100%; margin-bottom: 20px;">
-                        <source src="/${lectureData.audio_path}" type="audio/mpeg">
-                        Your browser does not support audio.
-                    </audio>
-                    ${lectureData.description ? 
-                        `<div style="color: #283044; font-family: Inter, sans-serif; line-height: 1.6;">
-                            ${lectureData.description}
-                         </div>` : ''}
+                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: white; border-radius: 12px;">
+                    <div style="width: 80%; max-width: 600px;">
+                        <h2 style="font-size: 18px; margin-bottom: 20px; text-align: center;">${lectureData.title}</h2>
+                        <audio controls style="width: 100%; margin-bottom: 20px;">
+                            <source src="/${lectureData.file_url}" type="audio/mpeg">
+                        </audio>
+                        ${lectureData.description ? `<div style="text-align: center;">${lectureData.description}</div>` : ''}
+                    </div>
                 </div>
             `;
 
             const audio = videoContainer.querySelector('audio');
-            setupAudioListeners(audio, lectureId);
+            if (audio) {
+                audio.addEventListener('ended', () => completeLecture(lectureId));
+            }
         } 
-        else if (lectureData.file_url) {
+        // Відео
+        else if (lectureData.file_type && (lectureData.file_type.startsWith('video/') || lectureData.file_type === 'video/quicktime')) {
             videoContainer.innerHTML = `
-                <div style="padding: 20px; background: white; height: 100%; border-radius: 12px;">
-                    <h2 style="margin-bottom: 20px; color: #283044; font-family: Inter, sans-serif;">
-                        ${lectureData.title}
-                    </h2>
-                    <a href="/${lectureData.file_url}" 
-                       target="_blank"
-                       class="download-button"
-                       style="display: inline-block; padding: 12px 24px; 
-                              background: #283044; color: white; text-decoration: none; 
-                              border-radius: 8px; margin-bottom: 20px;
-                              font-family: Inter, sans-serif;">
-                        Завантажити матеріал
-                    </a>
-                    ${lectureData.description ? 
-                        `<div style="color: #283044; font-family: Inter, sans-serif; line-height: 1.6;">
-                            ${lectureData.description}
-                         </div>` : ''}
+                <video controls style="width: 100%; height: 100%; border-radius: 12px;">
+                    <source src="/${lectureData.file_url}" type="video/mp4">
+                    <source src="/${lectureData.file_url}" type="video/quicktime">
+                    <source src="/${lectureData.file_url}" type="video/mov">
+                </video>
+            `;
+
+            const video = videoContainer.querySelector('video');
+            if (video) {
+                video.addEventListener('ended', () => completeLecture(lectureId));
+            }
+        }
+        // Файли
+        else if (lectureData.file_type && lectureData.file_url) {
+            videoContainer.innerHTML = `
+                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: white; border-radius: 12px;">
+                    <div style="text-align: center;">
+                        <h2 style="font-size: 18px; margin-bottom: 20px;">${lectureData.title}</h2>
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width: 64px; height: 64px; margin: 0 auto 20px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                        <p style="margin-bottom: 20px; color: #666;">${lectureData.file_url.split('/').pop()}</p>
+                        <a href="/${lectureData.file_url}" 
+                           download
+                           style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: #283044; color: white; border-radius: 8px; text-decoration: none;">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="width: 20px; height: 20px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                            Завантажити
+                        </a>
+                    </div>
                 </div>
             `;
 
             window.completionTimer = setTimeout(() => completeLecture(lectureId), 5000);
         }
-        else if (lectureData.video_path) {
-            videoContainer.innerHTML = `
-                <video controls width="100%" height="100%">
-                    <source src="/${lectureData.video_path}" type="video/mp4">
-                    Your browser does not support video.
-                </video>
-            `;
-
-            const video = videoContainer.querySelector('video');
-            setupVideoListeners(video, lectureId);
-        }
+        // Текстовий контент
         else {
             videoContainer.innerHTML = `
-                <div style="padding: 20px; background: white; height: 100%; overflow-y: auto; border-radius: 12px;">
-                    <h2 style="color: #283044; margin-bottom: 16px; font-family: Inter, sans-serif;">
-                        ${lectureData.title}
-                    </h2>
-                    <div style="color: #283044; font-family: Inter, sans-serif; line-height: 1.6;">
+                <div style="width: 100%; height: 100%; padding: 20px; background: white; border-radius: 12px;">
+                    <h2 style="font-size: 18px; margin-bottom: 20px; text-align: center;">${lectureData.title}</h2>
+                    <div style="color: #333;">
                         ${lectureData.description || 'Опис відсутній'}
                     </div>
                 </div>
@@ -757,8 +774,17 @@ window.handleLectureClick = async function(lectureId) {
         }
 
     } catch (error) {
-        console.error('Error:', error);
-        showErrorMessage(error);
+        console.error('Помилка:', error);
+        const videoContainer = document.querySelector('.video-player');
+        if (videoContainer) {
+            videoContainer.innerHTML = `
+                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                    <div style="padding: 16px; color: #dc2626; background: #fee2e2; border-radius: 12px;">
+                        Помилка завантаження контенту: ${error.message}
+                    </div>
+                </div>
+            `;
+        }
     }
 };
 
@@ -1471,6 +1497,7 @@ async function loadCourseData() {
                         id: lecture.id,
                         title: lecture.title,
                         completed: Boolean(lecture.completed),
+                        file_type: lecture.file_type,
                         contentType: lecture.file_type || 'text'
                     })),
                     progress: {
