@@ -23,7 +23,7 @@
             <main class="profile-container">
                 <div class="user-info">
                     <label for="upload-image">
-                        <img id="profile-image" class="profile-image" src="/images/profile-picture.png"
+                        <img id="profile-image" class="profile-image" src="/images/user-avatar.png"
                             alt="user image">
                     </label>
                     <input type="file" id="upload-image" accept="image/*" style="display: none;">
@@ -39,13 +39,17 @@
                     <!-- Вкладки -->
                     <div class="tab-container">
                         <div class="tabs">
-                            <button data-lang="publicProf" class="tab-link active" data-tab="public-profile">Public
-                                profile</button>
-                            <button data-lang="profile" class="tab-link" data-tab="profile">Profile</button>
-                            <button data-lang="security" class="tab-link" data-tab="security">Security</button>
-                            <button data-lang="messages" class="tab-link" data-tab="messages">Messages</button>
-                            <button data-lang="closeAccount" class="tab-link" data-tab="close-account">Closing an
-                                account</button>
+                            <button class="tab-link" data-tab="messages">
+                                <img src="/images/messages.png" alt="Messages Icon" class="tab-icon" /> <span  data-lang="messages">Messages</span></button>
+                            <button class="tab-link active" data-tab="public-profile">
+                                <img src="/images/publicprofile.png" alt="Public Profile Icon" class="tab-icon" /><span data-lang="publicProf">Public profile</span></button>
+                            <button class="tab-link" data-tab="profile">
+                                <img src="/images/changeprofile.png" alt="Profile Icon" class="tab-icon" /><span data-lang="profile">Profile</span></button>
+                            <button class="tab-link" data-tab="security">
+                                <img src="/images/security.png" alt="Security Icon" class="tab-icon" /><span  data-lang="security">Security</span></button>
+                            
+                            <button class="tab-link" data-tab="close-account">
+                                <img src="/images/closeaccount.png" alt="Close Account Icon" class="tab-icon" /><span  data-lang="closeAccount">Closing an account</span></button>
                         </div>
                     </div>
                     <!-- Модальне вікно -->
@@ -210,7 +214,7 @@
 
 
     removeImageButton.addEventListener('click', function () {
-        profileImage.src = 'images/profile-picture.png';
+        profileImage.src = '/images/user-avatar.png';
         uploadInput.value = '';
         removeImageButton.style.display = 'none';
         confirmImageButton.style.display = 'none';
