@@ -50,17 +50,13 @@ const translations = {
     lecture: "Lecture",
     lectureTitle: "Enter lecture title",
     enterLectureDescription: "Enter lecture description",
-    chooseFiles: "Upload Materials (PDF, DOCX etc.)",
-    chooseVideo: "Upload Video",
-    chooseAudio: "Upload Audio",
-    videoFileChosen: "No video chosen",
+    chooseFiles: "Upload Materials (Videos, audios, documents etc.)",
     fillRequiredFields: "Please fill all required fields!",
     confirmDeleteModule: 'Are you sure you want to delete this module?',
     courseTags: "Course Tags (hidden from users)",
     enterTags: "Enter tags",
     tagTip: "To add a tag, press ENTER",
-    note: "* Note: Uploaded files will not be saved after refreshing or closing the page. Please add them again.",
-    restriction: "* Note: You can only add one type of content: video, audio, materials, or description.",
+    note: "* Note: Uploaded files will not be saved after refreshing or closing the page. Please add them again."
   },
   ua: {
     pageTitle: 'StudyWith | Створення курсу',
@@ -113,17 +109,13 @@ const translations = {
     lecture: "Лекція",
     lectureTitle: "Введіть назву лекції",
     enterLectureDescription: "Введіть опис лекції",
-    chooseFiles: "Завантажити матеріали (PDF, DOCX тощо)",
-    chooseVideo: "Завантажити відео",
-    chooseAudio: "Завантажити аудіо",
-    videoFileChosen: "Відео не вибрано",
+    chooseFiles: "Завантажити матеріали (Відео, аудіо, документи тощо)",
     fillRequiredFields: "Будь ласка, заповніть усі обов'язкові поля!",
     confirmDeleteModule: 'Ви впевнені, що хочете видалити цей модуль?',
     courseTags: "Теги курсу (приховані від користувачів)",
     enterTags: "Введіть теги",
     tagTip: "Щоб додати тег, натисніть ENTER",
-    note: "Примітка: Завантажені файли не будуть збережені після оновлення або закриття сторінки. Будь ласка, додайте їх знову.",
-    restriction: "* Примітка: Ви можете додати лише один тип контенту: відео, аудіо, матеріали або опис.",
+    note: "Примітка: Завантажені файли не будуть збережені після оновлення або закриття сторінки. Будь ласка, додайте їх знову."
   },
 };
 
@@ -330,9 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const lectureDiv = document.createElement("div");
     lectureDiv.classList.add("lecture");
 
-    if (lectureData.videoFile) lectureDiv.dataset.videoFile = lectureData.videoFile;
     if (lectureData.materialsFiles) lectureDiv.dataset.materialsFiles = JSON.stringify(lectureData.materialsFiles);
-    if (lectureData.audioFile) lectureDiv.dataset.audioFile = lectureData.audioFile;
 
     lectureDiv.innerHTML = `
       <div class="container">
@@ -342,86 +332,36 @@ document.addEventListener('DOMContentLoaded', () => {
       <input type="text" placeholder="${translations[userLang].lectureTitle}" value="${lectureData.title || ""}">
       <label class="title-3">${translations[userLang].enterLectureDescription}</label>
       <textarea class="lecture-description" placeholder="${translations[userLang].enterLectureDescription}" rows="5">${lectureData.description || ""}</textarea>
-      <div class="restriction" style="color: #ff2600; font-size:13px; margin-top: 0px; font-weight: 430; margin-bottom: 15px" data-lang="restriction"> ${translations[userLang].restriction}</div>
-
-
-      <div class="note-container">
-        <label class="upload">${translations[userLang].chooseVideo}</label>
-        <div class="custom-file-container">
-          <label class="custom-file-upload">
-            ${translations[userLang].chooseFile}
-            <input class="lecture-video" name="lecture_video" type="file" accept="video/*" />
-          </label>
-          <div class="file-names-list">${lectureData.videoFile ? `<span>${lectureData.videoFile}</span>` : ""}</div>
-        </div>
-      </div>
 
       <div class="note-container">
         <label class="upload">${translations[userLang].chooseFiles}</label>
         <div class="custom-file-container">
           <label class="custom-file-upload">
             ${translations[userLang].chooseFile}
-            <input class="lecture-materials" name="lecture_files" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg,.svg,.webp" />
-
+            <input class="lecture-materials" name="lecture_files" type="file" multiple" />
           </label>
           <div class="file-names-list">
             ${lectureData.materialsFiles ? lectureData.materialsFiles.map(file => `<span>${file}</span>`).join("") : ""}
           </div>
         </div>
       </div>
-
-      <div class="note-container">
-        <label class="upload">${translations[userLang].chooseAudio}</label>
-        <div class="custom-file-container">
-          <label class="custom-file-upload">
-            ${translations[userLang].chooseFile}
-            <input class="lecture-audio" name="lecture_audio" type="file" accept="audio/*" />
-          </label>
-          <div class="file-names-list">${lectureData.audioFile ? `<span>${lectureData.audioFile}</span>` : ""}</div>
-        </div>
-        <div class="file-warning" style="color: #ff2600; font-size:13px; margin-top: 0px; font-weight: 430; margin-bottom: 15px" data-lang="note"> ${translations[userLang].note}</div>     
-      </div>`;
+      <div class="file-warning" style="color: #ff2600; font-size:13px; margin-top: 0px; font-weight: 430; margin-bottom: 15px" data-lang="note"> ${translations[userLang].note}</div>
+    `;
 
     lecturesDiv.appendChild(lectureDiv);
 
     const inputs = {
-      video: lectureDiv.querySelector(".lecture-video"),
       materials: lectureDiv.querySelector(".lecture-materials"),
-      audio: lectureDiv.querySelector(".lecture-audio"),
       description: lectureDiv.querySelector(".lecture-description"),
     };
-
-    const restrictionMessage = lectureDiv.querySelector(".restriction-message");
-
-    function disableOtherInputs(selectedInput) {
-        let isDisabled = selectedInput.files ? selectedInput.files.length > 0 : selectedInput.value.trim().length > 0;
-
-        Object.values(inputs).forEach(input => {
-            if (input !== selectedInput) {
-                input.disabled = isDisabled;
-                input.style.backgroundColor = isDisabled ? "#e0e0e0" : ""; // Сірий фон для заблокованих полів
-                input.style.cursor = isDisabled ? "not-allowed" : ""; // Курсор "заборонено"
-            }
-        });
-
-        restrictionMessage.textContent = isDisabled ? "You can only add one type of content: video, audio, files, or description." : "";
-    }
 
     function updateFileNamesList(input, fileListDiv) {
         fileListDiv.innerHTML = Array.from(input.files).map(file => `<span>${file.name}</span>`).join("");
         disableOtherInputs(input);
     }
 
-    inputs.video.addEventListener("change", function () {
-        updateFileNamesList(this, lectureDiv.querySelectorAll(".file-names-list")[0]);
-    });
-
     inputs.materials.addEventListener("change", function () {
-        updateFileNamesList(this, lectureDiv.querySelectorAll(".file-names-list")[1]);
-    });
-
-    inputs.audio.addEventListener("change", function () {
-        updateFileNamesList(this, lectureDiv.querySelectorAll(".file-names-list")[2]);
+        updateFileNamesList(this, lectureDiv.querySelectorAll(".file-names-list")[0]);
     });
 
     inputs.description.addEventListener("input", function () {
@@ -435,8 +375,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     lectureDiv.querySelector("input[type='text']").addEventListener("input", saveModulesToLocalStorage);
     lectureDiv.querySelector("textarea").addEventListener("input", saveModulesToLocalStorage);
-
 }
+
 
   
   function updateFileNamesList(inputElement, fileNamesList) {
@@ -743,27 +683,6 @@ lectureFiles.forEach(input => {
   }
 });
 
-
-const lectureVideos = document.querySelectorAll('.lecture-video');
-lectureVideos.forEach(input => {
-  if (input.files.length > 0) {
-    Array.from(input.files).forEach(file => {
-      
-      formData.append('lecture_videos', file);
-    });
-  }
-});
-
-const lectureAudio = document.querySelectorAll('.lecture-audio');
-lectureAudio.forEach(input => {
-  if (input.files.length > 0) {
-    Array.from(input.files).forEach(file => {
-      
-      formData.append('lecture_audio', file);
-    });
-  }
-});
-
 const courseData = {
   title: courseTitle,
   description: courseDescription,
@@ -1035,26 +954,7 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
         });
       }
     });
-  
-    
-    const lectureVideos = document.querySelectorAll('.lecture-video');
-    lectureVideos.forEach(input => {
-      if (input.files.length > 0) {
-        Array.from(input.files).forEach(file => {
-          formData.append('lecture_videos', file);
-        });
-      }
-    });
-  
-    const lectureAudio = document.querySelectorAll('.lecture-audio');
-    lectureAudio.forEach(input => {
-      if (input.files.length > 0) {
-        Array.from(input.files).forEach(file => {
-          formData.append('lecture_audio', file);
-        });
-      }
-    });
-    
+ 
     fetch('/api/courses/create', {
       method: 'POST',
       body: formData,

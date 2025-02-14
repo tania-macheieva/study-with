@@ -120,8 +120,7 @@ CREATE TABLE lectures (
     module_id INT NOT NULL,
     title VARCHAR(100) NOT NULL,
     description TEXT,
-    order_num INT NOT NULL,
-    content_type VARCHAR(20) NOT NULL DEFAULT 'description',  
+    order_num INT NOT NULL, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_module FOREIGN KEY (module_id) REFERENCES modules(id) ON DELETE CASCADE
 );
@@ -160,28 +159,6 @@ INSERT INTO education_levels (id, name, description) VALUES
 (3, 'Intermediate level', 'Intermediate knowledge and skills in the subject'),
 (4, 'Advanced level', 'Advanced expertise in the subject');
 
-
-CREATE TABLE videos (
-    id SERIAL PRIMARY KEY,
-    lecture_id INT NOT NULL,
-    file_name VARCHAR(255) NOT NULL,
-    file_path VARCHAR(255) NOT NULL,
-    file_size INT NOT NULL,
-    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    language_code VARCHAR(10) DEFAULT 'en',
-    FOREIGN KEY (lecture_id) REFERENCES lectures(id) ON DELETE CASCADE
-);
-
-CREATE TABLE audio (
-    id SERIAL PRIMARY KEY,
-    lecture_id INT NOT NULL,
-    file_name VARCHAR(255) NOT NULL,
-    file_path VARCHAR(255) NOT NULL,
-    file_size INT NOT NULL,
-    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    language_code VARCHAR(10) DEFAULT 'en',
-    FOREIGN KEY (lecture_id) REFERENCES lectures(id) ON DELETE CASCADE
-);
 
 -- таблиця з відгуками 
 CREATE TABLE teacher_reviews (

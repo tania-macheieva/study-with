@@ -6,9 +6,7 @@ const storage = require('./course-creation/storage-config');
  
 const upload = multer({ storage }).fields([
     { name: 'course_thumbnail', maxCount: 1 },
-    { name: 'lecture_files' },
-    { name: 'lecture_videos' },
-    { name: 'lecture_audio' },
+    { name: 'lecture_files' }
   ]);
   
   router.post('/save-draft', upload, async (req, res) => {  
@@ -158,8 +156,6 @@ const upload = multer({ storage }).fields([
   
         if (modulesToDelete.length > 0) {
           await pool.query(`DELETE FROM lecture_files WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
-          await pool.query(`DELETE FROM videos WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
-          await pool.query(`DELETE FROM audio WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
           await pool.query(`DELETE FROM lectures WHERE module_id = ANY($1::int[])`, [modulesToDelete]);
           await pool.query(`DELETE FROM modules WHERE id = ANY($1::int[])`, [modulesToDelete]);
         }
@@ -216,40 +212,6 @@ const upload = multer({ storage }).fields([
                       ]
                   );
                 }
-  
-                const videosForThisLecture = req.files['lecture_videos']?.slice(index, index + 1); 
-                if (videosForThisLecture && videosForThisLecture.length > 0) {
-                  await pool.query('DELETE FROM videos WHERE lecture_id = $1', [lectureId]);
-  
-                  const video = videosForThisLecture[0]; 
-                  await pool.query(
-                      `INSERT INTO videos (lecture_id, file_name, file_path, file_size)
-                       VALUES ($1, $2, $3, $4)`,
-                      [
-                          lectureId,
-                          video.originalname,
-                          video.path,
-                          video.size,
-                      ]
-                  );
-                }
-
-                  const audiosForThisLecture = req.files['lecture_audio']?.slice(index, index + 1); 
-                  if (audiosForThisLecture && audiosForThisLecture.length > 0) {
-                    await pool.query('DELETE FROM audio WHERE lecture_id = $1', [lectureId]);
-            
-                    const audio = audiosForThisLecture[0]; 
-                    await pool.query(
-                      `INSERT INTO audio (lecture_id, file_name, file_path, file_size)
-                      VALUES ($1, $2, $3, $4)`,
-                      [
-                        lectureId,
-                        audio.originalname,
-                        audio.path,
-                        audio.size,
-                      ]
-                    );
-                  }
                 }
             });
   
@@ -432,8 +394,6 @@ router.post('/create', upload, async (req, res) => {
             if (modulesToDelete.length > 0) {
               
               await pool.query(`DELETE FROM lecture_files WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
-              await pool.query(`DELETE FROM videos WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
-              await pool.query(`DELETE FROM audio WHERE lecture_id IN (SELECT id FROM lectures WHERE module_id = ANY($1::int[]))`, [modulesToDelete]);
               await pool.query(`DELETE FROM lectures WHERE module_id = ANY($1::int[])`, [modulesToDelete]);
           
               
@@ -507,43 +467,6 @@ router.post('/create', upload, async (req, res) => {
                             ]
                         );
                     }
-    
-                    
-                    const videosForThisLecture = req.files['lecture_videos']?.slice(index, index + 1); 
-    
-                    if (videosForThisLecture && videosForThisLecture.length > 0) {
-                        
-                        await pool.query('DELETE FROM videos WHERE lecture_id = $1', [lectureId]);
-    
-                        
-                        const video = videosForThisLecture[0]; 
-                        await pool.query(
-                            `INSERT INTO videos (lecture_id, file_name, file_path, file_size)
-                             VALUES ($1, $2, $3, $4)`,
-                            [
-                                lectureId,
-                                video.originalname,
-                                video.path,
-                                video.size,
-                            ]
-                        );
-                    } 
-                const audiosForThisLecture = req.files['lecture_audio']?.slice(index, index + 1); 
-                if (audiosForThisLecture && audiosForThisLecture.length > 0) {
-                  await pool.query('DELETE FROM audio WHERE lecture_id = $1', [lectureId]);
-          
-                  const audio = audiosForThisLecture[0]; 
-                  await pool.query(
-                    `INSERT INTO audio (lecture_id, file_name, file_path, file_size)
-                    VALUES ($1, $2, $3, $4)`,
-                    [
-                      lectureId,
-                      audio.originalname,
-                      audio.path,
-                      audio.size,
-                    ]
-                  );
-                }
               }
             });
                
