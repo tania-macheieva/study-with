@@ -1,7 +1,7 @@
 const translations = {
     en: {
         pageTitle: 'Study With | Profile',
-        username: 'Username',
+        // username: 'Username',
         btnTeacher: 'Become a teacher',
         myCourses: 'My courses',
         courseName: 'Course name',
@@ -51,7 +51,7 @@ const translations = {
     },
     ua: {
         pageTitle: 'Study With | Профіль',
-        username: 'Ім`я користувача',
+        // username: 'Ім`я користувача',
         btnTeacher: 'Стати вчителем',
         myCourses: 'Мої курси',
         courseName: 'Назва курсу',
@@ -101,6 +101,64 @@ const translations = {
     }
 };
 
+
+function manageViewAllButton(containerClass, itemsCount) {
+    const viewAllBtn = document.querySelector(`.${containerClass}`);
+    if (viewAllBtn) {
+        viewAllBtn.style.display = itemsCount <= 3 ? 'none' : 'block';
+    }
+}
+
+document.querySelectorAll('.btn-view-all-3').forEach(button => {
+    button.addEventListener('click', function() {
+        const certificatesSection = button.closest('.my-certificates');
+        const certificatesList = certificatesSection.querySelector('.certificates-list');
+        
+        if (certificatesList) {
+            if (certificatesList.classList.contains('expanded')) {
+                // Collapse the list
+                certificatesList.classList.remove('expanded');
+                button.textContent = translations[localStorage.getItem('language') || 'en'].btnViewAll;
+            } else {
+                // Expand the list
+                certificatesList.classList.add('expanded');
+                button.textContent = translations[localStorage.getItem('language') || 'en'].btnViewAll;
+            }
+        }
+    });
+});
+
+document.head.appendChild(document.createElement('style')).textContent = `
+    .certificates-list {
+        max-height: 400px; /* Height for 3 certificates */
+        overflow: hidden;
+        transition: max-height 0.3s ease-in-out;
+    }
+
+    .certificates-list.expanded {
+        max-height: 2000px; /* Or any value that would accommodate all certificates */
+    }
+
+    .btn-view-all-3 {
+        display: block; /* Show button by default */
+    }
+
+    /* Hide view all button if there are 3 or fewer certificates */
+    .certificates-list:not(.has-more) + .btn-view-all-3 {
+        display: none;
+    }
+`;
+
+function checkCertificatesCount() {
+    const certificatesList = document.querySelector('.certificates-list');
+    if (certificatesList) {
+        const certificates = certificatesList.querySelectorAll('.certificate');
+        certificatesList.classList.toggle('has-more', certificates.length > 3);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', checkCertificatesCount);
+
 // Основна функція для завантаження курсів
 async function loadEnrolledCourses() {
     try {
@@ -139,7 +197,8 @@ async function loadEnrolledCourses() {
             </div>
         `).join('');
 
-        // Додаємо обробники для кнопок Resume
+        manageViewAllButton('btn-view-all-1', courses.length);
+
         document.querySelectorAll('.btn-resume').forEach(button => {
             button.addEventListener('click', function() {
                 const courseId = this.getAttribute('data-course-id');
@@ -177,6 +236,7 @@ async function loadSavedBookmarks() {
 
         if (courses.length === 0) {
             bookmarksList.innerHTML = `<p class="no-courses">У вас ще немає збережених курсів</p>`;
+            manageViewAllButton('btn-view-all-4', 0);
             return;
         }
 
@@ -190,12 +250,15 @@ async function loadSavedBookmarks() {
             </div>
         `).join('');
 
+        manageViewAllButton('btn-view-all-4', courses.length);
+
     } catch (error) {
         console.error('Помилка завантаження збережених курсів:', error);
         const bookmarksList = document.querySelector('.bookmarks-list');
         if (bookmarksList) {
             bookmarksList.innerHTML = '<p class="error-message">Помилка завантаження збережених курсів</p>';
         }
+        manageViewAllButton('btn-view-all-4', 0);
     }
 }
 
@@ -299,15 +362,12 @@ const tabContents = {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Сторінка завантажена, починаємо ініціалізацію...');
     
-    // Завантажуємо курси та закладки
     loadEnrolledCourses();
     loadSavedBookmarks();
     
-    // Застосовуємо переклади
     const userLang = localStorage.getItem('language') || 'en';
     applyLanguage(userLang);
 
-    // Ініціалізація вкладок
     initializeTabs();
 
 // Обробники для кнопок "View all"
@@ -343,12 +403,41 @@ const modal = document.getElementById('modal');
 const modalContentContainer = document.getElementById('modal-content-container');
 const closeButton = document.querySelector('.close-button');
 
+async function loadStudentData() {
+    try {
+        const userId = localStorage.getItem('userId');
+        const response = await fetch(`http://localhost:8000/auth/profile/student/${userId}`);
+        
+        if (!response.ok) {
+            throw new Error('Failed to load profile data');
+        }
+
+        const data = await response.json();
+        
+        // Заповнюємо поля форми отриманими даними
+        document.querySelector('input[placeholder="Enter your real name"]').value = data.name || '';
+        document.querySelector('input[placeholder="Enter your nickname"]').value = data.nickname || '';
+        document.querySelector('input[placeholder="Enter your date of birth"]').value = data.date_of_birth ? data.date_of_birth.split('T')[0] : '';
+        document.querySelector('input[placeholder="Enter your phone number"]').value = data.phone_number || '';
+        document.querySelector('input[placeholder="Write some information about yourself"]').value = data.additional_info || '';
+
+    } catch (error) {
+        console.error('Error loading profile:', error);
+        alert('Failed to load profile data');
+    }
+    }
+    
 // Відкриття модального вікна
 tabLinks.forEach(tab => {
     tab.addEventListener('click', () => {
         const tabName = tab.getAttribute('data-tab');
         modalContentContainer.innerHTML = tabContents[tabName] || "<p>Content not found.</p>";
         modal.style.display = "flex";
+        
+        if (tabName === 'profile') {
+            loadStudentData();
+        }
+        
         applyLanguage(localStorage.getItem('language') || 'en');
     });
 });
@@ -368,50 +457,57 @@ window.addEventListener('click', (event) => {
 });
 }
 
-// Обробники подій для форм
 document.body.addEventListener('click', async (event) => {
 // Обробка форми профілю
 if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Save changes') {
     const name = document.querySelector('input[placeholder="Enter your real name"]').value;
     const nickname = document.querySelector('input[placeholder="Enter your nickname"]').value;
     const dateOfBirth = document.querySelector('input[placeholder="Enter your date of birth"]').value;
-    const phone = document.querySelector('input[placeholder="Enter your phone number"]').value;
-    const description = document.querySelector('input[placeholder="Write some information about yourself"]').value;
+    const phoneNumber = document.querySelector('input[placeholder="Enter your phone number"]').value;
+    const additionalInfo = document.querySelector('input[placeholder="Write some information about yourself"]').value;
 
     const userId = localStorage.getItem('userId');
 
     try {
-        const response = await fetch(`http://localhost:8000/auth/profile/${userId}`, {
-            method: 'PUT',
+        const response = await fetch('http://localhost:8000/auth/update-student-profile', {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
+                userId,
                 name,
                 nickname,
-                date_of_birth: dateOfBirth,
-                phone_number: phone,
-                description,
-            }),
+                dateOfBirth,
+                phoneNumber,
+                additionalInfo
+            })
         });
 
         const result = await response.json();
 
-        if (response.ok) {
+        if (result.success) {
             alert('Profile updated successfully!');
             const usernameElement = document.getElementById('username');
             if (usernameElement) {
-                usernameElement.textContent = nickname;
+                usernameElement.textContent = nickname || name;
             }
+            
+            // Оновлюємо дані в localStorage
+            localStorage.setItem('name', name);
+            localStorage.setItem('nickname', nickname);
+            
+            // Закриваємо модальне вікно
+            modal.style.display = "none";
         } else {
-            alert(`Error: ${result.error}`);
+            alert('Failed to update profile');
         }
-    } catch (err) {
-        console.error('Error:', err);
-        alert('An error occurred while updating the profile.');
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        alert('Error updating profile');
     }
 }
-
+ 
 // Обробка зміни пароля
 if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Update password') {
     const currentPassword = document.querySelector('input[placeholder="Enter current password"]').value;
@@ -544,7 +640,6 @@ async function updateProgress() {
     }
 }
 
-// Обробники для закриття/відкриття акаунту
 document.body.addEventListener('click', async (event) => {
 const userId = localStorage.getItem('userId');
 

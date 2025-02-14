@@ -1,20 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const Stripe = require('stripe');
-const pool = require('../db'); 
-require('dotenv').config();  // Load the default .env file
+const pool = require('../db');
+require('dotenv').config();
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+const PLATFORM_ACCOUNT_ID = process.env.STRIPE_ACCOUNT_ID;
 
-// Отримуємо дані курсу за ID
 router.get('/course/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const result = await pool.query('SELECT * FROM all_courses WHERE id = $1', [id]);
-
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Course not found' });
         }
-
         res.json(result.rows[0]);
     } catch (error) {
         console.error('Error fetching course:', error);
@@ -22,19 +20,51 @@ router.get('/course/:id', async (req, res) => {
     }
 });
 
-// Створюємо сесію Stripe для обробки платежу
 router.post('/create-checkout-session', async (req, res) => {
-    const { courseId, userId, donationAmount = 0 } = req.body;
-    console.log('Creating checkout session:', { courseId, userId, donationAmount });
+    const { courseId, userId } = req.body;
+    console.log('Creating checkout session:', { courseId, userId });
 
     try {
-        const result = await pool.query('SELECT * FROM all_courses WHERE id = $1', [courseId]);
-        if (result.rows.length === 0) {
+        const authorCheck = await pool.query(
+            'SELECT ac.*, t.author_stripe_account FROM all_courses ac ' +
+            'LEFT JOIN teachers t ON ac.author_id = t.user_id ' +
+            'WHERE ac.id = $1',
+            [courseId]
+        );
+
+        if (authorCheck.rows.length === 0) {
             return res.status(404).json({ error: 'Course not found' });
         }
 
-        const course = result.rows[0];
-        
+        const course = authorCheck.rows[0];
+        const { author_stripe_account } = course;
+
+        if (!author_stripe_account) {
+            return res.status(403).json({
+                error: 'Teacher has not connected their payment account'
+            });
+        }
+
+        if (course.author_id === parseInt(userId)) {
+            return res.status(403).json({ error: 'Author cannot purchase their own course' });
+        }
+
+        const enrollmentCheck = await pool.query(
+            'SELECT * FROM enrollments WHERE user_id = $1 AND course_id = $2',
+            [userId, courseId]
+        );
+
+        if (enrollmentCheck.rows.length > 0) {
+            return res.status(403).json({ error: 'Course already purchased' });
+        }
+
+        // Convert price to cents
+        const coursePriceCents = Math.round(parseFloat(course.price) * 100);
+        const platformFeeCents = Math.round(coursePriceCents * 0.3); // 30% platform fee
+        const teacherAmountCents = coursePriceCents - platformFeeCents; // 70% teacher amount
+
+        const transferGroup = `course_${courseId}_${Date.now()}`;
+
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: [{
@@ -44,16 +74,29 @@ router.post('/create-checkout-session', async (req, res) => {
                         name: course.name,
                         description: course.description || 'Course purchase'
                     },
-                    unit_amount: Math.round(parseFloat(course.price) * 100)
+                    unit_amount: coursePriceCents
                 },
                 quantity: 1
             }],
+            payment_intent_data: {
+                application_fee_amount: platformFeeCents,
+                transfer_data: {
+                    destination: author_stripe_account,
+                },
+            },
+            metadata: {
+                courseId: courseId.toString(),
+                userId: userId.toString(),
+                platformFeeCents: platformFeeCents.toString(),
+                teacherAmountCents: teacherAmountCents.toString(),
+                teacherStripeAccount: author_stripe_account,
+                transferGroup: transferGroup
+            },
             mode: 'payment',
             success_url: `${process.env.FRONTEND_URL}/pay-page/success.html?courseId=${courseId}&userId=${userId}&session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.FRONTEND_URL}/pay-page/cancel.html`
         });
 
-        console.log('Session created:', session.url);
         res.json({ url: session.url });
     } catch (error) {
         console.error('Error creating session:', error);
@@ -61,7 +104,6 @@ router.post('/create-checkout-session', async (req, res) => {
     }
 });
 
-// Додайте новий маршрут для перевірки статусу оплати
 router.get('/verify-payment', async (req, res) => {
     const { session_id } = req.query;
     
@@ -70,7 +112,32 @@ router.get('/verify-payment', async (req, res) => {
         if (session.payment_status === 'paid') {
             const { courseId, userId } = req.query;
             
-            // Записуємо користувача на курс
+            // Get amounts from metadata (already in cents)
+            const { platformFeeCents, teacherAmountCents } = session.metadata;
+            const totalAmountCents = parseInt(platformFeeCents) + parseInt(teacherAmountCents);
+            
+            // Save to database (amounts in cents)
+            await pool.query(
+                `INSERT INTO payments (
+                    user_id, 
+                    course_id, 
+                    amount, 
+                    platform_fee, 
+                    teacher_amount, 
+                    stripe_session_id, 
+                    status
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+                [
+                    userId, 
+                    courseId, 
+                    totalAmountCents,
+                    platformFeeCents,
+                    teacherAmountCents,
+                    session_id, 
+                    'completed'
+                ]
+            );
+            
             await pool.query(
                 `INSERT INTO enrollments (user_id, course_id, status, progress, enrollment_date)
                  VALUES ($1, $2, 'active', 0, CURRENT_TIMESTAMP)
@@ -88,7 +155,6 @@ router.get('/verify-payment', async (req, res) => {
     }
 });
 
-// Обробка webhook від Stripe
 router.post('/webhook', async (req, res) => {
     const signature = req.headers['stripe-signature'];
     
@@ -99,32 +165,53 @@ router.post('/webhook', async (req, res) => {
             process.env.STRIPE_WEBHOOK_SECRET
         );
 
-        console.log('Webhook event received:', event.type);
-
         if (event.type === 'checkout.session.completed') {
             const session = event.data.object;
+            const { 
+                courseId, 
+                userId,
+                platformFeeCents,
+                teacherAmountCents
+            } = session.metadata;
             
-            // Отримуємо дані з метаданих сесії
-            const courseId = session.metadata.courseId;
-            const userId = session.metadata.userId;
-            
-            console.log('Processing enrollment:', { courseId, userId });
-
-            // Записуємо користувача на курс
+            // Save to database (amounts in cents)
             await pool.query(
-                `INSERT INTO enrollments (user_id, course_id, status, progress, enrollment_date)
-                 VALUES ($1, $2, 'active', 0, CURRENT_TIMESTAMP)
-                 ON CONFLICT (user_id, course_id) DO NOTHING`,
-                [userId, courseId]
+                `INSERT INTO payments (
+                    user_id, 
+                    course_id, 
+                    amount, 
+                    platform_fee, 
+                    teacher_amount, 
+                    stripe_session_id, 
+                    status
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+                [
+                    userId,
+                    courseId,
+                    parseInt(platformFeeCents) + parseInt(teacherAmountCents),
+                    platformFeeCents,
+                    teacherAmountCents,
+                    session.id,
+                    'completed'
+                ]
             );
 
-            console.log('Enrollment completed successfully');
+            await pool.query(
+                `INSERT INTO enrollments (
+                    user_id, 
+                    course_id, 
+                    status, 
+                    progress, 
+                    enrollment_date
+                ) VALUES ($1, $2, 'active', 0, CURRENT_TIMESTAMP)`,
+                [userId, courseId]
+            );
         }
 
         res.json({ received: true });
-    } catch (err) {
-        console.error('Webhook error:', err.message);
-        return res.status(400).send(`Webhook Error: ${err.message}`);
+    } catch (error) {
+        console.error('Webhook error:', error);
+        res.status(400).send(`Webhook Error: ${error.message}`);
     }
 });
 

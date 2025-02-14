@@ -1129,6 +1129,194 @@ router.post('/upload-profile-image', uploads.single('profileImage'), async (req,
     }
 });
 
+// Update the student profile route
+router.get('/profile/student/:id', async (req, res) => {
+    const userId = req.params.id;
 
+    try {
+        const query = `
+            SELECT 
+                u.id,
+                u.name, 
+                u.email, 
+                s.profile_image,
+                u.role,
+                s.nickname,
+                s.date_of_birth,
+                s.phone_number,
+                s.additional_info
+            FROM users u
+            LEFT JOIN students s ON u.id = s.user_id
+            WHERE u.id = $1
+        `;
+
+        const result = await pool.query(query, [userId]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Profile not found' });
+        }
+
+        const profile = result.rows[0];
+        profile.profile_image = profile.profile_image || '/images/profile-picture.png';
+
+        res.status(200).json(profile);
+    } catch (error) {
+        console.error('Error getting profile:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Update the profile image upload route
+router.post('/upload-student-profile-image', uploads.single('profileImage'), async (req, res) => {
+    try {
+        const userId = req.body.userId;
+        if (!userId) {
+            return res.status(400).json({ error: 'User ID is required.' });
+        }
+
+        let filePath;
+        if (req.file) {
+            filePath = `/uploads/profile-images/${req.file.filename}`;
+        } else {
+            filePath = '/images/profile-picture.png';
+        }
+
+        // Start transaction
+        await pool.query('BEGIN');
+
+        try {
+            // Update profile_image in students table
+            const updateStudentQuery = `
+                UPDATE students 
+                SET profile_image = $1 
+                WHERE user_id = $2 
+                RETURNING *
+            `;
+            const result = await pool.query(updateStudentQuery, [filePath, userId]);
+
+            if (result.rowCount === 0) {
+                // If no student record exists, create one
+                const insertStudentQuery = `
+                    INSERT INTO students (user_id, profile_image)
+                    VALUES ($1, $2)
+                `;
+                await pool.query(insertStudentQuery, [userId, filePath]);
+            }
+
+            await pool.query('COMMIT');
+
+            res.status(200).json({ 
+                message: 'Profile image updated successfully!', 
+                filePath 
+            });
+        } catch (error) {
+            await pool.query('ROLLBACK');
+            throw error;
+        }
+    } catch (error) {
+        console.error('Error uploading profile image:', error);
+        res.status(500).json({ error: 'Failed to upload profile image.' });
+    }
+});
+// Маршрут для оновлення всіх даних профілю студента
+router.post('/update-student-profile', async (req, res) => {
+    try {
+        const { 
+            userId, 
+            nickname, 
+            name,
+            dateOfBirth,          // дата народження
+            phoneNumber,          // номер телефону
+            additionalInfo        // додаткова інформація
+        } = req.body;
+        
+        // Починаємо транзакцію
+        await pool.query('BEGIN');
+
+        try {
+            // Оновлюємо основні дані користувача
+            await pool.query(
+                'UPDATE users SET name = $1 WHERE id = $2',
+                [name, userId]
+            );
+
+            // Перевіряємо чи існує запис студента
+            const studentCheck = await pool.query(
+                'SELECT id FROM students WHERE user_id = $1',
+                [userId]
+            );
+
+            if (studentCheck.rows.length > 0) {
+                // Оновлюємо існуючий запис студента
+                await pool.query(
+                    `UPDATE students 
+                     SET nickname = $1,
+                         date_of_birth = $2,
+                         phone_number = $3,
+                         additional_info = $4
+                     WHERE user_id = $5`,
+                    [nickname, dateOfBirth, phoneNumber, additionalInfo, userId]
+                );
+            } else {
+                // Створюємо новий запис студента
+                await pool.query(
+                    `INSERT INTO students 
+                     (user_id, nickname, date_of_birth, phone_number, additional_info)
+                     VALUES ($1, $2, $3, $4, $5)`,
+                    [userId, nickname, dateOfBirth, phoneNumber, additionalInfo]
+                );
+            }
+
+            // Завершуємо транзакцію
+            await pool.query('COMMIT');
+            
+            res.json({ 
+                success: true,
+                message: 'Student profile updated successfully',
+                data: {
+                    name,
+                    nickname,
+                    dateOfBirth,
+                    phoneNumber,
+                    additionalInfo
+                }
+            });
+        } catch (error) {
+            // Відкатуємо транзакцію у випадку помилки
+            await pool.query('ROLLBACK');
+            throw error;
+        }
+    } catch (error) {
+        console.error('Error updating student profile:', error);
+        res.status(500).json({ 
+            error: 'Failed to update student profile',
+            details: error.message 
+        });
+    }
+});
+
+
+// Add route to get profile image
+router.get('/profile-image/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const query = `
+            SELECT profile_image 
+            FROM students 
+            WHERE user_id = $1
+        `;
+        const result = await pool.query(query, [userId]);
+
+        if (result.rows.length === 0) {
+            return res.json({ profileImage: '/images/profile-picture.png' });
+        }
+
+        const profileImage = result.rows[0].profile_image || '/images/profile-picture.png';
+        res.json({ profileImage });
+    } catch (error) {
+        console.error('Error fetching profile image:', error);
+        res.status(500).json({ error: 'Failed to fetch profile image.' });
+    }
+});
   
 module.exports = router;
