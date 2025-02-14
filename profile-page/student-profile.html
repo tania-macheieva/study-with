@@ -33,7 +33,7 @@
                         </button>
                     </div>
 
-                    <p data-lang="username" id="username">username</p>
+                    <p data-lang="username" id="username"></p>
                     <button class="btn-teacher" id="become-teacher-btn">
                         <span class="circle1"></span>
                         <span class="circle2"></span>
@@ -71,6 +71,13 @@
                     <div class="my-certificates">
                         <h2 data-lang="myCertificates">My certificates</h2>
                         <div class="certificates-list">
+                             <div class="certificate">
+                                <p class="p-1" data-lang="certificateName">Certificate name 1</p>
+                                <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
+                                <button class="btn-download">
+                                    <img src="/images/download-certificate.png">
+                                </button>
+                            </div> 
                             <div class="certificate">
                                 <p class="p-1" data-lang="certificateName">Certificate name 1</p>
                                 <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
@@ -78,6 +85,14 @@
                                     <img src="/images/download-certificate.png">
                                 </button>
                             </div>
+                            <div class="certificate">
+                                <p class="p-1" data-lang="certificateName">Certificate name 1</p>
+                                <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
+                                <button class="btn-download">
+                                    <img src="/images/download-certificate.png">
+                                </button>
+                            </div>
+                            
                         </div>
                         <button class="btn-view-all-3" data-lang="btnViewAll">View all</button>
                     </div>
@@ -97,9 +112,7 @@
         <script src="../profile-page/student-lang.js"></script>
         
         <script>
-            // Function to handle profile image upload and display
-              // Замініть поточну функцію handleProfileImage() на цю:
-                function handleProfileImage() {
+            function handleProfileImage() {
                     const uploadInput = document.getElementById('upload-image');
                     const profileImage = document.getElementById('profile-image');
                     const removeImageButton = document.getElementById('remove-image');
@@ -157,10 +170,8 @@
                 confirmImageButton.style.display = 'none';
             });
 
-                    // Завантажуємо зображення при ініціалізації
                     loadProfileImage();
                 }
-                // Initialize when document is ready
                 document.addEventListener('DOMContentLoaded', () => {
                     handleProfileImage();
                 });
@@ -182,17 +193,6 @@
                             const data = await response.json();
                             console.log("Received profile data:", data);
 
-                            // Оновлюємо нікнейм на сторінці
-                             const usernameElement = document.getElementById('username');
-                            if (usernameElement) {
-                                const displayName = data.nickname || data.name;
-                                usernameElement.textContent = displayName;
-                                // Update localStorage with the latest data from database
-                                localStorage.setItem('nickname', data.nickname || '');
-                                localStorage.setItem('name', data.name || '');
-                            }
-
-                            // Оновлюємо зображення профілю
                             const profileImage = document.getElementById('profile-image');
                             if (profileImage) {
                                 if (data.profile_image) {
@@ -205,17 +205,30 @@
                                 }
                             }
 
+                            const usernameElement = document.getElementById('username');
+                            if (usernameElement) {
+                                if (data.nickname) {
+                                    usernameElement.textContent = data.nickname;
+                                    localStorage.setItem('nickname', data.nickname);
+                                } else {
+                                    usernameElement.textContent = ''; 
+                                    localStorage.setItem('nickname', '');
+                                }
+                            }
                             return data;
                         } catch (err) {
                             console.error('Error loading profile:', err);
-                            // Встановлюємо дефолтне зображення у випадку помилки
                             const profileImage = document.getElementById('profile-image');
                             if (profileImage) {
                                 profileImage.src = '/images/profile-picture.png';
                             }
+
+                            const usernameElement = document.getElementById('username');
+                            if (usernameElement) {
+                                usernameElement.textContent = ''; 
+                            }
                         }
                     }
-                    // Функція для оновлення дефолтного зображення в БД
                     async function updateDefaultProfileImage(userId) {
                         try {
                             const defaultImagePath = '/images/profile-picture.png';
@@ -241,11 +254,10 @@
                     }
             
             
-                    // Обробник зміни файлу
                 uploadInput.addEventListener('change', function (event) {
                     const file = event.target.files[0];
                     if (file) {
-                        if (file.size > 1 * 1024 * 1024) { // 1MB
+                        if (file.size > 1 * 1024 * 1024) { 
                             alert('The file size exceeds 1 MB. Please upload a smaller file.');
                             uploadInput.value = '';
                             return;
@@ -261,8 +273,6 @@
                     }
                 });
 
-                // Обробник підтвердження завантаження
-                // Обробник підтвердження завантаження
                     confirmImageButton.addEventListener('click', async function () {
                         const file = uploadInput.files[0];
                         if (!file) {
@@ -310,7 +320,6 @@
                         removeImageButton.style.display = 'none';
                         confirmImageButton.style.display = 'none';
                     });
-                // Обробник видалення зображення
                 removeImageButton.addEventListener('click', function () {
                     profileImage.src = '/images/profile-picture.png';
                     uploadInput.value = '';
@@ -323,17 +332,17 @@
                 confirmImageButton.style.display = 'inline-block';
             });
 
-            function updateUsername(name) {
+            function updateUsername(data) {
                 const usernameElement = document.getElementById('username');
                 if (usernameElement) {
-                    usernameElement.textContent = name;
+                    const displayName = data.nickname || data.name || 'User';
+                    usernameElement.textContent = displayName;
                 }
             }
 
             async function updateStudentProfile(profileData) {
                 const userId = localStorage.getItem('userId');
                 if (!profileData) {
-                    // Якщо дані не передані, використовуємо збережені дані
                     profileData = {
                         name: localStorage.getItem('name'),
                         nickname: localStorage.getItem('nickname'),
@@ -343,7 +352,6 @@
                     };
                 }
 
-                // Форматуємо дату в формат YYYY-MM-DD для PostgreSQL
                 const formattedDate = profileData.dateOfBirth ? new Date(profileData.dateOfBirth).toISOString().split('T')[0] : null;
 
                 try {
@@ -369,17 +377,14 @@
                     const result = await response.json();
 
                     if (result.success) {
-                        // Оновлюємо локальні дані
                         localStorage.setItem('name', profileData.name);
                         localStorage.setItem('nickname', profileData.nickname);
                         localStorage.setItem('dateOfBirth', formattedDate);
                         localStorage.setItem('phoneNumber', profileData.phoneNumber);
                         localStorage.setItem('additionalInfo', profileData.additionalInfo);
 
-                        // Оновлюємо відображення на сторінці
                         updateUsername(profileData.nickname || profileData.name);
 
-                        // Оновлюємо інші поля на сторінці
                         const phoneElement = document.getElementById('phone-number');
                         if (phoneElement) {
                             phoneElement.textContent = profileData.phoneNumber;
@@ -460,41 +465,15 @@
                     email: localStorage.getItem('email'),
                 };
             }
-
-                // // При завантаженні сторінки
-                //     window.addEventListener('DOMContentLoaded', async () => {
-                //         console.log('Page loaded, initializing...');
-                //         try {
-                //             // Завантажуємо профіль
-                //             await loadStudentProfile();
-                //             console.log('Profile loaded successfully');
-
-                //             // Завантажуємо інші дані
-                //             loadEnrolledCourses();
-                //             loadSavedBookmarks();
-
-                //             // Оновлюємо мову
-                //             const userLang = localStorage.getItem('language') || 'en';
-                //             applyLanguage(userLang);
-                //         } catch (error) {
-                //             console.error('Error during initialization:', error);
-                //         }
-                //     });
-
                 document.addEventListener('DOMContentLoaded', () => {
 
-                    
-                        // Ініціалізуємо обробник зображення профілю
                         handleProfileImage();
 
-                        // Завантажуємо профіль
                         loadStudentProfile();
 
-                        // Завантажуємо інші дані
                         loadEnrolledCourses();
                         loadSavedBookmarks();
 
-                        // Застосовуємо переклади
                         const userLang = localStorage.getItem('language') || 'en';
                         applyLanguage(userLang);
                     });

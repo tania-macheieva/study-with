@@ -1,7 +1,7 @@
 const translations = {
     en: {
         pageTitle: 'Study With | Profile',
-        username: 'Username',
+        // username: 'Username',
         btnTeacher: 'Become a teacher',
         myCourses: 'My courses',
         courseName: 'Course name',
@@ -51,7 +51,7 @@ const translations = {
     },
     ua: {
         pageTitle: 'Study With | Профіль',
-        username: 'Ім`я користувача',
+        // username: 'Ім`я користувача',
         btnTeacher: 'Стати вчителем',
         myCourses: 'Мої курси',
         courseName: 'Назва курсу',
@@ -101,6 +101,64 @@ const translations = {
     }
 };
 
+
+function manageViewAllButton(containerClass, itemsCount) {
+    const viewAllBtn = document.querySelector(`.${containerClass}`);
+    if (viewAllBtn) {
+        viewAllBtn.style.display = itemsCount <= 3 ? 'none' : 'block';
+    }
+}
+
+document.querySelectorAll('.btn-view-all-3').forEach(button => {
+    button.addEventListener('click', function() {
+        const certificatesSection = button.closest('.my-certificates');
+        const certificatesList = certificatesSection.querySelector('.certificates-list');
+        
+        if (certificatesList) {
+            if (certificatesList.classList.contains('expanded')) {
+                // Collapse the list
+                certificatesList.classList.remove('expanded');
+                button.textContent = translations[localStorage.getItem('language') || 'en'].btnViewAll;
+            } else {
+                // Expand the list
+                certificatesList.classList.add('expanded');
+                button.textContent = translations[localStorage.getItem('language') || 'en'].btnViewAll;
+            }
+        }
+    });
+});
+
+document.head.appendChild(document.createElement('style')).textContent = `
+    .certificates-list {
+        max-height: 400px; /* Height for 3 certificates */
+        overflow: hidden;
+        transition: max-height 0.3s ease-in-out;
+    }
+
+    .certificates-list.expanded {
+        max-height: 2000px; /* Or any value that would accommodate all certificates */
+    }
+
+    .btn-view-all-3 {
+        display: block; /* Show button by default */
+    }
+
+    /* Hide view all button if there are 3 or fewer certificates */
+    .certificates-list:not(.has-more) + .btn-view-all-3 {
+        display: none;
+    }
+`;
+
+function checkCertificatesCount() {
+    const certificatesList = document.querySelector('.certificates-list');
+    if (certificatesList) {
+        const certificates = certificatesList.querySelectorAll('.certificate');
+        certificatesList.classList.toggle('has-more', certificates.length > 3);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', checkCertificatesCount);
+
 // Основна функція для завантаження курсів
 async function loadEnrolledCourses() {
     try {
@@ -139,7 +197,8 @@ async function loadEnrolledCourses() {
             </div>
         `).join('');
 
-        // Додаємо обробники для кнопок Resume
+        manageViewAllButton('btn-view-all-1', courses.length);
+
         document.querySelectorAll('.btn-resume').forEach(button => {
             button.addEventListener('click', function() {
                 const courseId = this.getAttribute('data-course-id');
@@ -177,6 +236,7 @@ async function loadSavedBookmarks() {
 
         if (courses.length === 0) {
             bookmarksList.innerHTML = `<p class="no-courses">У вас ще немає збережених курсів</p>`;
+            manageViewAllButton('btn-view-all-4', 0);
             return;
         }
 
@@ -190,12 +250,15 @@ async function loadSavedBookmarks() {
             </div>
         `).join('');
 
+        manageViewAllButton('btn-view-all-4', courses.length);
+
     } catch (error) {
         console.error('Помилка завантаження збережених курсів:', error);
         const bookmarksList = document.querySelector('.bookmarks-list');
         if (bookmarksList) {
             bookmarksList.innerHTML = '<p class="error-message">Помилка завантаження збережених курсів</p>';
         }
+        manageViewAllButton('btn-view-all-4', 0);
     }
 }
 
@@ -299,15 +362,12 @@ const tabContents = {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Сторінка завантажена, починаємо ініціалізацію...');
     
-    // Завантажуємо курси та закладки
     loadEnrolledCourses();
     loadSavedBookmarks();
     
-    // Застосовуємо переклади
     const userLang = localStorage.getItem('language') || 'en';
     applyLanguage(userLang);
 
-    // Ініціалізація вкладок
     initializeTabs();
 
 // Обробники для кнопок "View all"
@@ -374,7 +434,6 @@ tabLinks.forEach(tab => {
         modalContentContainer.innerHTML = tabContents[tabName] || "<p>Content not found.</p>";
         modal.style.display = "flex";
         
-        // Якщо відкрита вкладка profile, завантажуємо дані
         if (tabName === 'profile') {
             loadStudentData();
         }
@@ -398,7 +457,6 @@ window.addEventListener('click', (event) => {
 });
 }
 
-// Обробники подій для форм
 document.body.addEventListener('click', async (event) => {
 // Обробка форми профілю
 if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Save changes') {
@@ -430,7 +488,6 @@ if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Save chan
 
         if (result.success) {
             alert('Profile updated successfully!');
-        // Оновлюємо відображене ім'я користувача
             const usernameElement = document.getElementById('username');
             if (usernameElement) {
                 usernameElement.textContent = nickname || name;
@@ -583,7 +640,6 @@ async function updateProgress() {
     }
 }
 
-// Обробники для закриття/відкриття акаунту
 document.body.addEventListener('click', async (event) => {
 const userId = localStorage.getItem('userId');
 
