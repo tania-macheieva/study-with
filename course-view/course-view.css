@@ -638,6 +638,16 @@ input[type="checkbox"]:checked::before {
     margin-left: 48px;
 }
 
+.mention {
+    font-weight: 600;
+    color: #283044;
+    background: #DCECFC;
+    padding: 4px 8px;
+    border-radius: 8px;
+    display: inline-block;
+    font-size: 14px;    
+} 
+
 /* Show More Button */
 .show-more-button {
     margin: 10px 0;

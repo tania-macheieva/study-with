@@ -247,3 +247,4 @@ ALTER TABLE all_courses ADD COLUMN author_stripe_account VARCHAR(255);
 
 ALTER TABLE students
 ADD COLUMN profile_image VARCHAR(255) DEFAULT '/images/profile-picture.png';
+ 

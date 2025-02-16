@@ -12,7 +12,7 @@ const session = require('express-session');
 const stripeRoutes = require("./pay-page/stripe");
 const coursesRouter = require('./courses'); 
 const courseDraftRouter = require('./courses');
-const testRouter = require('./test') 
+const testRouter = require('./test')
 
 app.use(cors({
     origin: 'http://localhost:8000',
@@ -23,8 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use("/auth", authRoutes);
 app.use('/tests', testRouter);
-app.use('/courses', coursesRouter); 
-
+app.use('/courses', coursesRouter);  
 
 const searchRouter = require('./searchRouter');
 app.use('/api/search', searchRouter);

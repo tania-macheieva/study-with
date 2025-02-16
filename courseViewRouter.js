@@ -348,4 +348,9 @@ router.get('/lecture/:lectureId', async (req, res) => {
     }
 });
 
+
+///////////////////////
+///// COMMENTS ///////
+/////////////////////
+
 module.exports = router;
