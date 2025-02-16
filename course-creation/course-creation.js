@@ -338,7 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="custom-file-container">
           <label class="custom-file-upload">
             ${translations[userLang].chooseFile}
-            <input class="lecture-materials" name="lecture_files" type="file" multiple" required/>
+            <input class="lecture-materials" name="lecture_files_${lecturesDiv.children.length}" type="file" multiple" />
           </label>
           <div class="file-names-list">
             ${lectureData.materialsFiles ? lectureData.materialsFiles.map(file => `<span>${file}</span>`).join("") : ""}
@@ -672,13 +672,10 @@ document.addEventListener('DOMContentLoaded', function() {
 const addedLectureFiles = [];
 const formData = new FormData();
 const lectureFiles = document.querySelectorAll('.lecture-materials');
-lectureFiles.forEach(input => {
+lectureFiles.forEach((input, index) => {
   if (input.files.length > 0) {
     Array.from(input.files).forEach(file => {
-      if (!addedLectureFiles.some(addedFile => addedFile.name === file.name && addedFile.size === file.size)) {
-        addedLectureFiles.push(file); 
-        formData.append('lecture_files', file);
-      }
+      formData.append(`lecture_files_${index}`, file);
     });
   }
 });
@@ -944,13 +941,10 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
     const addedLectureFiles = [];
   
     const lectureFiles = document.querySelectorAll('.lecture-materials');
-    lectureFiles.forEach(input => {
+    lectureFiles.forEach((input, index) => {
       if (input.files.length > 0) {
         Array.from(input.files).forEach(file => {
-          if (!addedLectureFiles.some(addedFile => addedFile.name === file.name && addedFile.size === file.size)) {
-            addedLectureFiles.push(file);
-            formData.append('lecture_files', file);
-          }
+          formData.append(`lecture_files_${index}`, file);
         });
       }
     });

@@ -4,10 +4,7 @@ const pool = require('./db');
 const multer = require('multer');
 const storage = require('./course-creation/storage-config');
  
-const upload = multer({ storage }).fields([
-    { name: 'course_thumbnail', maxCount: 1 },
-    { name: 'lecture_files' }
-  ]);
+const upload = multer({ storage }).any();
   
   router.post('/save-draft', upload, async (req, res) => {  
     const {
@@ -191,27 +188,33 @@ const upload = multer({ storage }).fields([
                 );
               } else {
                 const lectureResult = await pool.query(
-                    `INSERT INTO lectures (module_id, title, description, order_num) VALUES ($1, $2, $3, $4) RETURNING id`,
-                    [moduleId, title, description, index + 1]
+                  `INSERT INTO lectures (module_id, title, description, order_num) VALUES ($1, $2, $3, $4) RETURNING id`,
+                  [moduleId, title, description, index + 1]
+              );
+              const lectureId = lectureResult.rows[0].id;
+              
+              if (req.files && req.files['lecture_files']) {
+                  const lectureFiles = req.files['lecture_files'].filter(file => 
+                      file.fieldname === `lecture_files_${index}`
                   );
-                const lectureId = lectureResult.rows[0].id;
-  
-                const filesForThisLecture = req.files['lecture_files']?.slice(index, index + 1); 
-                if (filesForThisLecture && filesForThisLecture.length > 0) {
-                  await pool.query('DELETE FROM lecture_files WHERE lecture_id = $1', [lectureId]);
-  
-                  const file = filesForThisLecture[0]; 
-                  await pool.query(
-                      `INSERT INTO lecture_files (lecture_id, file_name, file_url, file_type)
-                       VALUES ($1, $2, $3, $4)`,
-                      [
-                          lectureId,
-                          file.originalname,
-                          file.path,
-                          file.mimetype,
-                      ]
-                  );
-                }
+              
+                  if (lectureFiles.length > 0) {
+                      await pool.query('DELETE FROM lecture_files WHERE lecture_id = $1', [lectureId]);
+              
+                      for (const file of lectureFiles) {
+                          await pool.query(
+                              `INSERT INTO lecture_files (lecture_id, file_name, file_url, file_type)
+                               VALUES ($1, $2, $3, $4)`,
+                              [
+                                  lectureId,
+                                  file.originalname,
+                                  file.path,
+                                  file.mimetype
+                              ]
+                          );
+                      }
+                  }
+              }
                 }
             });
   
@@ -448,25 +451,27 @@ router.post('/create', upload, async (req, res) => {
     
     
                     
-                    const filesForThisLecture = req.files['lecture_files']?.slice(index, index + 1); 
-    
-                    if (filesForThisLecture && filesForThisLecture.length > 0) {
-                        
-                        await pool.query('DELETE FROM lecture_files WHERE lecture_id = $1', [lectureId]);
-    
-                        
-                        const file = filesForThisLecture[0]; 
-                        await pool.query(
-                            `INSERT INTO lecture_files (lecture_id, file_name, file_url, file_type)
-                             VALUES ($1, $2, $3, $4)`,
-                            [
-                                lectureId,
-                                file.originalname,
-                                file.path,
-                                file.mimetype,
-                            ]
-                        );
-                    }
+                      const lectureFileKey = `lecture_files_${index}`;
+                      const filesForThisLecture = Object.values(req.files).filter(file => 
+                          file.fieldname === lectureFileKey
+                      );
+                      
+                      if (filesForThisLecture && filesForThisLecture.length > 0) {
+                          await pool.query('DELETE FROM lecture_files WHERE lecture_id = $1', [lectureId]);
+                      
+                          for (const file of filesForThisLecture) {
+                              await pool.query(
+                                  `INSERT INTO lecture_files (lecture_id, file_name, file_url, file_type)
+                                   VALUES ($1, $2, $3, $4)`,
+                                  [
+                                      lectureId,
+                                      file.originalname,
+                                      file.path,
+                                      file.mimetype
+                                  ]
+                              );
+                          }
+                      }
               }
             });
                
