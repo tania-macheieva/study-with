@@ -209,10 +209,8 @@ class HeaderComponent extends HTMLElement {
                         <a class="lang-btn" data-lang="en">EN</a> |
                         <a class="lang-btn" data-lang="ua">UA</a>
                     </div>
-                    <button class="btn">
-                        <a id="user" href="/profile-student">
-                            <img src="../images/user-avatar.png" alt="user image" />
-                        </a>
+                    <button class="btn" id="profile-btn">
+                        <img src="../images/user-avatar.png" alt="user image" />
                     </button>
                     <div>
                         <button>
@@ -233,7 +231,53 @@ class HeaderComponent extends HTMLElement {
             </div>
         </header>
         `;
+        
+        this.initializeProfileButton();
     }
+
+    getStyles() {
+        return `
+            body {
+                margin: 0;
+                padding: 0;
+                background-color: #fff;
+                font-family: 'Inter', sans-serif;
+            }
+            /* Тут всі ваші стилі */
+        `;
+    }
+
+    initializeProfileButton() {
+        const profileButton = this.querySelector('#profile-btn');
+        if (profileButton) {
+            profileButton.addEventListener('click', () => {
+                this.handleProfileClick();
+            });
+        }
+    }
+
+    handleProfileClick() {
+        const userId = localStorage.getItem('userId');
+        const userRole = localStorage.getItem('role');
+
+        if (!userId) {
+            window.location.href = '/login';
+            return;
+        }
+
+        let profileUrl;
+        switch (userRole) {
+            case 'student':
+                profileUrl = '/profile-student';
+                break;
+            case 'teacher':
+                profileUrl = '/profile-teacher';
+                break;
+        }
+
+        window.location.href = profileUrl;
+    }
+
     setProgress(progress) {
         const progressBar = this.querySelector('.progress-bar span');
         const progressText = this.querySelector('.progress-text .percent');
@@ -347,5 +391,39 @@ const headerTranslations = {
         unenrollCourse: "Відписатися від цього курсу",
     },
 };
+
+function getUserRole() {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+    
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const payload = JSON.parse(atob(base64));
+        
+        return payload.role;
+    } catch (error) {
+        console.error('Помилка при отриманні ролі користувача:', error);
+        return null;
+    }
+}
+
+function initializeProfileRedirect() {
+    const userLink = document.querySelector('#user');
+    if (userLink) {
+        userLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const role = getUserRole();
+            
+            if (role === 'teacher') {
+                window.location.href = '/profile-teacher';
+            } else {
+                window.location.href = '/profile-student';
+            }
+        });
+    }
+}
+
+
 
 document.addEventListener('DOMContentLoaded', initializeCourseProgress);
