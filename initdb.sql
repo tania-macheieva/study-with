@@ -243,5 +243,14 @@ CREATE TABLE payments (
 );
 
 ALTER TABLE students
-ADD COLUMN profile_image VARCHAR(255) DEFAULT '/images/profile-picture.png';
+ADD COLUMN profile_image VARCHAR(255) DEFAULT '/images/user-avatar.png';
+
+-- якщо вже стовпець і треба змінити
+ALTER TABLE students
+ALTER COLUMN profile_image SET DEFAULT '/images/user-avatar.png';
+
+UPDATE students
+SET profile_image = '/images/user-avatar.png'
+WHERE id = 1;
+
  

@@ -1106,7 +1106,7 @@ router.post('/upload-profile-image', uploads.single('profileImage'), async (req,
             filePath = `/uploads/profile-images/${req.file.filename}`;
         } else {
             // Використання дефолтного зображення
-            filePath = '/images/profile-picture.png';
+            filePath = '/images/user-avatar.png';
         }
 
         // Оновлення шляху до зображення в таблиці users
@@ -1157,7 +1157,7 @@ router.get('/profile/student/:id', async (req, res) => {
         }
 
         const profile = result.rows[0];
-        profile.profile_image = profile.profile_image || '/images/profile-picture.png';
+        profile.profile_image = profile.profile_image || '/images/user-avatar.png';
 
         res.status(200).json(profile);
     } catch (error) {
@@ -1178,33 +1178,29 @@ router.post('/upload-student-profile-image', uploads.single('profileImage'), asy
         if (req.file) {
             filePath = `/uploads/profile-images/${req.file.filename}`;
         } else {
-            filePath = '/images/profile-picture.png';
+            filePath = '/images/user-avatar.png';
         }
 
-        // Start transaction
         await pool.query('BEGIN');
 
         try {
-            // Update profile_image in students table
-            const updateStudentQuery = `
+            const updateQuery = `
                 UPDATE students 
                 SET profile_image = $1 
                 WHERE user_id = $2 
                 RETURNING *
             `;
-            const result = await pool.query(updateStudentQuery, [filePath, userId]);
+            const result = await pool.query(updateQuery, [filePath, userId]);
 
             if (result.rowCount === 0) {
-                // If no student record exists, create one
-                const insertStudentQuery = `
+                const insertQuery = `
                     INSERT INTO students (user_id, profile_image)
                     VALUES ($1, $2)
                 `;
-                await pool.query(insertStudentQuery, [userId, filePath]);
+                await pool.query(insertQuery, [userId, filePath]);
             }
 
             await pool.query('COMMIT');
-
             res.status(200).json({ 
                 message: 'Profile image updated successfully!', 
                 filePath 
@@ -1295,6 +1291,38 @@ router.post('/update-student-profile', async (req, res) => {
     }
 });
 
+router.post('/reset-profile-image', async (req, res) => {
+    try {
+        const { userId } = req.body;
+        if (!userId) {
+            return res.status(400).json({ error: 'User ID is required.' });
+        }
+
+        const defaultImage = '/images/user-avatar.png';
+        
+        const query = `
+            UPDATE students 
+            SET profile_image = $1 
+            WHERE user_id = $2 
+            RETURNING *
+        `;
+        
+        const result = await pool.query(query, [defaultImage, userId]);
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Student profile not found.' });
+        }
+
+        res.status(200).json({ 
+            message: 'Profile image reset successfully!',
+            profileImage: defaultImage
+        });
+    } catch (error) {
+        console.error('Error resetting profile image:', error);
+        res.status(500).json({ error: 'Failed to reset profile image.' });
+    }
+});
+
 
 // Add route to get profile image
 router.get('/profile-image/:userId', async (req, res) => {
@@ -1308,10 +1336,10 @@ router.get('/profile-image/:userId', async (req, res) => {
         const result = await pool.query(query, [userId]);
 
         if (result.rows.length === 0) {
-            return res.json({ profileImage: '/images/profile-picture.png' });
+            return res.json({ profileImage: '/images/user-avatar.png' });
         }
 
-        const profileImage = result.rows[0].profile_image || '/images/profile-picture.png';
+        const profileImage = result.rows[0].profile_image || '/images/user-avatar.png';
         res.json({ profileImage });
     } catch (error) {
         console.error('Error fetching profile image:', error);

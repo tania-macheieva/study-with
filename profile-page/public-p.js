@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else if (teacher.certificates) {
                 avatarImg.src = `data:image/jpeg;base64,${teacher.certificates}`;
             } else {
-                avatarImg.src = '/images/profile-picture.png';
+                avatarImg.src = '/images/user-avatar.png';
             }
 
             // Basic information
