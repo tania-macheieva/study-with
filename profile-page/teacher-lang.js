@@ -214,7 +214,7 @@ async function loadEnrolledCourses() {
         if (!coursesContainer) return;
 
         if (!courses || courses.length === 0) {
-            coursesContainer.innerHTML = '<p class="no-courses">You haven\'t enrolled in any courses yet.</p>';
+            coursesContainer.innerHTML = '<p class="no-courses" data-lang="noCourses">You haven\'t enrolled in any courses yet.</p>';
             return;
         }
 
@@ -232,7 +232,6 @@ async function loadEnrolledCourses() {
             </div>
         `).join('');
 
-        // Додаємо обробники для кнопок Resume
         document.querySelectorAll('.btn-resume').forEach(button => {
             button.addEventListener('click', function() {
                 const courseId = this.getAttribute('data-course-id');
@@ -241,6 +240,8 @@ async function loadEnrolledCourses() {
                 }
             });
         });
+
+        toggleViewAllButton('courses-list', 'btn-view-all-1');
 
     } catch (error) {
         console.error('Error loading courses:', error);
@@ -328,5 +329,24 @@ async function loadSavedBookmarks() {
     }
 }
 
-// Викликаємо функцію при завантаженні сторінки
-document.addEventListener('DOMContentLoaded', loadEnrolledCourses);
+function toggleViewAllButton(containerClass, buttonClass, threshold = 3) {
+    const containers = document.querySelectorAll(`.${containerClass}`);
+    containers.forEach(container => {
+        const items = container.querySelectorAll(':scope > div');
+        const viewAllButton = container.parentElement.querySelector(`.${buttonClass}`);
+
+        if (viewAllButton) {
+            if (items.length > threshold) {
+                viewAllButton.style.display = 'block';
+            } else {
+                viewAllButton.style.display = 'none';
+            }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadEnrolledCourses();
+    loadSavedBookmarks();
+    toggleViewAllButton('courses-list', 'btn-view-all-1');
+});

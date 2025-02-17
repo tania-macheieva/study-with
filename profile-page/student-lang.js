@@ -9,7 +9,7 @@ const translations = {
         btnResume: 'Resume',
         btnViewAll1: 'View all',
         myCertificates: 'My certificates',
-        certificateName: 'Certificate name',
+        certificateName: 'Certificate name', 
         completedOn: 'Completed on dd/mm/yyyy',
         btnDownload: 'Download',
         myBookmarks: 'My bookmarks',
@@ -47,7 +47,8 @@ const translations = {
         privatePublic: 'You can make your account private or public using the buttons below.',
         closeAccount: 'Close Account',
         openAccount: 'Open Account',
-        noCourses: 'You haven\'t enrolled in any courses yet.'
+        noCourses: 'You haven\'t enrolled in any courses yet.',
+        btnShowLess: 'Show less',
     },
     ua: {
         pageTitle: 'Study With | Профіль',
@@ -97,67 +98,111 @@ const translations = {
         privatePublic: 'Ви можете зробити свій акаунт приватним або публічним за допомогою кнопок нижче.',
         closeAccount: 'Закрити акаунт',
         openAccount: 'Відкрити акаунт',
-        noCourses: 'Ви ще не записались на жодний курс.'
+        noCourses: 'Ви ще не записались на жодний курс.',
+        btnShowLess: 'Показати менше',
     }
 };
 
 
-function manageViewAllButton(containerClass, itemsCount) {
-    const viewAllBtn = document.querySelector(`.${containerClass}`);
-    if (viewAllBtn) {
-        viewAllBtn.style.display = itemsCount <= 3 ? 'none' : 'block';
-    }
-}
-
-document.querySelectorAll('.btn-view-all-3').forEach(button => {
-    button.addEventListener('click', function() {
-        const certificatesSection = button.closest('.my-certificates');
-        const certificatesList = certificatesSection.querySelector('.certificates-list');
-        
-        if (certificatesList) {
-            if (certificatesList.classList.contains('expanded')) {
-                // Collapse the list
-                certificatesList.classList.remove('expanded');
-                button.textContent = translations[localStorage.getItem('language') || 'en'].btnViewAll;
-            } else {
-                // Expand the list
-                certificatesList.classList.add('expanded');
-                button.textContent = translations[localStorage.getItem('language') || 'en'].btnViewAll;
-            }
-        }
-    });
-});
-
+// Загальні стилі для всіх списків
 document.head.appendChild(document.createElement('style')).textContent = `
-    .certificates-list {
-        max-height: 400px; /* Height for 3 certificates */
+    /* Base styles for lists */
+    .courses-list,
+    .certificates-list,
+    .bookmarks-list {
+        max-height: 400px; /* Висота для 3 елементів */
         overflow: hidden;
         transition: max-height 0.3s ease-in-out;
     }
 
-    .certificates-list.expanded {
-        max-height: 2000px; /* Or any value that would accommodate all certificates */
+    /* Expanded state */
+    .courses-list.expanded,
+    .certificates-list.expanded,
+    .bookmarks-list.expanded {
+        max-height: 2000px; /* Місце для всіх елементів */
     }
 
-    .btn-view-all-3 {
-        display: block; /* Show button by default */
-    }
-
-    /* Hide view all button if there are 3 or fewer certificates */
-    .certificates-list:not(.has-more) + .btn-view-all-3 {
-        display: none;
+    /* View all buttons default state */
+    .btn-view-all-1,
+    .btn-view-all-3,
+    .btn-view-all-4 {
+        display: none; /* Приховані за замовчуванням */
     }
 `;
 
-function checkCertificatesCount() {
-    const certificatesList = document.querySelector('.certificates-list');
-    if (certificatesList) {
-        const certificates = certificatesList.querySelectorAll('.certificate');
-        certificatesList.classList.toggle('has-more', certificates.length > 3);
+// Функція для керування кнопкою "Показати більше/менше"
+function manageViewAllButton(containerClass, itemsCount) {
+    const viewAllBtn = document.querySelector(`.${containerClass}`);
+    if (viewAllBtn) {
+        // Показуємо кнопку тільки якщо елементів більше 3
+        viewAllBtn.style.display = itemsCount > 3 ? 'block' : 'none';
+        
+        // Set initial button text
+        const lang = localStorage.getItem('language') || 'en';
+        viewAllBtn.textContent = translations[lang].btnViewAll;
     }
 }
 
-document.addEventListener('DOMContentLoaded', checkCertificatesCount);
+// Функція для ініціалізації всіх кнопок
+function initializeViewAllButtons() {
+    const buttonConfigs = [
+        { buttonClass: '.btn-view-all-1', containerClass: '.my-courses', listClass: '.courses-list' },
+        { buttonClass: '.btn-view-all-3', containerClass: '.my-certificates', listClass: '.certificates-list' },
+        { buttonClass: '.btn-view-all-4', containerClass: '.my-bookmarks', listClass: '.bookmarks-list' }
+    ];
+
+    buttonConfigs.forEach(config => {
+        document.querySelectorAll(config.buttonClass).forEach(button => {
+            // Set initial button text
+            const lang = localStorage.getItem('language') || 'en';
+            button.textContent = translations[lang].btnViewAll;
+            
+            button.addEventListener('click', function() {
+                const section = button.closest(config.containerClass);
+                const list = section.querySelector(config.listClass);
+                
+                if (list) {
+                    list.classList.toggle('expanded');
+                    const isExpanded = list.classList.contains('expanded');
+                    const lang = localStorage.getItem('language') || 'en';
+                    button.textContent = isExpanded ? 
+                        translations[lang].btnShowLess : 
+                        translations[lang].btnViewAll;
+                }
+            });
+        });
+    });
+}
+
+// Функція для перевірки кількості елементів у списках
+function checkItemsCount() {
+    // Для курсів
+    const coursesList = document.querySelector('.courses-list');
+    if (coursesList) {
+        const courses = coursesList.querySelectorAll('.course');
+        manageViewAllButton('btn-view-all-1', courses.length);
+    }
+
+    // Для сертифікатів
+    const certificatesList = document.querySelector('.certificates-list');
+    if (certificatesList) {
+        const certificates = certificatesList.querySelectorAll('.certificate');
+        manageViewAllButton('btn-view-all-3', certificates.length);
+    }
+
+    // Для закладок
+    const bookmarksList = document.querySelector('.bookmarks-list');
+    if (bookmarksList) {
+        const bookmarks = bookmarksList.querySelectorAll('.bookmark');
+        manageViewAllButton('btn-view-all-4', bookmarks.length);
+    }
+}
+
+// Ініціалізація при завантаженні сторінки
+document.addEventListener('DOMContentLoaded', () => {
+    initializeViewAllButtons();
+    checkItemsCount();
+}); 
 
 // Основна функція для завантаження курсів
 async function loadEnrolledCourses() {
@@ -178,6 +223,7 @@ async function loadEnrolledCourses() {
 
         if (!courses || courses.length === 0) {
             coursesContainer.innerHTML = `<p class="no-courses">${translations[localStorage.getItem('language') || 'en'].noCourses}</p>`;
+            manageViewAllButton('btn-view-all-1', 0);
             return;
         }
 
@@ -198,15 +244,7 @@ async function loadEnrolledCourses() {
         `).join('');
 
         manageViewAllButton('btn-view-all-1', courses.length);
-
-        document.querySelectorAll('.btn-resume').forEach(button => {
-            button.addEventListener('click', function() {
-                const courseId = this.getAttribute('data-course-id');
-                if (courseId) {
-                    window.location.href = `/course/${courseId}`; // Змінюємо URL
-                }
-            });
-        });
+        initializeViewAllButtons(); // Reinitialize button listeners after content load
 
     } catch (error) {
         console.error('Error loading enrolled courses:', error);
@@ -214,6 +252,7 @@ async function loadEnrolledCourses() {
         if (coursesContainer) {
             coursesContainer.innerHTML = '<p class="error-message">Failed to load courses. Please try again later.</p>';
         }
+        manageViewAllButton('btn-view-all-1', 0);
     }
 }
 
@@ -251,6 +290,8 @@ async function loadSavedBookmarks() {
         `).join('');
 
         manageViewAllButton('btn-view-all-4', courses.length);
+        initializeViewAllButtons();
+
 
     } catch (error) {
         console.error('Помилка завантаження збережених курсів:', error);

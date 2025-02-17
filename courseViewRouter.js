@@ -148,9 +148,11 @@ router.get('/course/:courseId/progress', async (req, res) => {
             return res.status(400).json({ error: 'User ID is required' });
         }
 
+        // Оновлений SQL запит для правильного розрахунку прогресу
         const progressQuery = `
-            WITH course_stats AS (
+            WITH lecture_counts AS (
                 SELECT 
+                    c.id as course_id,
                     COUNT(DISTINCT l.id) as total_lectures,
                     COUNT(DISTINCT CASE WHEN lp.completed = true THEN l.id END) as completed_lectures
                 FROM all_courses c
@@ -158,16 +160,22 @@ router.get('/course/:courseId/progress', async (req, res) => {
                 JOIN lectures l ON m.id = l.module_id
                 LEFT JOIN lecture_progress lp ON l.id = lp.lecture_id AND lp.user_id = $2
                 WHERE c.id = $1
+                GROUP BY c.id
             )
-            SELECT
-                cs.total_lectures,
-                cs.completed_lectures,
-                CASE 
-                    WHEN cs.total_lectures > 0 
-                    THEN ROUND((cs.completed_lectures::float / cs.total_lectures::float * 100)::numeric, 2)
-                    ELSE 0
-                END as progress_percentage
-            FROM course_stats cs
+            UPDATE enrollments e
+            SET progress = (
+                SELECT 
+                    CASE 
+                        WHEN lc.total_lectures > 0 
+                        THEN ROUND((lc.completed_lectures::float / lc.total_lectures * 100)::numeric, 2)
+                        ELSE 0 
+                    END
+                FROM lecture_counts lc
+            )
+            WHERE e.course_id = $1 AND e.user_id = $2
+            RETURNING progress, 
+                (SELECT total_lectures FROM lecture_counts) as total_lectures,
+                (SELECT completed_lectures FROM lecture_counts) as completed_lectures;
         `;
 
         const result = await db.query(progressQuery, [courseId, userId]);
@@ -178,9 +186,9 @@ router.get('/course/:courseId/progress', async (req, res) => {
 
         const progressData = result.rows[0];
         res.json({
-            progress: progressData.progress_percentage,
-            totalLectures: progressData.total_lectures,
-            completedLectures: progressData.completed_lectures
+            progress: progressData.progress,
+            totalLectures: parseInt(progressData.total_lectures),
+            completedLectures: parseInt(progressData.completed_lectures)
         });
     } catch (error) {
         console.error('Помилка отримання прогресу:', error);
@@ -197,23 +205,63 @@ router.post('/lecture/:lectureId/complete', async (req, res) => {
             return res.status(400).json({ error: 'User ID is required' });
         }
 
-        const query = `
+        // Спочатку оновлюємо статус лекції
+        const updateLectureQuery = `
             INSERT INTO lecture_progress (user_id, lecture_id, completed, completed_at)
             VALUES ($1, $2, true, CURRENT_TIMESTAMP)
             ON CONFLICT (user_id, lecture_id)
             DO UPDATE SET 
                 completed = true,
                 completed_at = CURRENT_TIMESTAMP
-            RETURNING *
+            RETURNING *;
         `;
 
-        const result = await db.query(query, [userId, lectureId]);
-        
-        await updateCourseProgress(userId, lectureId);
+        await db.query(updateLectureQuery, [userId, lectureId]);
 
-        res.json(result.rows[0]);
+        // Тепер оновлюємо загальний прогрес курсу
+        const updateProgressQuery = `
+            WITH course_info AS (
+                SELECT 
+                    c.id as course_id
+                FROM all_courses c
+                JOIN modules m ON c.id = m.course_id
+                JOIN lectures l ON m.id = l.module_id
+                WHERE l.id = $2
+            ),
+            lecture_counts AS (
+                SELECT 
+                    c.id as course_id,
+                    COUNT(DISTINCT l.id) as total_lectures,
+                    COUNT(DISTINCT CASE WHEN lp.completed = true THEN l.id END) as completed_lectures
+                FROM all_courses c
+                JOIN modules m ON c.id = m.course_id
+                JOIN lectures l ON m.id = l.module_id
+                LEFT JOIN lecture_progress lp ON l.id = lp.lecture_id AND lp.user_id = $1
+                WHERE c.id = (SELECT course_id FROM course_info)
+                GROUP BY c.id
+            )
+            UPDATE enrollments e
+            SET progress = (
+                SELECT 
+                    CASE 
+                        WHEN lc.total_lectures > 0 
+                        THEN ROUND((lc.completed_lectures::float / lc.total_lectures * 100)::numeric, 2)
+                        ELSE 0 
+                    END
+                FROM lecture_counts lc
+            )
+            WHERE e.course_id = (SELECT course_id FROM course_info)
+            AND e.user_id = $1
+            RETURNING progress;
+        `;
+
+        const result = await db.query(updateProgressQuery, [userId, lectureId]);
+        res.json({ 
+            success: true, 
+            progress: result.rows[0].progress 
+        });
     } catch (error) {
-        console.error('Помилка оновлення прогресу лекції:', error);
+        console.error('Помилка оновлення прогресу:', error);
         res.status(500).json({ error: 'Внутрішня помилка сервера' });
     }
 });

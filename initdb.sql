@@ -242,10 +242,8 @@ CREATE TABLE payments (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-ALTER TABLE all_courses ADD COLUMN author_stripe_account VARCHAR(255);
-
-
 ALTER TABLE students
+<<<<<<< HEAD
 ADD COLUMN profile_image VARCHAR(255) DEFAULT '/images/profile-picture.png';
 
 CREATE TABLE comments (
@@ -259,3 +257,16 @@ CREATE TABLE comments (
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_parent_comment FOREIGN KEY (parent_comment_id) REFERENCES comments(id) ON DELETE CASCADE
 );
+=======
+ADD COLUMN profile_image VARCHAR(255) DEFAULT '/images/user-avatar.png';
+
+-- якщо вже стовпець і треба змінити
+ALTER TABLE students
+ALTER COLUMN profile_image SET DEFAULT '/images/user-avatar.png';
+
+UPDATE students
+SET profile_image = '/images/user-avatar.png'
+WHERE id = 1;
+
+ 
+>>>>>>> 953e7dbd2c7a80b842586e526bca8877ef0fb7f9

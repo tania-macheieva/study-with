@@ -124,7 +124,7 @@
                     const removeImageButton = document.getElementById('remove-image');
                     const confirmImageButton = document.getElementById('confirm-image');
 
-                    // Функція для завантаження зображення профілю
+                    // Load profile image on page load
                     async function loadProfileImage() {
                         const userId = localStorage.getItem('userId');
                         if (!userId) return;
@@ -140,11 +140,11 @@
                             }
                         } catch (error) {
                             console.error('Error loading profile image:', error);
-                            profileImage.src = '/images/profile-picture.png';
+                            profileImage.src = '/images/user-avatar.png';
                         }
                     }
 
-                    // Обробник вибору файлу
+                    // Handle file selection
                     uploadInput.addEventListener('change', function (event) {
                         const file = event.target.files[0];
                         if (file) {
@@ -164,23 +164,92 @@
                         }
                     });
 
-            profileImage.addEventListener('click', function() {
-                removeImageButton.style.display = 'inline-block';
-                confirmImageButton.style.display = 'inline-block';
-            });
+                    // Handle image removal (reset to default)
+                    removeImageButton.addEventListener('click', async function () {
+                        const userId = localStorage.getItem('userId');
+                        if (!userId) return;
 
-            removeImageButton.addEventListener('click', function() {
-                profileImage.src = '/images/profile-picture.png';
-                uploadInput.value = '';
-                removeImageButton.style.display = 'none';
-                confirmImageButton.style.display = 'none';
-            });
+                        try {
+                            const response = await fetch('http://localhost:8000/auth/reset-profile-image', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ userId }),
+                            });
 
+                            if (response.ok) {
+                                profileImage.src = '/images/user-avatar.png';
+                                uploadInput.value = '';
+                                removeImageButton.style.display = 'none';
+                                confirmImageButton.style.display = 'none';
+                                alert('Profile image reset successfully');
+                            } else {
+                                throw new Error('Failed to reset profile image');
+                            }
+                        } catch (error) {
+                            console.error('Error resetting profile image:', error);
+                            alert('Failed to reset profile image');
+                        }
+                    });
+
+                    // Handle image confirmation and upload
+                    confirmImageButton.addEventListener('click', async function () {
+                        const file = uploadInput.files[0];
+                        if (!file) {
+                            alert('Please select an image to upload.');
+                            return;
+                        }
+
+                        const userId = localStorage.getItem('userId');
+                        const email = localStorage.getItem('email');
+                        if (!email || !userId) {
+                            alert('User information is not available. Please log in again.');
+                            return;
+                        }
+
+                        const formData = new FormData();
+                        formData.append('profileImage', file);
+                        formData.append('email', email);
+                        formData.append('userId', userId);
+
+                        try {
+                            const response = await fetch('http://localhost:8000/auth/upload-student-profile-image', {
+                                method: 'POST',
+                                body: formData,
+                            });
+
+                            const result = await response.json();
+
+                            if (response.ok) {
+                                alert('Profile image updated successfully!');
+                                const imageUrl = result.filePath.startsWith('http')
+                                    ? result.filePath
+                                    : `http://localhost:8000${result.filePath}`;
+                                profileImage.src = imageUrl;
+                                removeImageButton.style.display = 'none';
+                                confirmImageButton.style.display = 'none';
+                            } else {
+                                throw new Error(result.error || 'Failed to upload image');
+                            }
+                        } catch (error) {
+                            console.error('Error uploading profile image:', error);
+                            alert('Failed to upload profile image');
+                        }
+                    });
+
+                    // Show buttons when clicking on profile image
+                    profileImage.addEventListener('click', function () {
+                        removeImageButton.style.display = 'inline-block';
+                        confirmImageButton.style.display = 'inline-block';
+                    });
+
+                    // Initial load
                     loadProfileImage();
                 }
-                document.addEventListener('DOMContentLoaded', () => {
-                    handleProfileImage();
-                });
+
+                // Initialize when DOM is loaded
+                document.addEventListener('DOMContentLoaded', handleProfileImage);
             
                 // Функція завантаження профілю з сервера
                 async function loadStudentProfile() {
@@ -207,7 +276,7 @@
                                         : `http://localhost:8000${data.profile_image}`;
                                     profileImage.src = imageUrl;
                                 } else {
-                                    profileImage.src = '/images/profile-picture.png';
+                                    profileImage.src = '/images/user-avatar.png';
                                 }
                             }
 
@@ -226,7 +295,7 @@
                             console.error('Error loading profile:', err);
                             const profileImage = document.getElementById('profile-image');
                             if (profileImage) {
-                                profileImage.src = '/images/profile-picture.png';
+                                profileImage.src = '/images/user-avatar.png';
                             }
 
                             const usernameElement = document.getElementById('username');
@@ -237,7 +306,7 @@
                     }
                     async function updateDefaultProfileImage(userId) {
                         try {
-                            const defaultImagePath = '/images/profile-picture.png';
+                            const defaultImagePath = '/images/user-avatar.png';
                             const response = await fetch('http://localhost:8000/auth/update-default-image', {
                                 method: 'POST',
                                 headers: {
@@ -327,7 +396,7 @@
                         confirmImageButton.style.display = 'none';
                     });
                 removeImageButton.addEventListener('click', function () {
-                    profileImage.src = '/images/profile-picture.png';
+                    profileImage.src = '/images/user-avatar.png';
                     uploadInput.value = '';
                     removeImageButton.style.display = 'none';
                     confirmImageButton.style.display = 'none';
