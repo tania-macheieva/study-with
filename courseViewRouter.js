@@ -7,6 +7,7 @@ router.get('/course/:courseId', async (req, res) => {
         const { courseId } = req.params;
         const userId = req.query.userId;
 
+        // Перевірка валідності courseId
         if (!courseId || isNaN(courseId)) {
             return res.status(400).json({ 
                 error: 'Invalid course ID',
@@ -14,6 +15,7 @@ router.get('/course/:courseId', async (req, res) => {
             });
         }
 
+        // Перевірка на наявність userId
         if (!userId) {
             return res.status(400).json({ 
                 error: 'User ID is required',
@@ -22,6 +24,17 @@ router.get('/course/:courseId', async (req, res) => {
         }
 
         const courseIdNum = parseInt(courseId, 10);
+
+        // Перевірка, чи існує користувач з таким ID
+        const userCheckQuery = 'SELECT id FROM users WHERE id = $1';
+        const userCheckResult = await db.query(userCheckQuery, [userId]);
+
+        if (userCheckResult.rows.length === 0) {
+            return res.status(404).json({ 
+                error: 'User not found',
+                details: 'Please provide a valid user ID'
+            });
+        }
 
         // Оновлений запит з правильною обробкою статусу completed
         const courseQuery = `
@@ -352,5 +365,77 @@ router.get('/lecture/:lectureId', async (req, res) => {
 ///////////////////////
 ///// COMMENTS ///////
 /////////////////////
+router.post('/api/comments', async (req, res) => {
+    const { courseId, userId, parentCommentId, content } = req.body;
+
+    if (!courseId || !userId || !content) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    try {
+        // Insert the comment into the database
+        const insertCommentQuery = `
+            INSERT INTO comments (course_id, user_id, parent_comment_id, content)
+            VALUES ($1, $2, $3, $4)
+            RETURNING id, user_id, content, created_at;
+        `;
+        
+        const values = [courseId, userId, parentCommentId || null, content];
+        const result = await db.query(insertCommentQuery, values);
+
+        const newComment = result.rows[0];
+
+        // Respond with the newly created comment
+        res.status(201).json(newComment);
+    } catch (error) {
+        console.error('Error creating comment:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
+router.get('/api/course/:courseId/comments', async (req, res) => {
+    const { courseId } = req.params;
+    console.log(`Fetching comments for courseId: ${courseId}`);  // Log for debugging
+    try {
+        // Query the database to get comments for the course
+        const commentsQuery = `
+        SELECT 
+            c.id, 
+            c.user_id, 
+            u.name AS username, 
+            u.avatar, 
+            c.text, 
+            c.created_at,
+            c.parent_id
+        FROM comments c
+        JOIN users u ON c.user_id = u.id
+        WHERE c.course_id = $1
+        ORDER BY c.created_at ASC
+    `;
+    const commentsResult = await db.query(commentsQuery, [courseId]);
+
+    if (commentsResult.rows.length === 0) {
+        return res.status(404).json({ error: 'No comments found' });
+    }
+
+    res.json(commentsResult.rows);
+} catch (error) {
+    console.error('Error fetching comments:', error);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
+}
+});
+
+// router.get('/api/course/:courseId/comments', async (req, res) => {
+//     const { courseId } = req.params;
+//     try {
+//         const comments = await getCommentsForCourse(courseId); // Your function to fetch comments
+//         res.json(comments);
+//     } catch (error) {
+//         console.error('Error fetching comments:', error);
+//         res.status(500).json({ error: 'Internal server error' });
+//     }
+// });
+
 
 module.exports = router;

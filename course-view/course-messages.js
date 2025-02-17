@@ -1,15 +1,39 @@
 
 let DISCUSSION_MESSAGES = [
-    {
-        id: "1",
-        user: {
-            name: "question user 1",
-            avatar: "/images/user-avatar.png"
-        },
-        date: "29.01.2024",
-        text: "question question question question question 1",
-    },
+    
 ]
+const getCourseIdFromUrl = () => {
+    const pathParts = window.location.pathname.split('/');
+    const courseId = pathParts[2]; // Якщо URL - /course/13
+    console.log('Extracted courseId:', courseId);
+
+    
+    if (!courseId || isNaN(courseId)) {
+        console.error('Некоректний courseId:', courseId);
+    }
+     else {
+    loadComments();
+}}
+const fetchDiscussionMessages = async (courseId) => {
+    try {
+        const response = await fetch(`/api/course/${courseId}/comments`);
+        
+        if (!response.ok) {
+            console.error('Response error:', response.statusText); // Log the error details
+            throw new Error(`Failed to fetch comments for course ${courseId}`);
+        }
+
+        // Save the fetched messages to the DISCUSSION_MESSAGES array
+        DISCUSSION_MESSAGES = await response.json();
+    } catch (error) {
+        console.error('Error fetching discussion messages:', error);
+    }
+};
+
+
+// Викликаємо при завантаженні сторінки
+document.addEventListener('DOMContentLoaded', fetchDiscussionMessages);
+
 
 const createDiscussionTemplate = () => `
     <section class="discussion-section">
@@ -60,10 +84,10 @@ const createMessageHTML = (message, isReply = false, replyLevel = 0) => {
     messageElement.dataset.messageId = message.id;
     messageElement.dataset.replyLevel = replyLevel; 
 
-    if (message.id.includes('.')) {
+    if (typeof message.id === 'string' && message.id.includes('.')) {
         messageElement.dataset.parentId = message.id.substring(0, message.id.lastIndexOf('.'));
     }
-
+    
     const replyToUsername = message.replyTo ? `@${message.replyTo}` : '';
 
     messageElement.innerHTML = `
@@ -85,19 +109,35 @@ const createMessageHTML = (message, isReply = false, replyLevel = 0) => {
 };
 
 
-const handleReply = (messageId, replyText) => {
+const handleReply = async (messageId, replyText) => {
     const parentMessage = document.querySelector(`.message[data-message-id="${messageId}"]`);
+    if (!parentMessage) return;
+
     const parentUserName = parentMessage.querySelector('.username').textContent;
-    
+
     const replyMessage = {
-        id: generateUniqueId(), 
-        user: currentUser, 
+        userId: currentUser.id, 
+        parentId: messageId, 
         replyTo: parentUserName, 
         text: replyText,
-        date: new Date().toLocaleString()
+        date: new Date().toISOString()
     };
 
-    addMessageToThread(replyMessage); 
+    try {
+        const response = await fetch('http://localhost:8000/comments/reply', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(replyMessage)
+        });
+
+        if (!response.ok) throw new Error('Не вдалося надіслати відповідь');
+
+        const savedReply = await response.json();
+        parentMessage.replies.push(savedReply);
+        renderDiscussion();
+    } catch (error) {
+        console.error('Помилка при відправці відповіді:', error);
+    }
 };
 
 const updateMessageStyles = () => {
@@ -271,62 +311,44 @@ const toggleReplies = (messageId, show) => {
 };
 
 
-const addNewReply = (parentId, replyText) => {
+const addNewReply = async (parentId, replyText) => {
     const parentMessage = findMessageById(parentId);
     if (!parentMessage) return;
 
-    const replyingToUser = parentMessage.user.name; // Отримуємо ім'я користувача, якому відповідаємо
-    console.log(replyingToUser)
-    const formattedReplyText = `<span class="mention">@${replyingToUser}</span> ${replyText}`;
-
-    const newReplyId = generateReplyId(parentId);
-    const date = new Date();
-    const formattedDate = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
-
-    const newReply = {
-        id: newReplyId,
-        user: {
-            name: "Current User",
-            avatar: "/images/user-avatar.png"
-        },
-        date: formattedDate,
-        text: formattedReplyText, // Використовуємо відформатований текст
-        replies: []
+    const replyMessage = {
+        userId, // додаємо userId
+        parentId,
+        text: replyText,
+        date: new Date().toISOString()
     };
 
-    // Додаємо відповідь до масиву відповідей батьківського повідомлення
-    if (!parentMessage.replies) parentMessage.replies = [];
-    parentMessage.replies.push(newReply);
+    try {
+        const response = await fetch('http://localhost:8000/comments/reply', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(replyMessage)
+        });
 
-    // Додаємо відповідь у DOM без перезавантаження всього списку
-    const parentElement = document.querySelector(`.message[data-message-id="${parentId}"]`);
-    if (parentElement) {
-        const newReplyElement = createMessageHTML(newReply, true);
-        parentElement.appendChild(newReplyElement);
+        const savedReply = await response.json();  
+        parentMessage.replies.push(savedReply);  
+        renderDiscussion();  
+    } catch (error) {
+        console.error('Помилка при відправці відповіді:', error);
     }
-
-    toggleReplies(parentId, true); // Показуємо відповіді
-
-    // Очищаємо поле вводу
-    const replyInput = document.querySelector(`.message[data-message-id="${parentId}"] .reply-input input`);
-    if (replyInput) {
-        replyInput.value = '';
-        replyInput.closest('.reply-input').style.display = 'none'; // Ховаємо поле вводу
-    }
-};
-
-
-
-
+}; 
 const generateReplyId = (parentId) => {
     const parent = findMessageById(parentId);
-    if (!parent.replies?.length) return `${parentId}.1`;
+    if (!parent || !parent.replies?.length) return `${parentId}.1`;
     
-    const lastReplyNumber = Math.max(...parent.replies.map(reply => 
-        parseInt(reply.id.split('.').pop())
-    ));
-    return `${parentId}.${lastReplyNumber + 1}`;
+    const lastReplyId = parent.replies
+        .map(reply => reply.id.split('.').pop())
+        .map(Number)
+        .filter(num => !isNaN(num))
+        .sort((a, b) => b - a)[0];
+
+    return `${parentId}.${lastReplyId + 1}`;
 };
+
 
 const findMessageById = (id, messages = DISCUSSION_MESSAGES) => {
     for (const message of messages) {
@@ -563,16 +585,16 @@ const restoreFilters = (filters) => {
 };
 
 const discussionThread = document.querySelector('.discussion-thread');
-
 function renderDiscussionMessages() {
-  discussionThread.innerHTML = '';
-  DISCUSSION_MESSAGES.forEach(message => {
-    const messageElement = createMessageHTML(message);
-    discussionThread.appendChild(messageElement);
-  });
-  updateMessageStyles();
-}
-
+    discussionThread.innerHTML = '';  // Clear existing messages
+    DISCUSSION_MESSAGES.forEach(message => {
+      const messageElement = createMessageHTML(message);  // Assuming this function creates HTML for each message
+      discussionThread.appendChild(messageElement);
+    });
+    updateMessageStyles(); // Ensure styling is updated after rendering
+  }
+  
+const userId = localStorage.getItem('userId'); 
 const initializeDiscussionListeners = () => {
     const sendButton = document.querySelector('.send');
     const messageInput = document.querySelector('.search-bar input');
@@ -581,34 +603,35 @@ const initializeDiscussionListeners = () => {
     // Перевіряємо, чи є елементи на сторінці
     if (sendButton && messageInput && discussionThread) {
         // Відправка нового основного повідомлення
-        sendButton.addEventListener('click', () => {
-            const messageText = messageInput.value.trim(); 
-            const date = new Date();
-            const formattedDate = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
+        sendButton.addEventListener('click', async () => {
+            const messageText = messageInput.value.trim();
         
-            if (messageText) {
-                // Створюємо нове основне повідомлення
-                const newMessage = {
-                    id: `msg_${Date.now()}`, // Генеруємо унікальний id для повідомлення
-                    user: {
-                        name: "Current User",
-                        avatar: "/images/user-avatar.png"
-                    },
-                    date: formattedDate,
-                    text: messageText,
-                    replies: [] // Початково немає відповідей
-                };
-
-                // Додаємо нове повідомлення в масив DISCUSSION_MESSAGES
-                DISCUSSION_MESSAGES.push(newMessage);
-
-                // Оновлюємо відображення
-                renderDiscussion();
-
-                // Очищаємо поле вводу
-                messageInput.value = '';
+            if (!messageText) return; // Prevent empty messages
+        
+            const newMessage = {
+                user_id: userId,  // Use the user ID
+                text: messageText,
+                parent_id: null,  // Main message, not a reply
+            };
+        
+            try {
+                const response = await fetch('/api/comments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newMessage),
+                });
+        
+                if (!response.ok) throw new Error('Failed to send message');
+        
+                const savedMessage = await response.json();
+                DISCUSSION_MESSAGES.push(savedMessage); // Add the new message to the array
+                renderDiscussionMessages();  // Re-render the messages
+                messageInput.value = '';  // Clear input field
+            } catch (error) {
+                console.error('Error sending message:', error);
             }
         });
+        
         
         // Додаємо існуючі повідомлення в обговорення
         discussionThread.innerHTML = '';
@@ -718,3 +741,38 @@ const initializeDiscussionListeners = () => {
         updateMessageStyles();
     }
 };
+
+
+const loadComments = async () => {
+    try {
+        const pathParts = window.location.pathname.split('/');
+        const courseId = pathParts[pathParts.length - 1];  // Get courseId from URL
+
+        if (!courseId) {
+            console.error('Не вдалося знайти courseId в URL');
+            return;
+        }
+
+        console.log('courseId:', courseId);
+
+        // Fetch discussion messages using courseId
+        await fetchDiscussionMessages(courseId);
+
+        // Assuming the fetchDiscussionMessages() is responsible for setting DISCUSSION_MESSAGES
+        renderDiscussion(); // Render the fetched discussion
+
+    } catch (error) {
+        console.error('Помилка при завантаженні коментарів:', error);
+    }
+};
+
+
+
+loadComments();
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderDiscussion();
+    initializeFilters();
+    initializeDiscussionListeners();
+    initializeTabs();
+});

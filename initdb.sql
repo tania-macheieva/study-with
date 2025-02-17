@@ -247,4 +247,15 @@ ALTER TABLE all_courses ADD COLUMN author_stripe_account VARCHAR(255);
 
 ALTER TABLE students
 ADD COLUMN profile_image VARCHAR(255) DEFAULT '/images/profile-picture.png';
- 
+
+CREATE TABLE comments (
+    id SERIAL PRIMARY KEY,
+    course_id INT NOT NULL,
+    user_id INT NOT NULL,
+    parent_comment_id INT, -- Якщо це відповідь на коментар, інакше NULL
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_course FOREIGN KEY (course_id) REFERENCES all_courses(id) ON DELETE CASCADE,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_parent_comment FOREIGN KEY (parent_comment_id) REFERENCES comments(id) ON DELETE CASCADE
+);

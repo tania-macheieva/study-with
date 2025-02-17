@@ -1216,11 +1216,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     loadCourseData();
     createVideoPlayer();
-    renderCourseContent();
-    renderDiscussion();
-    initializeFilters();
-    initializeDiscussionListeners();
-    initializeTabs();
+    renderCourseContent();   
     initializeModuleListeners();
     initializeTopicListeners(); 
 });

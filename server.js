@@ -13,6 +13,7 @@ const stripeRoutes = require("./pay-page/stripe");
 const coursesRouter = require('./courses'); 
 const courseDraftRouter = require('./courses');
 const testRouter = require('./test')
+const commentRouter = require('./courseViewRouter')
 
 app.use(cors({
     origin: 'http://localhost:8000',
@@ -24,6 +25,7 @@ app.use(bodyParser.json());
 app.use("/auth", authRoutes);
 app.use('/tests', testRouter);
 app.use('/courses', coursesRouter);  
+app.use('/comments', commentRouter);  
 
 const searchRouter = require('./searchRouter');
 app.use('/api/search', searchRouter);
