@@ -332,7 +332,7 @@ NOTES.add({
     contentType: 'video'
 });
 
-const createVideoPlayer = () => {
+const createVideoPlayer = (videoUrl, videoType, onComplete, lectureId) => {
     const videoContainer = document.querySelector('.video-player');
     if (!videoContainer) return;
 
@@ -343,7 +343,7 @@ const createVideoPlayer = () => {
     videoWrapper.style.position = 'relative';
 
     const videoElement = document.createElement('video');
-    videoElement.id = VIDEO_SOURCE.id;
+    videoElement.id = 'course-video';
     videoElement.className = 'video-element';
     videoElement.controlsList = "nodownload";
     videoElement.controls = true;
@@ -356,21 +356,20 @@ const createVideoPlayer = () => {
         '-webkit-user-select': 'none',
     });
     
-    // Блокуємо контекстне меню, яке містить опцію "Зберегти відео як..."
     videoElement.addEventListener('contextmenu', (e) => {
         e.preventDefault();
     });
     
-    // Блокуємо комбінації клавіш для збереження
     videoElement.addEventListener('keydown', (e) => {
         if (e.ctrlKey && e.key === 's') {
             e.preventDefault();
         }
     });
 
+    // Додаємо source з переданими параметрами
     const sourceElement = document.createElement('source');
-    sourceElement.src = VIDEO_SOURCE.src;
-    sourceElement.type = VIDEO_SOURCE.type;
+    sourceElement.src = videoUrl;
+    sourceElement.type = videoType;
     videoElement.appendChild(sourceElement);
 
     const customControls = document.createElement('div');
@@ -406,7 +405,6 @@ const createVideoPlayer = () => {
     });
 
     customControls.appendChild(notesButton);
-
     videoWrapper.appendChild(videoElement);
     videoWrapper.appendChild(customControls);
     videoContainer.appendChild(videoWrapper);
@@ -422,8 +420,15 @@ const createVideoPlayer = () => {
     notesButton.addEventListener('click', () => {
         videoElement.pause();
         const currentTime = formatVideoTime(videoElement.currentTime);
-        showNotesModal(currentTime);
+        showNotesModal(currentTime, lectureId);
     });
+
+    // Додаємо обробник завершення відео
+    if (onComplete) {
+        videoElement.addEventListener('ended', onComplete);
+    }
+
+    return videoElement;
 };
 
 const saveNote = (noteData) => {
@@ -443,11 +448,12 @@ const formatVideoTime = (timeInSeconds) => {
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 };
 
-const showNotesModal = (currentTime) => {
+const showNotesModal = (currentTime, lectureId) => {
     const existingModal = document.querySelector('.notes-modal');
     if (existingModal) {
         existingModal.remove();
     }
+
     const modal = document.createElement('div');
     modal.className = 'notes-modal';
     const overlay = document.createElement('div');
@@ -461,6 +467,7 @@ const showNotesModal = (currentTime) => {
         background: rgba(0, 0, 0, 0.5);
         z-index: 999;
     `;
+
     modal.innerHTML = `
         <h3 style="margin: 0 0 15px 0; font-size: 18px;">Add note</h3>
         <p style="margin: 0 0 10px 0;">Video time: <span class="video-timestamp">${currentTime}</span></p>
@@ -470,7 +477,12 @@ const showNotesModal = (currentTime) => {
             <button class="save-button">Save</button>
         </div>
     `;
+
     Object.assign(modal.style, {
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
         width: '600px',
         background: 'white',
         padding: '20px',
@@ -478,25 +490,33 @@ const showNotesModal = (currentTime) => {
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
         zIndex: '1000'
     });
+
     document.body.appendChild(overlay);
     document.body.appendChild(modal);
     modal.querySelector('textarea').focus();
+
     const closeModal = () => {
         modal.remove();
         overlay.remove();
         const video = document.querySelector('#course-video');
         if (video) video.play();
     };
+
     modal.querySelector('.cancel-button').addEventListener('click', closeModal);
     overlay.addEventListener('click', closeModal);
     modal.querySelector('.save-button').addEventListener('click', () => {
         const noteText = modal.querySelector('textarea').value;
         const timestamp = modal.querySelector('.video-timestamp').textContent;
         if (noteText.trim()) {
-            saveNote({
+            const topicElement = document.querySelector(`[data-topic-id="${lectureId}"]`);
+            const moduleElement = topicElement?.closest('.module');
+            
+            NOTES.add({
                 text: noteText,
-                timestamp: timestamp,
-                videoId: VIDEO_SOURCE.id
+                videoTimecode: timestamp,
+                moduleId: moduleElement ? parseInt(moduleElement.dataset.moduleId) : null,
+                topicId: parseInt(lectureId),
+                contentType: 'video'
             });
         }
         closeModal();
@@ -600,11 +620,53 @@ window.handleLectureClick = async function(lectureId) {
         const videoContainer = document.querySelector('.video-player');
         if (!videoContainer) return;
 
-        updateActiveAndCompletedStates(lectureId);
-
-        if (window.completionTimer) {
-            clearTimeout(window.completionTimer);
+        // Якщо є остання завершена лекція і ми переходимо на іншу - показуємо галочку
+        if (lastCompletedLectureId && lastCompletedLectureId !== lectureId) {
+            const lastCompletedTopic = document.querySelector(`[data-topic-id="${lastCompletedLectureId}"]`);
+            if (lastCompletedTopic) {
+                lastCompletedTopic.style.backgroundColor = '#e8f5e9';
+                lastCompletedTopic.classList.add('completed');
+                
+                // Оновлюємо прогрес модуля
+                const moduleElement = lastCompletedTopic.closest('.module');
+                if (moduleElement) {
+                    const moduleId = moduleElement.dataset.moduleId;
+                    const module = COURSE_MODULES.find(m => m.id === parseInt(moduleId));
+                    if (module) {
+                        const progressText = moduleElement.querySelector('.module-progress');
+                        if (progressText) {
+                            const { completed, total } = module.progress;
+                            progressText.innerHTML = `
+                                <span>${completed}/${total} complete</span>
+                                <span class="separator">|</span>
+                                <span>${total - completed} left</span>
+                            `;
+                        }
+                    }
+                }
+                
+                // Оновлюємо загальний прогрес курсу в хедері
+                const totalProgress = calculateTotalProgress(COURSE_MODULES);
+                const progressBar = document.querySelector('.progress-bar span');
+                const progressText = document.querySelector('.progress-text .percent');
+                if (progressBar && progressText) {
+                    progressBar.style.width = `${totalProgress}%`;
+                    progressText.textContent = `${totalProgress}%`;
+                }
+            }
+            lastCompletedLectureId = null;
         }
+        // Оновлюємо активний стан для нової лекції
+        document.querySelectorAll('.topic-item').forEach(topic => {
+            topic.classList.remove('active');
+        });
+
+        const currentTopic = document.querySelector(`[data-topic-id="${lectureId}"]`);
+        if (currentTopic) {
+            currentTopic.classList.add('active');
+            currentTopic.style.backgroundColor = 'transparent';
+        }
+
 
         // Аудіо
         if (lectureData.file_type === 'audio/mpeg') {
@@ -622,23 +684,55 @@ window.handleLectureClick = async function(lectureId) {
 
             const audio = videoContainer.querySelector('audio');
             if (audio) {
-                audio.addEventListener('ended', () => completeLecture(lectureId));
+                let listenTime = 0;
+                let timer;
+        
+                audio.addEventListener('play', () => {
+                    timer = setInterval(() => {
+                        listenTime++;
+                        if (listenTime >= 15) { 
+                            clearInterval(timer);
+                            completeLecture(lectureId);
+                        }
+                    }, 1000);
+                });
+        
+                audio.addEventListener('pause', () => {
+                    clearInterval(timer);
+                });
+        
+                audio.addEventListener('seeked', () => {
+                    listenTime = 0;
+                    clearInterval(timer);
+                });
             }
         } 
         // Відео
         else if (lectureData.file_type && (lectureData.file_type.startsWith('video/') || lectureData.file_type === 'video/quicktime')) {
-            videoContainer.innerHTML = `
-                <video controls style="width: 100%; height: 100%; border-radius: 12px;">
-                    <source src="/${lectureData.file_url}" type="video/mp4">
-                    <source src="/${lectureData.file_url}" type="video/quicktime">
-                    <source src="/${lectureData.file_url}" type="video/mov">
-                </video>
-            `;
-
-            const video = videoContainer.querySelector('video');
-            if (video) {
-                video.addEventListener('ended', () => completeLecture(lectureId));
-            }
+            const videoUrl = `/${lectureData.file_url}`;
+            const videoType = 'video/mp4';  // Примусово встановлюємо тип як MP4
+            
+            console.log('Creating video player with:', videoUrl, videoType);
+            
+            const videoElement = createVideoPlayer(
+                videoUrl,
+                videoType,
+                () => completeLecture(lectureId),
+                lectureId
+            );
+        
+            // Додаємо обробники для відстеження помилок
+            videoElement.addEventListener('error', (e) => {
+                console.error('Video error:', videoElement.error);
+            });
+        
+            videoElement.addEventListener('loadstart', () => {
+                console.log('Video load started');
+            });
+        
+            videoElement.addEventListener('loadeddata', () => {
+                console.log('Video loaded successfully');
+            });
         }
         // Файли
         else if (lectureData.file_type && lectureData.file_url) {
@@ -752,12 +846,34 @@ window.completeLecture = async function(lectureId) {
             body: JSON.stringify({ userId })
         });
 
-        if (response.ok) {
-            const topic = document.querySelector(`[data-topic-id="${lectureId}"]`);
-            if (topic) {
-                topic.style.backgroundColor = '#e8f5e9';
-            }
-        }
+        if (!response.ok) throw new Error('Failed to complete lecture');
+
+        // Оновлюємо стан в пам'яті
+        COURSE_MODULES = COURSE_MODULES.map(module => {
+            const updatedLectures = module.lectures.map(lecture => 
+                lecture.id === parseInt(lectureId) 
+                    ? { ...lecture, completed: true }
+                    : lecture
+            );
+            
+            return {
+                ...module,
+                lectures: updatedLectures,
+                progress: {
+                    completed: updatedLectures.filter(l => l.completed).length,
+                    total: updatedLectures.length
+                }
+            };
+        });
+
+        // Зберігаємо ID останньої завершеної лекції
+        lastCompletedLectureId = lectureId;
+        
+        // Додаємо до множини завершених лекцій
+        completedLectures.add(lectureId.toString());
+
+        // Видаляємо оновлення прогресу модуля звідси
+
     } catch (error) {
         console.error('Error completing lecture:', error);
     }
@@ -1114,25 +1230,6 @@ function initializeTopicListeners() {
     });
  }
 
-async function completeLecture(lectureId) {
-    try {
-        const userId = localStorage.getItem('userId');
-        const response = await fetch(`/api/lecture/${lectureId}/complete`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ userId })
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to complete lecture');
-        }
-    } catch (error) {
-        console.error('Error completing lecture:', error);
-    }
-}
-
 async function updateProgress() {
     try {
         const courseId = window.location.pathname.split('/course/').pop();
@@ -1215,8 +1312,6 @@ document.addEventListener('DOMContentLoaded', () => {
         initializeCourseProgress();
     });
     loadCourseData();
-    createVideoPlayer();
     renderCourseContent();   
-    initializeModuleListeners();
-    initializeTopicListeners(); 
+    initializeModuleListeners(); 
 });
