@@ -114,7 +114,7 @@ async function toggleSaveCourse(courseId) {
 
     try {
         const endpoint = isCurrentlySaved ? 'unsave' : 'save';
-        const response = await fetch(`http://localhost:8000/api/courses/${endpoint}`, {
+        const response = await fetch(`http://localhost:8000/courses/${endpoint}`, {
             method: isCurrentlySaved ? 'DELETE' : 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -574,7 +574,7 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
         if (enrollmentStatus.isEnrolled) {
             signUpButton.textContent = 'Перейти до навчання';
             signUpButton.addEventListener('click', () => {
-                window.location.href = `/course/learn/${courseId}`;
+                window.location.href = `/course/${courseId}`;
             });
         } else {
             signUpButton.textContent = 'Sign Up';
@@ -619,7 +619,7 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
             showNotification('Ви успішно записались на курс!', 'success');
             
             setTimeout(() => {
-                window.location.href = `/course/learn/${courseId}`;
+                window.location.href = `/course/${courseId}`;
             }, 1500);
     
         } catch (error) {
