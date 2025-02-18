@@ -366,7 +366,6 @@ const createVideoPlayer = (videoUrl, videoType, onComplete, lectureId) => {
         }
     });
 
-    // Додаємо source з переданими параметрами
     const sourceElement = document.createElement('source');
     sourceElement.src = videoUrl;
     sourceElement.type = videoType;
@@ -422,11 +421,6 @@ const createVideoPlayer = (videoUrl, videoType, onComplete, lectureId) => {
         const currentTime = formatVideoTime(videoElement.currentTime);
         showNotesModal(currentTime, lectureId);
     });
-
-    // Додаємо обробник завершення відео
-    if (onComplete) {
-        videoElement.addEventListener('ended', onComplete);
-    }
 
     return videoElement;
 };
@@ -620,14 +614,12 @@ window.handleLectureClick = async function(lectureId) {
         const videoContainer = document.querySelector('.video-player');
         if (!videoContainer) return;
 
-        // Якщо є остання завершена лекція і ми переходимо на іншу - показуємо галочку
         if (lastCompletedLectureId && lastCompletedLectureId !== lectureId) {
             const lastCompletedTopic = document.querySelector(`[data-topic-id="${lastCompletedLectureId}"]`);
             if (lastCompletedTopic) {
                 lastCompletedTopic.style.backgroundColor = '#e8f5e9';
                 lastCompletedTopic.classList.add('completed');
                 
-                // Оновлюємо прогрес модуля
                 const moduleElement = lastCompletedTopic.closest('.module');
                 if (moduleElement) {
                     const moduleId = moduleElement.dataset.moduleId;
@@ -645,7 +637,6 @@ window.handleLectureClick = async function(lectureId) {
                     }
                 }
                 
-                // Оновлюємо загальний прогрес курсу в хедері
                 const totalProgress = calculateTotalProgress(COURSE_MODULES);
                 const progressBar = document.querySelector('.progress-bar span');
                 const progressText = document.querySelector('.progress-text .percent');
@@ -656,7 +647,6 @@ window.handleLectureClick = async function(lectureId) {
             }
             lastCompletedLectureId = null;
         }
-        // Оновлюємо активний стан для нової лекції
         document.querySelectorAll('.topic-item').forEach(topic => {
             topic.classList.remove('active');
         });
@@ -710,18 +700,43 @@ window.handleLectureClick = async function(lectureId) {
         // Відео
         else if (lectureData.file_type && (lectureData.file_type.startsWith('video/') || lectureData.file_type === 'video/quicktime')) {
             const videoUrl = `/${lectureData.file_url}`;
-            const videoType = 'video/mp4';  // Примусово встановлюємо тип як MP4
+            const videoType = 'video/mp4';
             
-            console.log('Creating video player with:', videoUrl, videoType);
+            function setupVideoTimeTracking(videoElement, lectureId) {
+                let watchTime = 0;
+                let timer;
+        
+                videoElement.addEventListener('play', () => {
+                    timer = setInterval(() => {
+                        watchTime++;
+                        if (watchTime >= 15) {
+                            clearInterval(timer);
+                            completeLecture(lectureId);
+                        }
+                    }, 1000);
+                });
+        
+                videoElement.addEventListener('pause', () => {
+                    clearInterval(timer);
+                });
+        
+                videoElement.addEventListener('seeked', () => {
+                    watchTime = 0;
+                    clearInterval(timer);
+                });
+            }
             
             const videoElement = createVideoPlayer(
                 videoUrl,
                 videoType,
-                () => completeLecture(lectureId),
+                null,  
                 lectureId
             );
         
-            // Додаємо обробники для відстеження помилок
+            if (videoElement) {
+                setupVideoTimeTracking(videoElement, lectureId);
+            }
+        
             videoElement.addEventListener('error', (e) => {
                 console.error('Video error:', videoElement.error);
             });
