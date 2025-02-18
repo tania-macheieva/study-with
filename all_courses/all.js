@@ -55,43 +55,48 @@ document.addEventListener("DOMContentLoaded", async function() {
     }
   
     function renderCourses() {
-      const coursesToShow = currentCourses.slice(0, displayedCourses);
-      const coursesContainer = document.querySelector(".courses");
-      coursesContainer.innerHTML = '';
-  
-      if (coursesToShow.length === 0) {
-          coursesContainer.innerHTML = '<p>Курсів не знайдено</p>';
-          return;
-      }
-  
-      coursesContainer.style.display = 'grid';
-      coursesContainer.style.gridTemplateColumns = 'repeat(3, 1fr)';
-      coursesContainer.style.gap = '40px';
-  
-      coursesToShow.forEach(course => {
-        const courseElement = document.createElement('div');
-        courseElement.className = 'course_group';
-        courseElement.style.cursor = 'pointer';
-        courseElement.innerHTML = `
+        const coursesToShow = currentCourses.slice(0, displayedCourses);
+        const coursesContainer = document.querySelector(".courses");
+        coursesContainer.innerHTML = '';
+    
+        if (coursesToShow.length === 0) {
+            coursesContainer.innerHTML = '<p>Курсів не знайдено</p>';
+            return;
+        }
+    
+        coursesContainer.style.display = 'grid';
+        coursesContainer.style.gridTemplateColumns = 'repeat(3, 1fr)';
+        coursesContainer.style.gap = '40px';
+    
+        coursesToShow.forEach(course => {
+            const courseElement = document.createElement('div');
+            courseElement.className = 'course_group';
+            courseElement.style.cursor = 'pointer';
+            
+            courseElement.innerHTML = `
             <div class="course_name">${course.name}</div>
             <div class="description">${course.description}</div>
+            <div class="course-image">
+                <img src="/uploads/${course.image_url || '/images/250x100.png'}" 
+                     alt="${course.name}" 
+                     onerror="this.src='/images/250x100.png'" />
+            </div>
             <div class="group-27">
-                <div class="price">${course.price === 0 ? 'Free' : '$' + course.price}</div>
-                <img class="arrow" src="/images/right-arrow.png" alt="Arrow Icon" />
+                <div class="price">${course.price === 0 ? 'Free' : `$${course.price}`}</div>
             </div>
         `;
-        
-        courseElement.addEventListener('click', () => {
-            window.location.href = `/course-preview?id=${course.id}`;
+            
+            courseElement.addEventListener('click', () => {
+                window.location.href = `/course-preview?id=${course.id}`;
+            });
+            
+            coursesContainer.appendChild(courseElement);
         });
-        
-        coursesContainer.appendChild(courseElement);
-    });
-  
-      const loadMoreButton = document.querySelector(".more-btn");
-      if (loadMoreButton) {
-          loadMoreButton.style.display = currentCourses.length > displayedCourses ? "block" : "none";
-      }
+    
+        const loadMoreButton = document.querySelector(".more-btn");
+        if (loadMoreButton) {
+            loadMoreButton.style.display = currentCourses.length > displayedCourses ? "block" : "none";
+        }
     }
   
     function getTranslation(key) {
