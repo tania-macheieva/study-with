@@ -162,10 +162,11 @@
       </p>
 
       <h3 data-lang="sectionEligibility">2. Право на використання</h3>
-      <p data-lang="eligibilityMsg">
+      <p data-lang="eligibilityMsg" class="student-content" hidden>
         Ви повинні бути не молодші 18 років або мати згоду батьків/опікунів для
         використання наших послуг.
       </p>
+      <p data-lang="eligibilityMsgT" class="teacher-content" hidden>Ви повинні бути не молодші 18 років для реєстрації та використання наших послуг як викладач.</p>
 
       <h3 data-lang="sectionAccounts">3. Облікові записи користувачів</h3>
       <ul>
@@ -184,13 +185,31 @@
         <li data-lang="contentPoint1">
           Контент на платформі є лише для освітніх цілей.
         </li>
-        <li data-lang="contentPoint2">
+        <li data-lang="contentPoint2" class="student-content" hidden>
           Ми не гарантуємо, що завершення курсу призведе до конкретних кар'єрних
           можливостей.
         </li>
         <li data-lang="contentPoint3">
           Інструктори зберігають авторські права на свої матеріали, але надають
           нам ліцензію на їх публікацію на нашій платформі.
+        </li>
+        <li data-lang="contentPoint4" class="teacher-content" hidden>Контент, створений вчителем, повинен бути унікальним, якісним та відповідати освітнім стандартам.
+        </li>
+        <li data-lang="contentPoint5" class="teacher-content" hidden>Заборонено завантажувати матеріали, які містять неналежний контент (мова ненависті, дискримінація, незаконний контент тощо).
+        </li>
+        <li data-lang="contentPoint6" class="teacher-content" hidden>Контент повинен відповідати темі курсу та бути орієнтованим на учнів.
+        </li>
+      </ul>
+
+      <h3 data-lang="sectionMoney" class="teacher-content" hidden>Монетизація та виплати</h3>
+      <ul>
+        <li data-lang="li1" class="teacher-content" hidden>
+          Вчителі отримують частку від продажів курсів відповідно до політики платформи.
+        </li>
+        <li data-lang="li2" class="teacher-content" hidden>
+          Вчителі отримують 70% від виручки від продажу курсів, а 30% утримуються платформою як комісія за надання доступу до сервісу та інші послуги.
+        </li>
+        <li data-lang="li3" class="teacher-content" hidden>
         </li>
       </ul>
 
@@ -208,13 +227,19 @@
 
       <h3 data-lang="sectionIp">6. Інтелектуальна власність</h3>
       <ul>
-        <li data-lang="ipPoint1">
+        <li data-lang="ipPoint1" class="student-content" hidden>
           Всі матеріали на платформі, включаючи тексти, зображення та відео,
           захищені авторським правом.
         </li>
-        <li data-lang="ipPoint2">
+        <li data-lang="ipPoint2" class="student-content" hidden>
           Ви не маєте права відтворювати, розповсюджувати чи ділитися контентом
           без явного дозволу.
+        </li>
+        <li data-lang="ipPoint3" class="teacher-content" hidden>Вчитель залишається власником авторських прав на створений контент.
+        </li>
+        <li data-lang="ipPoint4" class="teacher-content" hidden>Платформа отримує ліцензію на публікацію, поширення та просування цього контенту.
+        </li>
+        <li data-lang="ipPoint5" class="teacher-content" hidden>Заборонено завантажувати контент, права на який належать третім особам, без їхньої згоди.
         </li>
       </ul>
 
@@ -224,10 +249,14 @@
           Ви погоджуєтесь не використовувати платформу для незаконних або
           несанкціонованих цілей.
         </li>
-        <li data-lang="conductPoint2">
+        <li data-lang="conductPoint2" class="student-content" hidden>
           Насильство, мова ненависті або неприпустима поведінка щодо
           інструкторів, співробітників чи інших користувачів призведе до
           припинення облікового запису.
+        </li>
+        <li data-lang="conductPoint3" class="teacher-content" hidden>Вчителі зобов'язуються дотримуватися професійної етики у спілкуванні з учнями та іншими користувачами.
+        </li>
+        <li data-lang="conductPoint4" class="teacher-content" hidden>У разі скарг від учнів або інших користувачів платформа залишає за собою право призупинити обліковий запис.
         </li>
       </ul>
 
@@ -243,12 +272,15 @@
         час. Продовження використання платформи після оновлення означає вашу
         згоду з оновленими умовами.
       </p>
-
+      <p data-lang="modificationsMsg1" class="teacher-content" hidden>
+      Вчитель повинен періодично переглядати Умови та погоджуватися з оновленнями, щоб продовжувати користуватися платформою.
+    </p>
       <h3 data-lang="sectionTermination">10. Припинення</h3>
       <p data-lang="terminationMsg">
         Ми залишаємо за собою право призупинити або припинити ваш акаунт за
         порушення цих Умов та Положень.
       </p>
+      <p data-lang="terminationMsg1" class="teacher-content" hidden>Вчитель може припинити використання платформи в будь-який момент, повідомивши адміністрацію.</p>
 
       <h3 data-lang="sectionDisclaimer">11. Відмова від відповідальності</h3>
       <p data-lang="disclaimerMsg">
@@ -270,11 +302,12 @@
           >
         </p>
         <p>
-          <strong data-lang="lastUpdated">Останнє оновлення:</strong> 03.12.2024
+          <strong data-lang="lastUpdated">Останнє оновлення:</strong> 21.02.2025
         </p>
       </div>
     </main>
     <script src="/terms-cond/lang.js"></script>
     <script src="../footer/footer.js"></script>
+    <script src="/terms-cond/teacherview.js"></script>
   </body>
 </html>
