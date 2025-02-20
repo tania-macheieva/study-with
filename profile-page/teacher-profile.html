@@ -494,7 +494,7 @@
                 </div>
                 <div class="input-group">
                     <label>Stripe Account ID:</label>
-                    <input id="profile-stripe-account" type="text" placeholder="Enter your Stripe account ID" readonly>
+                    <input id="profile-stripe-account" type="text" placeholder="Enter your Stripe account ID" >
                 </div>
                 <button data-lang="saveChanges">Save changes</button>
             `,
@@ -541,20 +541,20 @@
         <button  data-lang="openAccount" id="open-account-btn" style="background-color: #4CAF50; color: white;">Open Account</button>
     `
     };
-        // Функція для форматування дати
-        function formatDate(dateString) {
-            if (!dateString) return '';
-            try {
-                const date = new Date(dateString);
-                return date.toISOString().split('T')[0];
-            } catch (error) {
-                console.error('Помилка форматування дати:', error);
-                return '';
+            // Функція для форматування дати
+            function formatDate(dateString) {
+                if (!dateString) return '';
+                try {
+                    const date = new Date(dateString);
+                    return date.toISOString().split('T')[0];
+                } catch (error) {
+                    console.error('Помилка форматування дати:', error);
+                    return '';
+                }
             }
-        }
 
-        // Головна функція для заповнення форми профілю
-        async function populateProfileForm(userId) {
+            // Головна функція для заповнення форми профілю
+            async function populateProfileForm(userId) {
             try {
                 const response = await fetch(`http://localhost:8000/auth/profile/teacher/${userId}`);
                 if (!response.ok) {
@@ -598,8 +598,8 @@
             }
         }
 
-        // Функція для збереження даних форми
-        async function saveProfileData(event) {
+           // Функція для збереження даних форми
+            async function saveProfileData(event) {
             event.preventDefault();
 
             const userId = localStorage.getItem('userId');
@@ -623,7 +623,9 @@
                 about: document.getElementById('profile-about').value.trim(),
                 education: document.getElementById('profile-education').value.trim(),
                 hobbies: document.getElementById('profile-hobbies').value.trim(),
-                language: document.getElementById('profile-language').value.trim()
+                language: document.getElementById('profile-language').value.trim(),
+                author_stripe_account: document.getElementById('profile-stripe-account').value.trim()
+
             };
 
             try {
@@ -651,23 +653,23 @@
                 console.error('Помилка оновлення профілю:', error);
                 alert('Виникла помилка при оновленні профілю: ' + error.message);
             }
-        }
+            }
 
-        // Ініціалізація обробників подій
-        function initializeProfileHandlers() {
-            document.addEventListener('DOMContentLoaded', () => {
-                const userId = localStorage.getItem('userId');
-                if (userId) {
-                    populateProfileForm(userId);
-                }
+            // Ініціалізація обробників подій
+            function initializeProfileHandlers() {
+                document.addEventListener('DOMContentLoaded', () => {
+                    const userId = localStorage.getItem('userId');
+                    if (userId) {
+                        populateProfileForm(userId);
+                    }
 
-                // Додаємо обробник для кнопки збереження
-                const saveButton = document.querySelector('button[data-lang="saveChanges"]');
-                if (saveButton) {
-                    saveButton.addEventListener('click', saveProfileData);
-                }
-            });
-        }
+                    // Додаємо обробник для кнопки збереження
+                    const saveButton = document.querySelector('button[data-lang="saveChanges"]');
+                    if (saveButton) {
+                        saveButton.addEventListener('click', saveProfileData);
+                    }
+                });
+            }
 
             // Add event listener for profile tab click
             const profileTab = document.querySelector('.tab-link[data-tab="profile"]');
@@ -740,7 +742,9 @@
                         about: getInputValue('input[placeholder="Write some information about yourself"]'),
                         education: getInputValue('input[placeholder="Write about your education"]'),
                         hobbies: getInputValue('input[placeholder="Write about your hobbies and interests."]'),
-                        language: getInputValue('input[placeholder="Write what languages ​​you speak"]')
+                        language: getInputValue('input[placeholder="Write what languages ​​you speak"]'),
+                        author_stripe_account: document.getElementById('profile-stripe-account').value.trim()
+
                     };
 
                     const userId = localStorage.getItem('userId');
