@@ -49,6 +49,7 @@ const translations = {
         openAccount: 'Open Account',
         noCourses: 'You haven\'t enrolled in any courses yet.',
         btnShowLess: 'Show less',
+        noLinkedCourses: "You have no saved courses yet"
     },
     ua: {
         pageTitle: 'Study With | Профіль',
@@ -100,6 +101,7 @@ const translations = {
         openAccount: 'Відкрити акаунт',
         noCourses: 'Ви ще не записались на жодний курс.',
         btnShowLess: 'Показати менше',
+        noLinkedCourses: 'У вас ще немає збережених курсів'
     }
 };
 
@@ -274,7 +276,7 @@ async function loadSavedBookmarks() {
         if (!bookmarksList) return;
 
         if (courses.length === 0) {
-            bookmarksList.innerHTML = `<p class="no-courses">У вас ще немає збережених курсів</p>`;
+            bookmarksList.innerHTML = `<p class="no-courses">${translations[localStorage.getItem('language') || 'en'].noLinkedCourses}</p>`;
             manageViewAllButton('btn-view-all-4', 0);
             return;
         }
