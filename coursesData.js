@@ -1,4 +1,4 @@
-const coursesData = [
+/*const coursesData = [
     { name: "Programming 101", description: "Intro to programming", price: 99, themes: ["Programming"], level: "level-basic", popularity: 120 },
     { name: "Advanced Design", description: "Learn advanced design techniques", price: 199, themes: ["Design"], level: "level-intermediate", popularity: 85 },
     { name: "Marketing Mastery", description: "Master marketing skills", price: 149, themes: ["Marketing"], level: "level-advanced", popularity: 95 },
@@ -46,4 +46,4 @@ const coursesData = [
     { name: "Cybersecurity Basics", description: "Introduction to cybersecurity", price: 199, themes: ["Programming"], level: "level-basic", popularity: 235 }
 ];
 
-module.exports = coursesData;
+module.exports = coursesData;*/

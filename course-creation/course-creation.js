@@ -241,11 +241,27 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   
   const createGeneralTestBtn = document.getElementById("create-general-test-btn");
-
-    // Додаємо обробник події для переходу на сторінку створення загального тесту
-    createGeneralTestBtn.addEventListener("click", () => {
-        window.location.href = "/test-creation?general=true";
-    });
+  const modal = document.getElementById("testModal");
+  const closeModal = document.querySelector(".close");
+  const iframe = document.getElementById("modalIframe");
+   // Обробник кліку для відкриття модального вікна
+createGeneralTestBtn.addEventListener("click", (event) => {
+  event.preventDefault(); 
+  iframe.src = "/test-creation?general=true"; 
+  modal.style.display = "block"; 
+});
+// Закриття при кліку поза модальним вікном
+window.addEventListener("click", (event) => {
+  if (event.target === modal) {
+      modal.style.display = "none";
+      iframe.src = "";
+  }
+});
+// Обробник кліку для закриття вікна
+closeModal.addEventListener("click", () => {
+  modal.style.display = "none";
+  iframe.src = ""; // Очищаємо iframe, щоб уникнути проблем з кешуванням
+});
   const addGeneralTestBtn = document.getElementById("add-general-test-btn");
   addGeneralTestBtn.addEventListener("click", () => {
     if (!document.querySelector(".gener-test-link-input")) {
@@ -295,12 +311,18 @@ document.addEventListener('DOMContentLoaded', () => {
         updateModuleNumbers();
       }
     });
-    moduleDiv.querySelector(".create-test-btn").addEventListener("click", () => {
+    const modal = document.getElementById("testModal");
+    const closeModal = document.querySelector(".close");
+    const iframe = document.getElementById("modalIframe");
+
+    moduleDiv.querySelector(".create-test-btn").addEventListener("click",(event) => {
+      event.preventDefault(); // Відміняємо стандартний перехід
       const moduleTitle = moduleDiv.querySelector("input").value.trim();
       if (moduleTitle) {
-          window.location.href = `/test-creation?module=${encodeURIComponent(moduleTitle)}`;
+        iframe.src = `/test-creation?module=${encodeURIComponent(moduleTitle)}`; // Завантажуємо сторінку у вікно
+        modal.style.display = "block"; // Показуємо модальне вікно
       } else {
-          alert("Please enter a module title before creating a test.");
+        alert("Please enter a module title before creating a test.");
       }
     });
     moduleDiv.querySelector(".add-test-btn").addEventListener("click", () => {
