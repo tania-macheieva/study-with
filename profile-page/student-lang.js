@@ -245,6 +245,15 @@ async function loadEnrolledCourses() {
             </div>
         `).join('');
 
+        document.querySelectorAll('.btn-resume').forEach(button => {
+            button.addEventListener('click', function() {
+                const courseId = this.getAttribute('data-course-id');
+                if (courseId) {
+                    window.location.href = `/course/${courseId}`;
+                }
+            });
+        });
+
         manageViewAllButton('btn-view-all-1', courses.length);
         initializeViewAllButtons(); // Reinitialize button listeners after content load
 

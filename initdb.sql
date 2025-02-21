@@ -7,10 +7,13 @@ CREATE TABLE users (
   phone_number VARCHAR(30),
   role VARCHAR(50) CHECK (role IN ('student', 'teacher')) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  profile_image VARCHAR(255),
+  profile_image VARCHAR(255) DEFAULT '/images/user-avatar.png',
   is_verified BOOLEAN DEFAULT FALSE,
   is_private BOOLEAN DEFAULT FALSE
 );
+-- ADD COLUMN profile_image VARCHAR(255) DEFAULT '/images/user-avatar.png';
+
+
 
 -- Створення таблиці викладачів
 CREATE TABLE teachers (
@@ -31,8 +34,13 @@ CREATE TABLE teachers (
     hobbies TEXT,
     language TEXT,
     certificates BYTEA,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    author_stripe_account VARCHAR(255)
 );
+
+-- UPDATE teachers
+-- SET author_stripe_account = 'acct_1QbnQ7GXqLYAoPtN'
+-- WHERE id = 1;
 
 -- Створення таблиці студентів
 CREATE TABLE students (
@@ -42,8 +50,17 @@ CREATE TABLE students (
     date_of_birth DATE,
     phone_number VARCHAR(30),
     additional_info TEXT,
+    profile_image VARCHAR(255) DEFAULT '/images/user-avatar.png',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- -- якщо вже стовпець є і треба змінити
+-- ALTER TABLE students
+-- ALTER COLUMN profile_image SET DEFAULT '/images/user-avatar.png';
+
+-- UPDATE students
+-- SET profile_image = '/images/user-avatar.png'
+-- WHERE id = 1;
+
 
 -- Створення таблиці категорій
 CREATE TABLE categories (
@@ -51,12 +68,36 @@ CREATE TABLE categories (
     name VARCHAR(50) UNIQUE NOT NULL
 );
 
+INSERT INTO categories (id, name) VALUES
+(1, 'Programming'),
+(2, 'Design'),
+(3, 'Marketing'),
+(4, 'Business'),
+(5, 'Languages'),
+(6, 'Finance'),
+(7, 'Personal Development'),
+(8, 'Art'),
+(9, 'Psychology'),
+(10, 'Health'),
+(11, 'Cooking'),
+(12, 'Science'),
+(13, 'Game Development'),
+(14, 'Childcare');
+
 -- Створення таблиці рівнів освіти
 CREATE TABLE education_levels (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) UNIQUE NOT NULL,
     description TEXT
 );
+
+
+INSERT INTO education_levels (id, name, description) VALUES
+(1, 'No level', 'No specific education level'),
+(2, 'Basic level', 'Basic understanding of the subject'),
+(3, 'Intermediate level', 'Intermediate knowledge and skills in the subject'),
+(4, 'Advanced level', 'Advanced expertise in the subject');
+
 
 -- Створення таблиці курсів
 CREATE TABLE all_courses (
@@ -72,6 +113,7 @@ CREATE TABLE all_courses (
     test_link VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    author_stripe_account VARCHAR(255),
     CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
     CONSTRAINT fk_education_level FOREIGN KEY (education_level_id) REFERENCES education_levels(id) ON DELETE SET NULL
@@ -137,28 +179,6 @@ CREATE TABLE lecture_files (
     CONSTRAINT fk_lecture FOREIGN KEY (lecture_id) REFERENCES lectures(id) ON DELETE CASCADE
 );
 
-INSERT INTO categories (id, name) VALUES
-(1, 'Programming'),
-(2, 'Design'),
-(3, 'Marketing'),
-(4, 'Business'),
-(5, 'Languages'),
-(6, 'Finance'),
-(7, 'Personal Development'),
-(8, 'Art'),
-(9, 'Psychology'),
-(10, 'Health'),
-(11, 'Cooking'),
-(12, 'Science'),
-(13, 'Game Development'),
-(14, 'Childcare');
-
-INSERT INTO education_levels (id, name, description) VALUES
-(1, 'No level', 'No specific education level'),
-(2, 'Basic level', 'Basic understanding of the subject'),
-(3, 'Intermediate level', 'Intermediate knowledge and skills in the subject'),
-(4, 'Advanced level', 'Advanced expertise in the subject');
-
 
 -- таблиця з відгуками 
 CREATE TABLE teacher_reviews (
@@ -170,11 +190,6 @@ CREATE TABLE teacher_reviews (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
-ALTER TABLE teachers ADD COLUMN author_stripe_account VARCHAR(255);
-UPDATE teachers
-SET author_stripe_account = 'acct_1QbnQ7GXqLYAoPtN'
-WHERE id = 1;
 
 CREATE TABLE tests (
   id SERIAL PRIMARY KEY,
@@ -217,9 +232,6 @@ CREATE TABLE enrollments (
     UNIQUE(user_id, course_id)
 );
 
--- колонка для  stripe акаунту
-ALTER TABLE all_courses ADD COLUMN author_stripe_account VARCHAR(255);
-
 CREATE TABLE lecture_progress (
     id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -242,33 +254,14 @@ CREATE TABLE payments (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- якщо вже стовпець є і треба змінити
-ALTER TABLE students
-
-ALTER COLUMN profile_image SET DEFAULT '/images/user-avatar.png';
-
-UPDATE students
-SET profile_image = '/images/user-avatar.png'
-WHERE id = 1;
-
-CREATE TABLE comments (
-    id SERIAL PRIMARY KEY,
-    course_id INT NOT NULL,
-    user_id INT NOT NULL,
-    parent_comment_id INT, -- Якщо це відповідь на коментар, інакше NULL
-    content TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_course FOREIGN KEY (course_id) REFERENCES all_courses(id) ON DELETE CASCADE,
-    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT fk_parent_comment FOREIGN KEY (parent_comment_id) REFERENCES comments(id) ON DELETE CASCADE
-);
-ADD COLUMN profile_image VARCHAR(255) DEFAULT '/images/user-avatar.png';
-
--- якщо вже стовпець і треба змінити
-ALTER TABLE students
-ALTER COLUMN profile_image SET DEFAULT '/images/user-avatar.png';
-
-UPDATE students
-SET profile_image = '/images/user-avatar.png'
-WHERE id = 1;
-
+-- CREATE TABLE comments (
+--     id SERIAL PRIMARY KEY,
+--     course_id INT NOT NULL,
+--     user_id INT NOT NULL,
+--     parent_comment_id INT, -- Якщо це відповідь на коментар, інакше NULL
+--     content TEXT NOT NULL,
+--     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--     CONSTRAINT fk_course FOREIGN KEY (course_id) REFERENCES all_courses(id) ON DELETE CASCADE,
+--     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+--     CONSTRAINT fk_parent_comment FOREIGN KEY (parent_comment_id) REFERENCES comments(id) ON DELETE CASCADE
+-- );
