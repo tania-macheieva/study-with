@@ -4,7 +4,10 @@ const pool = require('./db');
 const multer = require('multer');
 const storage = require('./course-creation/storage-config');
  
-const upload = multer({ storage }).any();
+const upload = multer({ storage }).fields([
+  { name: 'course_thumbnail', maxCount: 1 },
+  { name: 'lecture_files' }, 
+]);  
   
   router.post('/save-draft', upload, async (req, res) => {  
     const {
@@ -29,10 +32,10 @@ const upload = multer({ storage }).any();
     if (isNaN(parsedEducationLevel)) parsedEducationLevel = null;
   
     const courseThumbnail =
-      req.files && req.files['course_thumbnail'] && req.files['course_thumbnail'][0]
-        ? req.files['course_thumbnail'][0].filename
-        : null;
-  
+    req.files && req.files['course_thumbnail'] && req.files['course_thumbnail'][0]
+      ? req.files['course_thumbnail'][0].filename
+      : null;
+    
     if (!author_id) {
       return res.status(400).json({ success: false, message: 'Author ID is required!' });
     }

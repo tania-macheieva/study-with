@@ -161,7 +161,9 @@ app.use('/api', courseViewRouter);
 app.get('/course/:courseId', (req, res) => {
     res.sendFile(path.join(__dirname, 'course-view/course-view.html'));
 });
-
+app.get('/course/:courseId/comments', (req, res) => {
+    res.sendFile(path.join(__dirname, 'course-view/course-view.html'));
+});
 
 const HOST = process.env.HOST || "localhost";
 const PORT = process.env.PORT || 8000;

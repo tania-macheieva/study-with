@@ -1,5 +1,5 @@
 
-let DISCUSSION_MESSAGES = [
+const DISCUSSION_MESSAGES = [
     
 ]
 const getCourseIdFromUrl = () => {
@@ -14,17 +14,26 @@ const getCourseIdFromUrl = () => {
      else {
     loadComments();
 }}
-const fetchDiscussionMessages = async (courseId) => {
+const fetchDiscussionMessages = async () => {
     try {
-        const response = await fetch(`/api/course/${courseId}/comments`);
+        const courseId = window.location.pathname.split('/course/').pop(); 
+        const response = await fetch(`/course/${courseId}`);
+
         
+        // Перевірка на помилки HTTP
         if (!response.ok) {
-            console.error('Response error:', response.statusText); // Log the error details
-            throw new Error(`Failed to fetch comments for course ${courseId}`);
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-        // Save the fetched messages to the DISCUSSION_MESSAGES array
-        DISCUSSION_MESSAGES = await response.json();
+        const contentType = response.headers.get('Content-Type');
+        console.log('Content-Type:', contentType);  // Лог для відлагодження
+
+        // Перевірка на правильний тип відповіді
+        if (contentType && contentType.includes('application/json')) {
+            const rawResponse = await response.json();  // Отримуємо JSON
+            DISCUSSION_MESSAGES = rawResponse;
+            console.log('Fetched messages:', DISCUSSION_MESSAGES);  // Лог для перегляду отриманих повідомлень
+        }  
     } catch (error) {
         console.error('Error fetching discussion messages:', error);
     }
@@ -92,7 +101,7 @@ const createMessageHTML = (message, isReply = false, replyLevel = 0) => {
 
     messageElement.innerHTML = `
         <div class="user-info">
-            <img src="${message.user.avatar}" alt="User avatar" class="avatar">
+            <img src="${message.user.profile_image}" alt="User avatar" class="avatar">
             <span class="username">${message.user.name}</span>
             <span class="date">${message.date}</span>
         </div>
@@ -108,35 +117,48 @@ const createMessageHTML = (message, isReply = false, replyLevel = 0) => {
     return messageElement;
 };
 
-
+const renderDiscussion = () => {
+    if (Array.isArray(DISCUSSION_MESSAGES)) {
+        DISCUSSION_MESSAGES.forEach(message => {
+            const existingMessageElement = discussionThread.querySelector(`.message[data-message-id="${message.id}"]`);
+            if (existingMessageElement) {
+                existingMessageElement.innerHTML = createMessageHTML(message).innerHTML;
+            } else {
+                const messageElement = createMessageHTML(message);
+                discussionThread.appendChild(messageElement);
+            }
+        });
+    }
+    
+};
 const handleReply = async (messageId, replyText) => {
     const parentMessage = document.querySelector(`.message[data-message-id="${messageId}"]`);
     if (!parentMessage) return;
 
-    const parentUserName = parentMessage.querySelector('.username').textContent;
-
     const replyMessage = {
-        userId: currentUser.id, 
-        parentId: messageId, 
-        replyTo: parentUserName, 
-        text: replyText,
-        date: new Date().toISOString()
+        userId: currentUser.id,  // Current user
+        parentId: messageId,  // Parent comment id
+        replyTo: parentMessage.querySelector('.username').textContent,  // Reply target username
+        text: replyText,  // The reply text
+        date: new Date().toISOString()  // Current time
     };
 
     try {
-        const response = await fetch('http://localhost:8000/comments/reply', {
+        const response = await fetch('http://localhost:8000/api/comments/reply', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(replyMessage)
         });
 
-        if (!response.ok) throw new Error('Не вдалося надіслати відповідь');
-
-        const savedReply = await response.json();
-        parentMessage.replies.push(savedReply);
-        renderDiscussion();
+        if (response.ok) {
+            const savedReply = await response.json();
+            parentMessage.replies.push(savedReply);  // Add to the parent's replies
+            renderDiscussion();  // Re-render the thread
+        } else {
+            throw new Error('Failed to send reply');
+        }
     } catch (error) {
-        console.error('Помилка при відправці відповіді:', error);
+        console.error('Error while sending reply:', error);
     }
 };
 
@@ -323,11 +345,11 @@ const addNewReply = async (parentId, replyText) => {
     };
 
     try {
-        const response = await fetch('http://localhost:8000/comments/reply', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(replyMessage)
-        });
+        // const response = await fetch('http://localhost:8000/comments/reply', {
+        //     method: 'POST',
+        //     headers: { 'Content-Type': 'application/json' },
+        //     body: JSON.stringify(replyMessage)
+        // });
 
         const savedReply = await response.json();  
         parentMessage.replies.push(savedReply);  
@@ -361,24 +383,7 @@ const findMessageById = (id, messages = DISCUSSION_MESSAGES) => {
     return null;
 };
 
-const renderDiscussion = () => {
-    const discussionThread = document.querySelector('.discussion-thread');
-    if (discussionThread) {
-        // Оновлюємо тільки нові елементи
-        DISCUSSION_MESSAGES.forEach(message => {
-            const existingMessageElement = discussionThread.querySelector(`.message[data-message-id="${message.id}"]`);
-            if (existingMessageElement) {
-                // Якщо повідомлення вже є на сторінці, оновлюємо його
-                existingMessageElement.innerHTML = createMessageHTML(message).innerHTML;
-            } else {
-                // Якщо повідомлення нове, додаємо його
-                const messageElement = createMessageHTML(message);
-                discussionThread.appendChild(messageElement);
-            }
-        });
-        updateMessageStyles();  // Оновлюємо стилі для нових/змінених повідомлень
-    }
-};
+
 
 
 const initializeFilters = () => {
@@ -585,190 +590,202 @@ const restoreFilters = (filters) => {
 };
 
 const discussionThread = document.querySelector('.discussion-thread');
-function renderDiscussionMessages() {
-    discussionThread.innerHTML = '';  // Clear existing messages
+
+// Функція для рендерингу коментарів
+const renderDiscussionMessages = () => {
+    const discussionThread = document.querySelector('.discussion-thread');
+    discussionThread.innerHTML = '';  // Очищаємо лише контент повідомлень
     DISCUSSION_MESSAGES.forEach(message => {
-      const messageElement = createMessageHTML(message);  // Assuming this function creates HTML for each message
-      discussionThread.appendChild(messageElement);
+        const messageElement = createMessageHTML(message);
+        discussionThread.appendChild(messageElement);  // Додаємо нове повідомлення
     });
-    updateMessageStyles(); // Ensure styling is updated after rendering
-  }
-  
-const userId = localStorage.getItem('userId'); 
+    updateMessageStyles();  // Оновлюємо стилі після рендерингу
+};
+
+const userId = localStorage.getItem('userId');
+
 const initializeDiscussionListeners = () => {
     const sendButton = document.querySelector('.send');
     const messageInput = document.querySelector('.search-bar input');
     const discussionThread = document.querySelector('.discussion-thread');
 
-    // Перевіряємо, чи є елементи на сторінці
-    if (sendButton && messageInput && discussionThread) {
-        // Відправка нового основного повідомлення
-        sendButton.addEventListener('click', async () => {
-            const messageText = messageInput.value.trim();
-        
-            if (!messageText) return; // Prevent empty messages
-        
-            const newMessage = {
-                user_id: userId,  // Use the user ID
-                text: messageText,
-                parent_id: null,  // Main message, not a reply
-            };
-        
-            try {
-                const response = await fetch('/api/comments', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newMessage),
-                });
-        
-                if (!response.ok) throw new Error('Failed to send message');
-        
-                const savedMessage = await response.json();
-                DISCUSSION_MESSAGES.push(savedMessage); // Add the new message to the array
-                renderDiscussionMessages();  // Re-render the messages
-                messageInput.value = '';  // Clear input field
-            } catch (error) {
-                console.error('Error sending message:', error);
-            }
-        });
-        
-        
-        // Додаємо існуючі повідомлення в обговорення
-        discussionThread.innerHTML = '';
-        DISCUSSION_MESSAGES.forEach(message => {
-            const messageElement = createMessageHTML(message);
-            discussionThread.appendChild(messageElement);
-        });
-
-        // Ініціалізуємо інші слухачі подій (для кнопок опцій та відповіді)
-        document.addEventListener('click', function(e) {
-            const moreOptions = e.target.closest('.more-options');
-            if (moreOptions) {
-                const message = moreOptions.closest('.message');
-                const messageId = message.dataset.messageId;
-                const username = message.querySelector('.username').textContent;
-                const isReply = message.classList.contains('reply');
-                const existingMenu = document.querySelector('.options-menu');
-                if (existingMenu) {
-                    existingMenu.remove();
-                }
-                const optionsMenu = document.createElement('div');
-                optionsMenu.className = 'options-menu';
-
-                const menuOptions = isReply ? [
-                    { action: 'add-reply', text: 'Write a reply' },
-                    { action: 'follow', text: 'Follow replies' },
-                    { action: 'report', text: 'Report message' }
-                ] : [
-                    { action: 'show-replies', text: 'Show/Hide replies' },
-                    { action: 'add-reply', text: 'Write a reply' },
-                    { action: 'follow', text: 'Follow replies' },
-                    { action: 'report', text: 'Report message' }
-                ];
-                optionsMenu.innerHTML = menuOptions
-                    .map(option => `<div class="option" data-action="${option.action}">${option.text}</div>`)
-                    .join('');
-                Object.assign(optionsMenu.style, {
-                    position: 'absolute',
-                    right: '40px',
-                    top: '40px',
-                    background: '#FFFFFF',
-                    border: '2px solid #C7C7C7',
-                    borderRadius: '12px',
-                    padding: '10px',
-                    zIndex: '1000'
-                });
-                optionsMenu.querySelectorAll('.option').forEach(option => {
-                    Object.assign(option.style, {
-                        padding: '8px 16px',
-                        cursor: 'pointer',
-                        fontSize: '14px'
-                    });
-                    option.addEventListener('mouseenter', () => {
-                        option.style.background = '#F5F9FE';
-                    });
-                    option.addEventListener('mouseleave', () => {
-                        option.style.background = 'transparent';
-                    });
-                });
-                message.appendChild(optionsMenu);
-                optionsMenu.addEventListener('click', function(e) {
-                    const action = e.target.dataset.action;
-                    if (action === 'show-replies') {
-                        const areRepliesVisible = document.querySelector(`.message.reply[data-parent-id="${messageId}"]`) !== null;
-                        toggleReplies(messageId, !areRepliesVisible);
-                    } else if (action === 'add-reply') {
-                        const replyInput = message.querySelector('.reply-input');
-                        document.querySelectorAll('.reply-input').forEach(input => {
-                            if (input !== replyInput) {
-                                input.style.display = 'none';
-                            }
-                        });
-                        replyInput.style.display = replyInput.style.display === 'none' ? 'flex' : 'none';
-
-                        if (replyInput.style.display === 'flex') {
-                            const input = replyInput.querySelector('input');
-                            input.focus();
-                            input.placeholder = `написати відповідь до ${username}`;
-                        }
-                    }
-                    optionsMenu.remove();
-                });
-
-                document.addEventListener('click', function closeMenu(e) {
-                    if (!optionsMenu.contains(e.target) && !moreOptions.contains(e.target)) {
-                        optionsMenu.remove();
-                        document.removeEventListener('click', closeMenu);
-                    }
-                });
-            }
-        });
-
-        // Слухач для кнопки відповіді
-        discussionThread.addEventListener('click', function(e) {
-            const sendReplyButton = e.target.closest('.send-reply');
-            if (sendReplyButton) {
-                const replyInput = sendReplyButton.previousElementSibling;
-                const text = replyInput.value.trim();
-                const parentId = sendReplyButton.dataset.parentId; 
-                if (text && parentId) {
-                    addNewReply(parentId, text);
-                    replyInput.value = '';
-                    replyInput.closest('.reply-input').style.display = 'none';
-                }
-            }
-        });
-        updateMessageStyles();
+    if (!sendButton || !messageInput || !discussionThread) {
+        console.error('Required elements not found on the page.');
+        return;
     }
-};
 
+    // Перевірка, чи є користувач
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+        alert('User is not logged in.');
+        return;
+    } 
+    const courseId = window.location.pathname.split('/course/').pop();
+
+    sendButton.addEventListener('click', async () => {
+        const messageText = messageInput.value.trim();
+        if (!messageText) return;  // Перевірка на порожній текст
+
+        
+        const newMessage = {
+            courseId: courseId,          
+            userId: userId,                 
+            parentCommentId: null,        
+            content: messageText,        
+        };
+
+        try {
+            const response = await fetch('http://localhost:8000/api/comments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newMessage),
+            });
+            
+            if (response.ok) {
+                const savedMessage = await response.json();
+                DISCUSSION_MESSAGES.push(savedMessage);  // Add to your local state
+                renderDiscussion();  // Re-render discussion with new message
+            } else {
+                throw new Error('Failed to send the message.');
+            }
+            const savedMessage = await response.json();
+            DISCUSSION_MESSAGES.push(savedMessage);  // Додаємо нове повідомлення до масиву
+            const messageElement = createMessageHTML(savedMessage);  // Створюємо HTML для нового повідомлення
+            discussionThread.appendChild(messageElement);  // Додаємо нове повідомлення до DOM
+            messageInput.value = '';  // Очищаємо поле вводу
+        } catch (error) {
+            console.error('Error sending message:', error);
+            alert('Error sending message. Please try again later.');
+        }
+    });
+
+    // Відображаємо існуючі повідомлення
+    DISCUSSION_MESSAGES.forEach(message => {
+        const messageElement = createMessageHTML(message);
+        discussionThread.appendChild(messageElement);
+    });
+};
+    // Ініціалізуємо інші слухачі подій (для кнопок опцій та відповіді)
+    document.addEventListener('click', function(e) {
+        const moreOptions = e.target.closest('.more-options');
+        if (moreOptions) {
+            const message = moreOptions.closest('.message');
+            const messageId = message.dataset.messageId;
+            const username = message.querySelector('.username').textContent;
+            const isReply = message.classList.contains('reply');
+            const existingMenu = document.querySelector('.options-menu');
+            if (existingMenu) {
+                existingMenu.remove();
+            }
+            const optionsMenu = document.createElement('div');
+            optionsMenu.className = 'options-menu';
+
+            const menuOptions = isReply ? [
+                { action: 'add-reply', text: 'Write a reply' },
+                { action: 'follow', text: 'Follow replies' },
+                { action: 'report', text: 'Report message' }
+            ] : [
+                { action: 'show-replies', text: 'Show/Hide replies' },
+                { action: 'add-reply', text: 'Write a reply' },
+                { action: 'follow', text: 'Follow replies' },
+                { action: 'report', text: 'Report message' }
+            ];
+            optionsMenu.innerHTML = menuOptions
+                .map(option => `<div class="option" data-action="${option.action}">${option.text}</div>`)
+                .join('');
+            Object.assign(optionsMenu.style, {
+                position: 'absolute',
+                right: '40px',
+                top: '40px',
+                background: '#FFFFFF',
+                border: '2px solid #C7C7C7',
+                borderRadius: '12px',
+                padding: '10px',
+                zIndex: '1000'
+            });
+            optionsMenu.querySelectorAll('.option').forEach(option => {
+                Object.assign(option.style, {
+                    padding: '8px 16px',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                });
+                option.addEventListener('mouseenter', () => {
+                    option.style.background = '#F5F9FE';
+                });
+                option.addEventListener('mouseleave', () => {
+                    option.style.background = 'transparent';
+                });
+            });
+            message.appendChild(optionsMenu);
+            optionsMenu.addEventListener('click', function(e) {
+                const action = e.target.dataset.action;
+                if (action === 'show-replies') {
+                    const areRepliesVisible = document.querySelector(`.message.reply[data-parent-id="${messageId}"]`) !== null;
+                    toggleReplies(messageId, !areRepliesVisible);
+                } else if (action === 'add-reply') {
+                    const replyInput = message.querySelector('.reply-input');
+                    document.querySelectorAll('.reply-input').forEach(input => {
+                        if (input !== replyInput) {
+                            input.style.display = 'none';
+                        }
+                    });
+                    replyInput.style.display = replyInput.style.display === 'none' ? 'flex' : 'none';
+
+                    if (replyInput.style.display === 'flex') {
+                        const input = replyInput.querySelector('input');
+                        input.focus();
+                        input.placeholder = `написати відповідь до ${username}`;
+                    }
+                }
+                optionsMenu.remove();
+            });
+
+            document.addEventListener('click', function closeMenu(e) {
+                if (!optionsMenu.contains(e.target) && !moreOptions.contains(e.target)) {
+                    optionsMenu.remove();
+                    document.removeEventListener('click', closeMenu);
+                }
+            });
+        }
+    });
+
+    discussionThread.addEventListener('click', function(e){
+        const sendReplyButton = e.target.closest('.send-reply');
+        if (sendReplyButton) {
+            const replyInput = sendReplyButton.previousElementSibling;
+            const text = replyInput.value.trim();
+            const parentId = sendReplyButton.dataset.parentId; 
+            if (text && parentId) {
+                addNewReply(parentId, text);  // Додаємо відповідь
+                replyInput.value = '';  // Очищаємо поле вводу
+                replyInput.closest('.reply-input').style.display = 'none';  // Сховуємо поле вводу відповіді
+            } 
+        }
+    });
+
+    updateMessageStyles();  // Оновлюємо стилі післяініціалізації слухачів
+  
 
 const loadComments = async () => {
     try {
+        // Split the URL path and get the last part (courseId)
         const pathParts = window.location.pathname.split('/');
-        const courseId = pathParts[pathParts.length - 1];  // Get courseId from URL
+        const courseId = parseInt(pathParts[pathParts.length - 1], 10); // Ensure it's a number
 
-        if (!courseId) {
-            console.error('Не вдалося знайти courseId в URL');
+        if (isNaN(courseId)) {
+            console.error('Не вдалося знайти valid courseId в URL');
             return;
         }
 
-        console.log('courseId:', courseId);
-
-        // Fetch discussion messages using courseId
-        await fetchDiscussionMessages(courseId);
-
-        // Assuming the fetchDiscussionMessages() is responsible for setting DISCUSSION_MESSAGES
-        renderDiscussion(); // Render the fetched discussion
-
+        
+        renderDiscussion();  // Render after data is ready
     } catch (error) {
         console.error('Помилка при завантаженні коментарів:', error);
     }
 };
 
-
-
 loadComments();
+
 
 document.addEventListener('DOMContentLoaded', () => {
     renderDiscussion();

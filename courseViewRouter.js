@@ -412,66 +412,100 @@ router.get('/lecture/:lectureId', async (req, res) => {
 
 ///////////////////////
 ///// COMMENTS ///////
-/////////////////////
-router.post('/api/comments', async (req, res) => {
+/////////////////////   
+router.post('/comments', async (req, res) => {
     const { courseId, userId, parentCommentId, content } = req.body;
 
+    // Перевірка на наявність обов'язкових полів
     if (!courseId || !userId || !content) {
+        console.error('Missing fields:', { courseId, userId, content });
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
     try {
-        // Insert the comment into the database
         const insertCommentQuery = `
-            INSERT INTO comments (course_id, user_id, parent_comment_id, content)
+            INSERT INTO comments (course_id, user_id, parent_comment_id, text)
             VALUES ($1, $2, $3, $4)
-            RETURNING id, user_id, content, created_at;
+            RETURNING id, user_id, text, created_at;
         `;
-        
         const values = [courseId, userId, parentCommentId || null, content];
+        console.log('Executing query with values:', values);  // Логування значень перед виконанням запиту
+
         const result = await db.query(insertCommentQuery, values);
 
         const newComment = result.rows[0];
+        console.log('Comment created successfully:', newComment);  // Логування успіху створення
 
-        // Respond with the newly created comment
         res.status(201).json(newComment);
     } catch (error) {
-        console.error('Error creating comment:', error);
+        console.error('Error during comment creation:', error);  // Логування помилки
         res.status(500).json({ error: 'Internal server error' });
     }
 });
 
 
-router.get('/api/course/:courseId/comments', async (req, res) => {
+
+
+// router.get('/course/:courseId/comments', async (req, res) => {
+//     const { courseId } = req.params;
+//     console.log(`Fetching comments for courseId: ${courseId}`);  // Лог для відлагодження
+
+//     try {
+//         const commentsQuery = `
+//             SELECT u.profile_image, c.*
+//             FROM comments c
+//             JOIN users u ON u.id = c.user_id
+//             WHERE c.course_id = $1
+//         `;
+//         const commentsResult = await db.query(commentsQuery, [courseId]);
+
+//         if (commentsResult.rows.length === 0) {
+//             return res.status(404).json({ error: 'No comments found' });  // Повертаємо JSON
+//         }
+
+//         res.json(commentsResult.rows);  // Повертаємо JSON
+//     } catch (error) {
+//         console.error('Error fetching comments:', error);
+//         res.status(500).json({ error: 'Internal server error', details: error.message });
+//     }
+// });
+
+router.get('/course/:courseId', async (req, res) => {
     const { courseId } = req.params;
-    console.log(`Fetching comments for courseId: ${courseId}`);  // Log for debugging
+    console.log(`Fetching comments for courseId: ${courseId}`);  // Лог для відлагодження
+
     try {
-        // Query the database to get comments for the course
         const commentsQuery = `
-        SELECT 
-            c.id, 
-            c.user_id, 
-            u.name AS username, 
-            u.avatar, 
-            c.text, 
-            c.created_at,
-            c.parent_id
-        FROM comments c
-        JOIN users u ON c.user_id = u.id
-        WHERE c.course_id = $1
-        ORDER BY c.created_at ASC
-    `;
-    const commentsResult = await db.query(commentsQuery, [courseId]);
+            SELECT u.profile_image, c.*
+            FROM comments c
+            JOIN users u ON u.id = c.user_id
+            WHERE c.course_id = $1
+        `;
+        const commentsResult = await db.query(commentsQuery, [courseId]);
 
-    if (commentsResult.rows.length === 0) {
-        return res.status(404).json({ error: 'No comments found' });
+        if (commentsResult.rows.length === 0) {
+            return res.status(404).json({ error: 'No comments found' });
+        }
+
+        res.json(commentsResult.rows);  // Повертаємо JSON
+    } catch (error) {
+        console.error('Error fetching comments:', error);
+        res.status(500).json({ error: 'Internal server error', details: error.message });
     }
+});
 
-    res.json(commentsResult.rows);
-} catch (error) {
-    console.error('Error fetching comments:', error);
-    res.status(500).json({ error: 'Internal server error', details: error.message });
-}
+
+router.post('/comments/reply', async (req, res) => {
+    const { userId, parentId, text, date } = req.body;
+    try {
+        // Assuming the reply is inserted into the database
+        const result = await db.query('INSERT INTO comments (user_id, parent_id, text, created_at) VALUES ($1, $2, $3, $4) RETURNING *', [userId, parentId, text, date]);
+        const savedReply = result.rows[0];  // Assuming your database returns the saved reply
+        res.json(savedReply);
+    } catch (error) {
+        console.error('Error saving reply:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 });
 
 // router.get('/api/course/:courseId/comments', async (req, res) => {
