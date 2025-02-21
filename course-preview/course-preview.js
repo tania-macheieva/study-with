@@ -15,6 +15,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         // Оновлюємо елементи сторінки даними з API
         document.querySelector('.course-name').textContent = courseData.name;
+        document.querySelector('.prev-image').src = courseData.image_url 
+        ? `/uploads/${courseData.image_url}` 
+        : '/images/default-course.png';
         document.querySelector('.course-description').textContent = courseData.description;
         document.querySelector('.detail-category .detail-value').textContent = courseData.category;
         
