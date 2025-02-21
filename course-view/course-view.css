@@ -422,6 +422,10 @@ body {
     cursor: pointer;
 }
 
+.icon-button.send:hover img {
+    content: url('../images/send_hover.svg'); 
+}
+
 .icon-button img,
 .send-reply img {
     width: 18px;
