@@ -4,12 +4,10 @@ const pool = require('./db');
 const multer = require('multer');
 const storage = require('./course-creation/storage-config');
  
-const upload = multer({ storage }).fields([
-  { name: 'course_thumbnail', maxCount: 1 },
-  { name: 'lecture_files' }, 
-]); 
+const upload = multer({ storage }).any();
   
   router.post('/save-draft', upload, async (req, res) => {  
+    const courseThumbnail = req.files.find(file => file.fieldname === 'course_thumbnail')?.filename || null;
     const {
       course_title = '',
       course_description = '',
@@ -30,11 +28,6 @@ const upload = multer({ storage }).fields([
     if (isNaN(parsedCoursePrice)) parsedCoursePrice = null;
     if (isNaN(parsedCourseCategory)) parsedCourseCategory = null;
     if (isNaN(parsedEducationLevel)) parsedEducationLevel = null;
-  
-    const courseThumbnail =
-    req.files && req.files['course_thumbnail'] && req.files['course_thumbnail'][0]
-      ? req.files['course_thumbnail'][0].filename
-      : null;
     
     if (!author_id) {
       return res.status(400).json({ success: false, message: 'Author ID is required!' });
@@ -275,6 +268,7 @@ const upload = multer({ storage }).fields([
   });
   
 router.post('/create', upload, async (req, res) => {
+    const courseThumbnail = req.files.find(file => file.fieldname === 'course_thumbnail')?.filename || null;
     const {
         course_title,
         course_description,
@@ -286,9 +280,6 @@ router.post('/create', upload, async (req, res) => {
         test_link,
     } = req.body;
     console.log('Create_course_data:', req.body);
-    const courseThumbnail = req.files['course_thumbnail']
-        ? req.files['course_thumbnail'][0].filename
-        : null;
 
     if (!course_title || !course_description || !course_price || !course_category || !education_level || !author_id) {
         return res.status(400).json({ success: false, message: 'Please fill all required fields!' });
