@@ -103,6 +103,12 @@ main
     border-radius: 12px;
     flex-shrink: 0;
 }
+.prev-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    object-fit: cover;
+}
 
 /* Заголовок контенту */
 .content-header {

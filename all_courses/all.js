@@ -75,7 +75,10 @@ document.addEventListener("DOMContentLoaded", async function() {
             
             courseElement.innerHTML = `
             <div class="course_name">${course.name}</div>
-            <div class="description">${course.description}</div>
+            <div class="description-container">
+            <div class="description">${course.description.split(' ').slice(0, 10).join(' ')}...</div>
+             <div class="tooltip">${course.description}</div> 
+            </div>
             <div class="course-image">
                 <img src="/uploads/${course.image_url || '/images/250x100.png'}" 
                      alt="${course.name}" 
@@ -89,15 +92,37 @@ document.addEventListener("DOMContentLoaded", async function() {
             courseElement.addEventListener('click', () => {
                 window.location.href = `/course-preview?id=${course.id}`;
             });
+            document.querySelectorAll('.description-container').forEach(container => {
+                const description = container.querySelector('.description');
+                const tooltip = container.querySelector('.tooltip');
+            
+                description.addEventListener('mouseenter', (event) => {
+                    tooltip.style.display = 'block';
+            
+                    // Отримуємо координати миші
+                    const mouseX = event.clientX;
+                    const mouseY = event.clientY;
+            
+                    // Встановлюємо позицію тултипа біля миші
+                    tooltip.style.left = `${mouseX + 15}px`;
+                    tooltip.style.top = `${mouseY + 15}px`;
+                });
+            
+                description.addEventListener('mouseleave', () => {
+                    tooltip.style.display = 'none';
+                });
+            });
             
             coursesContainer.appendChild(courseElement);
         });
+  
     
         const loadMoreButton = document.querySelector(".more-btn");
         if (loadMoreButton) {
             loadMoreButton.style.display = currentCourses.length > displayedCourses ? "block" : "none";
         }
     }
+    
   
     function getTranslation(key) {
         const translations = {
