@@ -242,11 +242,9 @@ CREATE TABLE payments (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- якщо вже стовпець є і треба змінити
 ALTER TABLE students
-ADD COLUMN profile_image VARCHAR(255) DEFAULT '/images/user-avatar.png';
 
--- якщо вже стовпець і треба змінити
-ALTER TABLE students
 ALTER COLUMN profile_image SET DEFAULT '/images/user-avatar.png';
 
 UPDATE students
@@ -257,10 +255,20 @@ CREATE TABLE comments (
     id SERIAL PRIMARY KEY,
     course_id INT NOT NULL,
     user_id INT NOT NULL,
-    parent_comment_id INT,  -- Якщо це відповідь на коментар, інакше NULL
-    text TEXT NOT NULL,
+    parent_comment_id INT, -- Якщо це відповідь на коментар, інакше NULL
+    content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_course FOREIGN KEY (course_id) REFERENCES all_courses(id) ON DELETE CASCADE,
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_parent_comment FOREIGN KEY (parent_comment_id) REFERENCES comments(id) ON DELETE CASCADE
 );
+ADD COLUMN profile_image VARCHAR(255) DEFAULT '/images/user-avatar.png';
+
+-- якщо вже стовпець і треба змінити
+ALTER TABLE students
+ALTER COLUMN profile_image SET DEFAULT '/images/user-avatar.png';
+
+UPDATE students
+SET profile_image = '/images/user-avatar.png'
+WHERE id = 1;
+

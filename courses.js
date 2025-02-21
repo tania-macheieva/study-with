@@ -7,7 +7,7 @@ const storage = require('./course-creation/storage-config');
 const upload = multer({ storage }).fields([
   { name: 'course_thumbnail', maxCount: 1 },
   { name: 'lecture_files' }, 
-]);  
+]); 
   
   router.post('/save-draft', upload, async (req, res) => {  
     const {

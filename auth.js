@@ -1029,13 +1029,13 @@ router.put('/profile/teacher/:id', async (req, res) => {
         }
 
      if (author_stripe_account) {
-    await pool.query(
-        `UPDATE all_courses 
-        SET author_stripe_account = $1 
-        WHERE author_id = $2`,
-        [author_stripe_account, userId]
-    );
-}
+        await pool.query(
+            `UPDATE all_courses 
+            SET author_stripe_account = $1 
+            WHERE author_id = $2`,
+            [author_stripe_account, userId]
+        );
+        }
 
         await pool.query('COMMIT'); 
 
@@ -1047,14 +1047,14 @@ router.put('/profile/teacher/:id', async (req, res) => {
                 author_stripe_account
             }
         });
-    } catch (error) {
-        await pool.query('ROLLBACK'); 
-        console.error('Error updating teacher profile:', error.message);
-        res.status(500).json({ 
-            error: 'Failed to update profile',
-            details: error.message 
-        });
-    }
+        } catch (error) {
+            await pool.query('ROLLBACK'); 
+            console.error('Error updating teacher profile:', error.message);
+            res.status(500).json({ 
+                error: 'Failed to update profile',
+                details: error.message 
+            });
+        }
 });
 
 // Налаштування multer для завантаження файлів
@@ -1081,10 +1081,9 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-
 const uploads = multer({
     storage,
-    limits: { fileSize: 1 * 1024 * 1024 }, // Обмеження на 1MB
+    limits: { fileSize: 1 * 1024 * 1024 }, 
     fileFilter: (req, file, cb) => {
         if (!file.mimetype.startsWith('image/')) {
             cb(new Error('Only image files are allowed!'));
@@ -1093,6 +1092,7 @@ const uploads = multer({
         }
     },
 });
+
 router.post('/upload-profile-image', uploads.single('profileImage'), async (req, res) => {
     try {
         const email = req.body.email;
@@ -1102,14 +1102,11 @@ router.post('/upload-profile-image', uploads.single('profileImage'), async (req,
 
         let filePath;
         if (req.file) {
-            // Якщо файл завантажено користувачем
             filePath = `/uploads/profile-images/${req.file.filename}`;
         } else {
-            // Використання дефолтного зображення
             filePath = '/images/user-avatar.png';
         }
 
-        // Оновлення шляху до зображення в таблиці users
         const query = `UPDATE users SET profile_image = $1 WHERE email = $2`;
         const values = [filePath, email];
 
@@ -1129,7 +1126,6 @@ router.post('/upload-profile-image', uploads.single('profileImage'), async (req,
     }
 });
 
-// Update the student profile route
 router.get('/profile/student/:id', async (req, res) => {
     const userId = req.params.id;
 
@@ -1166,7 +1162,7 @@ router.get('/profile/student/:id', async (req, res) => {
     }
 });
 
-// Update the profile image upload route
+
 router.post('/upload-student-profile-image', uploads.single('profileImage'), async (req, res) => {
     try {
         const userId = req.body.userId;
@@ -1214,36 +1210,33 @@ router.post('/upload-student-profile-image', uploads.single('profileImage'), asy
         res.status(500).json({ error: 'Failed to upload profile image.' });
     }
 });
-// Маршрут для оновлення всіх даних профілю студента
+
 router.post('/update-student-profile', async (req, res) => {
     try {
         const { 
             userId, 
             nickname, 
             name,
-            dateOfBirth,          // дата народження
-            phoneNumber,          // номер телефону
-            additionalInfo        // додаткова інформація
+            dateOfBirth,         
+            phoneNumber,         
+            additionalInfo        
         } = req.body;
         
         // Починаємо транзакцію
         await pool.query('BEGIN');
 
         try {
-            // Оновлюємо основні дані користувача
             await pool.query(
                 'UPDATE users SET name = $1 WHERE id = $2',
                 [name, userId]
             );
 
-            // Перевіряємо чи існує запис студента
             const studentCheck = await pool.query(
                 'SELECT id FROM students WHERE user_id = $1',
                 [userId]
             );
 
             if (studentCheck.rows.length > 0) {
-                // Оновлюємо існуючий запис студента
                 await pool.query(
                     `UPDATE students 
                      SET nickname = $1,
@@ -1254,7 +1247,6 @@ router.post('/update-student-profile', async (req, res) => {
                     [nickname, dateOfBirth, phoneNumber, additionalInfo, userId]
                 );
             } else {
-                // Створюємо новий запис студента
                 await pool.query(
                     `INSERT INTO students 
                      (user_id, nickname, date_of_birth, phone_number, additional_info)
@@ -1263,7 +1255,6 @@ router.post('/update-student-profile', async (req, res) => {
                 );
             }
 
-            // Завершуємо транзакцію
             await pool.query('COMMIT');
             
             res.json({ 
@@ -1278,7 +1269,6 @@ router.post('/update-student-profile', async (req, res) => {
                 }
             });
         } catch (error) {
-            // Відкатуємо транзакцію у випадку помилки
             await pool.query('ROLLBACK');
             throw error;
         }
@@ -1324,7 +1314,6 @@ router.post('/reset-profile-image', async (req, res) => {
 });
 
 
-// Add route to get profile image
 router.get('/profile-image/:userId', async (req, res) => {
     try {
         const { userId } = req.params;
