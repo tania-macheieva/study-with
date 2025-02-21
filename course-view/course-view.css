@@ -520,7 +520,8 @@ body {
     border: 2px solid #C7C7C7;
     border-radius: 12px;
     padding: 20px;
-    margin-bottom: 16px;
+    margin-bottom: 0;
+    margin-top: 16px;
     background: #FFFFFF;
 }
 
@@ -637,6 +638,11 @@ input[type="checkbox"]:checked::before {
     background: #FFFFFF;
     cursor: pointer;
 }
+
+.message .send-reply:hover img {
+    content: url('../images/send_hover.svg'); 
+}
+
 
 .message.reply .user-info,
 .message.reply .message-text {

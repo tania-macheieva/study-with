@@ -371,18 +371,22 @@ router.get('/comments', async (req, res) => {
 
     try {
         const comments = await db.query(
-                `SELECT 
+            `SELECT 
                 c.id, 
                 c.content, 
                 c.created_at, 
                 c.parent_comment_id, 
                 u.name AS user_name, 
                 u.profile_image,    
-                s.profile_image AS student_profile_image
+                s.profile_image AS student_profile_image, 
+                c2.content AS parent_comment_content,
+                u2.name AS parent_username
             FROM comments c
             JOIN users u ON c.user_id = u.id
             LEFT JOIN teachers t ON u.id = t.user_id
             LEFT JOIN students s ON u.id = s.user_id
+            LEFT JOIN comments c2 ON c.parent_comment_id = c2.id
+            LEFT JOIN users u2 ON c2.user_id = u2.id
             WHERE c.course_id = $1
             ORDER BY c.created_at`,
             [course_id]
@@ -394,6 +398,7 @@ router.get('/comments', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch comments' });
     }
 });
+
 
 
 module.exports = router;
