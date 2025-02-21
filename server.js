@@ -24,8 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use("/auth", authRoutes);
 app.use('/tests', testRouter);
-app.use('/courses', coursesRouter);  
-app.use('/comments', commentRouter);  
+app.use('/courses', coursesRouter);   
 
 const searchRouter = require('./searchRouter');
 app.use('/api/search', searchRouter);
@@ -158,6 +157,7 @@ app.use((err, req, res, next) => {
 
 const courseViewRouter = require('./courseViewRouter');
 app.use('/api', courseViewRouter);
+app.use('/api/comments', commentRouter);  
 app.get('/course/:courseId', (req, res) => {
     res.sendFile(path.join(__dirname, 'course-view/course-view.html'));
 });

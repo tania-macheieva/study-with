@@ -7,7 +7,6 @@ router.get('/course/:courseId', async (req, res) => {
         const { courseId } = req.params;
         const userId = req.query.userId;
 
-        // Перевірка валідності courseId
         if (!courseId || isNaN(courseId)) {
             return res.status(400).json({ 
                 error: 'Invalid course ID',
@@ -15,7 +14,6 @@ router.get('/course/:courseId', async (req, res) => {
             });
         }
 
-        // Перевірка на наявність userId
         if (!userId) {
             return res.status(400).json({ 
                 error: 'User ID is required',
@@ -24,17 +22,6 @@ router.get('/course/:courseId', async (req, res) => {
         }
 
         const courseIdNum = parseInt(courseId, 10);
-
-        // Перевірка, чи існує користувач з таким ID
-        const userCheckQuery = 'SELECT id FROM users WHERE id = $1';
-        const userCheckResult = await db.query(userCheckQuery, [userId]);
-
-        if (userCheckResult.rows.length === 0) {
-            return res.status(404).json({ 
-                error: 'User not found',
-                details: 'Please provide a valid user ID'
-            });
-        }
 
         // Оновлений запит з правильною обробкою статусу completed
         const courseQuery = `
@@ -148,11 +135,9 @@ router.get('/course/:courseId/progress', async (req, res) => {
             return res.status(400).json({ error: 'User ID is required' });
         }
 
-        // Оновлений SQL запит для правильного розрахунку прогресу
         const progressQuery = `
-            WITH lecture_counts AS (
+            WITH course_stats AS (
                 SELECT 
-                    c.id as course_id,
                     COUNT(DISTINCT l.id) as total_lectures,
                     COUNT(DISTINCT CASE WHEN lp.completed = true THEN l.id END) as completed_lectures
                 FROM all_courses c
@@ -160,22 +145,16 @@ router.get('/course/:courseId/progress', async (req, res) => {
                 JOIN lectures l ON m.id = l.module_id
                 LEFT JOIN lecture_progress lp ON l.id = lp.lecture_id AND lp.user_id = $2
                 WHERE c.id = $1
-                GROUP BY c.id
             )
-            UPDATE enrollments e
-            SET progress = (
-                SELECT 
-                    CASE 
-                        WHEN lc.total_lectures > 0 
-                        THEN ROUND((lc.completed_lectures::float / lc.total_lectures * 100)::numeric, 2)
-                        ELSE 0 
-                    END
-                FROM lecture_counts lc
-            )
-            WHERE e.course_id = $1 AND e.user_id = $2
-            RETURNING progress, 
-                (SELECT total_lectures FROM lecture_counts) as total_lectures,
-                (SELECT completed_lectures FROM lecture_counts) as completed_lectures;
+            SELECT
+                cs.total_lectures,
+                cs.completed_lectures,
+                CASE 
+                    WHEN cs.total_lectures > 0 
+                    THEN ROUND((cs.completed_lectures::float / cs.total_lectures::float * 100)::numeric, 2)
+                    ELSE 0
+                END as progress_percentage
+            FROM course_stats cs
         `;
 
         const result = await db.query(progressQuery, [courseId, userId]);
@@ -186,9 +165,9 @@ router.get('/course/:courseId/progress', async (req, res) => {
 
         const progressData = result.rows[0];
         res.json({
-            progress: progressData.progress,
-            totalLectures: parseInt(progressData.total_lectures),
-            completedLectures: parseInt(progressData.completed_lectures)
+            progress: progressData.progress_percentage,
+            totalLectures: progressData.total_lectures,
+            completedLectures: progressData.completed_lectures
         });
     } catch (error) {
         console.error('Помилка отримання прогресу:', error);
@@ -205,63 +184,23 @@ router.post('/lecture/:lectureId/complete', async (req, res) => {
             return res.status(400).json({ error: 'User ID is required' });
         }
 
-        // Спочатку оновлюємо статус лекції
-        const updateLectureQuery = `
+        const query = `
             INSERT INTO lecture_progress (user_id, lecture_id, completed, completed_at)
             VALUES ($1, $2, true, CURRENT_TIMESTAMP)
             ON CONFLICT (user_id, lecture_id)
             DO UPDATE SET 
                 completed = true,
                 completed_at = CURRENT_TIMESTAMP
-            RETURNING *;
+            RETURNING *
         `;
 
-        await db.query(updateLectureQuery, [userId, lectureId]);
+        const result = await db.query(query, [userId, lectureId]);
+        
+        await updateCourseProgress(userId, lectureId);
 
-        // Тепер оновлюємо загальний прогрес курсу
-        const updateProgressQuery = `
-            WITH course_info AS (
-                SELECT 
-                    c.id as course_id
-                FROM all_courses c
-                JOIN modules m ON c.id = m.course_id
-                JOIN lectures l ON m.id = l.module_id
-                WHERE l.id = $2
-            ),
-            lecture_counts AS (
-                SELECT 
-                    c.id as course_id,
-                    COUNT(DISTINCT l.id) as total_lectures,
-                    COUNT(DISTINCT CASE WHEN lp.completed = true THEN l.id END) as completed_lectures
-                FROM all_courses c
-                JOIN modules m ON c.id = m.course_id
-                JOIN lectures l ON m.id = l.module_id
-                LEFT JOIN lecture_progress lp ON l.id = lp.lecture_id AND lp.user_id = $1
-                WHERE c.id = (SELECT course_id FROM course_info)
-                GROUP BY c.id
-            )
-            UPDATE enrollments e
-            SET progress = (
-                SELECT 
-                    CASE 
-                        WHEN lc.total_lectures > 0 
-                        THEN ROUND((lc.completed_lectures::float / lc.total_lectures * 100)::numeric, 2)
-                        ELSE 0 
-                    END
-                FROM lecture_counts lc
-            )
-            WHERE e.course_id = (SELECT course_id FROM course_info)
-            AND e.user_id = $1
-            RETURNING progress;
-        `;
-
-        const result = await db.query(updateProgressQuery, [userId, lectureId]);
-        res.json({ 
-            success: true, 
-            progress: result.rows[0].progress 
-        });
+        res.json(result.rows[0]);
     } catch (error) {
-        console.error('Помилка оновлення прогресу:', error);
+        console.error('Помилка оновлення прогресу лекції:', error);
         res.status(500).json({ error: 'Внутрішня помилка сервера' });
     }
 });
@@ -409,115 +348,52 @@ router.get('/lecture/:lectureId', async (req, res) => {
     }
 });
 
-
-///////////////////////
-///// COMMENTS ///////
-/////////////////////   
 router.post('/comments', async (req, res) => {
-    const { courseId, userId, parentCommentId, content } = req.body;
-
-    // Перевірка на наявність обов'язкових полів
-    if (!courseId || !userId || !content) {
-        console.error('Missing fields:', { courseId, userId, content });
-        return res.status(400).json({ error: 'Missing required fields' });
-    }
-
     try {
-        const insertCommentQuery = `
-            INSERT INTO comments (course_id, user_id, parent_comment_id, text)
-            VALUES ($1, $2, $3, $4)
-            RETURNING id, user_id, text, created_at;
-        `;
-        const values = [courseId, userId, parentCommentId || null, content];
-        console.log('Executing query with values:', values);  // Логування значень перед виконанням запиту
-
-        const result = await db.query(insertCommentQuery, values);
-
-        const newComment = result.rows[0];
-        console.log('Comment created successfully:', newComment);  // Логування успіху створення
-
-        res.status(201).json(newComment);
+        const { content, parent_comment_id, course_id, user_id } = req.body;
+        // Insert into the database
+        const result = await db.query(
+            'INSERT INTO comments (content, parent_comment_id, course_id, user_id) VALUES ($1, $2, $3, $4) RETURNING *',
+            [content, parent_comment_id, course_id, user_id]
+        );
+        res.status(201).json(result.rows[0]);
     } catch (error) {
-        console.error('Error during comment creation:', error);  // Логування помилки
-        res.status(500).json({ error: 'Internal server error' });
+        console.error('Error inserting comment:', error);
+        res.status(500).json({ error: 'Failed to add comment' });
     }
 });
+router.get('/comments', async (req, res) => {
+    const { course_id } = req.query;
 
-
-
-
-// router.get('/course/:courseId/comments', async (req, res) => {
-//     const { courseId } = req.params;
-//     console.log(`Fetching comments for courseId: ${courseId}`);  // Лог для відлагодження
-
-//     try {
-//         const commentsQuery = `
-//             SELECT u.profile_image, c.*
-//             FROM comments c
-//             JOIN users u ON u.id = c.user_id
-//             WHERE c.course_id = $1
-//         `;
-//         const commentsResult = await db.query(commentsQuery, [courseId]);
-
-//         if (commentsResult.rows.length === 0) {
-//             return res.status(404).json({ error: 'No comments found' });  // Повертаємо JSON
-//         }
-
-//         res.json(commentsResult.rows);  // Повертаємо JSON
-//     } catch (error) {
-//         console.error('Error fetching comments:', error);
-//         res.status(500).json({ error: 'Internal server error', details: error.message });
-//     }
-// });
-
-router.get('/course/:courseId', async (req, res) => {
-    const { courseId } = req.params;
-    console.log(`Fetching comments for courseId: ${courseId}`);  // Лог для відлагодження
+    if (!course_id) {
+        return res.status(400).json({ error: 'Course ID is required' });
+    }
 
     try {
-        const commentsQuery = `
-            SELECT u.profile_image, c.*
+        const comments = await db.query(
+                `SELECT 
+                c.id, 
+                c.content, 
+                c.created_at, 
+                c.parent_comment_id, 
+                u.name AS user_name, 
+                u.profile_image,    
+                s.profile_image AS student_profile_image
             FROM comments c
-            JOIN users u ON u.id = c.user_id
+            JOIN users u ON c.user_id = u.id
+            LEFT JOIN teachers t ON u.id = t.user_id
+            LEFT JOIN students s ON u.id = s.user_id
             WHERE c.course_id = $1
-        `;
-        const commentsResult = await db.query(commentsQuery, [courseId]);
+            ORDER BY c.created_at`,
+            [course_id]
+        );
 
-        if (commentsResult.rows.length === 0) {
-            return res.status(404).json({ error: 'No comments found' });
-        }
-
-        res.json(commentsResult.rows);  // Повертаємо JSON
-    } catch (error) {
-        console.error('Error fetching comments:', error);
-        res.status(500).json({ error: 'Internal server error', details: error.message });
+        res.json(comments.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to fetch comments' });
     }
 });
-
-
-router.post('/comments/reply', async (req, res) => {
-    const { userId, parentId, text, date } = req.body;
-    try {
-        // Assuming the reply is inserted into the database
-        const result = await db.query('INSERT INTO comments (user_id, parent_id, text, created_at) VALUES ($1, $2, $3, $4) RETURNING *', [userId, parentId, text, date]);
-        const savedReply = result.rows[0];  // Assuming your database returns the saved reply
-        res.json(savedReply);
-    } catch (error) {
-        console.error('Error saving reply:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-// router.get('/api/course/:courseId/comments', async (req, res) => {
-//     const { courseId } = req.params;
-//     try {
-//         const comments = await getCommentsForCourse(courseId); // Your function to fetch comments
-//         res.json(comments);
-//     } catch (error) {
-//         console.error('Error fetching comments:', error);
-//         res.status(500).json({ error: 'Internal server error' });
-//     }
-// });
 
 
 module.exports = router;

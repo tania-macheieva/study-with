@@ -152,9 +152,9 @@ CREATE TABLE modules (
     title VARCHAR(100) NOT NULL,
     order_num INT NOT NULL,
     test_link VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
     CONSTRAINT fk_course FOREIGN KEY (course_id) REFERENCES all_courses(id) ON DELETE CASCADE
-);
+); 
 
 -- Створення таблиці лекцій
 CREATE TABLE lectures (
@@ -254,14 +254,14 @@ CREATE TABLE payments (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- CREATE TABLE comments (
---     id SERIAL PRIMARY KEY,
---     course_id INT NOT NULL,
---     user_id INT NOT NULL,
---     parent_comment_id INT, -- Якщо це відповідь на коментар, інакше NULL
---     content TEXT NOT NULL,
---     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
---     CONSTRAINT fk_course FOREIGN KEY (course_id) REFERENCES all_courses(id) ON DELETE CASCADE,
---     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
---     CONSTRAINT fk_parent_comment FOREIGN KEY (parent_comment_id) REFERENCES comments(id) ON DELETE CASCADE
--- );
+CREATE TABLE comments (
+    id SERIAL PRIMARY KEY,
+    course_id INT NOT NULL,
+    user_id INT NOT NULL,
+    content TEXT NOT NULL,
+    parent_comment_id INT REFERENCES comments(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (course_id) REFERENCES all_courses(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
