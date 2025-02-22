@@ -36,6 +36,7 @@
                 </div>
             </div>
             <section class="discussion-thread">
+            
             </section>
         </section>
     `;
@@ -57,22 +58,19 @@
             }
         });
     };
-    
-
     const createMessageHTML = (message, isReply = false, replyLevel = 0) => {
         const messageElement = document.createElement('article');
         messageElement.className = 'message';
         if (isReply) messageElement.classList.add('reply');
         messageElement.dataset.messageId = message.id;
         messageElement.dataset.replyLevel = replyLevel;
-
+    
         if (typeof message.id === 'string' && message.id.includes('.')) {
             messageElement.dataset.parentId = message.id.substring(0, message.id.lastIndexOf('.'));
         }
-
+    
         const user = message.user || { name: message.user_name || 'Unknown User' };
         const avatar = message.teacher_profile_image || message.student_profile_image || user.profile_image || '/images/user-avatar.png';
-        const replyToUsername = message.replyTo ? `@${message.replyTo}` : '';
         const formatDate = (isoString) => {
             const date = new Date(isoString);
             return date.toLocaleDateString('uk-UA', {
@@ -81,84 +79,144 @@
                 year: 'numeric'
             });
         };
-
-        messageElement.innerHTML = `
+    
+        let messageContent = message.content || '';
+        
+        // Handle reply mentions
+        if (message.parent_comment_id) {
+            const parentUser = document.querySelector(`.message[data-message-id="${message.parent_comment_id}"] .username`);
+            if (parentUser) {
+                const parentUsername = parentUser.textContent;
+                
+                if (!messageContent.startsWith(`@${parentUsername}`)) {
+                    messageContent = `@${parentUsername} ${messageContent}`;
+                }
+                
+                // Extract the full username mention and the rest of the message
+                const mentionText = `@${parentUsername}`;
+                const indexOfSpace = messageContent.indexOf(' ', mentionText.length);
+                const mention = messageContent.substring(0, indexOfSpace !== -1 ? indexOfSpace : messageContent.length);
+                const restOfMessage = indexOfSpace !== -1 ? messageContent.substring(indexOfSpace) : '';
+                
+                // Format the entire username mention
+                messageContent = `<span class="mention">${mention}</span>${restOfMessage}`;
+            }
+        }
+    
+        messageElement.innerHTML = ` 
             <div class="user-info">
                 <img src="${avatar}" alt="User avatar" class="avatar">
                 <span class="username">${user.name}</span>
                 <span class="date">${formatDate(message.created_at)}</span>
             </div>
-            <p class="message-text">${replyToUsername} ${message.content}</p>
+            <p class="message-text">${messageContent}</p>
             <button class="more-options">...</button>
             <div class="reply-input" style="display: none;">
                 <input type="text" placeholder="write a reply to ${user.name}">
                 <button class="send-reply" data-parent-id="${message.id}">
                     <img src="../images/send.svg" alt="Send">
                 </button>
-            </div>
+            </div> 
         `;
+    
         return messageElement;
     };
-
+    
+    const handleReply = async (messageId, replyText) => {
+        const parentMessage = document.querySelector(`.message[data-message-id="${messageId}"]`);
+        const parentUsername = parentMessage.querySelector('.username').textContent;
+        
+        // Add complete @mention if it's not already there
+        const formattedReplyText = replyText.startsWith(`@${parentUsername}`) 
+            ? replyText 
+            : `@${parentUsername} ${replyText}`;
+    
+        const replyMessage = {
+            user_id: localStorage.getItem('userId'),
+            parent_comment_id: messageId,
+            course_id: window.location.pathname.split('/course/').pop(),
+            content: formattedReplyText
+        };
+    
+        try {
+            const response = await fetch('http://localhost:8000/api/comments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(replyMessage)
+            });
+    
+            if (response.ok) {
+                await response.json();
+                fetchComments(replyMessage.course_id);
+            } else {
+                throw new Error('Failed to send reply');
+            }
+        } catch (error) {
+            console.error('Error while sending reply:', error);
+        }
+    };
+    
+    
+        
     const updateMessageStyles = () => {
+        // Перебираємо всі основні повідомлення
         const mainMessages = document.querySelectorAll('.message:not(.reply)');
+    
         mainMessages.forEach(mainMessage => {
             const messageId = mainMessage.dataset.messageId;
             const replies = document.querySelectorAll(`.message.reply[data-parent-id="${messageId}"]`);
-
+    
+            // Очищаємо клас останньої відповіді у всіх вкладених відповідях
+            replies.forEach(reply => {
+                reply.classList.remove('last-reply');
+            });
+    
             if (replies.length > 0) {
+                // Визначаємо останню відповідь
+                const lastReply = replies[replies.length - 1];
+                lastReply.classList.add('last-reply');
+    
                 mainMessage.classList.add('has-visible-replies');
-
-                replies.forEach((reply, index) => {
-                    reply.style.margin = '0';
-
-                    const nestedReplies = document.querySelectorAll(`.message.reply[data-parent-id="${reply.dataset.messageId}"]`);
-                    if (nestedReplies.length === 0) {
-                        reply.style.borderBottomLeftRadius = '12px';
-                        reply.style.borderBottomRightRadius = '12px';
-                    } else {
-                        reply.style.borderBottomLeftRadius = '0';
-                        reply.style.borderBottomRightRadius = '0';
-                    }
-
-                    reply.style.borderTop = '0';
-                    reply.style.borderBottom = '2px solid #CCCCCC';
-                });
+                mainMessage.style.borderBottomLeftRadius = '0';
+                mainMessage.style.borderBottomRightRadius = '0';
+                mainMessage.style.borderBottom = '0'; // Прибираємо нижній бордер, якщо є відповіді
             } else {
                 mainMessage.classList.remove('has-visible-replies');
+                mainMessage.style.borderBottomLeftRadius = '0';
+                mainMessage.style.borderBottomRightRadius = '0';
+                mainMessage.style.borderBottom = '2px solid #CCCCCC';
             }
-        });
-
-        const replies = document.querySelectorAll('.message.reply');
-        replies.forEach(reply => {
-            const nextMessage = reply.nextElementSibling;
-            if (nextMessage && !nextMessage.classList.contains('reply')) {
-                reply.style.marginBottom = '0';
-            }
-
-            const nestedReplies = document.querySelectorAll(`.message.reply[data-parent-id="${reply.dataset.messageId}"]`);
-            nestedReplies.forEach(nestedReply => {
-                nestedReply.style.margin = '0';
-                nestedReply.style.borderBottomLeftRadius = '12px';
-                nestedReply.style.borderBottomRightRadius = '12px';
-                nestedReply.style.borderTop = 'none';
-                nestedReply.style.borderBottom = '2px solid #CCCCCC'; 
+    
+            // Стилізуємо відповіді
+            replies.forEach((reply, index) => {
+                reply.style.margin = '0';
+                reply.style.borderTop = '0';
+                reply.style.borderBottom = '2px solid #CCCCCC';
+                reply.style.borderBottomLeftRadius = '0';
+                reply.style.borderBottomRightRadius = '0';
+                
+                // Обробка вкладених відповідей
+                const nestedReplies = document.querySelectorAll(`.message.reply[data-parent-id="${reply.dataset.messageId}"]`);
+                if (nestedReplies.length > 0) {
+                    reply.style.borderBottom = '0';
+                }
             });
-
-            const lastNestedReply = replies[replies.length - 1];
-            if (lastNestedReply) {
-                lastNestedReply.style.borderBottomLeftRadius = '12px';
-                lastNestedReply.style.borderBottomRightRadius = '12px';
-            }
         });
-    }; 
-
-    // Handle border-radius for the last nested reply
-    const lastNestedReply = [...document.querySelectorAll('.message.reply')].pop();
-    if (lastNestedReply) {
-        lastNestedReply.style.borderBottomLeftRadius = '12px';
-        lastNestedReply.style.borderBottomRightRadius = '12px';
+    
+        // Оновлюємо стилі для першого та останнього коментаря
+        const allMessages = document.querySelectorAll('.message');
+        if (allMessages.length > 0) {
+            const firstMessage = allMessages[0];
+            firstMessage.style.borderTopLeftRadius = '12px';
+            firstMessage.style.borderTopRightRadius = '12px';
+    
+            const lastMessage = allMessages[allMessages.length - 1];
+            lastMessage.style.borderBottomLeftRadius = '12px';
+            lastMessage.style.borderBottomRightRadius = '12px';
+        }
     };
+    
+     
     const escapeSelector = (id) => CSS.escape(id); 
     const toggleReplies = (messageId, show) => {
         const escapedMessageId = escapeSelector(`show-more-${messageId}`);
@@ -206,7 +264,6 @@
                         padding: '8px 16px',
                         background: '#FFFFFF',
                         border: '2px solid #283044',
-                        borderRadius: '12px',
                         fontSize: '14px',
                         cursor: 'pointer',
                         display: 'block'
@@ -373,8 +430,9 @@
 
         // Відображаємо існуючі повідомлення
         fetchComments(courseId);
-
-
+ 
+        
+         
         // Handle "more options" button click
         document.addEventListener('click', function(e) {
             const moreOptions = e.target.closest('.more-options');
@@ -526,32 +584,8 @@
             }
         });
     };
-    const handleReply = async (messageId, replyText) => {
-        const replyMessage = {
-            user_id: localStorage.getItem('userId'),  
-            parent_comment_id: messageId,  
-            course_id: window.location.pathname.split('/course/').pop(),
-            content: replyText  
-        };
 
-        try {
-            const response = await fetch('http://localhost:8000/api/comments', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(replyMessage)
-            });
-
-            if (response.ok) {
-                await response.json();  // Можемо отримати відповідь, якщо потрібно
-                fetchComments(replyMessage.course_id);  // Оновлення всіх коментарів
-            } else {
-                throw new Error('Failed to send reply');
-            }
-        } catch (error) {
-            console.error('Error while sending reply:', error);
-        }
-    };
-
+    
 
     document.addEventListener('DOMContentLoaded', () => {
         // renderDiscussion();
