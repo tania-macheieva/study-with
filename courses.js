@@ -154,7 +154,7 @@ const upload = multer({ storage }).any();
         }
   
         const modulePromises = modulesArray.map(async (module) => {
-          const { id, title, order_num, lectures: moduleLectures } = module;
+          const { id, title, order_num, lectures: moduleLectures, test_link: moduleTestLink } = module;
   
           if (!title || !order_num) {
             throw new Error('Module must have a title and order_num.');
@@ -164,14 +164,15 @@ const upload = multer({ storage }).any();
           if (!moduleId) {
             const moduleResult = await pool.query(
               `INSERT INTO modules (course_id, title, order_num, test_link) VALUES ($1, $2, $3, $4) RETURNING id`,
-              [courseId, title, order_num, test_link]
+              [courseId, title, order_num, moduleTestLink || null] 
             );
+            
             moduleId = moduleResult.rows[0].id;
           } else {
             await pool.query(
-              `UPDATE modules SET title = $1 WHERE id = $2`,
-              [title, moduleId]
-            );
+              `UPDATE modules SET title = $1, test_link = COALESCE($2, test_link) WHERE id = $3`,
+              [title, moduleTestLink, moduleId]
+            );  
           }
   
           if (moduleLectures && Array.isArray(moduleLectures)) {
@@ -399,31 +400,46 @@ router.post('/create', upload, async (req, res) => {
           
             
             const modulePromises = modulesArray.map(async (module) => {
-              const { id, title, order_num, lectures: moduleLectures } = module;
+              const { id, title, order_num, lectures: moduleLectures, test_link: moduleTestLink } = module;
+              console.log('moduleTestLink before update:', moduleTestLink); // додаткове логування
+
               console.log('Module_data:', module);
+          
               if (!title || !order_num) {
-                throw new Error('Module must have a title and order_num.');
+                  throw new Error('Module must have a title and order_num.');
               }
+          
               const existingModuleResult = await pool.query(
-                `SELECT id FROM modules WHERE course_id = $1 AND order_num = $2`,
-                [courseId, order_num]
-            );
+                  `SELECT id FROM modules WHERE course_id = $1 AND order_num = $2`,
+                  [courseId, order_num]
+              );
+          
+              let moduleId = null;
+              if (existingModuleResult.rows.length > 0) {
+                  moduleId = existingModuleResult.rows[0].id;
+          
+                  // Додаємо лог перед оновленням
+                  console.log('moduleTestLink:', moduleTestLink);
+          
+                  await pool.query(
+                    `UPDATE modules 
+                     SET title = $1, 
+                         test_link = $2 
+                     WHERE id = $3`,
+                    [title, moduleTestLink, moduleId]
+                );
+                  
+          
+              } else {
+                  const moduleResult = await pool.query(
+                      `INSERT INTO modules (course_id, title, order_num, test_link) 
+                       VALUES ($1, $2, $3, $4) RETURNING id`,
+                      [courseId, title, order_num, moduleTestLink || null]
+                  );
+                  moduleId = moduleResult.rows[0].id;
+              } 
+          
             
-            let moduleId = null;
-            if (existingModuleResult.rows.length > 0) {
-                moduleId = existingModuleResult.rows[0].id;
-                await pool.query(
-                    `UPDATE modules SET title = $1 WHERE id = $2`,
-                    [title, moduleId]
-                );
-            } else {
-                const moduleResult = await pool.query(
-                    `INSERT INTO modules (course_id, title, order_num, test_link) VALUES ($1, $2, $3, $4) RETURNING id`,
-                    [courseId, title, order_num, test_link]
-                );
-                moduleId = moduleResult.rows[0].id;
-            }
-              
               if (moduleLectures && Array.isArray(moduleLectures)) {
                 const lecturePromises = moduleLectures.map(async (lecture, index) => {
                   const { id: lectureId, title, description } = lecture;

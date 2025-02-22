@@ -202,7 +202,7 @@
                 }
             });
         });
-    
+    };
         // Оновлюємо стилі для першого та останнього коментаря
         const allMessages = document.querySelectorAll('.message');
         if (allMessages.length > 0) {
@@ -214,8 +214,44 @@
             lastMessage.style.borderBottomLeftRadius = '12px';
             lastMessage.style.borderBottomRightRadius = '12px';
         }
-    };
-    
+        const showRepliesButtons = document.querySelectorAll('.Показати відповіді');
+        showRepliesButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.textContent = (this.textContent === 'Показати відповіді') ? 'Приховати відповіді' : 'Показати відповіді';
+        });
+        });
+        const showMoreReplies = (messageId, startIndex) => {
+            const allReplies = getAllReplies(messageId);
+            const remainingReplies = allReplies.slice(startIndex);
+            const lastVisibleReply = document.querySelector(`.message.reply[data-parent-id="${messageId}"]:last-of-type`);
+            remainingReplies.forEach(reply => {
+                const replyElement = createMessageHTML(reply, true);
+                lastVisibleReply.after(replyElement);
+            });
+            updateMessageStyles();
+            const showMoreButton = document.querySelector(`#show-more-${messageId}`);
+            if (showMoreButton) {
+                showMoreButton.remove();
+            }
+        };
+   
+        const getAllReplies = (messageId, messages = DISCUSSION_MESSAGES) => {
+            let allReplies = [];
+            function findMessageAndReplies(messages, targetId) {
+                for (const message of messages) {
+                    if (message.id === targetId) {
+                        return message.replies || [];
+                    }
+                    if (message.replies && message.replies.length > 0) {
+                        const found = findMessageAndReplies(message.replies, targetId);
+                        if (found.length > 0) return found;
+                    }
+                }
+                return [];
+            }
+            allReplies = findMessageAndReplies(messages, messageId);
+            return allReplies;
+        };
      
     const escapeSelector = (id) => CSS.escape(id); 
     const toggleReplies = (messageId, show) => {
@@ -292,30 +328,6 @@
         updateMessageStyles();
     };
 
-
-    const getAllReplies = (messageId, messages = []) => {
-        if (!Array.isArray(messages)) {
-            console.error("Invalid input: messages must be an array");
-            return [];
-        }
-        
-        let allReplies = [];
-        function findMessageAndReplies(messages, targetId) {
-            for (const message of messages) {
-                if (message.id === targetId) {
-                    return message.replies || [];
-                }
-                if (message.replies && message.replies.length > 0) {
-                    const found = findMessageAndReplies(message.replies, targetId);
-                    if (found.length > 0) return found;
-                }
-            }
-            return [];
-        }
-        allReplies = findMessageAndReplies(messages, messageId);
-        return allReplies;
-    };
-    
     
 
     // Функція для відправки коментаря
@@ -498,7 +510,7 @@
                             }
                         });
                         replyInput.style.display = replyInput.style.display === 'none' ? 'flex' : 'none';
-
+    
                         if (replyInput.style.display === 'flex') {
                             const input = replyInput.querySelector('input');
                             input.focus();

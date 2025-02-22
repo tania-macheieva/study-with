@@ -872,11 +872,15 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
     const categoryId = categoryTrigger.dataset.value;
     const educationLevel = educationTrigger.dataset.value;
     const courseThumbnail = document.getElementById('course_thumbnail').files[0];
-  
+    const GenTestLinkInput = document.querySelector(".gener-test-link-input"); 
+    const GenTestLink = GenTestLinkInput ? GenTestLinkInput.value.trim() : ""; 
+
     const modules = [];
     let moduleCounter = 1;
     document.querySelectorAll('.module').forEach(moduleDiv => {
       const moduleTitle = moduleDiv.querySelector('input').value;
+      const testLinkInput = moduleDiv.querySelector(".test-link-input"); // Отримуємо поле для посилання на тест
+      const testLink = testLinkInput ? testLinkInput.value.trim() : ""; // Беремо значення або порожній рядок
       const lectures = [];
   
       moduleDiv.querySelectorAll('.lecture').forEach(lectureDiv => {
@@ -887,7 +891,7 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
         lectures.push({ title: lectureTitle, description: lectureDescription, order_num: lectureOrderNum });
       });
   
-      modules.push({ title: moduleTitle, order_num: moduleCounter, lectures: lectures });
+      modules.push({ title: moduleTitle, order_num: moduleCounter,  test_link: testLink, lectures: lectures });
       moduleCounter++;
     });
   
@@ -959,7 +963,7 @@ document.getElementById('create-course').addEventListener('submit', function(e) 
     formData.append('author_id', authorId);
     formData.append('modules', JSON.stringify(modules)); 
     formData.append('tags', JSON.stringify(tagsList));
-  
+    formData.append('test_link',GenTestLink);
     
     const addedLectureFiles = [];
   
