@@ -512,23 +512,42 @@ body {
 
 /* Message Styles */
 .discussion-thread {
-    margin-top: 20px;
+    margin-top: 20px; 
 }
 
 .message {
     position: relative;
     border: 2px solid #C7C7C7;
-    border-radius: 12px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
     padding: 20px;
     margin-bottom: 0;
     margin-top: 16px;
-    background: #FFFFFF;
+    background: #FFFFFF; 
+}
+
+.message:first-of-type {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.message:last-of-type {
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
 }
 
 .message.reply {
     margin-top: -2px;
     margin-bottom: 0;
     border-radius: 0;
+}  
+
+.replies-container {
+    
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 .message.has-visible-replies {
@@ -537,10 +556,14 @@ body {
     border-bottom-right-radius: 0;
 }
 
+.message.reply:first-of-type {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
 .message.reply:last-of-type {
     border-bottom-left-radius: 12px;
     border-bottom-right-radius: 12px;
-    margin-bottom: 16px;
 }
 
 .message .user-info {
@@ -575,6 +598,18 @@ body {
     margin-left: 48px;
 }
 
+/* Для @mention */ 
+.mention {
+    font-weight: 600;
+    color: #283044;
+    background: #DCECFC;
+    padding: 4px 8px;
+    border-radius: 8px;
+    display: inline-block;
+    font-size: 14px;    
+}
+
+/* Стилі для кнопки "більше" */
 .message .more-options {
     position: absolute;
     right: 10px;
@@ -587,37 +622,13 @@ body {
     cursor: pointer;
 }
 
-/* Checkbox Styles */
-input[type="checkbox"] {
-    appearance: none; 
-    width: 20px;
-    height: 20px;
-    border: 1px solid #283044;
-    border-radius: 8px;
-    position: relative;
-    cursor: pointer;
-}
-
-input[type="checkbox"]:checked {
-    background-color: #ffffff;
-    border-color: #283044;
-}
-  
-input[type="checkbox"]:checked::before {
-    content: '✔';
-    position: absolute;
-    top: -4px;
-    left: 1px;
-    color: #283044;
-    font-size: 16px;
-}
-
-/* Reply Input Styles */
+/* Стилі для вводу відповіді */
 .message .reply-input {
     display: flex;
     gap: 10px;
     padding: 30px;
     margin-top: 20px;
+    border-radius: 12px;
 }
 
 .message .reply-input input {
@@ -643,21 +654,11 @@ input[type="checkbox"]:checked::before {
     content: url('../images/send_hover.svg'); 
 }
 
-
 .message.reply .user-info,
 .message.reply .message-text {
-    margin-left: 48px;
+    margin-left: 48px;  
 }
 
-.mention {
-    font-weight: 600;
-    color: #283044;
-    background: #DCECFC;
-    padding: 4px 8px;
-    border-radius: 8px;
-    display: inline-block;
-    font-size: 14px;    
-} 
 
 /* Show More Button */
 .show-more-button {
