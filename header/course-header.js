@@ -241,7 +241,7 @@ class HeaderComponent extends HTMLElement {
         const homeButton = this.querySelector('.home');
         if (homeButton) {
             homeButton.addEventListener('click', () => {
-                window.location.href = '/home';
+                window.location.href = '/';
             });
             homeButton.style.cursor = 'pointer';
         }
