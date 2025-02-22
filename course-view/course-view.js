@@ -980,7 +980,7 @@ async function loadCourseData() {
     try {
         const courseId = window.location.pathname.split('/course/').pop();
         const userId = localStorage.getItem('userId');
-
+ 
         const response = await fetch(`/api/course/${courseId}?userId=${userId}`);
         if (!response.ok) throw new Error('Failed to load course data');
         
@@ -1018,11 +1018,30 @@ async function loadCourseData() {
             
             renderCourseContent();
             applyCompletedLecturesStyles();
+ 
+            let firstUncompletedLecture = null;
+            for (const module of COURSE_MODULES) {
+                for (const lecture of module.lectures) {
+                    if (!lecture.completed) {
+                        firstUncompletedLecture = lecture;
+                        break;
+                    }
+                }
+                if (firstUncompletedLecture) break;
+            }
+ 
+            if (!firstUncompletedLecture && COURSE_MODULES.length > 0 && COURSE_MODULES[0].lectures.length > 0) {
+                firstUncompletedLecture = COURSE_MODULES[0].lectures[0];
+            }
+ 
+            if (firstUncompletedLecture) {
+                await handleLectureClick(firstUncompletedLecture.id);
+            }
         }
     } catch (error) {
         console.error('Error loading course data:', error);
     }
-}
+ }
 
 function applyCompletedLecturesStyles() {
     const topics = document.querySelectorAll('.topic-item');
@@ -1364,11 +1383,34 @@ async function initializeCourseProgress() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    loadCourseHeader().then(() => {
-        initializeCourseProgress();
-    });
-    loadCourseData();
-    renderCourseContent();   
-    initializeModuleListeners(); 
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        await loadCourseHeader();
+        await initializeCourseProgress();
+        await loadCourseData();
+        
+        let firstUncompletedLecture = null;
+        for (const module of COURSE_MODULES) {
+            for (const lecture of module.lectures) {
+                if (!lecture.completed) {
+                    firstUncompletedLecture = lecture;
+                    break;
+                }
+            }
+            if (firstUncompletedLecture) break;
+        }
+
+        if (!firstUncompletedLecture && COURSE_MODULES.length > 0 && COURSE_MODULES[0].lectures.length > 0) {
+            firstUncompletedLecture = COURSE_MODULES[0].lectures[0];
+        }
+
+        if (firstUncompletedLecture) {
+            handleLectureClick(firstUncompletedLecture.id);
+        }
+        
+        renderCourseContent();   
+        initializeModuleListeners();
+    } catch (error) {
+        console.error('Error initializing course view:', error);
+    }
 });

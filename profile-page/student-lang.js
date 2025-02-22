@@ -236,7 +236,7 @@ async function loadEnrolledCourses() {
                     <span style="width: ${course.progress || 0}%;"></span>
                 </div>
                 <p class="percent">${course.progress || 0}%</p>
-                <img src="${course.image_url || '/images/250x100.png'}" 
+                <img src="/uploads/${course.image_url || '/images/250x100.png'}" 
                      alt="${course.name}" 
                      onerror="this.src='/images/250x100.png'">
                 <button class="btn-resume" data-course-id="${course.id}">

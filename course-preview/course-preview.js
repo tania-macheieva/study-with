@@ -11,48 +11,85 @@ document.addEventListener('DOMContentLoaded', async function() {
     try {
         const response = await fetch(`/api/courses/${courseId}/full`);
         if (!response.ok) throw new Error('Помилка завантаження курсу');
-        courseData = await response.json(); // Зберігаємо дані в змінну
+        courseData = await response.json();
         
-        // Оновлюємо елементи сторінки даними з API
-        document.querySelector('.course-name').textContent = courseData.name;
+        console.log('Отримані дані курсу:', courseData);
+        
+        if (!courseData.name) {
+            throw new Error('У відповіді відсутня назва курсу');
+        }
+        
+        const courseNameElement = document.querySelector('.course-name');
+        if (courseNameElement) {
+            courseNameElement.textContent = courseData.name;
+        } else {
+            console.error('Не знайдено елемент для назви курсу');
+        }
+        
         document.querySelector('.prev-image').src = courseData.image_url 
-        ? `/uploads/${courseData.image_url}` 
-        : '/images/default-course.png';
+            ? `/uploads/${courseData.image_url}` 
+            : '/images/default-course.png';
         document.querySelector('.course-description').textContent = courseData.description;
         document.querySelector('.detail-category .detail-value').textContent = courseData.category;
-        
+    
         const detailsMainValues = document.querySelectorAll('.details-main .detail-value');
         detailsMainValues[0].textContent = courseData.level;
         detailsMainValues[1].textContent = '6 weeks';
         detailsMainValues[2].textContent = courseData.price === 0 ? 'Безкоштовно' : `$${courseData.price}`;
-
-        // Додаємо перевірку статусу запису користувача
+    
         const userId = localStorage.getItem('userId');
         if (userId) {
             const enrollmentStatus = await checkEnrollmentStatus(courseId, userId);
             updateSignUpButton(enrollmentStatus);
         }
-        // Оновлюємо модулі курсу
-        const modulesContainer = document.querySelector('.white-card');
-        if (course.modules && course.modules.length > 0) {
-            modulesContainer.innerHTML = course.modules.map(module => `
-                <div class="module">
-                    <h3>${module.title}</h3>
-                    ${module.lectures.map(lecture => `
-                        <div class="topic">${lecture.title}</div>
-                    `).join('')}
-                </div>
-            `).join('');
-        }
+    
+        const modulesSection = Array.from(document.querySelectorAll('.section')).find(section => 
+            section.querySelector('.info-label').textContent.trim() === 'Course modules'
+        );
 
+        if (modulesSection) {
+            const modulesContainer = modulesSection.querySelector('.white-card');
+            
+            if (courseData.modules && courseData.modules.length > 0) {
+                modulesContainer.innerHTML = courseData.modules.map(module => `
+                    <div class="module">
+                        <h3>${module.title}</h3>
+                        ${module.lectures && module.lectures.length > 0 
+                            ? module.lectures.map(lecture => `
+                                <div class="topic">${lecture.title}</div>
+                            `).join('')
+                            : '<div class="topic">Немає доступних лекцій</div>'
+                        }
+                    </div>
+                `).join('');
+            } else {
+                modulesContainer.innerHTML = `
+                    <div class="module">
+                        <h3>Інформація про модулі відсутня</h3>
+                    </div>
+                `;
+            }
+        }
+        
     } catch (error) {
-        console.error('Помилка:', error);
-        document.querySelector('.course-name').textContent = 'Помилка завантаження курсу';
+        console.error('Помилка завантаження курсу:', error);
+        
+        const errorElements = {
+            '.course-name': 'Помилка завантаження курсу',
+            '.course-description': 'Не вдалося завантажити опис курсу',
+            '.detail-category .detail-value': 'Не визначено',
+        };
+        
+        Object.entries(errorElements).forEach(([selector, message]) => {
+            const element = document.querySelector(selector);
+            if (element) element.textContent = message;
+        });
+        
+        showNotification('Помилка завантаження даних курсу', 'error');
     }
 
 
 
-   // Додаємо стилі для сповіщень
 const notificationStyles = document.createElement('style');
 notificationStyles.textContent = `
     .notification {
@@ -92,7 +129,6 @@ notificationStyles.textContent = `
 `;
 document.head.appendChild(notificationStyles);
 
-// Функція для показу сповіщень
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
@@ -104,7 +140,6 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
-// Функція для збереження/видалення курсу
 async function toggleSaveCourse(courseId) {
     const userId = localStorage.getItem('userId');
     if (!userId) {
@@ -135,7 +170,6 @@ async function toggleSaveCourse(courseId) {
 
         const data = await response.json();
         
-        // Оновлюємо стан кнопки
         const imgElement = saveBtn.querySelector('img');
         if (!isCurrentlySaved) {
             saveBtn.classList.add('saved');
@@ -153,7 +187,6 @@ async function toggleSaveCourse(courseId) {
     }
 }
 
-// Ініціалізуємо кнопку збереження при завантаженні сторінки
 async function initializeSaveButton() {
     const saveBtn = document.querySelector('.save-btn');
     if (!saveBtn) return;
@@ -164,7 +197,6 @@ async function initializeSaveButton() {
     if (!userId || !courseId) return;
 
     try {
-        // Перевіряємо чи курс вже збережений
         const response = await fetch(`http://localhost:8000/api/courses/is-saved?userId=${userId}&courseId=${courseId}`);
         const data = await response.json();
 
@@ -174,7 +206,6 @@ async function initializeSaveButton() {
             imgElement.src = '../images/save_active.svg';
         }
 
-        // Додаємо обробник кліку
         saveBtn.addEventListener('click', () => toggleSaveCourse(courseId));
 
     } catch (error) {
@@ -182,10 +213,8 @@ async function initializeSaveButton() {
     }
 }
 
-// Викликаємо ініціалізацію при завантаженні сторінки
 document.addEventListener('DOMContentLoaded', initializeSaveButton);
 
-    //кнопка поширення
     const shareBtn = document.querySelector('.share-btn');
     if (shareBtn) {
         shareBtn.addEventListener('click', async function() {
@@ -213,7 +242,6 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
         });
     }
 
-    // Функціонал для опису курсу
     const description = document.querySelector('.course-description');
     
     function initializeDescription() {
@@ -245,7 +273,6 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
     
     initializeDescription();
 
-    // Дані відгуків
     const reviews = [
         {
             username: "username 1",
@@ -284,7 +311,6 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
         }
     ];
 
-    // Дані спікерів
     const speakers = [
         {
             name: "Speaker name 1",
@@ -306,7 +332,6 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
     let currentReviewIndex = 0;
     let currentSpeakerIndex = 0;
 
-    // Функція форматування дати
     function formatReviewDate(date) {
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -328,7 +353,6 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
         });
     }
 
-    // Функція сортування відгуків
     function sortReviews(reviewsArray) {
         return [...reviewsArray].sort((a, b) => {
             if (a.text && !b.text) return -1;
@@ -337,7 +361,6 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
         });
     }
 
-    // Функція оновлення відгуку
     function updateReview() {
         const sortedReviews = sortReviews(reviews);
         const review = sortedReviews[currentReviewIndex];
@@ -354,7 +377,6 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
         `;
     }
 
-    // Функція оновлення спікера
     function updateSpeaker() {
         const speaker = speakers[currentSpeakerIndex];
         const speakersSection = document.querySelector('.speakers-section');
@@ -367,7 +389,6 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
         `;
     }
 
-    // Ініціалізація навігації каруселі
     const reviewsSection = document.querySelector('.reviews-section');
     const speakersSection = document.querySelector('.speakers-section');
 
@@ -405,7 +426,6 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
         }
     }
 
-    // Функції для модального вікна
     function calculateRatePercentages() {
         const total = reviews.length;
         const counts = {};
@@ -446,14 +466,12 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
         `).join('');
     }
 
-    // Створення контейнера для модального вікна
     if (!document.querySelector('.modal-container')) {
         const modalContainer = document.createElement('div');
         modalContainer.className = 'modal-container';
         document.body.appendChild(modalContainer);
     }
 
-    // Обробники для заголовків секцій
     document.querySelectorAll('.info-label').forEach(label => {
         label.addEventListener('click', function() {
             const section = this.closest('.section');
@@ -558,7 +576,6 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
         });
     });
 
-    // Функція перевірки статусу запису на курс
     async function checkEnrollmentStatus(courseId, userId) {
         try {
             const response = await fetch(`/api/courses/${courseId}/enrollment-status?userId=${userId}`);
@@ -570,7 +587,6 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
         }
     }
 
-    // Функція оновлення кнопки запису
     function updateSignUpButton(enrollmentStatus) {
         const signUpButton = document.querySelector('.sign-up');
         
@@ -585,7 +601,6 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
         }
     }
 
-    // Функція обробки запису на курс
     async function handleCourseEnrollment() {
         try {
             const userId = localStorage.getItem('userId');
@@ -597,9 +612,7 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
                 return;
             }
     
-            // Перевіряємо чи курс платний
             if (courseData.price > 0) {
-                // Перенаправляємо на сторінку оплати
                 window.location.href = `/pay-page/pay.html?id=${courseId}`;
                 return;
             }
@@ -631,7 +644,6 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
         }
     }
 
-    // Функція показу повідомлень
     function showNotification(message, type = 'info') {
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
@@ -643,9 +655,6 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
         }, 3000);
     }
 
-    
-
-    // Ініціалізація елементів каруселі
     updateReview();
     updateSpeaker();
 });

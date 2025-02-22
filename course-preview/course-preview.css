@@ -94,6 +94,7 @@ main
     flex-direction: column;
     min-width: 0;
     justify-content: space-between;
+    padding-bottom: 60px; 
 }
 
 .preview-image {
@@ -245,7 +246,11 @@ main
 .detail-value {
     font-size: 16px;
 }
-
+.btn-sign-up{
+    position: absolute;
+    bottom: 20px; /* Відступ від низу */
+    right: 20px; /* Відступ від правого краю */
+}
 /* Кнопка реєстрації */
 .sign-up {
     align-self: flex-end;

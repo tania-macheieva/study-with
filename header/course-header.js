@@ -1,6 +1,7 @@
 class HeaderComponent extends HTMLElement {
     constructor() {
         super();
+        
         this.innerHTML = `
         <style>
             body {
@@ -190,7 +191,7 @@ class HeaderComponent extends HTMLElement {
                         <img src="../images/arrow.svg" alt="arrow-exit-ico">Home
                     </h2>
                     <h2 class="course-n">
-                        <img src="../images/save-c.svg" alt="save-course-ico">Course name course name
+                        <img src="../images/save-c.svg" alt="save-course-ico">
                     </h2>
                 </div>
 
@@ -232,7 +233,18 @@ class HeaderComponent extends HTMLElement {
         </header>
         `;
         
+        
         this.initializeProfileButton();
+        this.initializeHomeButton();
+    }
+    initializeHomeButton() {
+        const homeButton = this.querySelector('.home');
+        if (homeButton) {
+            homeButton.addEventListener('click', () => {
+                window.location.href = '/';
+            });
+            homeButton.style.cursor = 'pointer';
+        }
     }
 
     getStyles() {
@@ -353,17 +365,38 @@ function applyTranslations(lang) {
 
 async function initializeCourseProgress() {
     try {
-        const courseId = window.location.pathname.split('/course/').pop();
+        const urlParams = new URLSearchParams(window.location.search);
+        let courseId = urlParams.get('id');
+
+        if (!courseId) {
+            courseId = window.location.pathname.split('/course/').pop();
+        }
+
         const userId = localStorage.getItem('userId');
 
         if (!courseId || !userId) return;
 
+        // Додаємо завантаження даних курсу
+        const courseResponse = await fetch(`/api/courses/${courseId}/full`);
+        if (!courseResponse.ok) {
+            throw new Error('Помилка завантаження даних курсу');
+        }
+        const courseData = await courseResponse.json();
+
+        // Додаємо оновлення назви
+        const courseNameElement = document.querySelector('.course-n');
+        if (courseNameElement) {
+            courseNameElement.innerHTML = `
+                <img src="../images/save-c.svg" alt="save-course-ico">
+                ${courseData.name}
+            `;
+        }
+
+        // Існуючий код для прогресу
         const response = await fetch(`/api/course/${courseId}/progress?userId=${userId}`);
-        
         if (!response.ok) {
             throw new Error('Помилка завантаження прогресу');
         }
-        
         const progressData = await response.json();
         
         const headerComponent = document.querySelector('course-header');
@@ -371,7 +404,7 @@ async function initializeCourseProgress() {
             headerComponent.setProgress(progressData.progress);
         }
     } catch (error) {
-        console.error('Помилка ініціалізації прогресу:', error);
+        console.error('Помилка ініціалізації курсу:', error);
     }
 }
 
