@@ -11,31 +11,46 @@
       href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="../all_courses/all.css" />
     <link rel="icon" href="../images/menu-logo.ico">
   <style>
-    body {
-      font-family:  "Inter", sans-serif;
-      background-color: #f9f9f9;
-      margin: 0;
-      padding: 20px;
-      min-height: 120vh;
-    }
-    .generate-test{
-  display: flex;
-  justify-content: center; /* Центрування кнопки "Save test" */
-  margin-top: 20px; /* Відступ зверху */
+body {
+    font-family: "Inter", sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-  /* Загальні стилі для форми */
+.generate-test {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0; 
+    padding: 20px 0; 
+}
+
+#final-test-block {
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
   form {
-    margin: 20px auto;
     width: 80%;
     max-width: 800px;
-    background-color: #F0F4F9;
+    margin: 0;  
     padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #F0F4F9;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
+    position: relative; 
+    transform: translateY(0);
+}
   
   label {
     font-size: 16px;
@@ -700,8 +715,6 @@ function addDragAndDropFunctionality(container) {
 
     });
   </script>
-  <script src="../header/auth-header.js"></script>
-  <script src="../footer/footer.js"></script>
   <script src="../tests/test-lang.js"></script>
 </body>
 </html>
