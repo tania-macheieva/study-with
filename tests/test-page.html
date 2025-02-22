@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title data-lang="testPage">Test Page</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -308,27 +309,71 @@ button {
 
   <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const storedTestId = localStorage.getItem('testId');
 
-    if (storedTestId) {
-        document.getElementById('test-id-input').value = storedTestId;
+    const secretKey ='testSecretIdEncription';
+    function getTestIdFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('testId');
     }
+
+    function decryptTestId(encryptedId) {
+        try {
+            const bytes = CryptoJS.AES.decrypt(encryptedId, secretKey);
+            return bytes.toString(CryptoJS.enc.Utf8);
+        } catch (error) {
+            console.error('Error while decrypting test ID:', error);
+            return null;
+        }
+    }
+
+    let encryptedTestId = getTestIdFromUrl();
+    if (encryptedTestId) {
+        console.log('Encrypted Test ID from URL:', encryptedTestId);
+
+        // Зберігаємо testId у localStorage
+        localStorage.setItem('testId', encryptedTestId);
+
+        // Очищаємо testId з URL
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+    } else {
+        // Якщо testId немає в URL, пробуємо взяти з localStorage
+        encryptedTestId = localStorage.getItem('testId');
+    }
+
+    // Перевіряємо, чи testId не пустий
+    if (!encryptedTestId || encryptedTestId.length < 10) {
+        console.error('Invalid test ID:', encryptedTestId);
+        return;
+    }
+
+    // Автоматично підставляємо testId у <input>
+    document.getElementById('test-id-input').value = encryptedTestId;
+
 
     // Обробник для кнопки "Generate Test"
 document.getElementById('generate-test-btn').addEventListener('click', async function () {
-  const testId = document.getElementById('test-id-input').value.trim();
+  let encryptedTestId = document.getElementById('test-id-input').value.trim();
   const finalTestBlock = document.getElementById('final-test-block');
   finalTestBlock.innerHTML = ''; // Очищуємо блок перед генерацією
-
-  if (!testId) {
-    finalTestBlock.innerHTML = '<p data-lang="enterTestId">Please provide a test ID.</p>';
+ 
+if (!encryptedTestId) {
+    encryptedTestId = localStorage.getItem('testId');
+}
+if (!encryptedTestId) {
+    finalTestBlock.innerHTML = '<p>Please provide a test ID.</p>';
     return;
-  }
+}
+const decryptedTestId = decryptTestId(encryptedTestId);
+        if (!decryptedTestId) {
+            console.error('Failed to decrypt test ID');
+            return;
+        }
 
   try {
     finalTestBlock.innerHTML = '<p  data-lang="loadTestData">Loading test data...</p>';
     // Запит на отримання тесту за ID
-    const response = await fetch(`/tests/get-test/${testId}`);
+    const response = await fetch(`/tests/get-test/${encodeURIComponent(encryptedTestId)}`);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch test: ${response.statusText}`);

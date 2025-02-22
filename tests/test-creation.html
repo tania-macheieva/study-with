@@ -67,6 +67,8 @@
   
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+
+
 // Функція для отримання параметра з URL
 function getQueryParam(name) {
     const params = new URLSearchParams(window.location.search);
@@ -159,6 +161,14 @@ if (moduleTitle) {
 
     return { html: wrapper, data: questionData };
   }
+  function decryptTestId(encryptedId) {
+    try {
+        const bytes = CryptoJS.AES.decrypt(encryptedId, secretKey);
+        return bytes.toString(CryptoJS.enc.Utf8);
+    } catch (error) {
+        return null;
+    }
+}
 
  // Обробник кнопки "Save test"
 document.getElementById('save-test-btn').addEventListener('click', (e) => {
@@ -226,57 +236,74 @@ if (answerElement) {
   
   .then(data => {
     if (data.testId) {
-      alert(`Test saved successfully! Your test ID is: ${data.testId}`);
-      console.log('Saved test ID:', data.testId);
-      // Зберігаємо testId в localStorage
-      localStorage.setItem('testId', data.testId);
-       // Генеруємо посилання на тест
-    const testLink = `http://localhost:8000/test-page/`;
+            alert(`Test saved successfully!`);
+            console.log('Saved test ID:', data.testId);
 
-    
-    // Зберігаємо посилання у кнопку для копіювання
-    document.getElementById('copy-test-link-btn').setAttribute('data-link', testLink);
+            // Очищаємо попередній testId, якщо він був
+            localStorage.removeItem('testId');
 
-    console.log('Saved test link:', testLink);
-    } else {
-      alert('Test saved, but no ID was returned from the server.');
-    }
-  })
-  .catch(error => {
-    alert('Error saving test!');
-    console.error(error);
-  });
- });
- document.getElementById('copy-test-link-btn').addEventListener('click', function () {
-    const testLink = 'http://localhost:8000/test-page/';
-    navigator.clipboard.writeText(testLink).then(() => {
-        alert('Test link copied to clipboard!');
-    }).catch(err => {
-        console.error('Failed to copy: ', err);
+            // Зберігаємо новий testId у localStorage
+            localStorage.setItem('testId', data.testId);
+            // Автоматично вставляємо testId у поле вводу
+            document.getElementById('test-id-input').value = data.testId;
+
+            // Генеруємо посилання на тест
+            const testLink = `http://localhost:8000/test-page?testId=${encodeURIComponent(data.testId)}`;
+
+            // Зберігаємо посилання у кнопку для копіювання
+            document.getElementById('copy-test-link-btn').setAttribute('data-link', testLink);
+
+            console.log('Saved test link:', testLink);
+        }  else {
+            alert('Test saved, but no ID was returned from the server.');
+        }
+    })
+    .catch(error => {
+        alert('Error saving test!');
+        console.error(error);
     });
 });
-const storedTestId = localStorage.getItem('testId');
+document.getElementById('copy-test-link-btn').addEventListener('click', function () {
+  const testLink = this.getAttribute('data-link');
 
-if (storedTestId) {
-    document.getElementById('test-id-input').value = storedTestId;
+if (!testLink) {
+    alert('No test link available! Please save the test first.');
+    return;
 }
+
+navigator.clipboard.writeText(testLink).then(() => {
+    alert('Test link copied to clipboard!');
+}).catch(err => {
+    console.error('Failed to copy: ', err);
+});
+});
+const testIdInput = document.getElementById('test-id-input');
+    const savedTestId = localStorage.getItem('testId');
+
+    if (savedTestId) {
+        testIdInput.value = savedTestId;
+    }
 
   
 // Обробник для кнопки "Generate Test"
 document.getElementById('generate-test-btn').addEventListener('click', async function () {
-  const testId = document.getElementById('test-id-input').value.trim();
+  const encryptedTestId = document.getElementById('test-id-input').value.trim();
   const finalTestBlock = document.getElementById('final-test-block');
   finalTestBlock.innerHTML = ''; // Очищуємо блок перед генерацією
 
-  if (!testId) {
-    finalTestBlock.innerHTML = '<p data-lang="enterTestId">Please provide a test ID.</p>';
-    return;
-  }
+    // Якщо поле вводу порожнє, беремо зашифрований testId із localStorage
+    if (!encryptedTestId) {
+        encryptedTestId = localStorage.getItem('testId');
+        if (!encryptedTestId) {
+            finalTestBlock.innerHTML = '<p>Please provide a test ID.</p>';
+            return;
+        }
+    }
 
   try {
     finalTestBlock.innerHTML = '<p data-lang="loadTestData" >Loading test data...</p>';
     // Запит на отримання тесту за ID
-    const response = await fetch(`/tests/get-test/${testId}`);
+    const response = await fetch(`/tests/get-test/${encodeURIComponent(encryptedTestId)}`);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch test: ${response.statusText}`);
