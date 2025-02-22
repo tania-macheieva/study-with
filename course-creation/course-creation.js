@@ -284,7 +284,7 @@ closeModal.addEventListener("click", () => {
       <button class="add-lecture-btn">${translations[userLang].addLecture}</button>
       <button class="delete-module-btn">${translations[userLang].deleteModule}</button>
       <button class="create-test-btn">${translations[userLang].createTest}</button>
-      <button class="add-test-btn">${translations[userLang].addTest}</button>
+      <button class="add-test-btn" type="button">${translations[userLang].addTest}</button>
     `;
   
     modulesList.appendChild(moduleDiv);
@@ -325,15 +325,16 @@ closeModal.addEventListener("click", () => {
         alert("Please enter a module title before creating a test.");
       }
     });
-    moduleDiv.querySelector(".add-test-btn").addEventListener("click", () => {
+    moduleDiv.querySelector(".add-test-btn").addEventListener("click", (e) => {
+      e.preventDefault();
       if (!moduleDiv.querySelector(".test-link-input")) {
           const testInputDiv = document.createElement("div");
           testInputDiv.innerHTML = `
               <input type="text" class="test-link-input" data-lang="enterTestlink" placeholder="Insert link to test">
           `;
-          moduleDiv.appendChild(testInputDiv);
+          moduleDiv.querySelector(".add-test-btn").after(testInputDiv);
       }
-  });
+    });
   
     saveModulesToLocalStorage();
   }
