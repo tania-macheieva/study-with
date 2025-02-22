@@ -564,10 +564,40 @@ function createModuleHTML(module) {
                             </li>
                         `).join('')}
                     </ul>
+                    ${module.test_link ? `
+                        <div class="module-test">
+                            <button onclick="openModuleTest('${module.test_link}')" class="test-button">
+                                <img src="/images/test-icon.svg" alt="Test icon" />
+                                Take module test
+                            </button>
+                        </div>
+                    ` : ''}
                 </div>
             ` : ''}
         </section>
     `;
+}
+
+window.openModuleTest = function(testLink) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Module Test</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <iframe src="${testLink}" frameborder="0"></iframe>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    modal.querySelector('.close-modal').addEventListener('click', () => {
+        modal.remove();
+    });
 }
 
 async function initializeLecturesState() {
@@ -1019,6 +1049,18 @@ function renderCourseContent() {
     COURSE_MODULES.forEach(module => {
         courseContent.insertAdjacentHTML('beforeend', createModuleHTML(module));
     });
+    
+    if (courseMeta.test_link) {
+        courseContent.insertAdjacentHTML('beforeend', `
+            <div class="course-final-test">
+                <h2>Final Course Test</h2>
+                <button onclick="openModuleTest('${courseMeta.test_link}')" class="test-button">
+                    <img src="/images/test-icon.svg" alt="Test icon" />
+                    Take final test
+                </button>
+            </div>
+        `);
+    }
     
     initializeModuleListeners();
 }

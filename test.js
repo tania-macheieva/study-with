@@ -4,6 +4,9 @@ const router = express.Router();
 const { pool } = require('./db');
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
+const CryptoJS = require('crypto-js');
+require('dotenv').config();
+const secretKey = process.env.ENCRYPT_SECRET;
 
 
 
@@ -86,7 +89,9 @@ router.post('/save-test', async (req, res) => {
   
   // Завершення транзакції
   await client.query('COMMIT');
-  res.status(200).json({ message: 'Test saved successfully', testId });
+  //  Шифруємо testId перед відправкою клієнту
+  const encryptedTestId = CryptoJS.AES.encrypt(testId.toString(), secretKey).toString();
+  res.status(200).json({ message: 'Test saved successfully', testId: encryptedTestId });
 } catch (error) {
   if (client) {
     await client.query('ROLLBACK'); // Відкат транзакції, якщо client створений
@@ -101,13 +106,19 @@ router.post('/save-test', async (req, res) => {
 });
 
 // Маршрут для отримання даних тесту
-router.get('/get-test/:testId', async (req, res) => {
+router.get('/get-test/:encryptedTestId', async (req, res) => {
   //console.log('Request body:', req.params); 
-  const { testId } = req.params;
-  if (!testId) {
+  const { encryptedTestId } = req.params;
+  if (!encryptedTestId) {
     return res.status(400).json({ error: 'Test ID is required' });
   }
   try {
+    // 🔹 Розшифровуємо testId
+    const bytes = CryptoJS.AES.decrypt(decodeURIComponent(encryptedTestId), secretKey);
+    const testId = bytes.toString(CryptoJS.enc.Utf8);
+    if (!testId) {
+      return res.status(400).json({ error: 'Invalid test ID' });
+  }
     // Отримуємо інформацію про тест
     const testQuery = `
       SELECT id, title, created_at 
