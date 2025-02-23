@@ -14,11 +14,7 @@ const createDiscussionTemplate = () => `
             <div class="checkbox-filter">
                 <input type="checkbox" id="questions-asked">
                 <label for="questions-asked">Questions I asked</label>
-            </div>
-            <div class="checkbox-filter">
-                <input type="checkbox" id="questions-following">
-                <label for="questions-following">Questions I'm following</label>
-            </div>
+            </div> 
             <div class="checkbox-filter">
                 <input type="checkbox" id="questions-responses">
                 <label for="questions-responses">Questions with responses</label>
@@ -61,12 +57,9 @@ messages.forEach(message => {
 function addShowRepliesButton(parentElement, messageId, replies) {
     const showRepliesButton = document.createElement('button');
     showRepliesButton.className = 'show-replies-button';
-
-    // Зчитуємо з localStorage, чи були відповіді відкриті
+ 
     const expandedFromStorage = localStorage.getItem(`replies-expanded-${messageId}`) === 'true';
-
-    // Якщо в localStorage не було запису, вважатимемо, що відповіді приховані
-    // або якщо 'false', то теж приховані
+ 
     if (expandedFromStorage) {
         showRepliesButton.dataset.expanded = 'true';
         showRepliesButton.textContent = 'Hide replies';
@@ -106,21 +99,17 @@ function addShowRepliesButton(parentElement, messageId, replies) {
 }
 
 document.querySelector('.send-reply').addEventListener('click', function(event) {
-    // Перевірка чи це кнопка для відправки відповіді
     const button = event.target;
-    const parentId = button.dataset.parentId; // id коментаря, на який відповідають
+    const parentId = button.dataset.parentId;
     const repliesButton = button.closest('.message').querySelector('.show-replies-button');
     
-    // Якщо відповіді були приховані, показуємо їх після надсилання нової відповіді
     if (repliesButton && repliesButton.dataset.expanded === 'false') {
-        // Тут код для надсилання відповіді...
-
-        // Показуємо відповіді після того, як надіслано
-        showReplies(button.closest('.message'), parentId, replies); // Відображаємо відповіді
-        repliesButton.textContent = 'Hide replies';  // Оновлюємо текст на кнопці
-        repliesButton.dataset.expanded = 'true';  // Оновлюємо стан кнопки
+        showReplies(button.closest('.message'), parentId, replies);
+        repliesButton.textContent = 'Hide replies';
+        repliesButton.dataset.expanded = 'true';
     }
 });
+
 
 
 function showReplies(parentElement, parentMessageId, replies) {
@@ -175,12 +164,13 @@ function renderReplies(replies, parentMessageId) {
     }    
     repliesContainer.innerHTML = '';
 
+    // Sort replies in reverse chronological order (newest to oldest)
+    const sortedReplies = [...replies].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+ 
+    // Map for quick access to comments by id
+    const replyMap = new Map(sortedReplies.map(reply => [reply.id, reply]));
 
-    // Карта для швидкого доступу до коментарів за їх id
-    const replyMap = new Map();
-    replies.forEach(reply => replyMap.set(reply.id, reply));
-
-    // Функція для створення окремої відповіді
+    // Create reply element function remains the same
     const createReplyElement = (reply) => {
         const replyElement = document.createElement('div');
         replyElement.classList.add('message', 'reply');
@@ -195,10 +185,10 @@ function renderReplies(replies, parentMessageId) {
                 year: 'numeric'
             });
         };
-
+        const avatar = reply.teacher_profile_image || reply.student_profile_image || user.profile_image || '/images/user-avatar.png';
         let messageContent = reply.content || '';
 
-        // Знаходимо ім'я користувача, якому відповідають
+        // Find the username of the parent comment
         let parentUsername = '';
         if (reply.parent_comment_id) {
             const parentReply = replyMap.get(reply.parent_comment_id);
@@ -210,14 +200,14 @@ function renderReplies(replies, parentMessageId) {
                     parentUsername = parentElement.querySelector('.username').textContent;
                 }
             }
-        }
+        } 
 
-        // Додаємо @mention, якщо його ще немає
+        // Add @mention if it's not already there
         if (parentUsername && !messageContent.startsWith(`@${parentUsername}`)) {
             messageContent = `@${parentUsername} ${messageContent}`;
         }
 
-        // Форматуємо @mention
+        // Format @mention
         if (parentUsername) {
             const mentionText = `@${parentUsername}`;
             const indexOfSpace = messageContent.indexOf(' ', mentionText.length);
@@ -228,7 +218,7 @@ function renderReplies(replies, parentMessageId) {
 
         replyElement.innerHTML = ` 
             <div class="user-info">
-                <img src="${reply.avatar || '/images/user-avatar.png'}" alt="User avatar" class="avatar">
+                <img src="${avatar || '/images/user-avatar.png'}" alt="User avatar" class="avatar">
                 <span class="username">${reply.user_name}</span>
                 <span class="date">${formatDate(reply.created_at)}</span>
             </div>
@@ -247,27 +237,27 @@ function renderReplies(replies, parentMessageId) {
         return replyElement;
     };
 
-    // Рекурсивна функція для обробки відповідей
+    // Modified recursive function to handle newest-first ordering while maintaining thread structure
     const processReplies = (parentId) => {
-        const currentLevelReplies = replies.filter(reply => reply.parent_comment_id === parentId);
+        // Get replies for this level and sort them newest first
+        const currentLevelReplies = sortedReplies
+            .filter(reply => reply.parent_comment_id === parentId);
         
+        // Process each reply
         currentLevelReplies.forEach(reply => {
             const replyElement = createReplyElement(reply);
             repliesContainer.appendChild(replyElement);
             
-            // Рекурсивно обробляємо відповіді на цю відповідь
+            // Process child replies immediately after their parent
             processReplies(reply.id);
         });
     };
 
-    // Починаємо обробку з відповідей на початковий коментар
+    // Start processing from the top level
     processReplies(parentMessageId);
-
-    // Якщо контейнер вже існує, ми не створюємо його знову
-    repliesContainer.style.display = 'block'; // Показуємо відповіді
-    updateMessageStyles(); // Оновлення стилів
-};
-
+    repliesContainer.style.display = 'block';
+    updateMessageStyles();
+}
 
 
 const createMessageHTML = (message, isReply = false, replyLevel = 0) => {
@@ -376,47 +366,54 @@ try {
 
 
 const updateMessageStyles = () => {
-// Перебираємо всі основні повідомлення
-const mainMessages = document.querySelectorAll('.message:not(.reply)');
+    // Перебираємо всі основні повідомлення
+    const mainMessages = document.querySelectorAll('.message:not(.reply)');
 
-mainMessages.forEach(mainMessage => {
-    const messageId = mainMessage.dataset.messageId;
-    const replies = document.querySelectorAll(`.message.reply[data-parent-id="${messageId}"]`);
+    mainMessages.forEach(mainMessage => {
+        const messageId = mainMessage.dataset.messageId;
+        const replies = document.querySelectorAll(`.message.reply[data-parent-id="${messageId}"]`);
 
-    // Очищаємо клас останньої відповіді у всіх вкладених відповідях
-    replies.forEach(reply => {
-        reply.classList.remove('last-reply');
-    });
+        // Очищаємо клас останньої відповіді у всіх вкладених відповідях
+        replies.forEach(reply => {
+            reply.classList.remove('last-reply');
+        });
 
-    if (replies.length > 0) {
-        // Визначаємо останню відповідь
-        const lastReply = replies[replies.length - 1];
-        lastReply.classList.add('last-reply');
+        if (replies.length > 0) {
+            // Визначаємо останню відповідь
+            const lastReply = replies[replies.length - 1];
+            lastReply.classList.add('last-reply');
 
-        mainMessage.classList.add('has-visible-replies');
-        mainMessage.style.borderBottomLeftRadius = '0';
-        mainMessage.style.borderBottomRightRadius = '0'; 
-    } else {
-        mainMessage.classList.remove('has-visible-replies');
-        mainMessage.style.borderBottom = '2px solid #CCCCCC';
-    }
-
-    // Стилізуємо відповіді
-    replies.forEach((reply, index) => {
-        reply.style.margin = '0';
-        reply.style.borderTop = '0';
-        reply.style.borderBottom = '2px solid #CCCCCC';
-        reply.style.borderBottomLeftRadius = '0';
-        reply.style.borderBottomRightRadius = '0';
-        
-        // Обробка вкладених відповідей
-        const nestedReplies = document.querySelectorAll(`.message.reply[data-parent-id="${reply.dataset.messageId}"]`);
-        if (nestedReplies.length > 0) {
-            reply.style.borderBottom = '0';
+            mainMessage.classList.add('has-visible-replies');
+            mainMessage.style.borderBottomLeftRadius = '0';
+            mainMessage.style.borderBottomRightRadius = '0';
+        } else {
+            mainMessage.classList.remove('has-visible-replies');
+            mainMessage.style.borderBottom = '2px solid #CCCCCC';
         }
+
+        // Стилізуємо відповіді, включаючи вкладені
+        replies.forEach(reply => {
+            reply.style.margin = '0';
+            reply.style.borderTop = '0';
+            reply.style.borderBottom = '2px solid #CCCCCC';
+            reply.style.borderBottomLeftRadius = '0';
+            reply.style.borderBottomRightRadius = '0';
+
+            // Обробка вкладених відповідей
+            const nestedReplies = document.querySelectorAll(`.message.reply[data-parent-id="${reply.dataset.messageId}"]`);
+            if (nestedReplies.length > 0) {
+                reply.style.borderBottom = '0';
+            }
+
+            // Додаємо бордер для останньої вкладеної відповіді
+            if (nestedReplies.length > 0) {
+                const lastNestedReply = nestedReplies[nestedReplies.length - 1];
+                lastNestedReply.style.borderBottom = '2px solid #CCCCCC';
+            }
+        });
     });
-});
 };
+
 // Оновлюємо стилі для першого та останнього коментаря
 const allMessages = document.querySelectorAll('.message');
 if (allMessages.length > 0) {
@@ -427,8 +424,7 @@ if (allMessages.length > 0) {
     const lastMessage = allMessages[allMessages.length - 1];
     lastMessage.style.borderBottomLeftRadius = '0';
     lastMessage.style.borderBottomRightRadius = '0';
-}
- 
+}  
 const showMoreReplies = (messageId, startIndex) => {
     const allReplies = getAllReplies(messageId);
     const remainingReplies = allReplies.slice(startIndex);
@@ -462,50 +458,9 @@ const getAllReplies = (messageId, messages = DISCUSSION_MESSAGES) => {
     return allReplies;
 };
 
+
 const escapeSelector = (id) => CSS.escape(id); 
-// const toggleReplies = (messageId, show) => {
-//     const parentMessage = document.querySelector(`.message[data-message-id="${messageId}"]`);
-//     if (!parentMessage) return;
 
-//     if (show) {
-//         if (!parentMessage.classList.contains('has-visible-replies')) {
-//             const allReplies = getAllReplies(messageId);
-//             if (allReplies.length > 0) {
-//                 parentMessage.classList.add('has-visible-replies');
-//                 let lastReplyElement;
-//                 let replyLevel = 1;
-
-//                 allReplies.forEach(reply => {
-//                     const replyElement = createMessageHTML(reply, true, replyLevel);
-//                     parentMessage.after(replyElement);
-//                     lastReplyElement = replyElement;
-
-//                     const nestedReplies = getAllReplies(reply.id);
-//                     if (nestedReplies.length > 0) {
-//                         replyLevel++;
-//                     }
-//                 });
-//             }
-//         }
-//     } else {
-//         // Видаляємо всі вкладені відповіді
-//         document.querySelectorAll(`.message[data-parent-id="${messageId}"]`).forEach(reply => {
-//             reply.remove();
-//         });
-
-//         // Також видаляємо вкладені відповіді глибше
-//         const removeNestedReplies = (parentId) => {
-//             const nestedReplies = document.querySelectorAll(`.message[data-parent-id="${parentId}"]`);
-//             nestedReplies.forEach(nestedReply => {
-//                 removeNestedReplies(nestedReply.dataset.messageId);
-//                 nestedReply.remove();
-//             });
-//         };
-
-//         removeNestedReplies(messageId);
-//         parentMessage.classList.remove('has-visible-replies');
-//     }
-// };
 const toggleReplies = (messageId, show) => {
     const parentMessage = document.querySelector(`.message[data-message-id="${messageId}"]`);
     if (!parentMessage) return;
@@ -656,12 +611,10 @@ document.addEventListener('click', function(e) {
         optionsMenu.className = 'options-menu';
 
         const menuOptions = isReply ? [
-            { action: 'add-reply', text: 'Write a reply' },
-            { action: 'follow', text: 'Follow replies' },
+            { action: 'add-reply', text: 'Write a reply' }, 
             { action: 'report', text: 'Report message' }
         ] : [ 
-            { action: 'add-reply', text: 'Write a reply' },
-            { action: 'follow', text: 'Follow replies' },
+            { action: 'add-reply', text: 'Write a reply' }, 
             { action: 'report', text: 'Report message' }
         ];
         optionsMenu.innerHTML = menuOptions
@@ -746,7 +699,7 @@ const fetchComments = async (courseId) => {
 
         const discussionThread = document.querySelector('.discussion-thread');
 
-        // Зберігаємо стан розгорнутих відповідей перед оновленням
+        // Save expanded states before updating
         const expandedStates = new Map();
         document.querySelectorAll('.show-replies-button').forEach(button => {
             const messageId = button.previousElementSibling.dataset.messageId;
@@ -755,30 +708,32 @@ const fetchComments = async (courseId) => {
 
         discussionThread.innerHTML = '';
 
-        // Групуємо всі коментарі за parent_comment_id
-        comments.forEach(comment => {
-            if (!comment.parent_comment_id) {
-                // Це головний коментар
-                const messageElement = createMessageHTML(comment);
-                discussionThread.appendChild(messageElement);
+        // Sort main comments by date in descending order (newest first)
+        const mainComments = comments
+            .filter(comment => !comment.parent_comment_id)
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
-                // Знаходимо всі відповіді для цього коментаря
-                const replies = comments.filter(reply => 
+        mainComments.forEach(comment => {
+            const messageElement = createMessageHTML(comment);
+            discussionThread.appendChild(messageElement);
+
+            // Find and sort replies for this comment
+            const replies = comments
+                .filter(reply => 
                     reply.parent_comment_id === comment.id || 
                     getParentChain(reply, comments).includes(comment.id)
-                );
+                )
+                .sort((a, b) => new Date(a.created_at) - new Date(b.created_at)); // Replies stay chronological
 
-                if (replies.length > 0) {
-                    addShowRepliesButton(messageElement, comment.id, replies);
+            if (replies.length > 0) {
+                addShowRepliesButton(messageElement, comment.id, replies);
 
-                    // Відновлюємо стан розгорнутих відповідей
-                    const wasExpanded = expandedStates.get(comment.id);
-                    if (wasExpanded) {
-                        const button = messageElement.nextElementSibling;
-                        if (button && button.classList.contains('show-replies-button')) {
-                            // Імітуємо клік на кнопці, щоб показати відповіді
-                            button.click();
-                        }
+                // Restore expanded state
+                const wasExpanded = expandedStates.get(comment.id);
+                if (wasExpanded) {
+                    const button = messageElement.nextElementSibling;
+                    if (button && button.classList.contains('show-replies-button')) {
+                        button.click();
                     }
                 }
             }
@@ -788,6 +743,8 @@ const fetchComments = async (courseId) => {
         console.error('Error fetching comments:', error);
     }
 };
+  
+
 // Допоміжна функція для отримання ланцюжка батьківських коментарів
 const getParentChain = (comment, allComments) => {
     const chain = [];
@@ -801,60 +758,6 @@ const getParentChain = (comment, allComments) => {
     
     return chain;
 };
-// const addShowRepliesButton = (parentElement, messageId, replies) => {
-//     const showRepliesButton = document.createElement('button');
-//     showRepliesButton.className = 'show-replies-button';
-//     showRepliesButton.textContent = `Show replies (${replies.length})`;
-
-//     // Перевірка збереженого стану
-//     const savedState = localStorage.getItem(`repliesExpanded-${messageId}`);
-//     showRepliesButton.dataset.expanded = savedState === 'true' ? 'true' : 'false';
-
-//     // Якщо відповіді вже мають бути відображені, показуємо їх
-//     if (showRepliesButton.dataset.expanded === 'true') {
-//         showRepliesButton.textContent = 'Hide replies';
-//         renderReplies(replies, messageId); // Показуємо відповіді
-//     }
-
-//     showRepliesButton.addEventListener('click', () => {
-//         const expanded = showRepliesButton.dataset.expanded === 'true';
-
-//         if (expanded) {
-//             // Приховуємо відповіді
-//             const repliesContainer = parentElement.nextElementSibling;
-//             if (repliesContainer && repliesContainer.classList.contains('replies-container')) {
-//                 repliesContainer.style.display = 'none';
-//             }
-
-//             // Оновлюємо стан кнопки
-//             showRepliesButton.dataset.expanded = 'false';
-//             showRepliesButton.textContent = `Show replies (${replies.length})`;
-
-//             // Зберігаємо стан в localStorage
-//             localStorage.setItem(`repliesExpanded-${messageId}`, 'false');
-//         } else {
-//             // Перевіряємо чи вже існує контейнер для відповідей
-//             let repliesContainer = parentElement.nextElementSibling;
-            
-//             // Якщо контейнер не існує або був прихований, додаємо його
-//             if (!repliesContainer || !repliesContainer.classList.contains('replies-container')) {
-//                 renderReplies(replies, messageId); // Показуємо відповіді
-//             } else {
-//                 repliesContainer.style.display = 'block'; // Якщо відповіді є, просто показуємо їх
-//             }
-
-//             // Оновлюємо стан кнопки
-//             showRepliesButton.dataset.expanded = 'true';
-//             showRepliesButton.textContent = 'Hide replies';
-
-//             // Зберігаємо стан в localStorage
-//             localStorage.setItem(`repliesExpanded-${messageId}`, 'true');
-//         }
-//     });
-
-//     parentElement.after(showRepliesButton);
-// };
-
 
 document.addEventListener('DOMContentLoaded', () => {
 // renderDiscussion();
