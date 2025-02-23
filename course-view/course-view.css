@@ -520,7 +520,7 @@ body {
     border: 2px solid #C7C7C7;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
-    padding: 20px;
+    padding: 10px 20px;
     margin-bottom: 0;
     margin-top: 16px;
     background: #FFFFFF; 
@@ -532,36 +532,27 @@ body {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
 }
+ 
 
-.message:last-of-type {
-    border-bottom-left-radius: 12px;
-    border-bottom-right-radius: 12px;
-}
-
-.message.reply {
-    margin-top: -2px;
+.message.reply {    
     margin-bottom: 0;
     border-radius: 0;
 }  
 
 .replies-container {
-    
-    border-bottom-left-radius: 0;
+    border-bottom-left-radius: 12px;
     border-bottom-right-radius: 0;
 }
 
 .message.has-visible-replies {
-    margin-bottom: 0;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-.message.reply:first-of-type {
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-}
+    margin-bottom: 0; 
+} 
 
 .message.reply:last-of-type {
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+.last-reply{
     border-bottom-left-radius: 12px;
     border-bottom-right-radius: 12px;
 }
@@ -570,17 +561,22 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 15px;
+    margin-top: 10px;
+    margin-bottom: 0px;
 }
 
+.message.reply .user-info,
+.message.reply .message-text {
+    margin-left: 48px;  
+}
 .message .avatar {
-    width: 38px;
-    height: 41px;
+    width: 40px;
+    height: 40px;
     border-radius: 100%;
 }
 
 .message .username {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 500;
     color: #000000;
 }
@@ -592,22 +588,13 @@ body {
 }
 
 .message .message-text {
-    font-size: 16px;
-    font-weight: 200;
+    font-size: 16px; 
     color: #000000;
     margin-left: 48px;
 }
 
 /* Для @mention */ 
-.mention {
-    font-weight: 600;
-    color: #283044;
-    background: #DCECFC;
-    padding: 4px 8px;
-    border-radius: 8px;
-    display: inline-block;
-    font-size: 14px;    
-}
+/* */
 
 /* Стилі для кнопки "більше" */
 .message .more-options {
@@ -654,10 +641,6 @@ body {
     content: url('../images/send_hover.svg'); 
 }
 
-.message.reply .user-info,
-.message.reply .message-text {
-    margin-left: 48px;  
-}
 
 
 /* Show More Button */
@@ -695,3 +678,64 @@ body {
     background-size: contain;
     background-repeat: no-repeat;
 }
+
+
+
+
+/*  */
+ 
+.message-content {
+    padding: 10px; 
+    margin-left: 35px;
+    border-top-right-radius: 0;   
+    border-top-left-radius: 0;   
+} 
+
+.message-content .mention {
+    font-weight: 600;
+    color: #283044;
+    background: #DCECFC;
+    padding: 4px 8px;
+    border-radius: 8px;
+    display: inline-block;
+    font-size: 14px;   
+} 
+
+.show-replies-button {
+    margin-top: 10px;
+    background-color: #dcecfc; 
+    padding: 0 15px;
+    border: 2px solid #283044;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: #283044;
+    cursor: pointer;
+    border-radius: 12px;
+    height: 31px;
+    transition: background-color 0.2s ease;
+}
+.show-replies-button:hover {
+    background-color: #c7e5fd;
+    border-color: #1a2b3d;
+}
+
+
+.message.reply {    
+    background-color: #f5faff;
+    border-left: 2px solid #283044;
+    padding: 10px;
+    margin-top: 0;     
+    border-top: 2px; 
+}
+
+.message.reply .message-content {
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.message.reply .message-text {
+    font-size: 14px;
+    color: #333;
+}
+  
