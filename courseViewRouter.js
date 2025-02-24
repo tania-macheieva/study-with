@@ -353,17 +353,36 @@ router.get('/lecture/:lectureId', async (req, res) => {
 router.post('/comments', async (req, res) => {
     try {
         const { content, parent_comment_id, course_id, user_id } = req.body;
-        // Insert into the database
+        let parentUserId = null;
+
+        if (parent_comment_id) {
+            const parentCommentResult = await db.query(
+                'SELECT user_id FROM comments WHERE id = $1',
+                [parent_comment_id]
+            );
+        
+            if (parentCommentResult.rows.length > 0) {
+                parentUserId = parentCommentResult.rows[0].user_id;
+            } else {
+                return res.status(404).json({ error: 'Parent comment not found' });
+            }
+        } 
+
+        // Insert the new comment along with parentUserId
         const result = await db.query(
-            'INSERT INTO comments (content, parent_comment_id, course_id, user_id) VALUES ($1, $2, $3, $4) RETURNING *',
-            [content, parent_comment_id, course_id, user_id]
+            'INSERT INTO comments (content, parent_comment_id, course_id, user_id, parent_user_id) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            [content, parent_comment_id, course_id, user_id, parentUserId]
         );
-        res.status(201).json(result.rows[0]);
+
+        const newComment = result.rows[0];
+
+        res.status(201).json(newComment);
     } catch (error) {
         console.error('Error inserting comment:', error);
         res.status(500).json({ error: 'Failed to add comment' });
     }
 });
+
 router.get('/comments', async (req, res) => {
     const { course_id } = req.query;
 
@@ -401,6 +420,85 @@ router.get('/comments', async (req, res) => {
     }
 });
 
+router.delete('/comments/:comment_id', async (req, res) => {
+    const { comment_id } = req.params;
+    const { user_id } = req.body;
 
+
+    // Authorization check here
+    if (!user_id) {
+        return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    try {
+        // Perform deletion query
+        const result = await db.query(
+            'DELETE FROM comments WHERE id = $1 AND user_id = $2 RETURNING *',
+            [comment_id, user_id]
+        );
+        if (result.rowCount > 0) {
+            return res.status(200).json({ message: 'Comment deleted successfully' });
+        } else {
+            return res.status(404).json({ error: 'Comment not found or not authorized to delete' });
+        }
+    } catch (err) {
+        console.error('Error deleting comment:', err);
+        res.status(500).json({ error: 'Failed to delete comment' });
+    }
+});
+
+router.put('/comments/:comment_id', async (req, res) => {
+    const { comment_id } = req.params;
+    const { text, user_id } = req.body;
+
+    console.log('User ID:', user_id); // Log the user_id to check if it's coming through properly.
+
+    if (!user_id) {
+        return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    if (!text) {
+        return res.status(400).json({ error: 'Comment text is required' });
+    }
+
+    try {
+        const result = await db.query(
+            'SELECT * FROM comments WHERE id = $1 AND user_id = $2',
+            [comment_id, user_id]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Comment not found or not authorized to edit' });
+        }
+
+        const updateResult = await db.query(
+            'UPDATE comments SET content = $1 WHERE id = $2 RETURNING *',
+            [text, comment_id]
+        );
+
+        if (updateResult.rowCount > 0) {
+            res.status(200).json(updateResult.rows[0]);
+        } else {
+            res.status(500).json({ error: 'Failed to update comment' });
+        }
+    } catch (err) {
+        console.error('Error updating comment:', err);
+        res.status(500).json({ error: 'Failed to update comment' });
+    }
+});
+router.get('/comments/:comment_id', async (req, res) => {
+    const { comment_id } = req.params;
+    try {
+        const result = await db.query('SELECT * FROM comments WHERE id = $1', [comment_id]);
+        if (result.rowCount > 0) {
+            res.json(result.rows[0]);
+        } else {
+            res.status(404).json({ error: 'Comment not found' });
+        }
+    } catch (error) {
+        console.error('Error fetching comment:', error);
+        res.status(500).json({ error: 'Failed to fetch comment' });
+    }
+});
 
 module.exports = router;
