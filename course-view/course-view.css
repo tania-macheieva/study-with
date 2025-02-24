@@ -650,8 +650,7 @@ body {
 .message .reply-input {
     display: flex;
     gap: 10px;
-    padding: 30px;
-    margin-top: 20px;
+    padding: 30px;  
     border-radius: 12px;
 }
 
@@ -702,4 +701,206 @@ body {
     background-size: contain;
     background-repeat: no-repeat;
 }
+
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    overflow: auto;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    width: 400px;
+    max-width: 90%;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    animation: modalFadeIn 0.3s ease-in-out;
+}
+
+/* Анімація для модалки */
+@keyframes modalFadeIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Стиль для заголовка модалки */
+.modal-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+/* Стиль для тексту опису */
+.modal-description {
+    font-size: 15px;
+    color: #666;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+/* Стиль для кнопок */
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.modal-button {
+    padding: 12px 25px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #283044;
+    background-color: #dcecfc; 
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    flex: 1;
+    margin: 5px;
+    border: 2px solid #283044;
+}
+
+.modal-button:hover {
+    background-color: #c7e5fd;
+    border-color: #283044;
+}
+
+/* Стиль для кнопки скасування */
+.modal-button.cancel {
+    background-color: #f07e71;
+    color: rgb(194, 1, 1);
+}
+
+.modal-button.cancel:hover {
+    background-color: #e77164;
+}
+.show-replies-button {
+    margin-top: 10px;
+    margin-bottom: 15px;
+    
+    padding: 0 15px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    
+    cursor: pointer;
+    border-radius: 12px;
+    height: 31px;
+    transition: background-color 0.2s ease;
+}
  
+/* Стилі для модалки */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    overflow: auto;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    width: 400px;
+    max-width: 90%;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    animation: modalFadeIn 0.3s ease-in-out;
+}
+
+/* Анімація для модалки */
+@keyframes modalFadeIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Стиль для заголовка модалки */
+.modal-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+/* Стиль для тексту опису */
+.modal-description {
+    font-size: 15px;
+    color: #666;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+/* Стиль для кнопок */
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.modal-button {
+    padding: 12px 25px;
+    font-size: 15px;
+    font-weight: 500; 
+    background-color: #ffff;
+    border: rgb(194, 1, 1) 2px solid; 
+    color: rgb(194, 1, 1); 
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    flex: 1;
+    margin: 5px;
+}
+
+.modal-button:hover {
+    background-color: rgb(250, 150, 150); 
+    border: rgb(194, 1, 1) 2px solid; 
+}
+
+/* Стиль для кнопки скасування */
+.modal-button.cancel {
+    background-color: #ffff;
+    border: 2px solid #283044;
+    color: #283044;
+}
+
+.modal-button.cancel:hover {
+    background-color: #c7e5fd;
+}
+
+.modal-textarea {
+    width: 100%;
+    height: 150px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}

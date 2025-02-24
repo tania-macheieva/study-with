@@ -99,17 +99,21 @@ function addShowRepliesButton(parentElement, messageId, replies) {
 }
 
 document.querySelector('.send-reply').addEventListener('click', function(event) {
+    // Перевірка чи це кнопка для відправки відповіді
     const button = event.target;
-    const parentId = button.dataset.parentId;
+    const parentId = button.dataset.parentId; // id коментаря, на який відповідають
     const repliesButton = button.closest('.message').querySelector('.show-replies-button');
     
+    // Якщо відповіді були приховані, показуємо їх після надсилання нової відповіді
     if (repliesButton && repliesButton.dataset.expanded === 'false') {
-        showReplies(button.closest('.message'), parentId, replies);
-        repliesButton.textContent = 'Hide replies';
-        repliesButton.dataset.expanded = 'true';
+        // Тут код для надсилання відповіді...
+
+        // Показуємо відповіді після того, як надіслано
+        showReplies(button.closest('.message'), parentId, replies); // Відображаємо відповіді
+        repliesButton.textContent = 'Hide replies';  // Оновлюємо текст на кнопці
+        repliesButton.dataset.expanded = 'true';  // Оновлюємо стан кнопки
     }
 });
-
 
 
 function showReplies(parentElement, parentMessageId, replies) {
@@ -342,7 +346,8 @@ const replyMessage = {
     user_id: localStorage.getItem('userId'),
     parent_comment_id: messageId,
     course_id: window.location.pathname.split('/course/').pop(),
-    content: formattedReplyText
+    content: formattedReplyText,
+    parent_user_id: parentUserId,
 };
 
 try {
@@ -478,43 +483,60 @@ const toggleReplies = (messageId, show) => {
     }
 };
 
+const getParentUserId = async (parentId) => {
+    const response = await fetch(`http://localhost:8000/api/comments/${parentId}`);
+    const parentComment = await response.json();
+    return parentComment.user_id;  // Повертаємо тільки ID користувача
+};
+
 
 
 // Функція для відправки коментаря
 const sendMessage = async (content, parentId = null) => {
-const courseId = window.location.pathname.split('/course/').pop();
-const userId = localStorage.getItem('userId');
-const messageData = {
-    content,
-    parent_comment_id: parentId,
-    course_id: courseId,  // Використовуємо поточний курс
-    user_id: userId       // Використовуємо поточного користувача
-};
+    const courseId = window.location.pathname.split('/course/').pop();
+    const userId = localStorage.getItem('userId');
 
-try {
-    const response = await fetch('http://localhost:8000/api/comments', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(messageData),
-    });
+    let parentUserId = null;
 
-    if (!response.ok) {
-        throw new Error('Failed to send message');
+    if (parentId) {
+        // Якщо є parentId, отримуємо відповідний parentUserId
+        parentUserId = await getParentUserId(parentId);  // Використовуємо await для асинхронної операції
     }
 
-    const newMessage = await response.json();
-    console.log(newMessage);  // Перевірте нові дані
+    console.log('Parent User ID:', parentUserId);  // Перевірка значення parentUserId
 
-    // Оновлюємо лише контейнер з коментарями
-    const courseId = window.location.pathname.split('/course/').pop();
-    fetchComments(courseId);  // Завантажуємо нові коментарі
+    const messageData = {
+        content,
+        parent_comment_id: parentId,
+        course_id: courseId,
+        user_id: userId,
+        parent_user_id: parentUserId,
+    };
 
-} catch (error) {
-    console.error('Error sending message:', error);
-}
+    try {
+        const response = await fetch('http://localhost:8000/api/comments', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(messageData),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to send message');
+        }
+
+        const newMessage = await response.json();
+        console.log(newMessage);
+
+        fetchComments(courseId);  // Оновлення коментарів
+
+    } catch (error) {
+        console.error('Error sending message:', error);
+    }
 };
+
+
 
 // Відправка основного коментаря
 document.querySelector('.send').addEventListener('click', () => {
@@ -593,79 +615,256 @@ sendButton.addEventListener('click', async () => {
 // Відображаємо існуючі повідомлення
 fetchComments(courseId);
 
+function createDeleteModal() {
+    // Перевірка, чи модалка вже існує
+    let modal = document.getElementById('deleteModal');
+    if (modal) {
+        return {
+            modal,
+            confirmButton: modal.querySelector('#confirmDeleteBtn'),
+            cancelButton: modal.querySelector('#cancelDeleteBtn')
+        };
+    }
 
- 
+    // Створення елементів модалки
+    modal = document.createElement('div');
+    modal.id = 'deleteModal';
+    modal.className = 'modal';
+
+    const modalContent = document.createElement('div');
+    modalContent.className = 'modal-content';
+
+    const title = document.createElement('h2');
+    title.className = 'modal-title';
+    title.textContent = 'Are you sure you want to delete this message?';
+
+    const description = document.createElement('p');
+    description.className = 'modal-description';
+    description.textContent = 'This action cannot be undone.';
+
+    const modalActions = document.createElement('div');
+    modalActions.className = 'modal-buttons';
+
+    const cancelButton = document.createElement('button');
+    cancelButton.id = 'cancelDeleteBtn';
+    cancelButton.className = 'modal-button cancel';
+    cancelButton.textContent = 'Cancel';
+
+    const confirmButton = document.createElement('button');
+    confirmButton.id = 'confirmDeleteBtn';
+    confirmButton.className = 'modal-button';
+    confirmButton.textContent = 'Delete';
+
+    // Додаємо елементи до модалки
+   
+    modalActions.appendChild(confirmButton); modalActions.appendChild(cancelButton);
+    modalContent.appendChild(title);
+    modalContent.appendChild(description);
+    modalContent.appendChild(modalActions);
+    modal.appendChild(modalContent);
+
+    // Додаємо модалку в body
+    document.body.appendChild(modal);
+
+    // Додаємо подію для закриття модалки при кліку поза її межами
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) { // Перевіряємо, чи клік був саме на фон
+            modal.style.display = 'none';
+            modal.remove();  // Видаляємо модалку з DOM
+        }
+    });
+
+    // Повертаємо елементи для подальшого використання
+    return {
+        modal,
+        confirmButton,
+        cancelButton,
+    };
+}
+
+function createEditModal(currentText) {
+    const modal = document.createElement('div');
+    modal.id = 'editModal';
+    modal.className = 'modal';
+
+    const modalContent = document.createElement('div');
+    modalContent.className = 'modal-content';
+
+    const title = document.createElement('h2');
+    title.textContent = 'Edit your comment';
+
+    const editTextArea = document.createElement('textarea');
+    editTextArea.className = 'modal-textarea';
+    editTextArea.textContent = currentText; // Set the current text in the textarea
+
+    const modalActions = document.createElement('div');
+    modalActions.className = 'modal-actions';
+
+    const cancelButton = document.createElement('button');
+    cancelButton.className = 'modal-btn cancel-btn';
+    cancelButton.textContent = 'Cancel';
+
+    const saveButton = document.createElement('button');
+    saveButton.className = 'modal-btn confirm-btn';
+    saveButton.textContent = 'Save';
+
+    modalActions.appendChild(cancelButton);
+    modalActions.appendChild(saveButton);
+    modalContent.appendChild(title);
+    modalContent.appendChild(editTextArea);
+    modalContent.appendChild(modalActions);
+    modal.appendChild(modalContent);
+
+    document.body.appendChild(modal);
+
+    return {
+        modal,
+        saveButton,
+        cancelButton,
+        editTextArea,
+    };
+}
+
 // Handle "more options" button click
-document.addEventListener('click', function(e) {
+document.addEventListener('click', function (e) {
     const moreOptions = e.target.closest('.more-options');
+
     if (moreOptions) {
         const message = moreOptions.closest('.message');
-        const messageId = message.dataset.messageId;
-        const username = message.querySelector('.username').textContent;
-        const isReply = message.classList.contains('reply');
+        const messageId = message.dataset.messageId; 
+        const usernameElement = message.querySelector('.username');
+        const commentUserId = message.dataset.parentUserId; // Зчитуємо commentUserId з атрибуту data-parent-user-id
+        const currentUserId = getCurrentUserId();
+
+        console.log('Comment User ID:', commentUserId);  
+        console.log('Message element:', message); 
+
+        const username = usernameElement ? usernameElement.textContent : 'Unknown User';
+        const currentTextElement = message.querySelector('.comment-text');
+        const currentText = currentTextElement ? currentTextElement.textContent : ''; 
+
         const existingMenu = document.querySelector('.options-menu');
         if (existingMenu) {
             existingMenu.remove();
         }
+
         const optionsMenu = document.createElement('div');
         optionsMenu.className = 'options-menu';
 
-        const menuOptions = isReply ? [
-            { action: 'add-reply', text: 'Write a reply' }, 
-            { action: 'report', text: 'Report message' }
-        ] : [ 
-            { action: 'add-reply', text: 'Write a reply' }, 
-            { action: 'report', text: 'Report message' }
+        const menuOptions = [
+            { action: 'add-reply', text: 'Write a reply' },
         ];
+
+        if (commentUserId === currentUserId) {
+            menuOptions.push({ action: 'edit', text: 'Edit message' });
+            menuOptions.push({ action: 'delete', text: 'Delete message' });
+        } else {
+            menuOptions.push({ action: 'report', text: 'Report message' });
+        }
+
         optionsMenu.innerHTML = menuOptions
             .map(option => `<div class="option" data-action="${option.action}">${option.text}</div>`)
             .join('');
+
         Object.assign(optionsMenu.style, {
             position: 'absolute',
             right: '40px',
             top: '40px',
-            background: '#FFFFFF',
-            border: '2px solid #C7C7C7',
-            borderRadius: '12px',
-            padding: '10px',
-            zIndex: '1000'
+            background: '#fff',
+            border: '2px solid #D1D1D1',
+            borderRadius: '8px',
+            padding: '8px 12px',
+            zIndex: '1000',
+            boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.1)',
+            width: '200px',
         });
+
         optionsMenu.querySelectorAll('.option').forEach(option => {
             Object.assign(option.style, {
                 padding: '8px 16px',
                 cursor: 'pointer',
-                fontSize: '14px'
+                fontSize: '14px',
+                color: '#333',
+                transition: 'background-color 0.2s ease',
             });
+
             option.addEventListener('mouseenter', () => {
-                option.style.background = '#F5F9FE';
+                option.style.backgroundColor = '#f0f0f0';
             });
             option.addEventListener('mouseleave', () => {
-                option.style.background = 'transparent';
+                option.style.backgroundColor = 'transparent';
             });
         });
+
         message.appendChild(optionsMenu);
-        optionsMenu.addEventListener('click', function(e) {
+
+        optionsMenu.addEventListener('click', function (e) {
             const action = e.target.dataset.action;
-            if (action === 'show-replies') {
-                const areRepliesVisible = document.querySelector(`.message.reply[data-parent-id="${messageId}"]`) !== null;
-                toggleReplies(messageId, !areRepliesVisible);
-            } else if (action === 'add-reply') {
+            if (action === 'add-reply') {
                 const replyInput = message.querySelector('.reply-input');
                 document.querySelectorAll('.reply-input').forEach(input => {
                     if (input !== replyInput) {
                         input.style.display = 'none';
                     }
                 });
+
                 replyInput.style.display = replyInput.style.display === 'none' ? 'flex' : 'none';
 
                 if (replyInput.style.display === 'flex') {
                     const input = replyInput.querySelector('input');
                     input.focus();
-                    input.placeholder = `написати відповідь до ${username}`;
+                    input.placeholder = `Reply to ${username}`;
                 }
             }
+
+            if (action === 'report') {
+                console.log('Report clicked');
+                openReportModal(messageId, username);
+            }
+        
+            if (action === 'delete') {
+                console.log('Delete clicked');
+                deleteMessage(messageId);
+            }
+        
+            if (action === 'edit') {
+                console.log('Edit clicked');
+                const { modal, saveButton, cancelButton, editTextArea } = createEditModal(currentText);
+        
+                cancelButton.onclick = () => {
+                    modal.remove();
+                };
+        
+                saveButton.onclick = async () => {
+                    const updatedText = editTextArea.value.trim();
+        
+                    if (updatedText !== currentText) {
+                        try {
+                            const response = await fetch(`/api/comments/${messageId}`, {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ user_id: currentUserId, content: updatedText })
+                            });
+        
+                            if (response.ok) {
+                                message.querySelector('.comment-text').textContent = updatedText;
+                                modal.remove();
+                            } else {
+                                alert('Failed to update comment');
+                            }
+                        } catch (err) {
+                            console.error('Error updating comment:', err);
+                            alert('Failed to update comment');
+                        }
+                    }
+                };
+            }
+        
             optionsMenu.remove();
         });
+        
 
         document.addEventListener('click', function closeMenu(e) {
             if (!optionsMenu.contains(e.target) && !moreOptions.contains(e.target)) {
@@ -674,9 +873,182 @@ document.addEventListener('click', function(e) {
             }
         });
     }
-}); 
+});
+
+
+function createDeleteModal() {
+    let modal = document.getElementById('deleteModal');
+    if (modal) {
+        return {
+            modal,
+            confirmButton: modal.querySelector('#confirmDeleteBtn'),
+            cancelButton: modal.querySelector('#cancelDeleteBtn')
+        };
+    }
+
+    // Створення елементів модалки
+    modal = document.createElement('div');
+    modal.id = 'deleteModal';
+    modal.className = 'modal';
+
+    const modalContent = document.createElement('div');
+    modalContent.className = 'modal-content';
+
+    const title = document.createElement('h2');
+    title.className = 'modal-title';
+    title.textContent = 'Are you sure you want to delete this message?';
+
+    const description = document.createElement('p');
+    description.className = 'modal-description';
+    description.textContent = 'This action cannot be undone.';
+
+    const modalActions = document.createElement('div');
+    modalActions.className = 'modal-buttons';
+
+    const cancelButton = document.createElement('button');
+    cancelButton.id = 'cancelDeleteBtn';
+    cancelButton.className = 'modal-button cancel';
+    cancelButton.textContent = 'Cancel';
+
+    const confirmButton = document.createElement('button');
+    confirmButton.id = 'confirmDeleteBtn';
+    confirmButton.className = 'modal-button';
+    confirmButton.textContent = 'Delete';
+
+    // Додаємо елементи до модалки
+   
+    modalActions.appendChild(confirmButton); modalActions.appendChild(cancelButton);
+    modalContent.appendChild(title);
+    modalContent.appendChild(description);
+    modalContent.appendChild(modalActions);
+    modal.appendChild(modalContent);
+
+    // Додаємо модалку в body
+    document.body.appendChild(modal);
+
+    // Додаємо подію для закриття модалки при кліку поза її межами
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) { // Перевіряємо, чи клік був саме на фон
+            modal.style.display = 'none';
+            modal.remove();  // Видаляємо модалку з DOM
+        }
+    });
+
+    // Повертаємо елементи для подальшого використання
+    return {
+        modal,
+        confirmButton,
+        cancelButton,
+    };
+}
+
+// Функція для відображення модалки
+async function deleteMessage(messageId) {
+    const { modal, confirmButton, cancelButton } = createDeleteModal();
+
+    return new Promise((resolve) => {
+        // Показуємо модалку
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+
+        // Подія для скасування
+        cancelButton.onclick = () => {
+            if (modal) {
+                modal.style.display = 'none';  // Закриваємо модалку
+            }
+            resolve(false);  // Користувач скасував
+            modal.remove();  // Видаляємо модалку з DOM
+        };
+
+        // Подія для підтвердження
+        confirmButton.onclick = async () => {
+            if (modal) {
+                modal.style.display = 'none';  // Закриваємо модалку
+            }
+            try {
+                const currentUserId = getCurrentUserId();
+                const response = await fetch(`/api/comments/${messageId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ user_id: currentUserId }),
+                });
+
+                if (response.ok) {
+                    // Видалення успішне, прибираємо елемент з DOM
+                    const messageElement = document.querySelector(`.message[data-message-id="${messageId}"]`);
+                    if (messageElement) {
+                        messageElement.remove();
+                    } 
+                    resolve(true);
+                } else { 
+                    resolve(false);
+                }
+            } catch (err) { 
+                resolve(false);
+            }
+
+            modal.remove();  // Видаляємо модалку з DOM
+        };
+    });
+}
+
+
+function getCurrentUserId() {
+    const currentUserId = localStorage.getItem('userId');
+    console.log('Current user ID:', currentUserId);
+
+    return currentUserId;
+}
+
+function openReportModal(messageId, username) {
+    // Create the modal
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h2 class="modal-title">Report Content</h2>
+            <p class="modal-description">We will review this content and take appropriate action if necessary.</p>
+            <div class="modal-buttons">
+                <button id="submit-report" class="modal-button">Submit Report</button>
+                <button id="close-modal" class="modal-button cancel">Cancel</button>
+            </div>
+        </div>
+    `;
+
+    // Append modal to the body
+    document.body.appendChild(modal);
+
+    // Close the modal when cancel is clicked
+    modal.querySelector('#close-modal').addEventListener('click', function() {
+        modal.remove();
+    });
+
+    // Handle report submission
+    modal.querySelector('#submit-report').addEventListener('click', function() {
+        console.log(`Report submitted for message ID: ${messageId}`);
+        console.log(`Reported by: ${username}`);
+        
+        // Here you can make an API request to submit the report to your server
+        // Example: axios.post('/report', { messageId, username });
+
+        modal.remove(); // Close the modal after submission
+    });
+
+    // Close the modal if clicked outside the modal content
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {  // Check if the click is outside the modal content
+            modal.remove();
+        }
+    });
+}
+
+
 discussionThread.addEventListener('click', function(e){
     const sendReplyButton = e.target.closest('.send-reply');
+
     if (sendReplyButton) {
         const replyInput = sendReplyButton.previousElementSibling;
         const replyContent = replyInput.value.trim();
