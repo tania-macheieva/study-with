@@ -260,9 +260,12 @@ CREATE TABLE comments (
     user_id INT NOT NULL,
     content TEXT NOT NULL,
     parent_comment_id INT REFERENCES comments(id) ON DELETE CASCADE,
+    parent_user_id INT REFERENCES users(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (course_id) REFERENCES all_courses(id),
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+
+-- ALTER TABLE comments ADD COLUMN parent_user_id INTEGER REFERENCES users(id);
 
