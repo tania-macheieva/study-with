@@ -424,20 +424,26 @@ router.delete('/comments/:comment_id', async (req, res) => {
     const { comment_id } = req.params;
     const { user_id } = req.body;
 
-
     // Authorization check here
     if (!user_id) {
         return res.status(400).json({ error: 'User ID is required' });
     }
 
     try {
-        // Perform deletion query
+        // First, delete all child comments (replies)
+        await db.query(
+            'DELETE FROM comments WHERE parent_comment_id = $1 AND user_id = $2',
+            [comment_id, user_id]
+        );
+
+        // Then, delete the main comment
         const result = await db.query(
             'DELETE FROM comments WHERE id = $1 AND user_id = $2 RETURNING *',
             [comment_id, user_id]
         );
+
         if (result.rowCount > 0) {
-            return res.status(200).json({ message: 'Comment deleted successfully' });
+            return res.status(200).json({ message: 'Comment and its replies deleted successfully' });
         } else {
             return res.status(404).json({ error: 'Comment not found or not authorized to delete' });
         }
@@ -446,6 +452,7 @@ router.delete('/comments/:comment_id', async (req, res) => {
         res.status(500).json({ error: 'Failed to delete comment' });
     }
 });
+
 
 router.put('/comments/:comment_id', async (req, res) => {
     const { comment_id } = req.params;

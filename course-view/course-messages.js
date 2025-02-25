@@ -54,7 +54,25 @@ messages.forEach(message => {
     }
 });
 };
+function updateRepliesButton(commentId) {
+    const repliesContainer = document.getElementById(`replies-container-${commentId}`);
+    const showRepliesButton = document.getElementById(`show-replies-button-${commentId}`);
+
+    if (repliesContainer && showRepliesButton) {
+        if (repliesContainer.children.length === 0) {
+            showRepliesButton.style.display = "none";
+        }
+    }
+}
+
+
+
 function addShowRepliesButton(parentElement, messageId, replies) {
+    // Якщо немає жодних відповідей, не створюємо кнопку
+    if (replies.length === 0) {
+        return;
+    }
+
     const showRepliesButton = document.createElement('button');
     showRepliesButton.className = 'show-replies-button';
  
@@ -98,23 +116,26 @@ function addShowRepliesButton(parentElement, messageId, replies) {
     }
 }
 
-document.querySelector('.send-reply').addEventListener('click', function(event) {
-    // Перевірка чи це кнопка для відправки відповіді
-    const button = event.target;
-    const parentId = button.dataset.parentId; // id коментаря, на який відповідають
-    const repliesButton = button.closest('.message').querySelector('.show-replies-button');
+
+// document.querySelector('.send-reply').addEventListener('click', function(event) { 
+//     // Перевірка, чи це кнопка для відправки відповіді
+//     const button = event.target;
+//     const parentId = button.dataset.parentId; // id коментаря, на який відповідають
+//     const repliesButton = button.closest('.message').querySelector('.show-replies-button');
     
-    // Якщо відповіді були приховані, показуємо їх після надсилання нової відповіді
-    if (repliesButton && repliesButton.dataset.expanded === 'false') {
-        // Тут код для надсилання відповіді...
+//     // Якщо відповіді були приховані, показуємо їх після надсилання нової відповіді
+//     if (repliesButton && repliesButton.dataset.expanded === 'false') {
+//         // Тут код для надсилання відповіді...
 
-        // Показуємо відповіді після того, як надіслано
-        showReplies(button.closest('.message'), parentId, replies); // Відображаємо відповіді
-        repliesButton.textContent = 'Hide replies';  // Оновлюємо текст на кнопці
-        repliesButton.dataset.expanded = 'true';  // Оновлюємо стан кнопки
-    }
-});
-
+//         // Показуємо відповіді після того, як надіслано
+//         showReplies(button.closest('.message'), parentId, replies); // Відображаємо відповіді
+//         repliesButton.textContent = 'Hide replies';  // Оновлюємо текст на кнопці
+//         repliesButton.dataset.expanded = 'true';  // Оновлюємо стан кнопки
+//     }
+    
+//     // Після надсилання перевіряємо, чи є відповіді і чи потрібно показати кнопку
+//     updateRepliesButtonVisibility(button.closest('.message'), parentId, replies);
+// })
 
 function showReplies(parentElement, parentMessageId, replies) {
     // Створення/оновлення контейнера для відповідей
@@ -264,74 +285,151 @@ function renderReplies(replies, parentMessageId) {
 }
 
 
-const createMessageHTML = (message, isReply = false, replyLevel = 0) => {
-const messageElement = document.createElement('article');
-messageElement.className = 'message';
-if (isReply) messageElement.classList.add('reply');
+const createMessageHTML = (message, isReply = false, replyLevel = 0) => { 
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message');
+    messageElement.className = `message ${isReply ? 'reply' : ''}`;
+    messageElement.dataset.messageId = message.id;
+    
+    // Get the ACTUAL author ID from the message object, not the current user
+    messageElement.dataset.userId = message.user_id;     
+    if (isReply) {
+        messageElement.dataset.parentId = message.parent_comment_id;
+    } 
 
-messageElement.dataset.messageId = message.id;
-messageElement.dataset.replyLevel = replyLevel;
+    messageElement.dataset.replyLevel = replyLevel;
 
-if (typeof message.id === 'string' && message.id.includes('.')) {
-    messageElement.dataset.parentId = message.id.substring(0, message.id.lastIndexOf('.'));
-}
+    if (typeof message.id === 'string' && message.id.includes('.')) {
+        messageElement.dataset.parentId = message.id.substring(0, message.id.lastIndexOf('.'));
+    }
 
-const user = message.user || { name: message.user_name || 'Unknown User' };
-const avatar = message.teacher_profile_image || message.student_profile_image || user.profile_image || '/images/user-avatar.png';
-const formatDate = (isoString) => {
-    const date = new Date(isoString);
-    return date.toLocaleDateString('uk-UA', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
+    const user = message.user || { name: message.user_name || 'Unknown User' };
+    const avatar = message.teacher_profile_image || message.student_profile_image || user.profile_image || '/images/user-avatar.png';
+    const formatDate = (isoString) => {
+        const date = new Date(isoString);
+        return date.toLocaleDateString('uk-UA', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    };
+
+    let messageContent = message.content || '';
+
+    // Handle reply mentions
+    if (message.parent_comment_id) {
+        const parentUser = document.querySelector(`.message[data-message-id="${message.parent_comment_id}"] .username`);
+        if (parentUser) {
+            const parentUsername = parentUser.textContent;
+
+            // Only add mention if it's not already present
+            if (!messageContent.startsWith(`@${parentUsername}`)) {
+                messageContent = `@${parentUsername} ${messageContent}`;
+            }
+
+            // Extract the full username mention and the rest of the message
+            const mentionText = `@${parentUsername}`;
+            const indexOfSpace = messageContent.indexOf(' ', mentionText.length);
+            const mention = messageContent.substring(0, indexOfSpace !== -1 ? indexOfSpace : messageContent.length);
+            const restOfMessage = indexOfSpace !== -1 ? messageContent.substring(indexOfSpace) : '';
+
+            // Format the entire username mention
+            messageContent = `<span class="mention">${mention}</span>${restOfMessage}`;
+        }
+    }
+
+    messageElement.innerHTML = ` 
+        <div class="user-info">
+            <img src="${avatar}" alt="User avatar" class="avatar">
+            <span class="username">${user.name}</span>
+            <span class="date">${formatDate(message.created_at)}</span>
+        </div>
+        <div class="message-content" style="padding-left: ${message.parent_comment_id ? '20px' : '0'};">
+            <p class="message-text">${messageContent}</p>
+        </div>
+        <button class="more-options">...</button>
+        <div class="reply-input" style="display: none;">
+            <input type="text" placeholder="write a reply to ${user.name}">
+            <button class="send-reply" data-parent-id="${message.id}">
+                <img src="../images/send.svg" alt="Send">
+            </button>
+        </div> 
+    `;
+
+    return messageElement;
 };
 
-let messageContent = message.content || '';
+// Also, fix the createReplyElement function which has the same issue
+const createReplyElement = (reply) => {
+    const replyElement = document.createElement('div');
+    replyElement.classList.add('message', 'reply');
+    replyElement.dataset.messageId = reply.id;
+    replyElement.dataset.parentId = reply.parent_comment_id;
+    
+    // Set the ACTUAL author ID, not the current user ID
+    replyElement.dataset.userId = reply.user_id;
 
-// Handle reply mentions
-if (message.parent_comment_id) {
-    const parentUser = document.querySelector(`.message[data-message-id="${message.parent_comment_id}"] .username`);
-    if (parentUser) {
-        const parentUsername = parentUser.textContent;
+    const formatDate = (isoString) => {
+        const date = new Date(isoString);
+        return date.toLocaleDateString('uk-UA', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    };
+    
+    const avatar = reply.teacher_profile_image || reply.student_profile_image || user.profile_image || '/images/user-avatar.png';
+    let messageContent = reply.content || '';
 
-        // Only add mention if it's not already present
-        if (!messageContent.startsWith(`@${parentUsername}`)) {
-            messageContent = `@${parentUsername} ${messageContent}`;
+    // Find the username of the parent comment
+    let parentUsername = '';
+    if (reply.parent_comment_id) {
+        const parentReply = replyMap.get(reply.parent_comment_id);
+        if (parentReply) {
+            parentUsername = parentReply.user_name;
+        } else {
+            const parentElement = document.querySelector(`.message[data-message-id="${reply.parent_comment_id}"]`);
+            if (parentElement) {
+                parentUsername = parentElement.querySelector('.username').textContent;
+            }
         }
+    } 
 
-        // Extract the full username mention and the rest of the message
+    // Add @mention if it's not already there
+    if (parentUsername && !messageContent.startsWith(`@${parentUsername}`)) {
+        messageContent = `@${parentUsername} ${messageContent}`;
+    }
+
+    // Format @mention
+    if (parentUsername) {
         const mentionText = `@${parentUsername}`;
         const indexOfSpace = messageContent.indexOf(' ', mentionText.length);
         const mention = messageContent.substring(0, indexOfSpace !== -1 ? indexOfSpace : messageContent.length);
         const restOfMessage = indexOfSpace !== -1 ? messageContent.substring(indexOfSpace) : '';
-
-        // Format the entire username mention
         messageContent = `<span class="mention">${mention}</span>${restOfMessage}`;
     }
-}
 
-messageElement.innerHTML = ` 
-    <div class="user-info">
-        <img src="${avatar}" alt="User avatar" class="avatar">
-        <span class="username">${user.name}</span>
-        <span class="date">${formatDate(message.created_at)}</span>
-    </div>
-    <div class="message-content" style="padding-left: ${message.parent_comment_id ? '20px' : '0'};">
-        <p class="message-text">${messageContent}</p>
-    </div>
-    <button class="more-options">...</button>
-    <div class="reply-input" style="display: none;">
-        <input type="text" placeholder="write a reply to ${user.name}">
-        <button class="send-reply" data-parent-id="${message.id}">
-            <img src="../images/send.svg" alt="Send">
-        </button>
-    </div> 
-`;
+    replyElement.innerHTML = ` 
+        <div class="user-info">
+            <img src="${avatar || '/images/user-avatar.png'}" alt="User avatar" class="avatar">
+            <span class="username">${reply.user_name}</span>
+            <span class="date">${formatDate(reply.created_at)}</span>
+        </div>
+        <div class="message-content">
+            <p class="message-text">${messageContent}</p>
+        </div>
+        <button class="more-options">...</button>
+        <div class="reply-input" style="display: none;">
+            <input type="text" placeholder="write a reply to ${reply.user_name}">
+            <button class="send-reply" data-parent-id="${reply.id}">
+                <img src="../images/send.svg" alt="Send">
+            </button>
+        </div>
+    `;
 
-
-return messageElement;
+    return replyElement;
 };
+
 
 const handleReply = async (messageId, replyText) => {
 const parentMessage = document.querySelector(`.message[data-message-id="${messageId}"]`);
@@ -491,7 +589,6 @@ const getParentUserId = async (parentId) => {
 
 
 
-// Функція для відправки коментаря
 const sendMessage = async (content, parentId = null) => {
     const courseId = window.location.pathname.split('/course/').pop();
     const userId = localStorage.getItem('userId');
@@ -500,17 +597,17 @@ const sendMessage = async (content, parentId = null) => {
 
     if (parentId) {
         // Якщо є parentId, отримуємо відповідний parentUserId
-        parentUserId = await getParentUserId(parentId);  // Використовуємо await для асинхронної операції
+        parentUserId = await getParentUserId(parentId);
     }
 
-    console.log('Parent User ID:', parentUserId);  // Перевірка значення parentUserId
+    console.log('Parent User ID:', parentUserId);
 
     const messageData = {
         content,
         parent_comment_id: parentId,
         course_id: courseId,
         user_id: userId,
-        parent_user_id: parentUserId,
+        parent_user_id: parentUserId,  // Додаємо parentUserId
     };
 
     try {
@@ -725,23 +822,42 @@ function createEditModal(currentText) {
     };
 }
 
-// Handle "more options" button click
+// Handle "more options" button click 
 document.addEventListener('click', function (e) {
     const moreOptions = e.target.closest('.more-options');
 
     if (moreOptions) {
         const message = moreOptions.closest('.message');
-        const messageId = message.dataset.messageId; 
+        const messageId = message.dataset.messageId;
+        
+        // Отримуємо userId та parentUserId з dataset
+        const commentUserId = message.dataset.userId;
+        const parentUserId = message.dataset.parentUserId;  
+
+        // Перевіряємо чи є значення для ID
+        if (!commentUserId) {
+            console.error('Comment User ID is missing!');
+        }
+        if (!parentUserId) {
+            console.error('Parent User ID is missing!');
+        }
+
         const usernameElement = message.querySelector('.username');
-        const commentUserId = message.dataset.parentUserId; // Зчитуємо commentUserId з атрибуту data-parent-user-id
-        const currentUserId = getCurrentUserId();
-
-        console.log('Comment User ID:', commentUserId);  
-        console.log('Message element:', message); 
-
         const username = usernameElement ? usernameElement.textContent : 'Unknown User';
-        const currentTextElement = message.querySelector('.comment-text');
-        const currentText = currentTextElement ? currentTextElement.textContent : ''; 
+        const currentTextElement = message.querySelector('.message-text');
+        const currentText = currentTextElement ? currentTextElement.textContent : '';
+
+        console.log('Comment User ID:', commentUserId);
+        console.log('Parent User ID:', parentUserId);  // Вивести parentUserId в лог
+
+        // Перевірка currentUserId
+        const currentUserId = localStorage.getItem('userId');
+        if (!currentUserId) {
+            console.error('Current User ID is missing!');
+            return;
+        }
+
+        console.log('Current User ID:', currentUserId);
 
         const existingMenu = document.querySelector('.options-menu');
         if (existingMenu) {
@@ -754,13 +870,15 @@ document.addEventListener('click', function (e) {
         const menuOptions = [
             { action: 'add-reply', text: 'Write a reply' },
         ];
-
-        if (commentUserId === currentUserId) {
+ 
+        // Only show edit and delete options if the current user is the author of the comment
+        // if (currentUserId === commentUserId) {
             menuOptions.push({ action: 'edit', text: 'Edit message' });
-            menuOptions.push({ action: 'delete', text: 'Delete message' });
-        } else {
-            menuOptions.push({ action: 'report', text: 'Report message' });
-        }
+            menuOptions.push({ action: 'delete', text: 'Delete message' }); 
+        // } else {
+            // Only show report for others' comments
+            menuOptions.push({ action: 'report', text: 'Report message' }); 
+        // }
 
         optionsMenu.innerHTML = menuOptions
             .map(option => `<div class="option" data-action="${option.action}">${option.text}</div>`)
@@ -822,12 +940,12 @@ document.addEventListener('click', function (e) {
                 openReportModal(messageId, username);
             }
         
-            if (action === 'delete') {
+            if (action === 'delete' && currentUserId === commentUserId) {
                 console.log('Delete clicked');
                 deleteMessage(messageId);
             }
         
-            if (action === 'edit') {
+            if (action === 'edit' && currentUserId === commentUserId) {
                 console.log('Edit clicked');
                 const { modal, saveButton, cancelButton, editTextArea } = createEditModal(currentText);
         
@@ -849,7 +967,10 @@ document.addEventListener('click', function (e) {
                             });
         
                             if (response.ok) {
-                                message.querySelector('.comment-text').textContent = updatedText;
+                                const textElement = message.querySelector('.message-text');
+                                if (textElement) {
+                                    textElement.innerHTML = updatedText;
+                                }
                                 modal.remove();
                             } else {
                                 alert('Failed to update comment');
@@ -864,7 +985,6 @@ document.addEventListener('click', function (e) {
         
             optionsMenu.remove();
         });
-        
 
         document.addEventListener('click', function closeMenu(e) {
             if (!optionsMenu.contains(e.target) && !moreOptions.contains(e.target)) {
@@ -876,124 +996,65 @@ document.addEventListener('click', function (e) {
 });
 
 
-function createDeleteModal() {
-    let modal = document.getElementById('deleteModal');
-    if (modal) {
-        return {
-            modal,
-            confirmButton: modal.querySelector('#confirmDeleteBtn'),
-            cancelButton: modal.querySelector('#cancelDeleteBtn')
-        };
-    }
-
-    // Створення елементів модалки
-    modal = document.createElement('div');
-    modal.id = 'deleteModal';
-    modal.className = 'modal';
-
-    const modalContent = document.createElement('div');
-    modalContent.className = 'modal-content';
-
-    const title = document.createElement('h2');
-    title.className = 'modal-title';
-    title.textContent = 'Are you sure you want to delete this message?';
-
-    const description = document.createElement('p');
-    description.className = 'modal-description';
-    description.textContent = 'This action cannot be undone.';
-
-    const modalActions = document.createElement('div');
-    modalActions.className = 'modal-buttons';
-
-    const cancelButton = document.createElement('button');
-    cancelButton.id = 'cancelDeleteBtn';
-    cancelButton.className = 'modal-button cancel';
-    cancelButton.textContent = 'Cancel';
-
-    const confirmButton = document.createElement('button');
-    confirmButton.id = 'confirmDeleteBtn';
-    confirmButton.className = 'modal-button';
-    confirmButton.textContent = 'Delete';
-
-    // Додаємо елементи до модалки
-   
-    modalActions.appendChild(confirmButton); modalActions.appendChild(cancelButton);
-    modalContent.appendChild(title);
-    modalContent.appendChild(description);
-    modalContent.appendChild(modalActions);
-    modal.appendChild(modalContent);
-
-    // Додаємо модалку в body
-    document.body.appendChild(modal);
-
-    // Додаємо подію для закриття модалки при кліку поза її межами
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) { // Перевіряємо, чи клік був саме на фон
-            modal.style.display = 'none';
-            modal.remove();  // Видаляємо модалку з DOM
-        }
-    });
-
-    // Повертаємо елементи для подальшого використання
-    return {
-        modal,
-        confirmButton,
-        cancelButton,
-    };
-}
-
-// Функція для відображення модалки
-async function deleteMessage(messageId) {
+const deleteMessage = async (messageId) => {
     const { modal, confirmButton, cancelButton } = createDeleteModal();
+    const currentUserId = getCurrentUserId();
 
     return new Promise((resolve) => {
-        // Показуємо модалку
-        if (modal) {
-            modal.style.display = 'flex';
-        }
+        if (modal) modal.style.display = 'flex';
 
-        // Подія для скасування
         cancelButton.onclick = () => {
-            if (modal) {
-                modal.style.display = 'none';  // Закриваємо модалку
-            }
-            resolve(false);  // Користувач скасував
-            modal.remove();  // Видаляємо модалку з DOM
+            if (modal) modal.style.display = 'none';
+            resolve(false);
+            modal.remove();
         };
 
-        // Подія для підтвердження
         confirmButton.onclick = async () => {
-            if (modal) {
-                modal.style.display = 'none';  // Закриваємо модалку
-            }
+            if (modal) modal.style.display = 'none';
+
             try {
-                const currentUserId = getCurrentUserId();
-                const response = await fetch(`/api/comments/${messageId}`, {
+                // Get the message element to check user ID directly from DOM
+                const messageElement = document.querySelector(`.message[data-message-id="${messageId}"]`);
+                const commentUserId = messageElement ? messageElement.dataset.userId : null;
+                
+                // Compare user IDs directly before making the API call
+                if (commentUserId !== currentUserId) {
+                    alert('You can only delete your own comments');
+                    resolve(false);
+                    modal.remove();
+                    return;
+                }
+                
+                // If user is the author, proceed with deletion
+                const deleteResponse = await fetch(`/api/comments/${messageId}`, {
                     method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ user_id: currentUserId }),
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentUserId })
                 });
 
-                if (response.ok) {
-                    // Видалення успішне, прибираємо елемент з DOM
-                    const messageElement = document.querySelector(`.message[data-message-id="${messageId}"]`);
-                    if (messageElement) {
-                        messageElement.remove();
-                    } 
+                if (deleteResponse.ok) {
+                    fetchComments(window.location.pathname.split('/course/').pop()); // Refresh comments
                     resolve(true);
-                } else { 
+                } else {
+                    const errorData = await deleteResponse.json();
+                    if (errorData && errorData.error === 'unauthorized') {
+                        alert('You can only delete your own comments');
+                    } else {
+                        alert('Failed to delete comment');
+                    }
                     resolve(false);
                 }
-            } catch (err) { 
+            } catch (err) {
+                console.error('Error deleting comment:', err);
+                alert('Error deleting comment');
                 resolve(false);
             }
 
-            modal.remove();  // Видаляємо модалку з DOM
+            modal.remove();
         };
     });
-}
+};
+
 
 
 function getCurrentUserId() {

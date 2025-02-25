@@ -566,7 +566,8 @@ body {
 }
   
 .replies-container { 
-    border-left: 2.5px solid #283044;
+    border-left: 2.8px solid #283044;
+    border-bottom-left-radius: 12px;
 }
 
 .message.has-visible-replies {
