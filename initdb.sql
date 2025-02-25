@@ -266,6 +266,9 @@ CREATE TABLE comments (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+ALTER TABLE comments
+ADD COLUMN parent_user_id INT REFERENCES users(id);
+
 
 -- ALTER TABLE comments ADD COLUMN parent_user_id INTEGER REFERENCES users(id);
 

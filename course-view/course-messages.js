@@ -210,7 +210,7 @@ function renderReplies(replies, parentMessageId) {
                 year: 'numeric'
             });
         };
-        const avatar = reply.teacher_profile_image || reply.student_profile_image || user.profile_image || '/images/user-avatar.png';
+        const avatar = reply.teacher_profile_image || reply.student_profile_image || '/images/user-avatar.png';
         let messageContent = reply.content || '';
 
         // Find the username of the parent comment
@@ -830,34 +830,22 @@ document.addEventListener('click', function (e) {
         const message = moreOptions.closest('.message');
         const messageId = message.dataset.messageId;
         
-        // Отримуємо userId та parentUserId з dataset
         const commentUserId = message.dataset.userId;
-        const parentUserId = message.dataset.parentUserId;  
-
-        // Перевіряємо чи є значення для ID
-        if (!commentUserId) {
-            console.error('Comment User ID is missing!');
-        }
-        if (!parentUserId) {
-            console.error('Parent User ID is missing!');
-        }
+        
+        console.log('Comment User ID:', commentUserId);
 
         const usernameElement = message.querySelector('.username');
         const username = usernameElement ? usernameElement.textContent : 'Unknown User';
         const currentTextElement = message.querySelector('.message-text');
         const currentText = currentTextElement ? currentTextElement.textContent : '';
 
-        console.log('Comment User ID:', commentUserId);
-        console.log('Parent User ID:', parentUserId);  // Вивести parentUserId в лог
-
-        // Перевірка currentUserId
         const currentUserId = localStorage.getItem('userId');
+        console.log('Current User ID:', currentUserId);
+
         if (!currentUserId) {
             console.error('Current User ID is missing!');
             return;
         }
-
-        console.log('Current User ID:', currentUserId);
 
         const existingMenu = document.querySelector('.options-menu');
         if (existingMenu) {
@@ -871,14 +859,12 @@ document.addEventListener('click', function (e) {
             { action: 'add-reply', text: 'Write a reply' },
         ];
  
-        // Only show edit and delete options if the current user is the author of the comment
-        // if (currentUserId === commentUserId) {
+        if (commentUserId && currentUserId && commentUserId.toString() === currentUserId.toString()) {
             menuOptions.push({ action: 'edit', text: 'Edit message' });
             menuOptions.push({ action: 'delete', text: 'Delete message' }); 
-        // } else {
-            // Only show report for others' comments
+        } else {
             menuOptions.push({ action: 'report', text: 'Report message' }); 
-        // }
+        }
 
         optionsMenu.innerHTML = menuOptions
             .map(option => `<div class="option" data-action="${option.action}">${option.text}</div>`)
@@ -918,6 +904,7 @@ document.addEventListener('click', function (e) {
 
         optionsMenu.addEventListener('click', function (e) {
             const action = e.target.dataset.action;
+            
             if (action === 'add-reply') {
                 const replyInput = message.querySelector('.reply-input');
                 document.querySelectorAll('.reply-input').forEach(input => {
@@ -936,51 +923,65 @@ document.addEventListener('click', function (e) {
             }
 
             if (action === 'report') {
-                console.log('Report clicked');
-                openReportModal(messageId, username);
+                if (!commentUserId || commentUserId.toString() !== currentUserId.toString()) {
+                    console.log('Report clicked');
+                    openReportModal(messageId, username);
+                } else {
+                    alert('Ви не можете поскаржитись на власний коментар');
+                }
             }
         
-            if (action === 'delete' && currentUserId === commentUserId) {
-                console.log('Delete clicked');
-                deleteMessage(messageId);
+            if (action === 'delete') {
+                if (commentUserId && currentUserId && commentUserId.toString() === currentUserId.toString()) {
+                    console.log('Delete clicked');
+                    deleteMessage(messageId);
+                } else {
+                    alert('Ви можете видаляти тільки власні коментарі');
+                }
             }
         
-            if (action === 'edit' && currentUserId === commentUserId) {
-                console.log('Edit clicked');
-                const { modal, saveButton, cancelButton, editTextArea } = createEditModal(currentText);
+            if (action === 'edit') {
+                if (commentUserId && currentUserId && commentUserId.toString() === currentUserId.toString()) {
+                    console.log('Edit clicked');
+                    const { modal, saveButton, cancelButton, editTextArea } = createEditModal(currentText);
         
-                cancelButton.onclick = () => {
-                    modal.remove();
-                };
+                    cancelButton.onclick = () => {
+                        modal.remove();
+                    };
         
-                saveButton.onclick = async () => {
-                    const updatedText = editTextArea.value.trim();
+                    saveButton.onclick = async () => {
+                        const updatedText = editTextArea.value.trim();
         
-                    if (updatedText !== currentText) {
-                        try {
-                            const response = await fetch(`/api/comments/${messageId}`, {
-                                method: 'PUT',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({ user_id: currentUserId, content: updatedText })
-                            });
+                        if (updatedText !== currentText) {
+                            try {
+                                const response = await fetch(`/api/comments/${messageId}`, {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({ user_id: currentUserId, content: updatedText })
+                                });
         
-                            if (response.ok) {
-                                const textElement = message.querySelector('.message-text');
-                                if (textElement) {
-                                    textElement.innerHTML = updatedText;
+                                if (response.ok) {
+                                    const textElement = message.querySelector('.message-text');
+                                    if (textElement) {
+                                        textElement.innerHTML = updatedText;
+                                    }
+                                    modal.remove();
+                                } else {
+                                    alert('Не вдалося оновити коментар');
                                 }
-                                modal.remove();
-                            } else {
-                                alert('Failed to update comment');
+                            } catch (err) {
+                                console.error('Error updating comment:', err);
+                                alert('Помилка при оновленні коментаря');
                             }
-                        } catch (err) {
-                            console.error('Error updating comment:', err);
-                            alert('Failed to update comment');
+                        } else {
+                            modal.remove();
                         }
-                    }
-                };
+                    };
+                } else {
+                    alert('Ви можете редагувати тільки власні коментарі');
+                }
             }
         
             optionsMenu.remove();
