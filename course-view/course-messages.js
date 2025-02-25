@@ -199,7 +199,7 @@ function renderReplies(replies, parentMessageId) {
     const createReplyElement = (reply) => {
         const replyElement = document.createElement('div');
         replyElement.classList.add('message', 'reply');
-        replyElement.вdataset.messageId = reply.id;
+        replyElement.dataset.messageId = reply.id;
         replyElement.dataset.parentId = reply.parent_comment_id;
 
         const formatDate = (isoString) => {
