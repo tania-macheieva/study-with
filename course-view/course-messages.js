@@ -189,18 +189,19 @@ function renderReplies(replies, parentMessageId) {
     }    
     repliesContainer.innerHTML = '';
 
-    // Sort replies in reverse chronological order (newest to oldest)
     const sortedReplies = [...replies].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
  
-    // Map for quick access to comments by id
     const replyMap = new Map(sortedReplies.map(reply => [reply.id, reply]));
 
-    // Create reply element function remains the same
     const createReplyElement = (reply) => {
         const replyElement = document.createElement('div');
         replyElement.classList.add('message', 'reply');
         replyElement.dataset.messageId = reply.id;
         replyElement.dataset.parentId = reply.parent_comment_id;
+        
+        replyElement.dataset.userId = reply.user_id;
+        
+        console.log(`Reply ${reply.id} has user_id: ${reply.user_id}`);
 
         const formatDate = (isoString) => {
             const date = new Date(isoString);
@@ -213,7 +214,6 @@ function renderReplies(replies, parentMessageId) {
         const avatar = reply.teacher_profile_image || reply.student_profile_image || '/images/user-avatar.png';
         let messageContent = reply.content || '';
 
-        // Find the username of the parent comment
         let parentUsername = '';
         if (reply.parent_comment_id) {
             const parentReply = replyMap.get(reply.parent_comment_id);
@@ -227,12 +227,10 @@ function renderReplies(replies, parentMessageId) {
             }
         } 
 
-        // Add @mention if it's not already there
         if (parentUsername && !messageContent.startsWith(`@${parentUsername}`)) {
             messageContent = `@${parentUsername} ${messageContent}`;
         }
 
-        // Format @mention
         if (parentUsername) {
             const mentionText = `@${parentUsername}`;
             const indexOfSpace = messageContent.indexOf(' ', mentionText.length);
@@ -262,23 +260,18 @@ function renderReplies(replies, parentMessageId) {
         return replyElement;
     };
 
-    // Modified recursive function to handle newest-first ordering while maintaining thread structure
     const processReplies = (parentId) => {
-        // Get replies for this level and sort them newest first
         const currentLevelReplies = sortedReplies
             .filter(reply => reply.parent_comment_id === parentId);
         
-        // Process each reply
         currentLevelReplies.forEach(reply => {
             const replyElement = createReplyElement(reply);
             repliesContainer.appendChild(replyElement);
             
-            // Process child replies immediately after their parent
             processReplies(reply.id);
         });
     };
 
-    // Start processing from the top level
     processReplies(parentMessageId);
     repliesContainer.style.display = 'block';
     updateMessageStyles();
