@@ -4,23 +4,251 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StudyWith</title>
-  <link rel="preload" href="path/to/font.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+  <title>StudyWith | Course Payment</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
     rel="stylesheet" />
   <script src="https://js.stripe.com/v3/"></script>
-  <link rel="stylesheet" href="../pay-page/style.css" />
   <link rel="icon" href="../images/menu-logo.ico">
+  <style>
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #FFFFFF;
+      margin: 5px 2px;
+      margin-top: 60px;
+      border-radius: 2px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #283044;
+      border-radius: 12px;
+      min-height: 40px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #506088;
+    }
+
+    ::-webkit-scrollbar:horizontal {
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track-horizontal {
+      background: #FFFFFF;
+      margin: 2px 5px;
+      border-radius: 2px;
+    }
+
+    ::-webkit-scrollbar-thumb-horizontal {
+      background: #283044;
+      border-radius: 12px;
+      min-width: 40px;
+    }
+
+    ::-webkit-scrollbar-thumb-horizontal:hover {
+      background: #506088;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      background-color: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+      box-sizing: border-box;
+    }
+
+    .course-card {
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 800px;
+      overflow: hidden;
+    }
+
+    .course-header {
+      padding: 24px;
+      border-bottom: 1px solid #eee;
+      
+    }
+
+    .course-header h2 {
+      font-size: 24px;
+      font-weight: 600;
+      color: #283044;
+      margin-bottom: 0;
+    }
+
+    #course-info {
+      padding: 0;
+    }
+
+    .course-content {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      padding: 24px;
+    }
+
+    @media (min-width: 768px) {
+      .course-content {
+        flex-direction: row;
+      }
+    }
+
+    .course-image {
+      flex: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      height: 250px;
+    }
+
+    .course-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .course-details {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .course-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #283044;
+      margin-bottom: 12px;
+    }
+
+    .course-description {
+      color: #555;
+      margin-bottom: 16px;
+      line-height: 1.6;
+      flex: 1;
+    }
+
+    .author-info {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+      color: #666;
+    }
+
+    .author-info img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      margin-right: 12px;
+      object-fit: cover;
+    }
+
+    .price-section {
+      /* background-color: #f5f7fa; */
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 16px;
+    }
+
+    .total-price {
+      font-size: 24px;
+      font-weight: 600;
+      color: #283044;
+      margin-bottom: 16px;
+    }
+
+    .checkout-button {
+      background-color: #283044;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      width: 100%;
+    }
+
+    .checkout-button:hover {
+      background-color: #3a4460;
+    }
+
+    .checkout-button.disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
+    .error-message {
+      color: #e53935;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+
+    .already-enrolled {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 16px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .back-button {
+      text-decoration: none;
+      margin-right: 16px; 
+      height: 24px; 
+    }
+
+    .back-button img {
+      margin-right: 8px;
+    }
+
+    a {    
+      text-decoration: none; 
+    }
+  </style>
 </head>
 
 <body>
   <main>
     <div class="course-card">
-      <h2>Course Details</h2>
-      <div id="course-info"></div>
+      <div class="course-header">
+        <h2> <a href="javascript:history.back()">
+          <img src="../images/arrow.svg" alt="Back" class="back-button">
+        </a>Course Payment</h2>
+      </div>
+      <div id="course-info">
+        <div class="loading" style="text-align: center; padding: 40px;">
+          Loading course details...
+        </div>
+      </div>
     </div>
   </main>
 
@@ -33,20 +261,46 @@
       window.location.href = "/";
     }
 
-    // Ініціалізація Stripe
+    // Initialize Stripe
     async function initializeStripe() {
-      try {
-        const response = await fetch("/get-stripe-key");
-        const data = await response.json();
-        stripe = Stripe(data.publicKey);
-      } catch (error) {
-        console.error('Error initializing Stripe:', error);
+        try {
+          const response = await fetch("/get-stripe-key");
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          if (!data.publicKey) {
+            throw new Error('No Stripe public key received');
+          }
+          stripe = Stripe(data.publicKey);
+          console.log('Stripe initialized successfully');
+        } catch (error) {
+          console.error('Error initializing Stripe:', error);
+          displayError('Payment system unavailable. Please try again later.');
+        }
       }
-    }
 
-    // Функція для обробки кліку по кнопці оплати
+      function displayError(message) {
+        const courseInfo = document.getElementById("course-info");
+        courseInfo.innerHTML = `
+    <div style="padding: 24px; text-align: center;">
+      <div class="error-message" style="font-size: 18px; margin-bottom: 20px;">
+        ${message}
+      </div>
+      <a href="/" class="checkout-button" style="display: inline-block; max-width: 200px; text-decoration: none;">
+        Return to Homepage
+      </a>
+    </div>
+  `;
+      }
+
+    // Handle checkout button click
     async function handleCheckout() {
       try {
+        const checkoutButton = document.getElementById('checkout-button');
+        checkoutButton.disabled = true;
+        checkoutButton.textContent = 'Processing...';
+
         const response = await fetch("/pay-page/create-checkout-session", {
           method: "POST",
           headers: {
@@ -60,15 +314,43 @@
 
         const data = await response.json();
 
-        if (data.url) {
+        if (data.error) {
+          if (data.error === 'Course already purchased') {
+            displayAlreadyEnrolled();
+          } else {
+            throw new Error(data.error);
+          }
+        } else if (data.url) {
           window.location.href = data.url;
         } else {
           throw new Error('No checkout URL received');
         }
       } catch (error) {
         console.error('Checkout error:', error);
-        alert('Payment initialization failed: ' + error.message);
+        const errorMessage = document.createElement('div');
+        errorMessage.classList.add('error-message');
+        errorMessage.textContent = 'Payment initialization failed: ' + error.message;
+
+        const priceSection = document.querySelector('.price-section');
+        priceSection.appendChild(errorMessage);
+
+        const checkoutButton = document.getElementById('checkout-button');
+        checkoutButton.disabled = false;
+        checkoutButton.textContent = 'Try Again';
       }
+    }
+
+    function displayAlreadyEnrolled() {
+      const priceSection = document.querySelector('.price-section');
+      priceSection.innerHTML = `
+        <div class="already-enrolled">
+          You are already enrolled in this course.
+          <br><br>
+          <a href="/dashboard/student.html" class="checkout-button" style="display: inline-block; text-decoration: none;">
+            Go to Your Courses
+          </a>
+        </div>
+      `;
     }
 
     function updateUI(course) {
@@ -76,19 +358,42 @@
       const price = parseFloat(course.price);
       const userId = localStorage.getItem('userId');
 
+      // Визначення шляху до зображення курсу
+      const courseImage = course.image_url
+        ? `/uploads/${course.image_url}`
+        : '../images/default-course.jpg';
+
       courseInfo.innerHTML = `
-          <h3>${course.name}</h3>
-          <p>${course.description}</p>
-          <div class="price-section">
-            <div class="total-price">Total: $${price.toFixed(2)}</div>
-            <button id="checkout-button" class="checkout-button">
-              Proceed to Payment
-            </button>
+        <div class="course-content">
+          <div class="course-image">
+            <img src="${courseImage}" alt="${course.name}" onerror="this.src='../images/250x100.jpg'">
           </div>
-        `;
+          <div class="course-details">
+            <h3 class="course-title">${course.name}</h3>
+
+            <div class="author-info">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>By ${course.author_name || 'Unknown Author'}</span>
+            </div>
+            
+            <p class="course-description">${course.description || 'No description available.'}</p>
+            
+            <div class="price-section">
+              <div class="total-price">Total: $${price.toFixed(2)}</div>
+              <button id="checkout-button" class="checkout-button">
+                Proceed to Payment
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
 
       const checkoutButton = document.getElementById('checkout-button');
 
+      // Check if user is the author
       if (course.author_id === parseInt(userId)) {
         checkoutButton.disabled = true;
         checkoutButton.textContent = 'You cannot purchase your own course';
@@ -97,21 +402,99 @@
         checkoutButton.addEventListener('click', handleCheckout);
       }
     }
+    // Modified course fetch to get author information
+      async function fetchCourseWithAuthor() {
+          const response = await fetch(`/pay-page/course/${courseId}`);
+          if (!response.ok) {
+            throw new Error('Failed to load course');
+          }
 
-    // Ініціалізація сторінки
+          let course = await response.json();
+
+          // Якщо ім'я автора не вказано, отримайте його за ID автора
+          if (!course.author_name && course.author_id) {
+            try {
+              const authorResponse = await fetch(`/users/${course.author_id}`);
+              if (authorResponse.ok) {
+                const authorData = await authorResponse.json();
+                course.author_name = authorData.name || authorData.username || 'Unknown Author';
+              }
+            } catch (error) {
+              console.error('Error fetching author details:', error);
+              course.author_name = 'Unknown Author';
+            }
+          }
+
+          return course;
+        }
+    // Check enrollment status
+    async function checkEnrollment() {
+      const userId = localStorage.getItem('userId');
+      if (!userId) return false;
+
+      try {
+        const response = await fetch(`/enrollments/check?userId=${userId}&courseId=${courseId}`);
+        const data = await response.json();
+        return data.enrolled;
+      } catch (error) {
+        console.error('Error checking enrollment:', error);
+        return false;
+      }
+    }
+
+    // Initialize page
     document.addEventListener('DOMContentLoaded', async function () {
-      // Ініціалізуємо Stripe
+      // Load user auth state
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        window.location.href = '/login/login.html?redirect=' + encodeURIComponent(window.location.href);
+        return;
+      }
+
+      // Initialize Stripe
       await initializeStripe();
 
-      // Завантажуємо інформацію про курс
+      // Check if already enrolled
+      const isEnrolled = await checkEnrollment();
+      if (isEnrolled) {
+        const courseInfo = document.getElementById("course-info");
+        courseInfo.innerHTML = `
+          <div style="padding: 24px;">
+            <div class="already-enrolled">
+              You are already enrolled in this course.
+              <br><br>
+              <a href="/dashboard/student.html" class="checkout-button" style="display: inline-block; text-decoration: none;">
+                Go to Your Courses
+              </a>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      // Load course information
       try {
         const response = await fetch(`/pay-page/course/${courseId}`);
+        if (!response.ok) {
+          throw new Error('Failed to load course');
+        }
+
         const course = await response.json();
         console.log('Course data:', course);
         updateUI(course);
       } catch (error) {
         console.error('Error loading course:', error);
-        alert('Error loading course details');
+        const courseInfo = document.getElementById("course-info");
+        courseInfo.innerHTML = `
+          <div style="padding: 24px; text-align: center;">
+            <div class="error-message" style="font-size: 18px; margin-bottom: 20px;">
+              Error loading course details
+            </div>
+            <a href="/" class="checkout-button" style="display: inline-block; max-width: 200px; text-decoration: none;">
+              Return to Homepage
+            </a>
+          </div>
+        `;
       }
     });
   </script>
