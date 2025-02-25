@@ -395,8 +395,9 @@ router.get('/comments', async (req, res) => {
             `SELECT 
                 c.id, 
                 c.content, 
-                c.created_at, 
-                c.parent_comment_id, 
+                c.created_at,
+                c.parent_comment_id,
+                c.user_id, 
                 u.name AS user_name, 
                 u.profile_image,    
                 s.profile_image AS student_profile_image, 
