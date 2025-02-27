@@ -566,10 +566,12 @@ function createModuleHTML(module) {
                     </ul>
                     ${module.test_link ? `
                         <div class="module-test">
-                            <button onclick="openModuleTest('${module.test_link}')" class="test-button">
-                                <img src="/images/test-icon.svg" alt="Test icon" />
-                                Take module test
-                            </button>
+                            <li onclick="openModuleTest('${module.test_link}')" 
+                                class="topic-item test-item"
+                                data-content-type="test">
+                                <img src="/images/test-icon.svg" class="topic-icon" alt="test icon" />
+                                <span class="topic-title">Module Test</span>
+                            </li>
                         </div>
                     ` : ''}
                 </div>
@@ -578,26 +580,222 @@ function createModuleHTML(module) {
     `;
 }
 
-window.openModuleTest = function(testLink) {
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.innerHTML = `
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Module Test</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <iframe src="${testLink}" frameborder="0"></iframe>
-            </div>
+function renderCourseContent() {
+    const courseContent = document.querySelector('.course-content');
+    if (!courseContent) return;
+    
+    courseContent.innerHTML = `
+        <div class="course-header">
+            <h1>Course content</h1>
+            <button class="toggle-all" aria-label="Toggle all content"></button>
         </div>
     `;
     
-    document.body.appendChild(modal);
-    
-    modal.querySelector('.close-modal').addEventListener('click', () => {
-        modal.remove();
+    COURSE_MODULES.forEach(module => {
+        courseContent.insertAdjacentHTML('beforeend', createModuleHTML(module));
     });
+    
+    const courseId = window.location.pathname.split('/course/').pop();
+    courseContent.insertAdjacentHTML('beforeend', `
+        <section class="final-test-section" data-course-id="${courseId}">
+            <div class="module-header">
+                <h2>Final Test</h2>
+            </div>
+            <div class="test-content" onclick="handleTestClick('course', ${courseId})">
+                <img src="/images/test-icon.svg" alt="Test icon" class="topic-icon" />
+                <span class="topic-title">Take Final Test</span>
+            </div>
+        </section>
+    `);
+    
+    initializeModuleListeners();
+}
+
+function renderTestQuestions(questions) {
+    if (!questions || !Array.isArray(questions)) return '<p>No questions available</p>';
+    
+    return questions.map((question, index) => `
+        <div class="test-question" data-question-id="${question.id}">
+            <h3>Question ${index + 1}</h3>
+            <p>${question.question_text}</p>
+            ${renderAnswers(question)}
+        </div>
+    `).join('');
+}
+
+function renderAnswers(question) {
+    if (!question.answers || !Array.isArray(question.answers)) return '';
+    
+    return `
+        <div class="answers-container">
+            ${question.answers.map(answer => `
+                <label class="answer-option">
+                    <input type="${question.type === 'multiple' ? 'checkbox' : 'radio'}" 
+                           name="question_${question.id}" 
+                           value="${answer.id}">
+                    ${answer.answer_text}
+                </label>
+            `).join('')}
+        </div>
+    `;
+}
+
+window.submitTest = async function(id, testType) {
+    try {
+        const userId = localStorage.getItem('userId');
+        const answers = collectTestAnswers();
+        
+        const response = await fetch(`/api/${testType}/${id}/test/submit`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                userId,
+                answers
+            })
+        });
+        
+        if (!response.ok) throw new Error('Failed to submit test');
+        
+        const result = await response.json();
+        showTestResults(result);
+    } catch (error) {
+        console.error('Error submitting test:', error);
+        showErrorMessage(error);
+    }
+}
+
+function collectTestAnswers() {
+    const answers = [];
+    document.querySelectorAll('.test-question').forEach(questionEl => {
+        const questionId = questionEl.dataset.questionId;
+        const selectedAnswers = Array.from(questionEl.querySelectorAll('input:checked'))
+            .map(input => input.value);
+        
+        answers.push({
+            questionId,
+            selectedAnswers
+        });
+    });
+    return answers;
+}
+
+function showTestResults(result) {
+    const videoContainer = document.querySelector('.video-player');
+    if (!videoContainer) return;
+    
+    videoContainer.innerHTML = `
+        <div class="test-results">
+            <h2>Test Results</h2>
+            <div class="score">Your score: ${result.score}%</div>
+            <div class="details">
+                Correct answers: ${result.correctAnswers}/${result.totalQuestions}
+            </div>
+            <button onclick="handleTestClick('${result.testType}', ${result.id})" class="retry-btn">
+                Try Again
+            </button>
+        </div>
+    `;
+}
+
+async function checkTestAvailability(moduleId) {
+    try {
+        const userId = localStorage.getItem('userId');
+        const response = await fetch(`/api/module/${moduleId}/test/availability?userId=${userId}`);
+        
+        if (!response.ok) {
+            throw new Error('Failed to check test availability');
+        }
+
+        const data = await response.json();
+        return data.isAvailable;
+    } catch (error) {
+        console.error('Error checking test availability:', error);
+        return false;
+    }
+}
+
+async function handleTestComplete(testData) {
+    const userId = localStorage.getItem('userId');
+    
+    try {
+        const response = await fetch(`/api/${testData.type}/${testData.id}/test/complete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                userId,
+                score: testData.score,
+                answers: testData.answers
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to save test results');
+        }
+        
+    } catch (error) {
+        console.error('Error handling test completion:', error);
+    }
+}
+
+window.openModuleTest = async function(testLink) {
+    const videoContainer = document.querySelector('.video-player');
+    if (!videoContainer) return;
+
+    videoContainer.innerHTML = '';
+
+    try {
+        const testContainer = document.createElement('div');
+        testContainer.className = 'test-container';
+        
+        Object.assign(testContainer.style, {
+            width: '100%',
+            height: '100%',
+            background: 'white',
+            borderRadius: '12px',
+            overflow: 'hidden'
+        });
+
+        const iframe = document.createElement('iframe');
+        Object.assign(iframe.style, {
+            width: '100%',
+            height: '100%',
+            border: 'none'
+        });
+
+        iframe.src = testLink;
+        
+        window.addEventListener('message', function(event) {
+            if (event.origin !== window.location.origin) return;
+            
+            if (event.data.type === 'testComplete') {
+                handleTestComplete(event.data);
+            }
+        });
+
+        testContainer.appendChild(iframe);
+        videoContainer.appendChild(testContainer);
+
+        document.querySelectorAll('.topic-item').forEach(item => {
+            item.classList.remove('active');
+        });
+
+        const testItem = document.querySelector(`[data-test-link="${testLink}"]`);
+        if (testItem) {
+            testItem.classList.add('active');
+        }
+
+    } catch (error) {
+        console.error('Error opening test:', error);
+        videoContainer.innerHTML = `
+            <div class="error-container" style="padding: 20px; color: red;">
+                Error loading test: ${error.message}
+            </div>
+        `;
+    }
 }
 
 async function initializeLecturesState() {
@@ -1002,6 +1200,7 @@ async function loadCourseData() {
                 return {
                     id: module.id,
                     title: module.title,
+                    test_link: module.test_link, 
                     lectures: lectures.map(lecture => ({
                         id: lecture.id,
                         title: lecture.title,
@@ -1015,6 +1214,10 @@ async function loadCourseData() {
                     }
                 };
             });
+            
+            courseMeta = {
+                test_link: courseData.test_link
+            };
             
             renderCourseContent();
             applyCompletedLecturesStyles();

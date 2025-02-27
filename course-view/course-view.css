@@ -703,6 +703,64 @@ body {
     background-repeat: no-repeat;
 }
 
+<<<<<<< HEAD
+.module-test {
+    margin-top: 15px;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+.test-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.test-item:hover {
+    background-color: #f5f5f5;
+}
+
+.topic-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.course-final-test {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.course-final-test h2 {
+    margin: 0 0 15px 0;
+    font-size: 18px;
+}
+
+.test-button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: #283044;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    justify-content: center;
+}
+
+.test-button img {
+    width: 20px;
+    height: 20px;
+}
+=======
 
 .modal {
     position: fixed;
@@ -905,3 +963,4 @@ body {
     border-radius: 8px;
     margin-bottom: 20px;
 }
+>>>>>>> c5a28196ac6a89858d06b7025e97d957c4eefbe1

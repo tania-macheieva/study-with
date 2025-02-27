@@ -267,4 +267,15 @@ CREATE TABLE comments (
 );
 
 -- ALTER TABLE comments ADD COLUMN parent_user_id INTEGER REFERENCES users(id);
+CREATE TABLE bookmarks (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    course_id INT NOT NULL,
+    is_saved BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_course FOREIGN KEY (course_id) REFERENCES all_courses(id) ON DELETE CASCADE,
+    UNIQUE (user_id, course_id) -- Уникнення дублювання записів
+);
+
 

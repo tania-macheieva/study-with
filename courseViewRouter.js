@@ -7,31 +7,17 @@ router.get('/course/:courseId', async (req, res) => {
         const { courseId } = req.params;
         const userId = req.query.userId;
 
-        if (!courseId || isNaN(courseId)) {
-            return res.status(400).json({ 
-                error: 'Invalid course ID',
-                details: 'Course ID must be a valid number'
-            });
-        }
-
         if (!userId) {
-            return res.status(400).json({ 
-                error: 'User ID is required',
-                details: 'Please provide a valid user ID'
-            });
+            return res.status(400).json({ error: 'User ID is required' });
         }
 
-        const courseIdNum = parseInt(courseId, 10);
-
-        // Оновлений запит з правильною обробкою статусу completed
-        const courseQuery = `
+        // Оновлений запит для отримання даних курсу разом з тестами
+        const query = `
             SELECT 
                 c.id,
                 c.name,
                 c.description,
-                c.author_id,
                 c.test_link as course_test_link,
-                u.name as author_name,
                 m.id as module_id,
                 m.title as module_title,
                 m.order_num as module_order,
@@ -42,20 +28,8 @@ router.get('/course/:courseId', async (req, res) => {
                 l.order_num as lecture_order,
                 lf.file_url,
                 lf.file_type,
-                COALESCE(lp.completed, false) as is_completed,
-                (
-                    SELECT COUNT(*)
-                    FROM lectures l2
-                    WHERE l2.module_id = m.id
-                ) as module_total_lectures,
-                (
-                    SELECT COUNT(*)
-                    FROM lectures l2
-                    JOIN lecture_progress lp2 ON l2.id = lp2.lecture_id
-                    WHERE l2.module_id = m.id AND lp2.user_id = $2 AND lp2.completed = true
-                ) as module_completed_lectures
+                COALESCE(lp.completed, false) as is_completed
             FROM all_courses c
-            LEFT JOIN users u ON c.author_id = u.id
             LEFT JOIN modules m ON c.id = m.course_id
             LEFT JOIN lectures l ON m.id = l.module_id
             LEFT JOIN lecture_files lf ON l.id = lf.lecture_id
@@ -64,39 +38,37 @@ router.get('/course/:courseId', async (req, res) => {
             ORDER BY m.order_num, l.order_num
         `;
 
-        const courseResult = await db.query(courseQuery, [courseIdNum, userId]);
+        const result = await db.query(query, [courseId, userId]);
 
-        if (courseResult.rows.length === 0) {
+        if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Course not found' });
         }
 
-        // Формуємо дані курсу
+        // Форматуємо дані курсу
         const courseData = {
-            id: courseResult.rows[0].id,
-            name: courseResult.rows[0].name,
-            description: courseResult.rows[0].description,
-            author: {
-                id: courseResult.rows[0].author_id,
-                name: courseResult.rows[0].author_name
-            },
+            id: result.rows[0].id,
+            name: result.rows[0].name,
+            description: result.rows[0].description,
+            test_link: result.rows[0].course_test_link,
             modules: []
         };
 
-        // Створюємо Map для модулів
+        // Групуємо дані по модулях
         const modulesMap = new Map();
 
-        courseResult.rows.forEach(row => {
+        result.rows.forEach(row => {
             if (row.module_id) {
                 if (!modulesMap.has(row.module_id)) {
                     modulesMap.set(row.module_id, {
                         id: row.module_id,
                         title: row.module_title,
                         order: row.module_order,
+                        test_link: row.module_test_link,
                         lectures: []
                     });
                 }
                 
-                if (row.lecture_id && !modulesMap.get(row.module_id).lectures.some(l => l.id === row.lecture_id)) {
+                if (row.lecture_id) {
                     modulesMap.get(row.module_id).lectures.push({
                         id: row.lecture_id,
                         title: row.lecture_title,
@@ -121,10 +93,7 @@ router.get('/course/:courseId', async (req, res) => {
         res.json(courseData);
     } catch (error) {
         console.error('Error loading course data:', error);
-        res.status(500).json({ 
-            error: 'Internal server error',
-            details: error.message
-        });
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
@@ -418,6 +387,104 @@ router.get('/comments', async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Failed to fetch comments' });
+    }
+});
+
+router.get('/module/:moduleId/test', async (req, res) => {
+    try {
+        const { moduleId } = req.params;
+        const userId = req.query.userId;
+
+        if (!userId) {
+            return res.status(400).json({ error: 'User ID is required' });
+        }
+
+        // Перевіряємо чи існує тест для модуля
+        const moduleQuery = `
+            SELECT test_link
+            FROM modules
+            WHERE id = $1
+        `;
+        
+        const moduleResult = await db.query(moduleQuery, [moduleId]);
+        
+        if (moduleResult.rows.length === 0 || !moduleResult.rows[0].test_link) {
+            return res.status(404).json({ error: 'Test not found for this module' });
+        }
+
+        // Отримуємо контент тесту
+        const testLink = moduleResult.rows[0].test_link;
+        
+        res.json({
+            type: 'module',
+            moduleId: moduleId,
+            testLink: testLink
+        });
+
+    } catch (error) {
+        console.error('Error loading module test:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Отримання фінального тесту курсу
+router.get('/course/:courseId/test', async (req, res) => {
+    try {
+        const { courseId } = req.params;
+        const userId = req.query.userId;
+
+        if (!userId) {
+            return res.status(400).json({ error: 'User ID is required' });
+        }
+
+        // Перевіряємо чи існує фінальний тест для курсу
+        const courseQuery = `
+            SELECT test_link
+            FROM all_courses
+            WHERE id = $1
+        `;
+        
+        const courseResult = await db.query(courseQuery, [courseId]);
+        
+        if (courseResult.rows.length === 0 || !courseResult.rows[0].test_link) {
+            return res.status(404).json({ error: 'Final test not found for this course' });
+        }
+
+        // Отримуємо контент тесту
+        const testLink = courseResult.rows[0].test_link;
+        
+        res.json({
+            type: 'course',
+            courseId: courseId,
+            testLink: testLink
+        });
+
+    } catch (error) {
+        console.error('Error loading course test:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.post('/module/:moduleId/test/submit', async (req, res) => {
+    try {
+        const { moduleId } = req.params;
+        const { userId, answers } = req.body;
+
+        if (!userId || !answers) {
+            return res.status(400).json({ error: 'User ID and answers are required' });
+        }
+
+        // Тут можна додати логіку для збереження результатів тесту
+        // Наприклад, зберігати в окрему таблицю test_results
+
+        res.json({
+            success: true,
+            message: 'Test submitted successfully'
+        });
+
+    } catch (error) {
+        console.error('Error submitting test:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
