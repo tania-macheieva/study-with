@@ -390,7 +390,6 @@ router.get('/comments', async (req, res) => {
     }
 });
 
-<<<<<<< HEAD
 router.get('/module/:moduleId/test', async (req, res) => {
     try {
         const { moduleId } = req.params;
@@ -489,11 +488,9 @@ router.post('/module/:moduleId/test/submit', async (req, res) => {
     }
 });
 
-=======
 router.delete('/comments/:comment_id', async (req, res) => {
     const { comment_id } = req.params;
     const { user_id } = req.body;
->>>>>>> c5a28196ac6a89858d06b7025e97d957c4eefbe1
 
     // Authorization check here
     if (!user_id) {
