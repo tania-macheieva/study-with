@@ -520,7 +520,7 @@ body {
     border: 2px solid #C7C7C7;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
-    padding: 20px;
+    padding: 15px 20px;
     margin-bottom: 0;
     margin-top: 16px;
     background: #FFFFFF; 
@@ -533,54 +533,70 @@ body {
     border-bottom-right-radius: 0;
 }
 
-.message:last-of-type {
-    border-bottom-left-radius: 12px;
-    border-bottom-right-radius: 12px;
-}
-
-.message.reply {
-    margin-top: -2px;
+.message.reply {    
     margin-bottom: 0;
     border-radius: 0;
-}  
+    background-color: #f5faff;
+    border-left: none;  
+    padding: 10px;
+    margin-top: 0;     
+    border-top: 2px solid #CCCCCC;
+    border-bottom: 2px solid #CCCCCC;
+}
 
-.replies-container {
-    
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+.message-content {
+    padding: 10px; 
+    margin-left: 35px;
+    border-top-right-radius: 0;   
+    border-top-left-radius: 0;   
+} 
+
+.message-content .mention {
+    font-weight: 600;
+    color: #283044;
+    background: #DCECFC;
+    padding: 4px 8px;
+    border-radius: 8px;
+    display: inline-block;
+    font-size: 14px;   
+} 
+.message.reply .message-text {
+    font-size: 14px;
+    color: #333;
+}
+  
+.replies-container { 
+    border-left: 2.8px solid #283044;
+    border-bottom-left-radius: 12px;
 }
 
 .message.has-visible-replies {
-    margin-bottom: 0;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-.message.reply:first-of-type {
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-}
+    margin-bottom: 0; 
+} 
 
 .message.reply:last-of-type {
     border-bottom-left-radius: 12px;
     border-bottom-right-radius: 12px;
 }
-
 .message .user-info {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 15px;
+    margin-bottom: 0px;
 }
 
+.message.reply .user-info,
+.message.reply .message-text {
+    margin-left: 48px;  
+}
 .message .avatar {
-    width: 38px;
-    height: 41px;
+    width: 40px;
+    height: 40px;
     border-radius: 100%;
 }
 
 .message .username {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 500;
     color: #000000;
 }
@@ -592,28 +608,16 @@ body {
 }
 
 .message .message-text {
-    font-size: 16px;
-    font-weight: 200;
+    font-size: 16px; 
     color: #000000;
     margin-left: 48px;
-}
-
-/* Для @mention */ 
-.mention {
-    font-weight: 600;
-    color: #283044;
-    background: #DCECFC;
-    padding: 4px 8px;
-    border-radius: 8px;
-    display: inline-block;
-    font-size: 14px;    
 }
 
 /* Стилі для кнопки "більше" */
 .message .more-options {
     position: absolute;
     right: 10px;
-    top: 60px;
+    top: 45px;
     transform: rotate(90deg);
     font-size: 36px;
     color: #000000;
@@ -621,13 +625,33 @@ body {
     border: none;
     cursor: pointer;
 }
+ 
+.show-replies-button {
+    margin-top: 10px;
+    margin-bottom: 15px;
+    background-color: #dcecfc; 
+    padding: 0 15px;
+    border: 2px solid #283044;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: #283044;
+    cursor: pointer;
+    border-radius: 12px;
+    height: 31px;
+    transition: background-color 0.2s ease;
+}
+
+.show-replies-button:hover {
+    background-color: #c7e5fd;
+    border-color: #1a2b3d;
+}
 
 /* Стилі для вводу відповіді */
 .message .reply-input {
     display: flex;
     gap: 10px;
-    padding: 30px;
-    margin-top: 20px;
+    padding: 30px;  
     border-radius: 12px;
 }
 
@@ -654,23 +678,6 @@ body {
     content: url('../images/send_hover.svg'); 
 }
 
-.message.reply .user-info,
-.message.reply .message-text {
-    margin-left: 48px;  
-}
-
-
-/* Show More Button */
-.show-more-button {
-    margin: 10px 0;
-    padding: 8px 16px;
-    background: #FFFFFF;
-    border: 2px solid #283044;
-    border-radius: 12px;
-    font-size: 14px;
-    cursor: pointer;
-    display: block;
-}
 
 /* Topic Icons */
 .topics li::after {
@@ -696,6 +703,7 @@ body {
     background-repeat: no-repeat;
 }
 
+<<<<<<< HEAD
 .module-test {
     margin-top: 15px;
     border-top: 1px solid #eee;
@@ -752,3 +760,207 @@ body {
     width: 20px;
     height: 20px;
 }
+=======
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    overflow: auto;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    width: 400px;
+    max-width: 90%;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    animation: modalFadeIn 0.3s ease-in-out;
+}
+
+/* Анімація для модалки */
+@keyframes modalFadeIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Стиль для заголовка модалки */
+.modal-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+/* Стиль для тексту опису */
+.modal-description {
+    font-size: 15px;
+    color: #666;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+/* Стиль для кнопок */
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.modal-button {
+    padding: 12px 25px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #283044;
+    background-color: #dcecfc; 
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    flex: 1;
+    margin: 5px;
+    border: 2px solid #283044;
+}
+
+.modal-button:hover {
+    background-color: #c7e5fd;
+    border-color: #283044;
+}
+
+/* Стиль для кнопки скасування */
+.modal-button.cancel {
+    background-color: #f07e71;
+    color: rgb(194, 1, 1);
+}
+
+.modal-button.cancel:hover {
+    background-color: #e77164;
+}
+.show-replies-button {
+    margin-top: 10px;
+    margin-bottom: 15px;
+    
+    padding: 0 15px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    
+    cursor: pointer;
+    border-radius: 12px;
+    height: 31px;
+    transition: background-color 0.2s ease;
+}
+ 
+/* Стилі для модалки */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    overflow: auto;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    width: 400px;
+    max-width: 90%;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    animation: modalFadeIn 0.3s ease-in-out;
+}
+
+/* Анімація для модалки */
+@keyframes modalFadeIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Стиль для заголовка модалки */
+.modal-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+/* Стиль для тексту опису */
+.modal-description {
+    font-size: 15px;
+    color: #666;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+/* Стиль для кнопок */
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.modal-button {
+    padding: 12px 25px;
+    font-size: 15px;
+    font-weight: 500; 
+    background-color: #ffff;
+    border: rgb(194, 1, 1) 2px solid; 
+    color: rgb(194, 1, 1); 
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    flex: 1;
+    margin: 5px;
+}
+
+.modal-button:hover {
+    background-color: rgb(250, 150, 150); 
+    border: rgb(194, 1, 1) 2px solid; 
+}
+
+/* Стиль для кнопки скасування */
+.modal-button.cancel {
+    background-color: #ffff;
+    border: 2px solid #283044;
+    color: #283044;
+}
+
+.modal-button.cancel:hover {
+    background-color: #c7e5fd;
+}
+
+.modal-textarea {
+    width: 100%;
+    height: 150px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+>>>>>>> c5a28196ac6a89858d06b7025e97d957c4eefbe1
