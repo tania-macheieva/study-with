@@ -276,10 +276,12 @@ async function loadSavedBookmarks() {
             return;
         }
 
-        const response = await fetch(`http://localhost:8000/courses/saved/${userId}`);
+        const response = await fetch(`http://localhost:8000/courses/bookmarks/${userId}`);
         if (!response.ok) throw new Error('Помилка завантаження збережених курсів');
         
-        const courses = await response.json();
+        let courses = await response.json();
+        //Відфільтровуємо лише ті курси, які `is_saved = TRUE`
+        courses = courses.filter(course => course.is_saved);
         const bookmarksList = document.querySelector('.bookmarks-list');
         
         if (!bookmarksList) return;
@@ -293,12 +295,21 @@ async function loadSavedBookmarks() {
         bookmarksList.innerHTML = courses.map(course => `
             <div class="bookmark">
                 <p class="p-1">${course.name}</p>
-                <img src="${course.image_url || '/images/250x100.png'}" alt="${course.name}">
+                <img src="/uploads/${course.image_url || '/images/250x100.png'}" alt="${course.name}">
                 <button class="btn-open" onclick="window.location.href='/course/preview?id=${course.id}'">
                     ${translations[localStorage.getItem('language') || 'en'].btnOpen}
                 </button>
+                <button class="remove-bookmark" data-course-id="${course.id}">Remove</button>
             </div>
         `).join('');
+
+        // Додаємо обробник подій для кожної кнопки "Remove"
+        document.querySelectorAll('.remove-bookmark').forEach(button => {
+            button.addEventListener('click', async function () {
+                const courseId = this.dataset.courseId;
+                await toggleBookmark(courseId); 
+            });
+        });
 
         manageViewAllButton('btn-view-all-4', courses.length);
         initializeViewAllButtons();
@@ -311,6 +322,33 @@ async function loadSavedBookmarks() {
             bookmarksList.innerHTML = '<p class="error-message">Помилка завантаження збережених курсів</p>';
         }
         manageViewAllButton('btn-view-all-4', 0);
+    }
+
+}
+// Функція для перемикання стану закладки (Додати / Видалити)
+async function toggleBookmark(courseId) {
+    const userId = localStorage.getItem('userId');
+
+    if (!userId) {
+        console.log('Користувач не авторизований');
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:8000/api/courses/bookmarks', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, courseId })
+        });
+
+        if (!response.ok) throw new Error('Помилка зміни стану закладки');
+
+        console.log('Закладка оновлена успішно');
+        loadSavedBookmarks(); // Оновлюємо список закладок після видалення
+
+    } catch (error) {
+        console.error('Помилка видалення закладки:', error);
+        alert('Помилка видалення закладки'); 
     }
 }
 

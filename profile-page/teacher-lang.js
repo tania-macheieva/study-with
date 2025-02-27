@@ -142,6 +142,11 @@ const translations = {
         btnResume: 'Продовжити'
     },
 };
+document.addEventListener('DOMContentLoaded', () => {
+const tabLinks = document.querySelectorAll('.tab-link');
+    const modal = document.getElementById('modal');
+    const modalContentContainer = document.getElementById('modal-content-container');
+    const closeButton = document.querySelector('.close-button');
 // Відкриття модального вікна
 tabLinks.forEach(tab => {
     tab.addEventListener('click', () => {
@@ -288,7 +293,7 @@ async function updateProgress() {
         console.error('Error updating progress:', error);
     }
 }
-
+// Функція для завантаження закладок
 async function loadSavedBookmarks() {
     try {
         const userId = localStorage.getItem('userId');
@@ -297,28 +302,45 @@ async function loadSavedBookmarks() {
             return;
         }
 
-        const response = await fetch(`http://localhost:8000/api/courses/saved/${userId}`);
+        const response = await fetch(`http://localhost:8000/courses/bookmarks/${userId}`);
+        console.log('Response status:', response.status);
         if (!response.ok) throw new Error('Помилка завантаження збережених курсів');
         
-        const courses = await response.json();
+        let courses = await response.json();
+        //Відфільтровуємо лише ті курси, які `is_saved = TRUE`
+        courses = courses.filter(course => course.is_saved);
         const bookmarksList = document.querySelector('.bookmarks-list');
         
         if (!bookmarksList) return;
 
         if (courses.length === 0) {
-            bookmarksList.innerHTML = `<p class="no-courses">У вас ще немає збережених курсів</p>`;
+            bookmarksList.innerHTML = `<p class="no-courses">${translations[localStorage.getItem('language') || 'en'].noLinkedCourses}</p>`;
+            manageViewAllButton('btn-view-all-4', 0);
             return;
         }
 
         bookmarksList.innerHTML = courses.map(course => `
             <div class="bookmark">
                 <p class="p-1">${course.name}</p>
-                <img src="${course.image_url || '/images/250x100.png'}" alt="${course.name}">
+                <img src="/uploads/${course.image_url || '/images/250x100.png'}" alt="${course.name}">
                 <button class="btn-open" onclick="window.location.href='/course/preview?id=${course.id}'">
                     ${translations[localStorage.getItem('language') || 'en'].btnOpen}
                 </button>
+                <button class="remove-bookmark" data-course-id="${course.id}">Remove</button>
             </div>
         `).join('');
+
+        // Додаємо обробник подій для кожної кнопки "Remove"
+        document.querySelectorAll('.remove-bookmark').forEach(button => {
+            button.addEventListener('click', async function () {
+                const courseId = this.dataset.courseId;
+                await toggleBookmark(courseId); 
+            });
+        });
+
+        manageViewAllButton('btn-view-all-4', courses.length);
+        initializeViewAllButtons();
+
 
     } catch (error) {
         console.error('Помилка завантаження збережених курсів:', error);
@@ -326,6 +348,34 @@ async function loadSavedBookmarks() {
         if (bookmarksList) {
             bookmarksList.innerHTML = '<p class="error-message">Помилка завантаження збережених курсів</p>';
         }
+        manageViewAllButton('btn-view-all-4', 0);
+    }
+
+}
+// Функція для перемикання стану закладки (Додати / Видалити)
+async function toggleBookmark(courseId) {
+    const userId = localStorage.getItem('userId');
+
+    if (!userId) {
+        console.log('Користувач не авторизований');
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:8000/api/courses/bookmarks', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, courseId })
+        });
+
+        if (!response.ok) throw new Error('Помилка зміни стану закладки');
+
+        console.log('Закладка оновлена успішно');
+        await loadSavedBookmarks(); 
+
+    } catch (error) {
+        console.error('Помилка видалення закладки:', error);
+        alert('Помилка видалення закладки'); 
     }
 }
 
@@ -344,8 +394,50 @@ function toggleViewAllButton(containerClass, buttonClass, threshold = 3) {
         }
     });
 }
+// Функція для керування кнопкою "Показати більше/менше"
+function manageViewAllButton(containerClass, itemsCount) {
+    const viewAllBtn = document.querySelector(`.${containerClass}`);
+    if (viewAllBtn) {
+        // Показуємо кнопку тільки якщо елементів більше 3
+        viewAllBtn.style.display = itemsCount > 3 ? 'block' : 'none';
+        
+        // Set initial button text
+        const lang = localStorage.getItem('language') || 'en';
+        viewAllBtn.textContent = translations[lang].btnViewAll;
+    }
+}
+// Функція для ініціалізації всіх кнопок
+function initializeViewAllButtons() {
+    const buttonConfigs = [
+        { buttonClass: '.btn-view-all-1', containerClass: '.my-courses', listClass: '.courses-list' },
+        { buttonClass: '.btn-view-all-3', containerClass: '.my-certificates', listClass: '.certificates-list' },
+        { buttonClass: '.btn-view-all-4', containerClass: '.my-bookmarks', listClass: '.bookmarks-list' }
+    ];
 
-document.addEventListener('DOMContentLoaded', () => {
+    buttonConfigs.forEach(config => {
+        document.querySelectorAll(config.buttonClass).forEach(button => {
+            // Set initial button text
+            const lang = localStorage.getItem('language') || 'en';
+            button.textContent = translations[lang].btnViewAll;
+            
+            button.addEventListener('click', function() {
+                const section = button.closest(config.containerClass);
+                const list = section.querySelector(config.listClass);
+                
+                if (list) {
+                    list.classList.toggle('expanded');
+                    const isExpanded = list.classList.contains('expanded');
+                    const lang = localStorage.getItem('language') || 'en';
+                    button.textContent = isExpanded ? 
+                        translations[lang].btnShowLess : 
+                        translations[lang].btnViewAll;
+                }
+            });
+        });
+    });
+}
+
+
     loadEnrolledCourses();
     loadSavedBookmarks();
     toggleViewAllButton('courses-list', 'btn-view-all-1');
