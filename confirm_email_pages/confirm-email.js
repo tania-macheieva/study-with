@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('verificationForm');
     const inputs = document.querySelectorAll('input');
-    const resendLink = document.getElementById('resendLink');
-    const timerSpan = document.getElementById('timer');
+    const resendLinkContainer = document.querySelector('.resend-link');
+    let timerSpan = document.getElementById('timer');
     
     // Автофокус на наступний інпут
     inputs.forEach((input, index) => {
@@ -38,42 +38,62 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Таймер для повторної відправки
     let timeLeft = 60;
-    const timer = setInterval(() => {
-        timeLeft--;
-        timerSpan.textContent = timeLeft;
-        
-        if (timeLeft <= 0) {
-            clearInterval(timer);
-            resendLink.innerHTML = '<a href="#" id="resendButton">Resend code</a>';
-            
-            // Обробник для повторної відправки
-            document.getElementById('resendButton').addEventListener('click', async (e) => {
-                e.preventDefault();
-                try {
-                    const email = localStorage.getItem('userEmail');
-                    const response = await fetch('/auth/resend-code', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ email })
+    let timer;
+    function startTimer() {
+        timeLeft = 60;
+        resendLinkContainer.innerHTML = `Resend email in <span id="timer">${timeLeft}</span> seconds`;
+        timerSpan = document.getElementById('timer');
+
+        timer = setInterval(() => {
+            timeLeft--;
+            timerSpan.textContent = timeLeft;
+
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                resendLinkContainer.innerHTML = `<a href="#" id="resendButton">Resend code</a>`;
+
+                // Додаємо слухача подій для повторної відправки
+                const resendButton = document.getElementById('resendButton');
+                if (resendButton) {
+                    resendButton.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        await resendCode();
                     });
-                    
-                    if (response.ok) {
-                        timeLeft = 60;
-                        resendLink.innerHTML = `Resend email in <span id="timer">${timeLeft}</span> seconds`;
-                        timerSpan = document.getElementById('timer');
-                        startTimer();
-                    } else {
-                        alert('Error resending code');
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('Error resending code');
                 }
+            }
+        }, 1000);
+    }
+
+    async function resendCode() {
+        try {
+            const email = localStorage.getItem('userEmail'); 
+            if (!email) {
+                alert('Email not found. Please try registering again.');
+                window.location.href = '/register';
+                return;
+            }
+
+            const response = await fetch('/auth/resend-code', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
             });
+
+            if (response.ok) {
+                alert('New verification code sent to your email.');
+                startTimer(); // Запускаємо таймер знову
+            } else {
+                const errorData = await response.json();
+                alert(`Error: ${errorData.error}`);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error resending code');
         }
-    }, 1000);
+    }
+
+    startTimer(); // Запускаємо таймер при завантаженні сторінки
+
 
     // Обробка відправки форми
     form.addEventListener('submit', async (e) => {
