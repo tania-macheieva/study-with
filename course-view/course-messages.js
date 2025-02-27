@@ -134,14 +134,13 @@ function showReplies(parentElement, parentMessageId, replies) {
         repliesContainer.style.display = 'block';
     }
 
-    // Знаходимо кнопку і оновлюємо її
     const showRepliesButton = parentElement.querySelector('.show-replies-button');
     if (showRepliesButton) {
         showRepliesButton.dataset.expanded = 'true';
-        showRepliesButton.textContent = 'Hide replies'; // змінюємо текст кнопки
+        showRepliesButton.textContent = 'Hide replies';
         localStorage.setItem(`replies-expanded-${parentMessageId}`, 'true');
-        localStorage.setItem(`replies-timestamp-${parentMessageId}`, Date.now().toString());
     }
+
 }
 
 
@@ -261,8 +260,10 @@ function renderReplies(replies, parentMessageId) {
         });
     };
 
-    processReplies(parentMessageId);
-    repliesContainer.style.display = 'block';
+    processReplies(parentMessageId); 
+    if (repliesContainer) {
+        repliesContainer.style.display = 'block';
+    }
     updateMessageStyles();
 }
 
