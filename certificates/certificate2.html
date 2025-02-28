@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: white;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding:0 70px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .certificate {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            width: 100%;
+            /* max-width: 1000px; */
+        }
+
+        .certificate-image {
+            width: 100%;
+            max-width: 650px;
+            height: auto;
+            align-self: flex-end; /* Фіксує картинку в правому нижньому куті */
+            /* margin-left: auto;  */
+            margin-right: 40px;
+        }
+
+        .content {
+            position: absolute;
+            left: 5%;
+            top: 45%;
+            transform: translateY(-50%);
+            color: black; /* або інший колір, щоб текст був видимим */
+            width: 50%;
+        }
+
+        .logo {
+            width: 36px;
+            height: 36px;
+            vertical-align: middle;
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 60px;
+            font-weight: bold;
+            margin-bottom: 40px;
+        }
+
+        p {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+
+        .signature {
+            margin-top: -450px;
+            margin-left: 260px;
+            width: 200px;
+        }
+
+        .cert-number{
+            font-size: 12px;
+            margin-top: 30px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="certificate">
+        <img class="certificate-image" src="../images/certificate2.png" alt="certificate">
+        <div class="content">
+            <h2><img class="logo" src="../images/menu-logo.png" alt="logo"> StudyWith</h2>
+            <h1>CERTIFICATE</h1>
+            <p>This certifies that</p>
+            <h3>IVAN IVANENKO</h3>
+            <p>Has successfully completed the course</p>
+            <h3>COURSE NAME</h3>
+            <p>Date of issue:</p>
+            <p>2020-01-01</p>
+            <p class="cert-number">CERT-2025-00123</p>
+            <img class="signature" src="../images/signature1.png" alt="signature">
+        </div>
+    </div>
+</body>
+
+</html>
