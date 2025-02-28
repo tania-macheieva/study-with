@@ -50,6 +50,8 @@ app.use((req, res, next) => {
     next();
 });
 
+const certificateRouter = require('./certificateRouter');
+app.use('/api', certificateRouter);
 
 
 app.use(express.static(path.join(__dirname)));

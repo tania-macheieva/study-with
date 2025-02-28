@@ -1,37 +1,25 @@
 const express = require('express');
 const router = express.Router();
 const db = require('./db');
+const fetch = require('node-fetch');
+require('dotenv').config();
 
 router.get('/course/:courseId', async (req, res) => {
     try {
         const { courseId } = req.params;
         const userId = req.query.userId;
 
-        if (!courseId || isNaN(courseId)) {
-            return res.status(400).json({ 
-                error: 'Invalid course ID',
-                details: 'Course ID must be a valid number'
-            });
-        }
-
         if (!userId) {
-            return res.status(400).json({ 
-                error: 'User ID is required',
-                details: 'Please provide a valid user ID'
-            });
+            return res.status(400).json({ error: 'User ID is required' });
         }
 
-        const courseIdNum = parseInt(courseId, 10);
-
-        // Оновлений запит з правильною обробкою статусу completed
-        const courseQuery = `
+        // Оновлений запит для отримання даних курсу разом з тестами
+        const query = `
             SELECT 
                 c.id,
                 c.name,
                 c.description,
-                c.author_id,
                 c.test_link as course_test_link,
-                u.name as author_name,
                 m.id as module_id,
                 m.title as module_title,
                 m.order_num as module_order,
@@ -42,20 +30,8 @@ router.get('/course/:courseId', async (req, res) => {
                 l.order_num as lecture_order,
                 lf.file_url,
                 lf.file_type,
-                COALESCE(lp.completed, false) as is_completed,
-                (
-                    SELECT COUNT(*)
-                    FROM lectures l2
-                    WHERE l2.module_id = m.id
-                ) as module_total_lectures,
-                (
-                    SELECT COUNT(*)
-                    FROM lectures l2
-                    JOIN lecture_progress lp2 ON l2.id = lp2.lecture_id
-                    WHERE l2.module_id = m.id AND lp2.user_id = $2 AND lp2.completed = true
-                ) as module_completed_lectures
+                COALESCE(lp.completed, false) as is_completed
             FROM all_courses c
-            LEFT JOIN users u ON c.author_id = u.id
             LEFT JOIN modules m ON c.id = m.course_id
             LEFT JOIN lectures l ON m.id = l.module_id
             LEFT JOIN lecture_files lf ON l.id = lf.lecture_id
@@ -64,39 +40,37 @@ router.get('/course/:courseId', async (req, res) => {
             ORDER BY m.order_num, l.order_num
         `;
 
-        const courseResult = await db.query(courseQuery, [courseIdNum, userId]);
+        const result = await db.query(query, [courseId, userId]);
 
-        if (courseResult.rows.length === 0) {
+        if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Course not found' });
         }
 
-        // Формуємо дані курсу
+        // Форматуємо дані курсу
         const courseData = {
-            id: courseResult.rows[0].id,
-            name: courseResult.rows[0].name,
-            description: courseResult.rows[0].description,
-            author: {
-                id: courseResult.rows[0].author_id,
-                name: courseResult.rows[0].author_name
-            },
+            id: result.rows[0].id,
+            name: result.rows[0].name,
+            description: result.rows[0].description,
+            test_link: result.rows[0].course_test_link,
             modules: []
         };
 
-        // Створюємо Map для модулів
+        // Групуємо дані по модулях
         const modulesMap = new Map();
 
-        courseResult.rows.forEach(row => {
+        result.rows.forEach(row => {
             if (row.module_id) {
                 if (!modulesMap.has(row.module_id)) {
                     modulesMap.set(row.module_id, {
                         id: row.module_id,
                         title: row.module_title,
                         order: row.module_order,
+                        test_link: row.module_test_link,
                         lectures: []
                     });
                 }
                 
-                if (row.lecture_id && !modulesMap.get(row.module_id).lectures.some(l => l.id === row.lecture_id)) {
+                if (row.lecture_id) {
                     modulesMap.get(row.module_id).lectures.push({
                         id: row.lecture_id,
                         title: row.lecture_title,
@@ -121,10 +95,7 @@ router.get('/course/:courseId', async (req, res) => {
         res.json(courseData);
     } catch (error) {
         console.error('Error loading course data:', error);
-        res.status(500).json({ 
-            error: 'Internal server error',
-            details: error.message
-        });
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
@@ -350,6 +321,105 @@ router.get('/lecture/:lectureId', async (req, res) => {
     }
 });
 
+router.get('/module/:moduleId/test', async (req, res) => {
+    try {
+        const { moduleId } = req.params;
+        const userId = req.query.userId;
+
+        if (!userId) {
+            return res.status(400).json({ error: 'User ID is required' });
+        }
+
+        // Перевіряємо чи існує тест для модуля
+        const moduleQuery = `
+            SELECT test_link
+            FROM modules
+            WHERE id = $1
+        `;
+        
+        const moduleResult = await db.query(moduleQuery, [moduleId]);
+        
+        if (moduleResult.rows.length === 0 || !moduleResult.rows[0].test_link) {
+            return res.status(404).json({ error: 'Test not found for this module' });
+        }
+
+        // Отримуємо контент тесту
+        const testLink = moduleResult.rows[0].test_link;
+        
+        res.json({
+            type: 'module',
+            moduleId: moduleId,
+            testLink: testLink
+        });
+
+    } catch (error) {
+        console.error('Error loading module test:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.get('/course/:courseId/test', async (req, res) => {
+    try {
+        const { courseId } = req.params;
+        const userId = req.query.userId;
+
+        if (!userId) {
+            return res.status(400).json({ error: 'User ID is required' });
+        }
+
+        // Перевіряємо чи існує фінальний тест для курсу
+        const courseQuery = `
+            SELECT test_link
+            FROM all_courses
+            WHERE id = $1
+        `;
+        
+        const courseResult = await db.query(courseQuery, [courseId]);
+        
+        if (courseResult.rows.length === 0 || !courseResult.rows[0].test_link) {
+            return res.status(404).json({ error: 'Final test not found for this course' });
+        }
+
+        // Отримуємо контент тесту
+        const testLink = courseResult.rows[0].test_link;
+        
+        res.json({
+            type: 'course',
+            courseId: courseId,
+            testLink: testLink
+        });
+
+    } catch (error) {
+        console.error('Error loading course test:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.post('/module/:moduleId/test/submit', async (req, res) => {
+    try {
+        const { moduleId } = req.params;
+        const { userId, answers } = req.body;
+
+        if (!userId || !answers) {
+            return res.status(400).json({ error: 'User ID and answers are required' });
+        }
+
+        // Тут можна додати логіку для збереження результатів тесту
+        // Наприклад, зберігати в окрему таблицю test_results
+
+        res.json({
+            success: true,
+            message: 'Test submitted successfully'
+        });
+
+    } catch (error) {
+        console.error('Error submitting test:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
+
 router.post('/comments', async (req, res) => {
     try {
         const { content, parent_comment_id, course_id, user_id } = req.body;
@@ -395,8 +465,9 @@ router.get('/comments', async (req, res) => {
             `SELECT 
                 c.id, 
                 c.content, 
-                c.created_at, 
-                c.parent_comment_id, 
+                c.created_at,
+                c.parent_comment_id,
+                c.user_id, 
                 u.name AS user_name, 
                 u.profile_image,    
                 s.profile_image AS student_profile_image, 
@@ -424,20 +495,26 @@ router.delete('/comments/:comment_id', async (req, res) => {
     const { comment_id } = req.params;
     const { user_id } = req.body;
 
-
     // Authorization check here
     if (!user_id) {
         return res.status(400).json({ error: 'User ID is required' });
     }
 
     try {
-        // Perform deletion query
+        // First, delete all child comments (replies)
+        await db.query(
+            'DELETE FROM comments WHERE parent_comment_id = $1 AND user_id = $2',
+            [comment_id, user_id]
+        );
+
+        // Then, delete the main comment
         const result = await db.query(
             'DELETE FROM comments WHERE id = $1 AND user_id = $2 RETURNING *',
             [comment_id, user_id]
         );
+
         if (result.rowCount > 0) {
-            return res.status(200).json({ message: 'Comment deleted successfully' });
+            return res.status(200).json({ message: 'Comment and its replies deleted successfully' });
         } else {
             return res.status(404).json({ error: 'Comment not found or not authorized to delete' });
         }
@@ -449,43 +526,44 @@ router.delete('/comments/:comment_id', async (req, res) => {
 
 router.put('/comments/:comment_id', async (req, res) => {
     const { comment_id } = req.params;
-    const { text, user_id } = req.body;
-
-    console.log('User ID:', user_id); // Log the user_id to check if it's coming through properly.
+    const { content, user_id } = req.body;
 
     if (!user_id) {
         return res.status(400).json({ error: 'User ID is required' });
     }
-
-    if (!text) {
+    
+    if (!content) {
         return res.status(400).json({ error: 'Comment text is required' });
     }
-
+    
     try {
         const result = await db.query(
             'SELECT * FROM comments WHERE id = $1 AND user_id = $2',
             [comment_id, user_id]
         );
-
+    
         if (result.rowCount === 0) {
-            return res.status(404).json({ error: 'Comment not found or not authorized to edit' });
+            return res.status(403).json({ error: 'Comment not found or not authorized to edit' }); // Using 403 for authorization errors
         }
-
+    
         const updateResult = await db.query(
             'UPDATE comments SET content = $1 WHERE id = $2 RETURNING *',
-            [text, comment_id]
+            [content, comment_id]
         );
-
+        
         if (updateResult.rowCount > 0) {
             res.status(200).json(updateResult.rows[0]);
         } else {
             res.status(500).json({ error: 'Failed to update comment' });
         }
+        
     } catch (err) {
         console.error('Error updating comment:', err);
-        res.status(500).json({ error: 'Failed to update comment' });
+        res.status(500).json({ error: 'Database error while updating comment' });
     }
+    
 });
+
 router.get('/comments/:comment_id', async (req, res) => {
     const { comment_id } = req.params;
     try {
@@ -500,5 +578,51 @@ router.get('/comments/:comment_id', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch comment' });
     }
 });
+
+router.post('/report', async (req, res) => {
+    const { currentUsername, messageId, username, messageContent} = req.body;
+
+    // Перевірка на наявність всіх необхідних полів
+    if (!currentUsername || !messageId || !username || !messageContent) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // Перевірка, чи є необхідні змінні середовища
+    if (!process.env.TRELLO_API_KEY || !process.env.TRELLO_TOKEN || !process.env.TRELLO_LIST_ID) {
+        return res.status(500).json({ error: 'Missing Trello API configuration' });
+    }
+
+    try {
+        // Створення запиту на створення картки Trello
+        const response = await fetch('https://api.trello.com/1/cards', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: `🚨 Report from ${currentUsername} against ${username}`,
+                desc: `📜 **Message Content:** ${messageContent}\n\n🆔 **Message ID:** ${messageId}\n👤 **Reported User:** ${username}\n🕵️ **Reported by:** ${currentUsername}\n\n 📅 **Reported on:** ${new Date().toLocaleString()}`,
+                
+                idList: process.env.TRELLO_LIST_ID,
+                key: process.env.TRELLO_API_KEY,
+                token: process.env.TRELLO_TOKEN,
+            }),
+        });
+
+        // Якщо запит до Trello не успішний
+        if (!response.ok) {
+            throw new Error('Failed to create Trello card');
+        }
+
+        // Отримання відповіді від Trello
+        const data = await response.json();
+
+        // Повернення успішної відповіді
+        res.json({ message: 'Report submitted successfully', trelloCardId: data.id });
+    } catch (error) {
+        console.error('Error reporting message:', error);
+        res.status(500).json({ error: 'Failed to report message' });
+    }
+});
+
+
 
 module.exports = router;

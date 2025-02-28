@@ -1039,5 +1039,57 @@ router.get('/saved/:userId', async (req, res) => {
       });
   }
 });
+//маршрут для додавання курсу в закладки
+router.post('/bookmarks', async (req, res) => {
+  const { userId, courseId } = req.body;
+
+  if (!userId || !courseId) {
+      return res.status(400).json({ error: 'Невірні дані' });
+  }
+
+  try {
+    console.log(`📝 Додаємо або змінюємо стан закладки: userId=${userId}, courseId=${courseId}`);
+
+    await pool.query(`
+      INSERT INTO bookmarks (user_id, course_id, is_saved) 
+      VALUES ($1, $2, TRUE) 
+      ON CONFLICT (user_id, course_id) 
+      DO UPDATE SET is_saved = NOT bookmarks.is_saved;
+    `, [userId, courseId]);
+
+      res.json({ message: "Курс додано у закладки" });
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Помилка бази даних" });
+  }
+});
+router.delete('/bookmarks', async (req, res) => {
+  const { userId, courseId } = req.body;
+  try {
+      await pool.query(`
+          UPDATE bookmarks SET is_saved = FALSE WHERE user_id = $1 AND course_id = $2;
+      `, [userId, courseId]);
+      res.json({ message: "Course removed from bookmarks" });
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Database error" });
+  }
+});
+router.get('/bookmarks/:userId', async (req, res) => {
+  const { userId } = req.params;
+  try {
+      const { rows } = await pool.query(`
+           SELECT ac.id, ac.name, ac.image_url, b.is_saved
+            FROM bookmarks b
+            JOIN all_courses ac ON b.course_id = ac.id
+            WHERE b.user_id = $1 AND b.is_saved = TRUE
+      `, [userId]);
+      res.json(rows);
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Database error" });
+  }
+});
+
 
 module.exports = router;

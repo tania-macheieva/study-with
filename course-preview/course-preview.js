@@ -38,10 +38,57 @@ document.addEventListener('DOMContentLoaded', async function() {
         detailsMainValues[2].textContent = courseData.price === 0 ? 'Безкоштовно' : `$${courseData.price}`;
     
         const userId = localStorage.getItem('userId');
-        if (userId) {
-            const enrollmentStatus = await checkEnrollmentStatus(courseId, userId);
-            updateSignUpButton(enrollmentStatus);
+        const saveButton = document.querySelector('.save-btn');
+
+        if (userId && saveButton) {
+            // Функція для оновлення стану кнопки закладки
+            const updateBookmark = async () => {
+                const isBookmarked = await checkIfBookmarked(userId, courseId);
+                updateBookmarkButton(saveButton, isBookmarked);
+            };
+        
+            // Викликаємо функцію для початкового оновлення стану
+            await updateBookmark();
+
+            // =================== 🆕 Обробник "Додати/Видалити із закладок" ===================
+            saveButton.addEventListener('click', async function () {
+                if (!userId) {
+                    showNotification('Будь ласка, увійдіть у систему, щоб додати курс у закладки.', 'error');
+                    return;
+                }
+
+                try {
+                    // Отримуємо поточний стан закладки з сервера
+                    let isBookmarked = await checkIfBookmarked(userId, courseId);
+                    let method = 'POST'; // Використовуємо один маршрут для перемикання стану
+                  
+                    const response = await fetch(' http://localhost:8000/api/courses/bookmarks', {
+                        method,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId, courseId })
+                    });
+                    console.log('Відповідь сервера:', response);
+
+                    if (!response.ok) throw new Error(`Не вдалося ${isBookmarked ? 'видалити' : 'додати'} курс у закладки`);
+
+                    isBookmarked = !isBookmarked; // Перемикаємо стан
+                    updateBookmarkButton(saveButton, isBookmarked);
+                    // Оновлюємо стан кнопки закладки
+                    await  updateBookmark();
+                    showNotification(`Курс ${isBookmarked ? 'додано в закладки' : 'видалено із закладок'}`, 'success');
+
+                } catch (error) {
+                    console.error('Помилка зміни закладки:', error);
+                    showNotification('Помилка зміни закладки', 'error');
+                }
+            });
         }
+
+      // Відображення модулів курсу 
+      if (!courseData || !courseData.modules) {
+        console.warn("Модулі курсу відсутні або не завантажилися.");
+        return;
+    }
     
         const modulesSection = Array.from(document.querySelectorAll('.section')).find(section => 
             section.querySelector('.info-label').textContent.trim() === 'Course modules'
@@ -70,9 +117,8 @@ document.addEventListener('DOMContentLoaded', async function() {
                 `;
             }
         }
-        
-    } catch (error) {
-        console.error('Помилка завантаження курсу:', error);
+    }catch (error) {
+    console.error('Помилка завантаження курсу:', error);
         
         const errorElements = {
             '.course-name': 'Помилка завантаження курсу',
@@ -87,6 +133,29 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         showNotification('Помилка завантаження даних курсу', 'error');
     }
+
+// Функція перевірки, чи курс у закладках 
+async function checkIfBookmarked(userId, courseId) {
+    try {
+        const response = await fetch(`http://localhost:8000/api/courses/bookmarks/${userId}`);
+        if (!response.ok) throw new Error('Помилка отримання закладок');
+        const bookmarks = await response.json();
+        const bookmark = bookmarks.find(bookmark => bookmark.id === parseInt(courseId));
+        return bookmark ? bookmark.is_saved : false;
+    } catch (error) {
+        console.error('Помилка перевірки закладок:', error);
+        return false;
+    }
+}
+
+//  Функція оновлення кнопки закладок 
+function updateBookmarkButton(saveButton, isBookmarked) {
+    saveButton.classList.toggle('saved', isBookmarked);
+    saveButton.innerHTML = isBookmarked
+        ? `<img src="../images/save_saved.svg" alt="saved">`
+        : `<img src="../images/save_normal.svg" alt="save">`;
+}
+
 
 
 
@@ -331,6 +400,7 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
 
     let currentReviewIndex = 0;
     let currentSpeakerIndex = 0;
+
 
     function formatReviewDate(date) {
         const now = new Date();
@@ -657,4 +727,5 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
 
     updateReview();
     updateSpeaker();
+    
 });

@@ -260,8 +260,59 @@ CREATE TABLE comments (
     user_id INT NOT NULL,
     content TEXT NOT NULL,
     parent_comment_id INT REFERENCES comments(id) ON DELETE CASCADE,
+    parent_user_id INT REFERENCES users(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (course_id) REFERENCES all_courses(id),
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+-- ALTER TABLE comments ADD COLUMN parent_user_id INTEGER REFERENCES users(id);
+CREATE TABLE bookmarks (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    course_id INT NOT NULL,
+    is_saved BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_course FOREIGN KEY (course_id) REFERENCES all_courses(id) ON DELETE CASCADE,
+    UNIQUE (user_id, course_id) -- Уникнення дублювання записів
+);
+
+-- Створення таблиці сертифікатів
+CREATE TABLE IF NOT EXISTS certificates (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    course_id INTEGER NOT NULL,
+    issued_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    certificate_number VARCHAR(50),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES all_courses(id) ON DELETE CASCADE,
+    UNIQUE (user_id, course_id)
+);
+
+-- Індекси для пришвидшення пошуку
+CREATE INDEX IF NOT EXISTS idx_certificates_user_id ON certificates(user_id);
+CREATE INDEX IF NOT EXISTS idx_certificates_course_id ON certificates(course_id);
+CREATE INDEX IF NOT EXISTS idx_certificates_issued_at ON certificates(issued_at);
+
+-- Тригер для автоматичного створення номеру сертифікату
+CREATE OR REPLACE FUNCTION generate_certificate_number()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.certificate_number := 'CERT-' || to_char(NEW.issued_at, 'YYYY') || '-' || LPAD(nextval('certificate_number_seq')::text, 5, '0');
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Послідовність для генерації номерів сертифікатів
+CREATE SEQUENCE IF NOT EXISTS certificate_number_seq START 1;
+
+-- Створення тригеру для нових записів
+CREATE OR REPLACE TRIGGER certificate_number_trigger
+BEFORE INSERT ON certificates
+FOR EACH ROW
+EXECUTE FUNCTION generate_certificate_number();
+
 

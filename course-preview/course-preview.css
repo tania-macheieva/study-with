@@ -163,9 +163,9 @@ main
 }
 
 /* Стан для збереженої закладки */
-.save-btn.saved img {
+/*.save-btn.saved img {
     content: url('../images/save_saved.svg');
-}
+}*/
 
 /* Стан для збереженої закладки при наведенні */
 .save-btn.saved:hover img {

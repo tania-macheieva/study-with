@@ -54,13 +54,37 @@ messages.forEach(message => {
     }
 });
 };
+function updateRepliesButton(commentId) {
+    const repliesContainer = document.getElementById(`replies-container-${commentId}`);
+    const showRepliesButton = document.getElementById(`show-replies-button-${commentId}`);
+
+    if (repliesContainer && showRepliesButton) {
+        if (repliesContainer.children.length === 0) {
+            showRepliesButton.style.display = "none";
+        }
+    }
+}
+
+
+
 function addShowRepliesButton(parentElement, messageId, replies) {
+    // Якщо немає жодних відповідей, не створюємо кнопку
+    if (replies.length === 0) {
+        return;
+    }
+
     const showRepliesButton = document.createElement('button');
     showRepliesButton.className = 'show-replies-button';
- 
-    const expandedFromStorage = localStorage.getItem(`replies-expanded-${messageId}`) === 'true';
- 
-    if (expandedFromStorage) {
+
+    const expandedFromStorage = localStorage.getItem(`replies-expanded-${messageId}`);
+    const timestamp = localStorage.getItem(`replies-timestamp-${messageId}`);
+    const currentTime = Date.now();
+
+    // Якщо збережено, що відповіді мають бути показані і з моменту збереження пройшло менше 2 хвилин
+    const isRecentlyStored = timestamp && currentTime - timestamp < 60 * 1000;
+    const expanded = expandedFromStorage === 'true' && isRecentlyStored;
+
+    if (expanded) {
         showRepliesButton.dataset.expanded = 'true';
         showRepliesButton.textContent = 'Hide replies';
     } else {
@@ -77,19 +101,21 @@ function addShowRepliesButton(parentElement, messageId, replies) {
             showRepliesButton.dataset.expanded = 'false';
             showRepliesButton.textContent = `Show replies (${replies.length})`;
             localStorage.setItem(`replies-expanded-${messageId}`, 'false');
+            localStorage.setItem(`replies-timestamp-${messageId}`, currentTime.toString());
         } else {
             // Якщо було сховано — показуємо
             showReplies(parentElement, messageId, replies);
             showRepliesButton.dataset.expanded = 'true';
             showRepliesButton.textContent = 'Hide replies';
             localStorage.setItem(`replies-expanded-${messageId}`, 'true');
+            localStorage.setItem(`replies-timestamp-${messageId}`, currentTime.toString());
         }
     });
 
     parentElement.after(showRepliesButton);
 
     // Відразу після створення кнопки, синхронізуємо DOM зі станом localStorage:
-    if (expandedFromStorage) {
+    if (expanded) {
         // Якщо збережено, що відповіді мають бути показані, показуємо
         showReplies(parentElement, messageId, replies);
     } else {
@@ -97,24 +123,6 @@ function addShowRepliesButton(parentElement, messageId, replies) {
         hideReplies(parentElement, messageId, replies);
     }
 }
-
-document.querySelector('.send-reply').addEventListener('click', function(event) {
-    // Перевірка чи це кнопка для відправки відповіді
-    const button = event.target;
-    const parentId = button.dataset.parentId; // id коментаря, на який відповідають
-    const repliesButton = button.closest('.message').querySelector('.show-replies-button');
-    
-    // Якщо відповіді були приховані, показуємо їх після надсилання нової відповіді
-    if (repliesButton && repliesButton.dataset.expanded === 'false') {
-        // Тут код для надсилання відповіді...
-
-        // Показуємо відповіді після того, як надіслано
-        showReplies(button.closest('.message'), parentId, replies); // Відображаємо відповіді
-        repliesButton.textContent = 'Hide replies';  // Оновлюємо текст на кнопці
-        repliesButton.dataset.expanded = 'true';  // Оновлюємо стан кнопки
-    }
-});
-
 
 function showReplies(parentElement, parentMessageId, replies) {
     // Створення/оновлення контейнера для відповідей
@@ -126,14 +134,15 @@ function showReplies(parentElement, parentMessageId, replies) {
         repliesContainer.style.display = 'block';
     }
 
-    // Знаходимо кнопку і оновлюємо її
     const showRepliesButton = parentElement.querySelector('.show-replies-button');
     if (showRepliesButton) {
         showRepliesButton.dataset.expanded = 'true';
-        showRepliesButton.textContent = 'Hide replies'; // змінюємо текст кнопки
+        showRepliesButton.textContent = 'Hide replies';
         localStorage.setItem(`replies-expanded-${parentMessageId}`, 'true');
     }
+
 }
+
 
 
 function hideReplies(parentElement, messageId, replies) {
@@ -168,18 +177,19 @@ function renderReplies(replies, parentMessageId) {
     }    
     repliesContainer.innerHTML = '';
 
-    // Sort replies in reverse chronological order (newest to oldest)
     const sortedReplies = [...replies].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
  
-    // Map for quick access to comments by id
     const replyMap = new Map(sortedReplies.map(reply => [reply.id, reply]));
 
-    // Create reply element function remains the same
     const createReplyElement = (reply) => {
         const replyElement = document.createElement('div');
         replyElement.classList.add('message', 'reply');
         replyElement.dataset.messageId = reply.id;
         replyElement.dataset.parentId = reply.parent_comment_id;
+        
+        replyElement.dataset.userId = reply.user_id;
+        
+        console.log(`Reply ${reply.id} has user_id: ${reply.user_id}`);
 
         const formatDate = (isoString) => {
             const date = new Date(isoString);
@@ -189,10 +199,9 @@ function renderReplies(replies, parentMessageId) {
                 year: 'numeric'
             });
         };
-        const avatar = reply.teacher_profile_image || reply.student_profile_image || user.profile_image || '/images/user-avatar.png';
+        const avatar = reply.teacher_profile_image || reply.student_profile_image || '/images/user-avatar.png';
         let messageContent = reply.content || '';
 
-        // Find the username of the parent comment
         let parentUsername = '';
         if (reply.parent_comment_id) {
             const parentReply = replyMap.get(reply.parent_comment_id);
@@ -206,12 +215,10 @@ function renderReplies(replies, parentMessageId) {
             }
         } 
 
-        // Add @mention if it's not already there
         if (parentUsername && !messageContent.startsWith(`@${parentUsername}`)) {
             messageContent = `@${parentUsername} ${messageContent}`;
         }
 
-        // Format @mention
         if (parentUsername) {
             const mentionText = `@${parentUsername}`;
             const indexOfSpace = messageContent.indexOf(' ', mentionText.length);
@@ -241,97 +248,171 @@ function renderReplies(replies, parentMessageId) {
         return replyElement;
     };
 
-    // Modified recursive function to handle newest-first ordering while maintaining thread structure
     const processReplies = (parentId) => {
-        // Get replies for this level and sort them newest first
         const currentLevelReplies = sortedReplies
             .filter(reply => reply.parent_comment_id === parentId);
         
-        // Process each reply
         currentLevelReplies.forEach(reply => {
             const replyElement = createReplyElement(reply);
             repliesContainer.appendChild(replyElement);
             
-            // Process child replies immediately after their parent
             processReplies(reply.id);
         });
     };
 
-    // Start processing from the top level
-    processReplies(parentMessageId);
-    repliesContainer.style.display = 'block';
+    processReplies(parentMessageId); 
+    if (repliesContainer) {
+        repliesContainer.style.display = 'block';
+    }
     updateMessageStyles();
 }
 
 
-const createMessageHTML = (message, isReply = false, replyLevel = 0) => {
-const messageElement = document.createElement('article');
-messageElement.className = 'message';
-if (isReply) messageElement.classList.add('reply');
+const createMessageHTML = (message, isReply = false, replyLevel = 0) => { 
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message');
+    messageElement.className = `message ${isReply ? 'reply' : ''}`;
+    messageElement.dataset.messageId = message.id;
+    
+    // Get the ACTUAL author ID from the message object, not the current user
+    messageElement.dataset.userId = message.user_id;     
+    if (isReply) {
+        messageElement.dataset.parentId = message.parent_comment_id;
+    } 
 
-messageElement.dataset.messageId = message.id;
-messageElement.dataset.replyLevel = replyLevel;
+    messageElement.dataset.replyLevel = replyLevel;
 
-if (typeof message.id === 'string' && message.id.includes('.')) {
-    messageElement.dataset.parentId = message.id.substring(0, message.id.lastIndexOf('.'));
-}
+    if (typeof message.id === 'string' && message.id.includes('.')) {
+        messageElement.dataset.parentId = message.id.substring(0, message.id.lastIndexOf('.'));
+    }
 
-const user = message.user || { name: message.user_name || 'Unknown User' };
-const avatar = message.teacher_profile_image || message.student_profile_image || user.profile_image || '/images/user-avatar.png';
-const formatDate = (isoString) => {
-    const date = new Date(isoString);
-    return date.toLocaleDateString('uk-UA', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
+    const user = message.user || { name: message.user_name || 'Unknown User' };
+    const avatar = message.teacher_profile_image || message.student_profile_image || user.profile_image || '/images/user-avatar.png';
+    const formatDate = (isoString) => {
+        const date = new Date(isoString);
+        return date.toLocaleDateString('uk-UA', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    };
+
+    let messageContent = message.content || '';
+
+    // Handle reply mentions
+    if (message.parent_comment_id) {
+        const parentUser = document.querySelector(`.message[data-message-id="${message.parent_comment_id}"] .username`);
+        if (parentUser) {
+            const parentUsername = parentUser.textContent;
+
+            // Only add mention if it's not already present
+            if (!messageContent.startsWith(`@${parentUsername}`)) {
+                messageContent = `@${parentUsername} ${messageContent}`;
+            }
+
+            // Extract the full username mention and the rest of the message
+            const mentionText = `@${parentUsername}`;
+            const indexOfSpace = messageContent.indexOf(' ', mentionText.length);
+            const mention = messageContent.substring(0, indexOfSpace !== -1 ? indexOfSpace : messageContent.length);
+            const restOfMessage = indexOfSpace !== -1 ? messageContent.substring(indexOfSpace) : '';
+
+            // Format the entire username mention
+            messageContent = `<span class="mention">${mention}</span>${restOfMessage}`;
+        }
+    }
+
+    messageElement.innerHTML = ` 
+        <div class="user-info">
+            <img src="${avatar}" alt="User avatar" class="avatar">
+            <span class="username">${user.name}</span>
+            <span class="date">${formatDate(message.created_at)}</span>
+        </div>
+        <div class="message-content" style="padding-left: ${message.parent_comment_id ? '20px' : '0'};">
+            <p class="message-text">${messageContent}</p>
+        </div>
+        <button class="more-options">...</button>
+        <div class="reply-input" style="display: none;">
+            <input type="text" placeholder="write a reply to ${user.name}">
+            <button class="send-reply" data-parent-id="${message.id}">
+                <img src="../images/send.svg" alt="Send">
+            </button>
+        </div> 
+    `;
+
+    return messageElement;
 };
 
-let messageContent = message.content || '';
+// Also, fix the createReplyElement function which has the same issue
+const createReplyElement = (reply) => {
+    const replyElement = document.createElement('div');
+    replyElement.classList.add('message', 'reply');
+    replyElement.dataset.messageId = reply.id;
+    replyElement.dataset.parentId = reply.parent_comment_id;
+    
+    // Set the ACTUAL author ID, not the current user ID
+    replyElement.dataset.userId = reply.user_id;
 
-// Handle reply mentions
-if (message.parent_comment_id) {
-    const parentUser = document.querySelector(`.message[data-message-id="${message.parent_comment_id}"] .username`);
-    if (parentUser) {
-        const parentUsername = parentUser.textContent;
+    const formatDate = (isoString) => {
+        const date = new Date(isoString);
+        return date.toLocaleDateString('uk-UA', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    };
+    
+    const avatar = reply.teacher_profile_image || reply.student_profile_image || user.profile_image || '/images/user-avatar.png';
+    let messageContent = reply.content || '';
 
-        // Only add mention if it's not already present
-        if (!messageContent.startsWith(`@${parentUsername}`)) {
-            messageContent = `@${parentUsername} ${messageContent}`;
+    // Find the username of the parent comment
+    let parentUsername = '';
+    if (reply.parent_comment_id) {
+        const parentReply = replyMap.get(reply.parent_comment_id);
+        if (parentReply) {
+            parentUsername = parentReply.user_name;
+        } else {
+            const parentElement = document.querySelector(`.message[data-message-id="${reply.parent_comment_id}"]`);
+            if (parentElement) {
+                parentUsername = parentElement.querySelector('.username').textContent;
+            }
         }
+    } 
 
-        // Extract the full username mention and the rest of the message
+    // Add @mention if it's not already there
+    if (parentUsername && !messageContent.startsWith(`@${parentUsername}`)) {
+        messageContent = `@${parentUsername} ${messageContent}`;
+    }
+
+    // Format @mention
+    if (parentUsername) {
         const mentionText = `@${parentUsername}`;
         const indexOfSpace = messageContent.indexOf(' ', mentionText.length);
         const mention = messageContent.substring(0, indexOfSpace !== -1 ? indexOfSpace : messageContent.length);
         const restOfMessage = indexOfSpace !== -1 ? messageContent.substring(indexOfSpace) : '';
-
-        // Format the entire username mention
         messageContent = `<span class="mention">${mention}</span>${restOfMessage}`;
     }
-}
 
-messageElement.innerHTML = ` 
-    <div class="user-info">
-        <img src="${avatar}" alt="User avatar" class="avatar">
-        <span class="username">${user.name}</span>
-        <span class="date">${formatDate(message.created_at)}</span>
-    </div>
-    <div class="message-content" style="padding-left: ${message.parent_comment_id ? '20px' : '0'};">
-        <p class="message-text">${messageContent}</p>
-    </div>
-    <button class="more-options">...</button>
-    <div class="reply-input" style="display: none;">
-        <input type="text" placeholder="write a reply to ${user.name}">
-        <button class="send-reply" data-parent-id="${message.id}">
-            <img src="../images/send.svg" alt="Send">
-        </button>
-    </div> 
-`;
+    replyElement.innerHTML = ` 
+        <div class="user-info">
+            <img src="${avatar || '/images/user-avatar.png'}" alt="User avatar" class="avatar">
+            <span class="username">${reply.user_name}</span>
+            <span class="date">${formatDate(reply.created_at)}</span>
+        </div>
+        <div class="message-content">
+            <p class="message-text">${messageContent}</p>
+        </div>
+        <button class="more-options">...</button>
+        <div class="reply-input" style="display: none;">
+            <input type="text" placeholder="write a reply to ${reply.user_name}">
+            <button class="send-reply" data-parent-id="${reply.id}">
+                <img src="../images/send.svg" alt="Send">
+            </button>
+        </div>
+    `;
 
-
-return messageElement;
+    return replyElement;
 };
+
 
 const handleReply = async (messageId, replyText) => {
 const parentMessage = document.querySelector(`.message[data-message-id="${messageId}"]`);
@@ -491,7 +572,6 @@ const getParentUserId = async (parentId) => {
 
 
 
-// Функція для відправки коментаря
 const sendMessage = async (content, parentId = null) => {
     const courseId = window.location.pathname.split('/course/').pop();
     const userId = localStorage.getItem('userId');
@@ -500,17 +580,17 @@ const sendMessage = async (content, parentId = null) => {
 
     if (parentId) {
         // Якщо є parentId, отримуємо відповідний parentUserId
-        parentUserId = await getParentUserId(parentId);  // Використовуємо await для асинхронної операції
+        parentUserId = await getParentUserId(parentId);
     }
 
-    console.log('Parent User ID:', parentUserId);  // Перевірка значення parentUserId
+    console.log('Parent User ID:', parentUserId);
 
     const messageData = {
         content,
         parent_comment_id: parentId,
         course_id: courseId,
         user_id: userId,
-        parent_user_id: parentUserId,
+        parent_user_id: parentUserId,  // Додаємо parentUserId
     };
 
     try {
@@ -647,17 +727,17 @@ function createDeleteModal() {
 
     const cancelButton = document.createElement('button');
     cancelButton.id = 'cancelDeleteBtn';
-    cancelButton.className = 'modal-button cancel';
+    cancelButton.className = 'modal-button';
     cancelButton.textContent = 'Cancel';
 
     const confirmButton = document.createElement('button');
     confirmButton.id = 'confirmDeleteBtn';
-    confirmButton.className = 'modal-button';
+    confirmButton.className = 'modal-button red';
     confirmButton.textContent = 'Delete';
 
     // Додаємо елементи до модалки
-   
-    modalActions.appendChild(confirmButton); modalActions.appendChild(cancelButton);
+    modalActions.appendChild(cancelButton);
+    modalActions.appendChild(confirmButton); 
     modalContent.appendChild(title);
     modalContent.appendChild(description);
     modalContent.appendChild(modalActions);
@@ -701,11 +781,11 @@ function createEditModal(currentText) {
     modalActions.className = 'modal-actions';
 
     const cancelButton = document.createElement('button');
-    cancelButton.className = 'modal-btn cancel-btn';
+    cancelButton.className = 'modal-button red';
     cancelButton.textContent = 'Cancel';
 
     const saveButton = document.createElement('button');
-    saveButton.className = 'modal-btn confirm-btn';
+    saveButton.className = 'modal-button';
     saveButton.textContent = 'Save';
 
     modalActions.appendChild(cancelButton);
@@ -717,6 +797,16 @@ function createEditModal(currentText) {
 
     document.body.appendChild(modal);
 
+    // Додати анімацію показу
+    setTimeout(() => {
+        modal.classList.add('show');
+    }, 10);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) { // Перевіряємо, чи клік був саме на фон
+            modal.style.display = 'none';
+            modal.remove();  // Видаляємо модалку з DOM
+        }
+    });
     return {
         modal,
         saveButton,
@@ -725,23 +815,24 @@ function createEditModal(currentText) {
     };
 }
 
-// Handle "more options" button click
+// Handle "more options" button click 
 document.addEventListener('click', function (e) {
     const moreOptions = e.target.closest('.more-options');
 
     if (moreOptions) {
         const message = moreOptions.closest('.message');
-        const messageId = message.dataset.messageId; 
+        const messageId = message.dataset.messageId;
+        const commentUserId = message.dataset.userId;
         const usernameElement = message.querySelector('.username');
-        const commentUserId = message.dataset.parentUserId; // Зчитуємо commentUserId з атрибуту data-parent-user-id
-        const currentUserId = getCurrentUserId();
-
-        console.log('Comment User ID:', commentUserId);  
-        console.log('Message element:', message); 
-
         const username = usernameElement ? usernameElement.textContent : 'Unknown User';
-        const currentTextElement = message.querySelector('.comment-text');
-        const currentText = currentTextElement ? currentTextElement.textContent : ''; 
+        const currentTextElement = message.querySelector('.message-text');
+        const currentText = currentTextElement ? currentTextElement.textContent : '';
+
+        const currentUserId = localStorage.getItem('userId');
+        if (!currentUserId) {
+            console.error('Current User ID is missing!');
+            return;
+        }
 
         const existingMenu = document.querySelector('.options-menu');
         if (existingMenu) {
@@ -752,18 +843,18 @@ document.addEventListener('click', function (e) {
         optionsMenu.className = 'options-menu';
 
         const menuOptions = [
-            { action: 'add-reply', text: 'Write a reply' },
+            { action: 'add-reply', text: 'Write a reply', icon: '<i class="fa fa-reply"></i>' },
         ];
-
-        if (commentUserId === currentUserId) {
-            menuOptions.push({ action: 'edit', text: 'Edit message' });
-            menuOptions.push({ action: 'delete', text: 'Delete message' });
+ 
+        if (commentUserId && currentUserId && commentUserId.toString() === currentUserId.toString()) {
+            menuOptions.push({ action: 'edit', text: 'Edit message', icon: '<i class="fa fa-pencil-alt"></i>' });
+            menuOptions.push({ action: 'delete', text: 'Delete message', icon: '<i class="fa fa-trash"></i>' });
         } else {
-            menuOptions.push({ action: 'report', text: 'Report message' });
+            menuOptions.push({ action: 'report', text: 'Report message', icon: '<i class="fa fa-flag"></i>' });
         }
 
         optionsMenu.innerHTML = menuOptions
-            .map(option => `<div class="option" data-action="${option.action}">${option.text}</div>`)
+            .map(option => `<div class="option" data-action="${option.action}">${option.icon} ${option.text}</div>`)
             .join('');
 
         Object.assign(optionsMenu.style, {
@@ -784,9 +875,19 @@ document.addEventListener('click', function (e) {
                 padding: '8px 16px',
                 cursor: 'pointer',
                 fontSize: '14px',
-                color: '#333',
+                color: '#283044',
+                display: 'flex',
+                alignItems: 'center',
                 transition: 'background-color 0.2s ease',
             });
+
+            const icon = option.querySelector('i');
+            if (icon) {
+                Object.assign(icon.style, {
+                    marginRight: '8px',
+                    fontSize: '16px',
+                });
+            }
 
             option.addEventListener('mouseenter', () => {
                 option.style.backgroundColor = '#f0f0f0';
@@ -800,6 +901,7 @@ document.addEventListener('click', function (e) {
 
         optionsMenu.addEventListener('click', function (e) {
             const action = e.target.dataset.action;
+
             if (action === 'add-reply') {
                 const replyInput = message.querySelector('.reply-input');
                 document.querySelectorAll('.reply-input').forEach(input => {
@@ -818,53 +920,69 @@ document.addEventListener('click', function (e) {
             }
 
             if (action === 'report') {
-                console.log('Report clicked');
-                openReportModal(messageId, username);
+                if (!commentUserId || commentUserId.toString() !== currentUserId.toString()) {
+                    console.log('Report clicked');
+                    openReportModal(messageId, username);
+                } else {
+                    alert('Ви не можете поскаржитись на власний коментар');
+                }
             }
         
             if (action === 'delete') {
-                console.log('Delete clicked');
-                deleteMessage(messageId);
+                if (commentUserId && currentUserId && commentUserId.toString() === currentUserId.toString()) {
+                    console.log('Delete clicked');
+                    deleteMessage(messageId);
+                } else {
+                    alert('Ви можете видаляти тільки власні коментарі');
+                }
             }
         
             if (action === 'edit') {
-                console.log('Edit clicked');
-                const { modal, saveButton, cancelButton, editTextArea } = createEditModal(currentText);
-        
-                cancelButton.onclick = () => {
-                    modal.remove();
-                };
-        
-                saveButton.onclick = async () => {
-                    const updatedText = editTextArea.value.trim();
-        
-                    if (updatedText !== currentText) {
-                        try {
-                            const response = await fetch(`/api/comments/${messageId}`, {
-                                method: 'PUT',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({ user_id: currentUserId, content: updatedText })
-                            });
-        
-                            if (response.ok) {
-                                message.querySelector('.comment-text').textContent = updatedText;
-                                modal.remove();
-                            } else {
-                                alert('Failed to update comment');
+                if (commentUserId && currentUserId && commentUserId.toString() === currentUserId.toString()) {
+                    console.log('Edit clicked');
+                    const { modal, saveButton, cancelButton, editTextArea } = createEditModal(currentText);
+
+                    cancelButton.onclick = () => {
+                        modal.remove();
+                    };
+
+                    saveButton.onclick = async () => {
+                        const updatedText = editTextArea.value.trim();
+                    
+                        if (updatedText !== currentText) {
+                            try {
+                                const response = await fetch(`/api/comments/${messageId}`, {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({ user_id: currentUserId, content: updatedText })
+                                });
+                    
+                                if (response.ok) {
+                                    const textElement = message.querySelector('.message-text');
+                                    if (textElement) {
+                                        textElement.innerHTML = updatedText;
+                                    }
+                                    modal.remove();
+                                } else {
+                                    alert('Не вдалося оновити коментар');
+                                }
+                            } catch (err) {
+                                console.error('Error updating comment:', err);
+                                alert('Помилка при оновленні коментаря');
                             }
-                        } catch (err) {
-                            console.error('Error updating comment:', err);
-                            alert('Failed to update comment');
+                        } else {
+                            modal.remove();
                         }
-                    }
-                };
+                    };
+                } else {
+                    alert('Ви можете редагувати тільки власні коментарі');
+                }
             }
-        
+
             optionsMenu.remove();
         });
-        
 
         document.addEventListener('click', function closeMenu(e) {
             if (!optionsMenu.contains(e.target) && !moreOptions.contains(e.target)) {
@@ -874,128 +992,6 @@ document.addEventListener('click', function (e) {
         });
     }
 });
-
-
-function createDeleteModal() {
-    let modal = document.getElementById('deleteModal');
-    if (modal) {
-        return {
-            modal,
-            confirmButton: modal.querySelector('#confirmDeleteBtn'),
-            cancelButton: modal.querySelector('#cancelDeleteBtn')
-        };
-    }
-
-    // Створення елементів модалки
-    modal = document.createElement('div');
-    modal.id = 'deleteModal';
-    modal.className = 'modal';
-
-    const modalContent = document.createElement('div');
-    modalContent.className = 'modal-content';
-
-    const title = document.createElement('h2');
-    title.className = 'modal-title';
-    title.textContent = 'Are you sure you want to delete this message?';
-
-    const description = document.createElement('p');
-    description.className = 'modal-description';
-    description.textContent = 'This action cannot be undone.';
-
-    const modalActions = document.createElement('div');
-    modalActions.className = 'modal-buttons';
-
-    const cancelButton = document.createElement('button');
-    cancelButton.id = 'cancelDeleteBtn';
-    cancelButton.className = 'modal-button cancel';
-    cancelButton.textContent = 'Cancel';
-
-    const confirmButton = document.createElement('button');
-    confirmButton.id = 'confirmDeleteBtn';
-    confirmButton.className = 'modal-button';
-    confirmButton.textContent = 'Delete';
-
-    // Додаємо елементи до модалки
-   
-    modalActions.appendChild(confirmButton); modalActions.appendChild(cancelButton);
-    modalContent.appendChild(title);
-    modalContent.appendChild(description);
-    modalContent.appendChild(modalActions);
-    modal.appendChild(modalContent);
-
-    // Додаємо модалку в body
-    document.body.appendChild(modal);
-
-    // Додаємо подію для закриття модалки при кліку поза її межами
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) { // Перевіряємо, чи клік був саме на фон
-            modal.style.display = 'none';
-            modal.remove();  // Видаляємо модалку з DOM
-        }
-    });
-
-    // Повертаємо елементи для подальшого використання
-    return {
-        modal,
-        confirmButton,
-        cancelButton,
-    };
-}
-
-// Функція для відображення модалки
-async function deleteMessage(messageId) {
-    const { modal, confirmButton, cancelButton } = createDeleteModal();
-
-    return new Promise((resolve) => {
-        // Показуємо модалку
-        if (modal) {
-            modal.style.display = 'flex';
-        }
-
-        // Подія для скасування
-        cancelButton.onclick = () => {
-            if (modal) {
-                modal.style.display = 'none';  // Закриваємо модалку
-            }
-            resolve(false);  // Користувач скасував
-            modal.remove();  // Видаляємо модалку з DOM
-        };
-
-        // Подія для підтвердження
-        confirmButton.onclick = async () => {
-            if (modal) {
-                modal.style.display = 'none';  // Закриваємо модалку
-            }
-            try {
-                const currentUserId = getCurrentUserId();
-                const response = await fetch(`/api/comments/${messageId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ user_id: currentUserId }),
-                });
-
-                if (response.ok) {
-                    // Видалення успішне, прибираємо елемент з DOM
-                    const messageElement = document.querySelector(`.message[data-message-id="${messageId}"]`);
-                    if (messageElement) {
-                        messageElement.remove();
-                    } 
-                    resolve(true);
-                } else { 
-                    resolve(false);
-                }
-            } catch (err) { 
-                resolve(false);
-            }
-
-            modal.remove();  // Видаляємо модалку з DOM
-        };
-    });
-}
-
-
 function getCurrentUserId() {
     const currentUserId = localStorage.getItem('userId');
     console.log('Current user ID:', currentUserId);
@@ -1003,17 +999,81 @@ function getCurrentUserId() {
     return currentUserId;
 }
 
+const deleteMessage = async (messageId) => {
+    const { modal, confirmButton, cancelButton } = createDeleteModal();
+    const currentUserId = getCurrentUserId();
+
+    return new Promise((resolve) => {
+        if (modal) modal.style.display = 'flex';
+
+        cancelButton.onclick = () => {
+            if (modal) modal.style.display = 'none';
+            resolve(false);
+            modal.remove();
+        };
+
+        confirmButton.onclick = async () => {
+            if (modal) modal.style.display = 'none';
+
+            try {
+                // Get the message element to check user ID directly from DOM
+                const messageElement = document.querySelector(`.message[data-message-id="${messageId}"]`);
+                const commentUserId = messageElement ? messageElement.dataset.userId : null;
+                
+                // Compare user IDs directly before making the API call
+                if (commentUserId !== currentUserId) {
+                    alert('You can only delete your own comments');
+                    resolve(false);
+                    modal.remove();
+                    return;
+                }
+                
+                // If user is the author, proceed with deletion
+                const deleteResponse = await fetch(`/api/comments/${messageId}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentUserId })
+                });
+
+                if (deleteResponse.ok) {
+                    fetchComments(window.location.pathname.split('/course/').pop()); // Refresh comments
+                    resolve(true);
+                } else {
+                    const errorData = await deleteResponse.json();
+                    if (errorData && errorData.error === 'unauthorized') {
+                        alert('You can only delete your own comments');
+                    } else {
+                        alert('Failed to delete comment');
+                    }
+                    resolve(false);
+                }
+            } catch (err) {
+                console.error('Error deleting comment:', err);
+                alert('Error deleting comment');
+                resolve(false);
+            }
+
+            modal.remove();
+        };
+    });
+};
+ 
+
 function openReportModal(messageId, username) {
+
+    const currentUsername = localStorage.getItem('name') || 'Unknown User'; 
+    const messageContent = document.querySelector(`.message[data-message-id="${messageId}"] .message-text`)?.textContent || 'No content available';
+
     // Create the modal
     const modal = document.createElement('div');
     modal.className = 'modal';
     modal.innerHTML = `
         <div class="modal-content">
-            <h2 class="modal-title">Report Content</h2>
-            <p class="modal-description">We will review this content and take appropriate action if necessary.</p>
+            <h2 class="modal-title">🚨 Report Content</h2>
+            <p class="modal-description">We take reports seriously. Our team will review the content and take appropriate action if necessary.</p>
             <div class="modal-buttons">
-                <button id="submit-report" class="modal-button">Submit Report</button>
-                <button id="close-modal" class="modal-button cancel">Cancel</button>
+                <button id="close-modal" class="modal-button red">Cancel</button>
+                <button id="submit-report" class="modal-button">Submit</button>
             </div>
         </div>
     `;
@@ -1027,14 +1087,38 @@ function openReportModal(messageId, username) {
     });
 
     // Handle report submission
-    modal.querySelector('#submit-report').addEventListener('click', function() {
-        console.log(`Report submitted for message ID: ${messageId}`);
-        console.log(`Reported by: ${username}`);
+    modal.querySelector('#submit-report').addEventListener('click', async function() {
+        try {
+            console.log(`Report by: ${currentUsername}`); 
+            console.log(`Report submitted for message ID: ${messageId}`);
+            console.log(`Reported on: ${username}`);
+            console.log(`Reported content: ${messageContent}`);
         
-        // Here you can make an API request to submit the report to your server
-        // Example: axios.post('/report', { messageId, username });
+            // Send the report to the server
+            const response = await fetch('/api/report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    currentUsername,
+                    messageId, 
+                    username,
+                    messageContent
+                })
+            });
 
-        modal.remove(); // Close the modal after submission
+            if (!response.ok) {
+                const result = await response.json();
+                alert(`Error: ${result.error}`);
+            } else {
+                alert('Скаргу надіслано!');
+            }
+        } catch (error) {
+            console.error('Error submitting report:', error);
+            alert('Помилка при надсиланні скарги');
+        }
+        
+        // Close the modal after submission
+        modal.remove();
     });
 
     // Close the modal if clicked outside the modal content
