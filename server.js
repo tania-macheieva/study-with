@@ -140,7 +140,7 @@ app.post('/pay-page/webhook', express.raw({type: 'application/json'}), (req, res
 });
 app.use("/pay-page", stripeRoutes);
 app.get('/get-stripe-key', (req, res) => {
-    const publicKey = process.env.STRIPE_PUBLIC_KEY;
+    const publicKey = process.env.STRIPE_PUBLISHABLE_KEY;
     console.log('Returning public key:', publicKey ? 'Yes' : 'No');
     
     if (!publicKey) {

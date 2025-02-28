@@ -6,15 +6,27 @@ require('dotenv').config();
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const PLATFORM_ACCOUNT_ID = process.env.STRIPE_ACCOUNT_ID;
 
+
+
+router.get('/get-stripe-key', (req, res) => {
+    const publicKey = process.env.STRIPE_PUBLIC_KEY;
+    console.log('Returning public key:', publicKey ? 'Yes' : 'No');
+    
+    if (!publicKey) {
+        return res.status(500).json({ error: 'Stripe public key not configured' });
+    }
+    
+    res.json({ publicKey });
+});
 router.get('/course/:id', async (req, res) => {
     const { id } = req.params;
-    try {
+    try { 
         const result = await pool.query(`
             SELECT ac.*, u.name as author_name 
             FROM all_courses ac
             LEFT JOIN users u ON ac.author_id = u.id
             WHERE ac.id = $1
-        `, [id]);
+        `, [id]); 
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Course not found' });
         }
@@ -70,12 +82,15 @@ router.post('/create-checkout-session', async (req, res) => {
 
         const transferGroup = `course_${courseId}_${Date.now()}`;
 
-        // Update this part of your create-checkout-session route
-        // Log the full image URL for debugging
-        const courseImage = course.image_url
-        ? `${process.env.FRONTEND_URL}/uploads/${course.image_url}`
-        : `${process.env.FRONTEND_URL}/images/default-course.jpg`;
-        console.log('Course image URL being sent to Stripe:', courseImage);
+             let courseImage = course.image_url
+            ? `${process.env.FRONTEND_URL}/uploads/${course.image_url}`
+            : `${process.env.FRONTEND_URL}/images/default-course.jpg`;
+
+        // Properly encode the URL to handle spaces and special characters
+        courseImage = encodeURI(courseImage);
+
+        // Ensure there are no spaces by replacing them with %20
+        courseImage = courseImage.replace(/ /g, '%20');
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: [{
@@ -106,14 +121,15 @@ router.post('/create-checkout-session', async (req, res) => {
             },
             mode: 'payment',
             success_url: `${process.env.FRONTEND_URL}/pay-page/success.html?courseId=${courseId}&userId=${userId}&session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.FRONTEND_URL}/pay-page/cancel.html`
+            cancel_url: `${process.env.FRONTEND_URL}/pay-page/cancel.html`,
         });
 
         res.json({ url: session.url });
     } catch (error) {
         console.error('Error creating session:', error);
-        res.status(500).json({ error: error.message });
-    }
+        return res.status(500).json({ 
+            error: error.message || 'An error occurred creating the checkout session' 
+        });    }
 });
 
 router.get('/verify-payment', async (req, res) => {
@@ -227,4 +243,20 @@ router.post('/webhook', async (req, res) => {
     }
 });
 
+
+router.get('/enrollments/check', async (req, res) => {
+    const { userId, courseId } = req.query;
+    
+    try {
+        const result = await pool.query(
+            'SELECT * FROM enrollments WHERE user_id = $1 AND course_id = $2',
+            [userId, courseId]
+        );
+        
+        res.json({ enrolled: result.rows.length > 0 });
+    } catch (error) {
+        console.error('Error checking enrollment:', error);
+        res.status(500).json({ error: 'Failed to check enrollment status' });
+    }
+});
 module.exports = router;
