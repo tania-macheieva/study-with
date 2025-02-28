@@ -843,14 +843,14 @@ document.addEventListener('click', function (e) {
         optionsMenu.className = 'options-menu';
 
         const menuOptions = [
-            { action: 'add-reply', text: 'Write a reply', icon: '<i class="fa fa-reply"></i>' },
+            { action: 'add-reply', text: 'Write a reply', icon: '<img src="../images/reply.ico" style="margin-right:5px" alt="Reply">'  },
         ];
  
         if (commentUserId && currentUserId && commentUserId.toString() === currentUserId.toString()) {
-            menuOptions.push({ action: 'edit', text: 'Edit message', icon: '<i class="fa fa-pencil-alt"></i>' });
-            menuOptions.push({ action: 'delete', text: 'Delete message', icon: '<i class="fa fa-trash"></i>' });
+            menuOptions.push({ action: 'edit', text: 'Edit message', icon: '<img src="../images/edit.ico" style="margin-right:7px; width: 18px; height: 18x;" alt="Edit">' });
+            menuOptions.push({ action: 'delete', text: 'Delete message', icon: '<img src="../images/delete.ico" style="margin-right:8px; width: 18px; height: 18x;" alt="Delete">' });
         } else {
-            menuOptions.push({ action: 'report', text: 'Report message', icon: '<i class="fa fa-flag"></i>' });
+            menuOptions.push({ action: 'report', text: 'Report message', icon: '<img src="../images/report.ico" style="margin-right:3px; width: 25px; height: 25px;" alt="Report">' });
         }
 
         optionsMenu.innerHTML = menuOptions
