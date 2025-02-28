@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.error('ID курсу не вказано');
         return;
     }
-
+ 
     try {
         const response = await fetch(`/api/courses/${courseId}/full`);
         if (!response.ok) throw new Error('Помилка завантаження курсу');
@@ -657,8 +657,27 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
         }
     }
 
-    function updateSignUpButton(enrollmentStatus) {
+    // Check enrollment status and update Sign Up button
+    const userId = localStorage.getItem('userId');
+    const signUpButton = document.querySelector('.sign-up');
+
+    if (signUpButton) {
+        if (userId) {
+            const enrollmentStatus = await checkEnrollmentStatus(courseId, userId);
+            updateSignUpButton(enrollmentStatus, courseId, courseData);
+        } else {
+            // Set up button for non-logged in users
+            signUpButton.textContent = 'Sign Up';
+            signUpButton.addEventListener('click', () => {
+                const returnUrl = encodeURIComponent(window.location.href);
+                window.location.href = `/login?redirect=${returnUrl}`;
+            });
+        }
+    }
+    function updateSignUpButton(enrollmentStatus, courseId, courseData) {
         const signUpButton = document.querySelector('.sign-up');
+        
+        if (!signUpButton) return;
         
         if (enrollmentStatus.isEnrolled) {
             signUpButton.textContent = 'Перейти до навчання';
@@ -667,11 +686,11 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
             });
         } else {
             signUpButton.textContent = 'Sign Up';
-            signUpButton.addEventListener('click', handleCourseEnrollment);
+            signUpButton.addEventListener('click', () => handleCourseEnrollment(courseId, courseData));
         }
     }
 
-    async function handleCourseEnrollment() {
+    async function handleCourseEnrollment(courseId, courseData) {
         try {
             const userId = localStorage.getItem('userId');
             const token = localStorage.getItem('token');
@@ -681,12 +700,12 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
                 window.location.href = `/login?redirect=${returnUrl}`;
                 return;
             }
-    
+
             if (courseData.price > 0) {
                 window.location.href = `/pay-page/pay.html?id=${courseId}`;
                 return;
             }
-    
+
             const response = await fetch(`/api/courses/${courseId}/enroll`, {
                 method: 'POST',
                 headers: {
@@ -695,19 +714,19 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
                 },
                 body: JSON.stringify({ userId })
             });
-    
+
             const data = await response.json();
-    
+
             if (!response.ok) {
                 throw new Error(data.error || 'Помилка при записі на курс');
             }
-    
+
             showNotification('Ви успішно записались на курс!', 'success');
             
             setTimeout(() => {
                 window.location.href = `/course/${courseId}`;
             }, 1500);
-    
+
         } catch (error) {
             console.error('Помилка:', error);
             showNotification(error.message, 'error');
