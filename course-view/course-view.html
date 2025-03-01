@@ -16,10 +16,14 @@
                 <div class="video-player"></div>
             </section>
 
-            <nav class="tabs">
-                <button class="tab active">Discussion</button>
-                <button class="tab">My notes & marks</button>
-            </nav>
+            <div class="tabs-container">
+                <nav class="tabs">
+                    <button class="tab active">Discussion</button>
+                    <button class="tab">My notes & marks</button>
+                </nav>
+                <button class="nav-review-button" onclick="showReviewPopup()">Submit review</button>
+            </div> 
+
 
             <section class="discussion-section">
                 <div class="search-bar">
@@ -86,6 +90,7 @@
     <script src="/footer/footer.js"></script>
     <script src="/course-view/course-view.js"></script>
     <script src="/course-view/course-messages.js"></script>
+    <script src="/course-view/review.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 </body>
 </html>
