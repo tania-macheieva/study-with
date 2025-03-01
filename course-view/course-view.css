@@ -542,7 +542,7 @@ body {
     padding: 10px;
     padding-bottom: 20px;
     margin-top: 0;     
-    border-top: 2px solid #CCCCCC;
+    border-top: 0px solid #CCCCCC;
     border-bottom: 2px solid #CCCCCC;
 }
 
@@ -562,6 +562,15 @@ body {
     display: inline-block;
     font-size: 14px;   
 } 
+.mention {
+    font-weight: 600;
+    color: #283044;
+    background: #DCECFC;
+    padding: 4px 8px;
+    border-radius: 8px;
+    display: inline-block;
+    font-size: 14px;   
+}   
 .message.reply .message-text {
     font-size: 14px;
     color: #333;
@@ -576,10 +585,7 @@ body {
     margin-bottom: 0; 
 } 
 
-.message.reply:last-of-type {
-    border-bottom-left-radius: 12px;
-    border-bottom-right-radius: 12px;
-}
+ 
 .message .user-info {
     display: flex;
     align-items: center;

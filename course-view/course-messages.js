@@ -38,22 +38,23 @@ const createDiscussionTemplate = () => `
 `;
 
 const renderDiscussion = (messages) => {
-if (!Array.isArray(messages)) {
-    console.error("Invalid input: messages must be an array");
-    return;
-}
-
-const discussionThread = document.querySelector('.discussion-thread');
-messages.forEach(message => {
-    const existingMessageElement = discussionThread.querySelector(`.message[data-message-id="${message.id}"]`);
-    if (existingMessageElement) {
-        existingMessageElement.innerHTML = createMessageHTML(message).innerHTML;
-    } else {
-        const messageElement = createMessageHTML(message);
-        discussionThread.appendChild(messageElement);
+    if (!Array.isArray(messages)) {
+        console.error("Invalid input: messages must be an array");
+        return;
     }
-});
+
+    const discussionThread = document.querySelector('.discussion-thread');
+    messages.forEach(message => {
+        const existingMessageElement = discussionThread.querySelector(`.message[data-message-id="${message.id}"]`);
+        if (existingMessageElement) {
+            existingMessageElement.innerHTML = createMessageHTML(message).innerHTML;
+        } else {
+            const messageElement = createMessageHTML(message);
+            discussionThread.appendChild(messageElement);
+        }
+    });
 };
+
 function updateRepliesButton(commentId) {
     const repliesContainer = document.getElementById(`replies-container-${commentId}`);
     const showRepliesButton = document.getElementById(`show-replies-button-${commentId}`);
@@ -65,23 +66,22 @@ function updateRepliesButton(commentId) {
     }
 }
 
-
-
 function addShowRepliesButton(parentElement, messageId, replies) {
-    // Якщо немає жодних відповідей, не створюємо кнопку
+    // If there are no replies, don't create the button
     if (replies.length === 0) {
         return;
     }
 
     const showRepliesButton = document.createElement('button');
     showRepliesButton.className = 'show-replies-button';
+    showRepliesButton.id = `show-replies-button-${messageId}`;
 
     const expandedFromStorage = localStorage.getItem(`replies-expanded-${messageId}`);
     const timestamp = localStorage.getItem(`replies-timestamp-${messageId}`);
     const currentTime = Date.now();
 
-    // Якщо збережено, що відповіді мають бути показані і з моменту збереження пройшло менше 2 хвилин
-    const isRecentlyStored = timestamp && currentTime - timestamp < 60 * 1000;
+    // If saved that replies should be shown and less than 1 minute has passed since saving
+    const isRecentlyStored = timestamp && currentTime - parseInt(timestamp) < 60 * 1000;
     const expanded = expandedFromStorage === 'true' && isRecentlyStored;
 
     if (expanded) {
@@ -92,18 +92,18 @@ function addShowRepliesButton(parentElement, messageId, replies) {
         showRepliesButton.textContent = `Show replies (${replies.length})`;
     }
 
-    // Додаємо слухач кліку
+    // Add click listener
     showRepliesButton.addEventListener('click', () => {
         const isExpanded = showRepliesButton.dataset.expanded === 'true';
         if (isExpanded) {
-            // Якщо було розгорнуто — ховаємо
+            // If expanded - hide
             hideReplies(parentElement, messageId, replies);
             showRepliesButton.dataset.expanded = 'false';
             showRepliesButton.textContent = `Show replies (${replies.length})`;
             localStorage.setItem(`replies-expanded-${messageId}`, 'false');
             localStorage.setItem(`replies-timestamp-${messageId}`, currentTime.toString());
         } else {
-            // Якщо було сховано — показуємо
+            // If hidden - show
             showReplies(parentElement, messageId, replies);
             showRepliesButton.dataset.expanded = 'true';
             showRepliesButton.textContent = 'Hide replies';
@@ -114,49 +114,42 @@ function addShowRepliesButton(parentElement, messageId, replies) {
 
     parentElement.after(showRepliesButton);
 
-    // Відразу після створення кнопки, синхронізуємо DOM зі станом localStorage:
+    // Immediately after creating the button, sync DOM with localStorage state:
     if (expanded) {
-        // Якщо збережено, що відповіді мають бути показані, показуємо
+        // If saved that replies should be shown, display them
         showReplies(parentElement, messageId, replies);
     } else {
-        // Якщо збережено, що відповіді мають бути сховані, приховуємо (про всяк випадок)
+        // If saved that replies should be hidden, hide them (just in case)
         hideReplies(parentElement, messageId, replies);
     }
 }
 
 function showReplies(parentElement, parentMessageId, replies) {
-    // Створення/оновлення контейнера для відповідей
+    // Завжди показуємо всі відповіді після додавання нової
     renderReplies(replies, parentMessageId);
 
-    // Переконуємось, що контейнер існує та відображається
+    // Показуємо контейнер для відповідей
     const repliesContainer = getRepliesContainer(parentElement);
     if (repliesContainer) {
         repliesContainer.style.display = 'block';
     }
 
-    const showRepliesButton = parentElement.querySelector('.show-replies-button');
+    const showRepliesButton = document.getElementById(`show-replies-button-${parentMessageId}`);
     if (showRepliesButton) {
         showRepliesButton.dataset.expanded = 'true';
         showRepliesButton.textContent = 'Hide replies';
-        localStorage.setItem(`replies-expanded-${parentMessageId}`, 'true');
     }
-
 }
 
-
-
 function hideReplies(parentElement, messageId, replies) {
-    // Шукаємо контейнер
+    // Якщо потрібно, приховуємо відповідей
     const repliesContainer = getRepliesContainer(parentElement);
-    // Якщо він є, приховуємо його
     if (repliesContainer) {
         repliesContainer.style.display = 'none';
     }
 }
 
-/**
- * Допоміжна функція, щоб знаходити repliesContainer
- */
+ 
 function getRepliesContainer(parentElement) {
     const nextEl = parentElement.nextElementSibling;
     if (nextEl && nextEl.classList.contains('replies-container')) {
@@ -173,6 +166,7 @@ function renderReplies(replies, parentMessageId) {
     if (!repliesContainer || !repliesContainer.classList.contains('replies-container')) {
         repliesContainer = document.createElement('div');
         repliesContainer.classList.add('replies-container');
+        repliesContainer.id = `replies-container-${parentMessageId}`;
         parentMessage.after(repliesContainer);
     }    
     repliesContainer.innerHTML = '';
@@ -186,7 +180,6 @@ function renderReplies(replies, parentMessageId) {
         replyElement.classList.add('message', 'reply');
         replyElement.dataset.messageId = reply.id;
         replyElement.dataset.parentId = reply.parent_comment_id;
-        
         replyElement.dataset.userId = reply.user_id;
         
         console.log(`Reply ${reply.id} has user_id: ${reply.user_id}`);
@@ -199,6 +192,7 @@ function renderReplies(replies, parentMessageId) {
                 year: 'numeric'
             });
         };
+        
         const avatar = reply.teacher_profile_image || reply.student_profile_image || '/images/user-avatar.png';
         let messageContent = reply.content || '';
 
@@ -219,22 +213,23 @@ function renderReplies(replies, parentMessageId) {
             messageContent = `@${parentUsername} ${messageContent}`;
         }
 
+        let formattedMessage = messageContent;
         if (parentUsername) {
             const mentionText = `@${parentUsername}`;
             const indexOfSpace = messageContent.indexOf(' ', mentionText.length);
             const mention = messageContent.substring(0, indexOfSpace !== -1 ? indexOfSpace : messageContent.length);
             const restOfMessage = indexOfSpace !== -1 ? messageContent.substring(indexOfSpace) : '';
-            messageContent = `<span class="mention">${mention}</span>${restOfMessage}`;
+            formattedMessage = `<span class="mention">${mention}</span>${restOfMessage}`;
         }
 
-        replyElement.innerHTML = ` 
+        replyElement.innerHTML = `
             <div class="user-info">
                 <img src="${avatar || '/images/user-avatar.png'}" alt="User avatar" class="avatar">
                 <span class="username">${reply.user_name}</span>
                 <span class="date">${formatDate(reply.created_at)}</span>
             </div>
             <div class="message-content">
-                <p class="message-text">${messageContent}</p>
+                <p class="message-text">${formattedMessage}</p>
             </div>
             <button class="more-options">...</button>
             <div class="reply-input" style="display: none;">
@@ -341,112 +336,54 @@ const createMessageHTML = (message, isReply = false, replyLevel = 0) => {
 
     return messageElement;
 };
-
-// Also, fix the createReplyElement function which has the same issue
-const createReplyElement = (reply) => {
-    const replyElement = document.createElement('div');
-    replyElement.classList.add('message', 'reply');
-    replyElement.dataset.messageId = reply.id;
-    replyElement.dataset.parentId = reply.parent_comment_id;
-    
-    // Set the ACTUAL author ID, not the current user ID
-    replyElement.dataset.userId = reply.user_id;
-
-    const formatDate = (isoString) => {
-        const date = new Date(isoString);
-        return date.toLocaleDateString('uk-UA', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        });
-    };
-    
-    const avatar = reply.teacher_profile_image || reply.student_profile_image || user.profile_image || '/images/user-avatar.png';
-    let messageContent = reply.content || '';
-
-    // Find the username of the parent comment
-    let parentUsername = '';
-    if (reply.parent_comment_id) {
-        const parentReply = replyMap.get(reply.parent_comment_id);
-        if (parentReply) {
-            parentUsername = parentReply.user_name;
-        } else {
-            const parentElement = document.querySelector(`.message[data-message-id="${reply.parent_comment_id}"]`);
-            if (parentElement) {
-                parentUsername = parentElement.querySelector('.username').textContent;
-            }
-        }
-    } 
-
-    // Add @mention if it's not already there
-    if (parentUsername && !messageContent.startsWith(`@${parentUsername}`)) {
-        messageContent = `@${parentUsername} ${messageContent}`;
-    }
-
-    // Format @mention
-    if (parentUsername) {
-        const mentionText = `@${parentUsername}`;
-        const indexOfSpace = messageContent.indexOf(' ', mentionText.length);
-        const mention = messageContent.substring(0, indexOfSpace !== -1 ? indexOfSpace : messageContent.length);
-        const restOfMessage = indexOfSpace !== -1 ? messageContent.substring(indexOfSpace) : '';
-        messageContent = `<span class="mention">${mention}</span>${restOfMessage}`;
-    }
-
-    replyElement.innerHTML = ` 
-        <div class="user-info">
-            <img src="${avatar || '/images/user-avatar.png'}" alt="User avatar" class="avatar">
-            <span class="username">${reply.user_name}</span>
-            <span class="date">${formatDate(reply.created_at)}</span>
-        </div>
-        <div class="message-content">
-            <p class="message-text">${messageContent}</p>
-        </div>
-        <button class="more-options">...</button>
-        <div class="reply-input" style="display: none;">
-            <input type="text" placeholder="write a reply to ${reply.user_name}">
-            <button class="send-reply" data-parent-id="${reply.id}">
-                <img src="../images/send.svg" alt="Send">
-            </button>
-        </div>
-    `;
-
-    return replyElement;
-};
-
+ 
 
 const handleReply = async (messageId, replyText) => {
-const parentMessage = document.querySelector(`.message[data-message-id="${messageId}"]`);
-const parentUsername = parentMessage.querySelector('.username').textContent;
+    const parentMessage = document.querySelector(`.message[data-message-id="${messageId}"]`);
+    const parentUsername = parentMessage.querySelector('.username').textContent;
 
-// Add complete @mention if it's not already there
-const formattedReplyText = replyText.startsWith(`@${parentUsername}`) 
-    ? replyText 
-    : `@${parentUsername} ${replyText}`;
+    // Форматуємо текст відповіді з @-згадкою
+    const formattedReplyText = replyText.startsWith(`@${parentUsername}`) 
+        ? replyText 
+        : `@${parentUsername} ${replyText}`;
 
-const replyMessage = {
-    user_id: localStorage.getItem('userId'),
-    parent_comment_id: messageId,
-    course_id: window.location.pathname.split('/course/').pop(),
-    content: formattedReplyText,
-    parent_user_id: parentUserId,
-};
+    const replyMessage = {
+        user_id: localStorage.getItem('userId'),
+        parent_comment_id: messageId,
+        course_id: window.location.pathname.split('/course/').pop(),
+        content: formattedReplyText,
+        parent_user_id: parentUserId,
+    };
 
-try {
-    const response = await fetch('http://localhost:8000/api/comments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(replyMessage)
-    });
+    try {
+        const response = await fetch('http://localhost:8000/api/comments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(replyMessage)
+        });
 
-    if (response.ok) {
-        await response.json();
-        fetchComments(replyMessage.course_id);
-    } else {
-        throw new Error('Failed to send reply');
+        if (response.ok) {
+            const replyData = await response.json();
+            fetchComments(replyMessage.course_id);
+
+            // Після успішного додавання відповіді, розгортаємо всі відповіді для цього коментаря
+            const repliesContainer = document.getElementById(`replies-container-${messageId}`);
+            if (repliesContainer) {
+                repliesContainer.style.display = 'block'; // показуємо контейнер з відповідями
+            }
+
+            // Якщо є кнопка "Show replies", змінюємо її на "Hide replies"
+            const showRepliesButton = document.getElementById(`show-replies-button-${messageId}`);
+            if (showRepliesButton) {
+                showRepliesButton.dataset.expanded = 'true';
+                showRepliesButton.textContent = 'Hide replies';
+            }
+        } else {
+            throw new Error('Failed to send reply');
+        }
+    } catch (error) {
+        console.error('Error while sending reply:', error);
     }
-} catch (error) {
-    console.error('Error while sending reply:', error);
-}
 };
 
 
@@ -474,31 +411,38 @@ const updateMessageStyles = () => {
             mainMessage.style.borderBottomRightRadius = '0';
         } else {
             mainMessage.classList.remove('has-visible-replies');
-            mainMessage.style.borderBottom = '2px solid #CCCCCC';
         }
 
-        // Стилізуємо відповіді, включаючи вкладені
+        // Стилізуємо відповіді
         replies.forEach(reply => {
-            reply.style.margin = '0';
-            reply.style.borderTop = '0';
-            reply.style.borderBottom = '2px solid #CCCCCC';
-            reply.style.borderBottomLeftRadius = '0';
-            reply.style.borderBottomRightRadius = '0';
+            reply.style.margin = '0';       
 
             // Обробка вкладених відповідей
             const nestedReplies = document.querySelectorAll(`.message.reply[data-parent-id="${reply.dataset.messageId}"]`);
             if (nestedReplies.length > 0) {
-                reply.style.borderBottom = '0';
+                reply.style.borderBottom = '2px solid #ddd';  // Легкий бордер для вкладених
             }
 
             // Додаємо бордер для останньої вкладеної відповіді
             if (nestedReplies.length > 0) {
-                const lastNestedReply = nestedReplies[nestedReplies.length - 1];
-                lastNestedReply.style.borderBottom = '2px solid #CCCCCC';
+                const lastNestedReply = nestedReplies[nestedReplies.length - 1]; 
+                lastNestedReply.style.borderBottom = '2px solid #CCCCCC';  // Більш виразний бордер для останнього
             }
         });
     });
-};
+
+    // Оновлюємо бордери для першого та останнього коментаря
+    const allMessages = document.querySelectorAll('.message');
+    if (allMessages.length > 0) {
+        const firstMessage = allMessages[0];
+        firstMessage.style.borderTopLeftRadius = '12px';
+        firstMessage.style.borderTopRightRadius = '12px';
+
+        const lastMessage = allMessages[allMessages.length - 1];
+        lastMessage.style.borderBottomLeftRadius = '0';
+        lastMessage.style.borderBottomRightRadius = '0';
+    }
+}; 
 
 // Оновлюємо стилі для першого та останнього коментаря
 const allMessages = document.querySelectorAll('.message');
@@ -773,9 +717,14 @@ function createEditModal(currentText) {
     const title = document.createElement('h2');
     title.textContent = 'Edit your comment';
 
+    const textContainer = document.createElement('div');
+    textContainer.className = 'modal-text-container';
+ 
     const editTextArea = document.createElement('textarea');
     editTextArea.className = 'modal-textarea';
-    editTextArea.textContent = currentText; // Set the current text in the textarea
+    editTextArea.value = currentText; // Встановлюємо текст як є
+
+    textContainer.appendChild(editTextArea);
 
     const modalActions = document.createElement('div');
     modalActions.className = 'modal-actions';
@@ -791,29 +740,57 @@ function createEditModal(currentText) {
     modalActions.appendChild(cancelButton);
     modalActions.appendChild(saveButton);
     modalContent.appendChild(title);
-    modalContent.appendChild(editTextArea);
+    modalContent.appendChild(textContainer);
     modalContent.appendChild(modalActions);
     modal.appendChild(modalContent);
 
     document.body.appendChild(modal);
 
-    // Додати анімацію показу
+    // Додати анімацію появи
     setTimeout(() => {
         modal.classList.add('show');
     }, 10);
+
     modal.addEventListener('click', (e) => {
-        if (e.target === modal) { // Перевіряємо, чи клік був саме на фон
-            modal.style.display = 'none';
-            modal.remove();  // Видаляємо модалку з DOM
+        if (e.target === modal) { // Перевірка чи клік на фон
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.remove();  // Видаляємо модальне вікно
+            }, 300); // Час, щоб співпало з анімацією
         }
     });
+
+    cancelButton.addEventListener('click', () => {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.remove();
+        }, 300);
+    });
+
+    saveButton.addEventListener('click', () => {
+        let updatedText = editTextArea.value;
+    
+        // Заміна @mention на форматований <span class="mention">
+        updatedText = updatedText.replace(/(@\w+)/g, '<span class="mention">$1</span>');
+    
+        // Створення елемента <p> з відформатованим текстом
+        const p = document.createElement('p');
+        p.className = 'message-text';
+        p.innerHTML = updatedText; // Тепер текст буде містити HTML
+    
+        // Виведення результату для перевірки
+        console.log('Updated comment with mention:', p.outerHTML);
+    });
+        
+
     return {
         modal,
         saveButton,
         cancelButton,
-        editTextArea,
+        editTextArea, 
     };
 }
+
 
 // Handle "more options" button click 
 document.addEventListener('click', function (e) {
@@ -940,47 +917,64 @@ document.addEventListener('click', function (e) {
             if (action === 'edit') {
                 if (commentUserId && currentUserId && commentUserId.toString() === currentUserId.toString()) {
                     console.log('Edit clicked');
-                    const { modal, saveButton, cancelButton, editTextArea } = createEditModal(currentText);
-
+                    
+                    // Отримуємо текст коментаря перед редагуванням
+                    const originalText = currentText.trim();
+                    
+                    // Визначаємо, чи є mention (текст з @) в коментарі
+                    const mentionElement = message.querySelector('.mention');
+                    const mention = mentionElement ? mentionElement.textContent : '';
+                    const contentWithoutMention = originalText.replace(mention, '').trim();
+            
+                    // Створюємо модальне вікно редагування
+                    const { modal, saveButton, cancelButton, editTextArea } = createEditModal(contentWithoutMention);
+            
                     cancelButton.onclick = () => {
                         modal.remove();
                     };
-
+            
                     saveButton.onclick = async () => {
-                        const updatedText = editTextArea.value.trim();
-                    
-                        if (updatedText !== currentText) {
-                            try {
-                                const response = await fetch(`/api/comments/${messageId}`, {
-                                    method: 'PUT',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                    },
-                                    body: JSON.stringify({ user_id: currentUserId, content: updatedText })
-                                });
-                    
-                                if (response.ok) {
-                                    const textElement = message.querySelector('.message-text');
-                                    if (textElement) {
-                                        textElement.innerHTML = updatedText;
-                                    }
-                                    modal.remove();
-                                } else {
-                                    alert('Не вдалося оновити коментар');
+                        let updatedText = editTextArea.value.trim();
+                        
+                        if (!updatedText) {
+                            alert('Коментар не може бути порожнім');
+                            return;
+                        }
+            
+                        // Якщо mention був, додаємо його назад до тексту
+                        updatedText = mention ? `${mention} ${updatedText}` : updatedText;
+            
+                        try {
+                            const response = await fetch(`/api/comments/${messageId}`, {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ user_id: currentUserId, content: updatedText })
+                            });
+            
+                            if (response.ok) {
+                                // Оновлюємо текст в DOM
+                                const textElement = message.querySelector('.message-text');
+                                if (textElement) {
+                                    // Якщо є mention, додаємо його знову в HTML
+                                    textElement.innerHTML = `${mention ? `<span class="mention">${mention}</span> ` : ''}${updatedText.replace(mention, '').trim()}`;
                                 }
-                            } catch (err) {
-                                console.error('Error updating comment:', err);
-                                alert('Помилка при оновленні коментаря');
+                                modal.remove();  // Закриваємо модальне вікно
+                            } else {
+                                alert('Не вдалося оновити коментар');
                             }
-                        } else {
-                            modal.remove();
+                        } catch (err) {
+                            console.error('Error updating comment:', err);
+                            alert('Помилка при оновленні коментаря');
                         }
                     };
                 } else {
                     alert('Ви можете редагувати тільки власні коментарі');
                 }
             }
-
+            
+            
             optionsMenu.remove();
         });
 
@@ -1109,9 +1103,7 @@ function openReportModal(messageId, username) {
             if (!response.ok) {
                 const result = await response.json();
                 alert(`Error: ${result.error}`);
-            } else {
-                alert('Скаргу надіслано!');
-            }
+            } 
         } catch (error) {
             console.error('Error submitting report:', error);
             alert('Помилка при надсиланні скарги');
