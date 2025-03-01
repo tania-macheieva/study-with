@@ -573,6 +573,7 @@ document.querySelector('.discussion-thread').addEventListener('click', (event) =
     }
 });
 
+// Модифікована функція handleReply для автоматичного розгортання відповідей
 const handleReply = async (messageId, replyText) => {
     const parentMessage = document.querySelector(`.message[data-message-id="${messageId}"]`);
     if (!parentMessage) return;
@@ -598,20 +599,14 @@ const handleReply = async (messageId, replyText) => {
 
         if (response.ok) {
             const replyData = await response.json();
-
-            // Перевіряємо чи необхідно змінити стан кнопки "Show replies"
+            
+            // Автоматично розгортаємо відповіді
             const showRepliesButton = document.getElementById(`show-replies-button-${messageId}`);
             if (showRepliesButton) {
                 showRepliesButton.dataset.expanded = 'true';
                 showRepliesButton.textContent = 'Hide replies';
                 localStorage.setItem(`replies-expanded-${messageId}`, 'true');
                 localStorage.setItem(`replies-timestamp-${messageId}`, Date.now().toString());
-
-                // Розгортаємо контейнер відповідей, якщо він є
-                const repliesContainer = document.getElementById(`replies-container-${messageId}`);
-                if (repliesContainer) {
-                    repliesContainer.style.display = 'block';
-                }
             }
             
             // Оновлюємо коментарі щоб побачити нову відповідь
@@ -649,52 +644,44 @@ function showReplies(parentElement, parentMessageId, replies) {
 } 
 
 const initializeDiscussionListeners = () => {
-const sendButton = document.querySelector('.send');
-const messageInput = document.querySelector('.search-bar input');
-const discussionThread = document.querySelector('.discussion-thread');
+    const sendButton = document.querySelector('.send');
+    const messageInput = document.querySelector('.search-bar input');
+    const discussionThread = document.querySelector('.discussion-thread');
 
-if (!sendButton || !messageInput || !discussionThread) {
-    console.error('Required elements not found on the page.');
-    return;
-}
+    if (!sendButton || !messageInput || !discussionThread) {
+        console.error('Required elements not found on the page.');
+        return;
+    }
 
-// Перевірка, чи є користувач
-const userId = localStorage.getItem('userId');
-if (!userId) {
-    alert('User is not logged in.');
-    return;
-}
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+        alert('User is not logged in.');
+        return;
+    }
 
-const courseId = window.location.pathname.split('/course/').pop();
+    const courseId = window.location.pathname.split('/course/').pop();
 
-sendButton.addEventListener('click', async () => {
-    const messageText = messageInput.value.trim();
-    if (!messageText) return;  // Перевірка на порожній текст
+    const handleSendMessage = () => {
+        const messageText = messageInput.value.trim();
+        if (!messageText) return;
 
-    const newMessage = {
-        courseId: courseId,
-        userId: userId,
-        parentCommentId: null,
-        content: messageText,
+        sendMessage(messageText);
+        messageInput.value = ''; // Очистити поле вводу
     };
 
-    try {
-        const response = await fetch('http://localhost:8000/api/comments', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newMessage),
-        });
+    // Надсилання повідомлення при кліку на кнопку
+    sendButton.addEventListener('click', handleSendMessage);
 
-        if (response.ok) { 
-            fetchComments(courseId);  // Refresh the discussion with new comment
-        } else {
-            throw new Error('Failed to send the message.');
+    // Надсилання повідомлення при натисканні Enter
+    messageInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            handleSendMessage();
         }
-    } catch (error) {
-        console.error('Error sending message:', error);
-        alert('Error sending message. Please try again later.');
-    }
-});
+    });
+
+ 
+
 
 // Відображаємо існуючі повідомлення
 fetchComments(courseId);
@@ -1180,20 +1167,73 @@ function openReportModal(messageId, username) {
         }
     });
 }
-
-
-discussionThread.addEventListener('click', function(e){
+discussionThread.addEventListener('click', function (e) {
     const sendReplyButton = e.target.closest('.send-reply');
 
     if (sendReplyButton) {
         const replyInput = sendReplyButton.previousElementSibling;
         const replyContent = replyInput.value.trim();
-        const parentId = sendReplyButton.dataset.parentId; 
+        const parentId = sendReplyButton.dataset.parentId;
+
         if (replyContent && parentId) {
-            sendMessage(replyContent, parentId)  // Додаємо відповідь
-            replyInput.value = '';  // Очищаємо поле вводу
-            replyInput.closest('.reply-input').style.display = 'none';  // Сховуємо поле вводу відповіді
-        } 
+            sendMessage(replyContent, parentId);
+            replyInput.value = ''; // Очищаємо поле вводу
+        }
+    }
+});
+// Надсилання відповіді по Enter
+// Надсилання відповіді по Enter
+discussionThread.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        const activeInput = e.target;
+        if (activeInput.tagName === 'INPUT' && activeInput.closest('.reply-input')) {
+            e.preventDefault(); // Запобігаємо додаванню нового рядка
+            
+            // Знаходимо кнопку send-reply, щоб отримати parentId
+            const sendReplyButton = activeInput.closest('.reply-input').querySelector('.send-reply');
+            const parentId = sendReplyButton.dataset.parentId;
+            const replyContent = activeInput.value.trim();
+            
+            // Знаходимо повідомлення, на яке відповідаємо
+            const messageElement = activeInput.closest('.message');
+            
+            // Перевіряємо наявність контейнера відповідей
+            let repliesContainer = document.getElementById(`replies-container-${parentId}`);
+            
+            // Знаходимо кнопку "Show replies"
+            const showRepliesButton = document.getElementById(`show-replies-button-${parentId}`);
+            
+            // Якщо є кнопка показу відповідей, змінюємо її стан на "розгорнуто"
+            if (showRepliesButton) {
+                // Зберігаємо стан у localStorage
+                localStorage.setItem(`replies-expanded-${parentId}`, 'true');
+                localStorage.setItem(`replies-timestamp-${parentId}`, Date.now().toString());
+                
+                // Оновлюємо стан і текст кнопки
+                showRepliesButton.dataset.expanded = 'true';
+                showRepliesButton.textContent = 'Hide replies';
+                
+                // Якщо є контейнер відповідей, показуємо його
+                if (repliesContainer) {
+                    repliesContainer.style.display = 'block';
+                }
+            }
+            
+            // Відправляємо повідомлення, тільки якщо є вміст
+            if (replyContent) {
+                // Функція для відправки повідомлення з автооновленням
+                sendMessage(replyContent, parentId);
+                activeInput.value = '';  // Очистити поле вводу
+                
+                // При відправці нової відповіді, оновлюємо та показуємо всі відповіді
+                const courseId = window.location.pathname.split('/course/').pop();
+                
+                // Додаємо затримку, щоб дочекатися оновлення даних на сервері
+                setTimeout(() => {
+                    fetchComments(courseId);  // Оновлюємо всі коментарі
+                }, 300);
+            }
+        }
     }
 });
 };
