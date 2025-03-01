@@ -21,6 +21,7 @@
     "express": "^4.21.2",
     "express-session": "^1.18.1",
     "fs": "^0.0.1-security",
+    "fs-extra": "^11.3.0",
     "fuse.js": "^7.0.0",
     "google-auth-library": "^9.15.0",
     "googleapis": "^144.0.0",
@@ -30,6 +31,7 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "path": "^0.12.7",
+    "pdfkit": "^0.16.0",
     "pg": "^8.13.1",
     "postgres": "^3.4.5",
     "stripe": "^17.6.0"

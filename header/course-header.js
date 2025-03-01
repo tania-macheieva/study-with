@@ -537,23 +537,42 @@ async function generateAndDownloadCertificate() {
             throw new Error('Помилка отримання даних користувача');
         }
         const userData = await userResponse.json();
-        const userName = userData.name || 'Student';
-        
-        const courseResponse = await fetch(`/api/courses/${courseId}/full`);
+        const userName = userData.name;
+
+        const courseResponse = await fetch(`/api/courses/${courseId}`);
         if (!courseResponse.ok) {
-            throw new Error('Помилка завантаження даних курсу');
+            throw new Error('Помилка отримання даних курсу');
         }
         const courseData = await courseResponse.json();
+        const courseName = courseData.name;
+
+        const currentDate = new Date();
+        const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}.${(currentDate.getMonth() + 1).toString().padStart(2, '0')}.${currentDate.getFullYear()}`;
+        const certNumber = `CERT-${currentDate.getFullYear()}-${Math.floor(Math.random() * 100000).toString().padStart(5, '0')}`;
+
+        const response = await fetch('/api/certificate/generate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                userId,
+                courseId
+            })
+        });
         
-        const certificateHTML = createCertificateTemplate(userName, courseData.name);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.details || 'Помилка генерації сертифікату');
+        }
         
-        const pdfBlob = await convertHTMLToPDF(certificateHTML);
+        const pdfBlob = await response.blob();
         
         const blobUrl = URL.createObjectURL(pdfBlob);
         
         const downloadLink = document.createElement('a');
         downloadLink.href = blobUrl;
-        downloadLink.download = `Certificate_${courseData.name.replace(/\s+/g, '_')}.pdf`;
+        downloadLink.download = `Certificate_${courseId}.pdf`;
         
         document.body.appendChild(downloadLink);
         downloadLink.click();
@@ -561,21 +580,9 @@ async function generateAndDownloadCertificate() {
         
         setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
         
-        await fetch('/api/certificate/issue', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                userId,
-                courseId,
-                issuedAt: new Date().toISOString()
-            })
-        });
-        
     } catch (error) {
         console.error('Помилка генерації сертифікату:', error);
-        alert('Помилка при створенні сертифікату. Спробуйте пізніше.');
+        alert('Помилка при створенні сертифікату: ' + error.message);
     }
 }
 
@@ -586,157 +593,121 @@ function createCertificateTemplate(userName, courseName) {
     const certNumber = `CERT-${currentDate.getFullYear()}-${Math.floor(Math.random() * 100000).toString().padStart(5, '0')}`;
     
     return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Сертифікат - ${courseName}</title>
-        <style>
-            body {
-                margin: 0;
-                padding: 0;
-                font-family: 'Inter', sans-serif;
-                background-color: #f8f9fa;
-            }
-            .certificate-container {
-                width: 210mm;
-                height: 297mm;
-                margin: 0 auto;
-                background-color: white;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                position: relative;
-                overflow: hidden;
-                padding: 20px;
-                box-sizing: border-box;
-            }
-            .certificate-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 20px;
-            }
-            .certificate-logo {
-                font-weight: bold;
-                font-size: 24px;
-                color: #283044;
-                display: flex;
-                align-items: center;
-            }
-            .certificate-title {
-                text-align: center;
-                font-size: 64px;
-                font-weight: bold;
-                color: #283044;
-                margin: 40px 0;
-            }
-            .certificate-content {
-                text-align: left;
-                font-size: 24px;
-                margin: 20px 0;
-                line-height: 1.8;
-            }
-            .certificate-name {
-                font-size: 42px;
-                font-weight: bold;
-                color: #283044;
-                margin: 30px 0;
-            }
-            .certificate-course {
-                font-size: 32px;
-                font-weight: bold;
-                margin: 30px 0;
-                color: #283044;
-            }
-            .certificate-date {
-                margin-top: 40px;
-                font-size: 20px;
-            }
-            .certificate-number {
-                position: absolute;
-                bottom: 20px;
-                right: 20px;
-                font-size: 12px;
-                color: #666;
-            }
-            .certificate-image {
-                position: absolute;
-                bottom: 100px;
-                right: 50px;
-                width: 150px;
-                height: auto;
-            }
-            .certificate-stamp {
-                position: absolute;
-                left: 100px;
-                bottom: 80px;
-                width: 150px;
-                height: auto;
-                opacity: 0.9;
-            }
-            .background-shape {
-                position: absolute;
-                z-index: -1;
-            }
-            .shapes-container {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                overflow: hidden;
-                z-index: -1;
-            }
-            .trophy {
-                position: absolute;
-                right: 50px;
-                top: 50%;
-                width: 150px;
-                height: auto;
-            }
-            .person {
-                position: absolute;
-                left: 50%;
-                bottom: 150px;
-                width: 150px;
-                height: auto;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="certificate-container">
-            <div class="shapes-container">
-                <!-- Декоративні елементи та фонові зображення -->
-                <div class="background-shape" style="top: 50px; right: 50px; width: 100px; height: 100px; background-color: rgba(220, 236, 252, 0.5); border-radius: 50%;"></div>
-                <div class="background-shape" style="bottom: 100px; left: 80px; width: 150px; height: 150px; background-color: rgba(220, 236, 252, 0.3); border-radius: 50%;"></div>
-                <div class="background-shape" style="top: 200px; left: 50px; width: 80px; height: 80px; background-color: rgba(240, 240, 240, 0.8); border-radius: 50%;"></div>
-            </div>
-            
-            <div class="certificate-header">
-                <div class="certificate-logo">
-                    <span>StudyWith</span>
-                </div>
-            </div>
-            
-            <div class="certificate-title">CERTIFICATE</div>
-            
-            <div class="certificate-content">
-                <p>This certifies that</p>
-                <div class="certificate-name">${userName.toUpperCase()}</div>
-                <p>Has successfully completed<br>the course</p>
-                <div class="certificate-course">${courseName}</div>
-                <div class="certificate-date">
-                    <p>Data of issue<br>${formattedDate}</p>
-                </div>
-            </div>
-            
-            <img class="certificate-stamp" src="../images/stamp.png" alt="Stamp">
-            <img class="trophy" src="../images/trophy.png" alt="Trophy">
-            <img class="person" src="../images/person.png" alt="Person">
-            
-            <div class="certificate-number">${certNumber}</div>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../certificates/certificate1.css">
+</head>
+
+<style>
+body {
+    background-color: #cecece;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.certificate {
+    padding: 20px;
+    position: relative;
+    width: 2000px;
+    height: auto;
+}
+
+.certificate-image {
+    width: 100%;
+    display: block;
+}
+
+.content {
+    position: absolute;
+    top: 55%;
+    left: 45%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    text-align: left;
+}
+
+.logo {
+    width: 36px;
+    height: 36px;
+    vertical-align: middle;
+}
+
+h2 {
+    font-size: 36px;
+    font-weight: 500;
+    display: flex;
+    align-items: left;
+    justify-content: left;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 68px;
+    font-weight: bold;
+    margin-bottom: 40px;
+}
+
+p {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+h3 {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+.p1{
+    margin-top: 30px;
+}
+.cert-number {
+    font-size: 20px;
+    margin-top: 90px;
+}
+
+.signature {
+    position: absolute;
+    bottom: 50px;
+    left: 30%;
+    transform: translateX(-50%);
+    width: 200px;
+}
+</style>
+
+<body>
+    <div class="certificate">
+        <img class="certificate-image" src="../images/certificate1.png" alt="certificate">
+        <div class="content">
+            <h2><img class="logo" src="../images/menu-logo.png" alt="logo"> StudyWith</h2>
+            <h1>CERTIFICATE</h1>
+            <p>This certifies that</p>
+            <h3>${userName.toUpperCase()}</h3>
+            <p>Has successfully completed the course</p>
+            <h3>${courseName}</h3>
+            <p >Date of issue:${formattedDate}</p>
+            <p>2020-01-01</p>
+            <p class="cert-number">${certNumber}</p>
+            <img class="signature" src="../images/signature1.png" alt="signature">
         </div>
-    </body>
-    </html>
+    </div>
+</body>
+
+</html>
     `;
 }
 

@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const db = require('./db');
+const PDFDocument = require('pdfkit');
+const fs = require('fs-extra');
+const path = require('path');
 
 router.post('/certificate/issue', async (req, res) => {
     try {
@@ -173,4 +176,205 @@ router.get('/user/:userId', async (req, res) => {
     }
 });
 
+const FONTS_PATH = path.join(__dirname, 'fonts');
+
+router.post('/certificate/generate', async (req, res) => {
+    try {
+        console.log('Starting certificate generation process with PDFKit');
+        const { userId, courseId } = req.body;
+        
+        if (!userId || !courseId) {
+            return res.status(400).json({ 
+                error: 'Missing required fields',
+                details: 'User ID and Course ID are required'
+            });
+        }
+        
+        const userQuery = `SELECT name FROM users WHERE id = $1`;
+        const userResult = await db.query(userQuery, [userId]);
+        
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        
+        const userName = userResult.rows[0].name;
+        
+        const courseQuery = `SELECT name FROM all_courses WHERE id = $1`;
+        const courseResult = await db.query(courseQuery, [courseId]);
+        
+        if (courseResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Course not found' });
+        }
+        
+        const courseName = courseResult.rows[0].name;
+        
+        const currentDate = new Date();
+        const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}.${(currentDate.getMonth() + 1).toString().padStart(2, '0')}.${currentDate.getFullYear()}`;
+        const certNumber = `CERT-${currentDate.getFullYear()}-${Math.floor(Math.random() * 100000).toString().padStart(5, '0')}`;
+        
+        const certificateImagePath = path.join(__dirname, 'images', 'certificate1.png');
+        const logoPath = path.join(__dirname, 'images', 'menu-logo.png');
+        const signaturePath = path.join(__dirname, 'images', 'signature1.png');
+        
+        const regularFontPath = path.join(FONTS_PATH, 'Inter-Regular.ttf');
+        const boldFontPath = path.join(FONTS_PATH, 'Inter-Bold.ttf');
+        
+        console.log('Image paths:', {
+            certificateImagePath,
+            logoPath,
+            signaturePath,
+            regularFontPath,
+            boldFontPath
+        });
+        
+        const certificateImageExists = await fs.pathExists(certificateImagePath);
+        const logoExists = await fs.pathExists(logoPath);
+        const signatureExists = await fs.pathExists(signaturePath);
+        const regularFontExists = await fs.pathExists(regularFontPath);
+        const boldFontExists = await fs.pathExists(boldFontPath);
+        
+        console.log('Files exist check:', {
+            certificateImageExists,
+            logoExists,
+            signatureExists,
+            regularFontExists,
+            boldFontExists
+        });
+        
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=Certificate_${courseName.replace(/\s+/g, '_')}.pdf`);
+        
+        const doc = new PDFDocument({
+            layout: 'landscape',
+            size: 'A4',
+            margin: 0,
+            info: {
+                Title: `${courseName} - Certificate`,
+                Author: 'StudyWith',
+                Subject: 'Course Completion Certificate'
+            }
+        });
+        
+        doc.pipe(res);
+        
+        if (regularFontExists) {
+            doc.registerFont('InterRegular', regularFontPath);
+        } else {
+            console.warn('Regular font file not found, falling back to default');
+        }
+        
+        if (boldFontExists) {
+            doc.registerFont('InterBold', boldFontPath);
+        } else {
+            console.warn('Bold font file not found, falling back to default');
+        }
+        
+        if (certificateImageExists) {
+            doc.image(certificateImagePath, 0, 0, {
+                width: doc.page.width,
+                height: doc.page.height
+            });
+            console.log('Added certificate background image');
+        } else {
+            doc.rect(0, 0, doc.page.width, doc.page.height).fill('#FFFFFF');
+            doc.rect(0, doc.page.height - 230, doc.page.width, 230).fill('#E6EEFF');
+            console.log('Created default background');
+        }
+        
+        if (logoExists) {
+            doc.image(logoPath, 40, 40, { width: 40 });
+            console.log('Added logo');
+        }
+        
+        const titleFont = boldFontExists ? 'InterBold' : 'Helvetica-Bold';
+        const regularFont = regularFontExists ? 'InterRegular' : 'Helvetica';
+        
+        doc.font(titleFont)
+           .fontSize(28)
+           .fillColor('#333')
+           .text('StudyWith', 90, 45);
+        
+        doc.font(titleFont)
+           .fontSize(64)
+           .fillColor('#333')  
+           .text('CERTIFICATE', 40, 100);
+        
+        doc.font(regularFont)
+           .fontSize(20)
+           .fillColor('#333')  
+           .text('This certifies that', 40, 180);
+        
+        doc.font(titleFont)
+           .fontSize(36)
+           .fillColor('#333')  
+           .text(userName.toUpperCase(), 40, 210);
+        
+        doc.font(regularFont)
+           .fontSize(20)
+           .fillColor('#333')  
+           .text('Has successfully completed the course', 40, 270);
+        
+        doc.font(titleFont)
+           .fontSize(30)
+           .fillColor('#333')  
+           .text(courseName, 40, 300, { width: 500 });
+        
+        doc.font(regularFont)
+           .fontSize(20)
+           .fillColor('#333')  
+           .text('Date of issue', 40, 360);
+        
+        doc.font(titleFont)
+           .fontSize(24)
+           .fillColor('#333') 
+           .text(formattedDate, 40, 390);
+        
+        doc.font(regularFont)
+           .fontSize(16)
+           .fillColor('#333')  
+           .text(certNumber, 40, 500);
+        
+        if (signatureExists) {
+            doc.image(signaturePath, 40, 430, { width: 150 });
+            console.log('Added signature');
+        }
+        
+        const existingCertQuery = `
+            SELECT * FROM certificates 
+            WHERE user_id = $1 AND course_id = $2
+        `;
+        
+        const existingCertResult = await db.query(existingCertQuery, [userId, courseId]);
+        
+        if (existingCertResult.rows.length > 0) {
+            await db.query(`
+                UPDATE certificates 
+                SET issued_at = $3, updated_at = CURRENT_TIMESTAMP, certificate_number = $4
+                WHERE user_id = $1 AND course_id = $2
+            `, [userId, courseId, currentDate, certNumber]);
+            console.log('Updated existing certificate record in DB');
+        } else {
+            await db.query(`
+                INSERT INTO certificates (user_id, course_id, issued_at, created_at, updated_at, certificate_number)
+                VALUES ($1, $2, $3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, $4)
+            `, [userId, courseId, currentDate, certNumber]);
+            console.log('Inserted new certificate record in DB');
+        }
+        
+        doc.end();
+        console.log('Certificate generation process completed successfully');
+        
+    } catch (error) {
+        console.error('Error generating certificate with PDFKit:', error);
+        
+        if (!res.headersSent) {
+            res.status(500).json({ 
+                error: 'Internal server error',
+                details: error.message
+            });
+        } else {
+            res.end();
+        }
+    }
+});
 module.exports = router;
