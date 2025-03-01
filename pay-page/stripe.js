@@ -6,18 +6,16 @@ require('dotenv').config();
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const PLATFORM_ACCOUNT_ID = process.env.STRIPE_ACCOUNT_ID;
 
-
-
-router.get('/get-stripe-key', (req, res) => {
-    const publicKey = process.env.STRIPE_PUBLIC_KEY;
-    console.log('Returning public key:', publicKey ? 'Yes' : 'No');
+// router.get('/get-stripe-key', (req, res) => {
+//     const publicKey = process.env.STRIPE_PUBLIC_KEY;
+//     console.log('Returning public key:', publicKey ? 'Yes' : 'No');
     
-    if (!publicKey) {
-        return res.status(500).json({ error: 'Stripe public key not configured' });
-    }
+//     if (!publicKey) {
+//         return res.status(500).json({ error: 'Stripe public key not configured' });
+//     }
     
-    res.json({ publicKey });
-});
+//     res.json({ publicKey });
+// });
 router.get('/course/:id', async (req, res) => {
     const { id } = req.params;
     try { 
@@ -77,20 +75,29 @@ router.post('/create-checkout-session', async (req, res) => {
 
         // Convert price to cents
         const coursePriceCents = Math.round(parseFloat(course.price) * 100);
-        const platformFeeCents = Math.round(coursePriceCents * 0.3); // 30% platform fee
-        const teacherAmountCents = coursePriceCents - platformFeeCents; // 70% teacher amount
+        const platformFeeCents = Math.round(coursePriceCents * 0.3);
+        const teacherAmountCents = coursePriceCents - platformFeeCents; 
 
         const transferGroup = `course_${courseId}_${Date.now()}`;
+        let courseImage = 'https://placehold.co/600x400?text=Course+Image';
 
-             let courseImage = course.image_url
-            ? `${process.env.FRONTEND_URL}/uploads/${course.image_url}`
-            : `${process.env.FRONTEND_URL}/images/default-course.jpg`;
+        if (course.image_url) {
+            const baseUrl = process.env.FRONTEND_URL;
+            
+            if (course.image_url.startsWith('http')) {
+                courseImage = course.image_url;
+            } else {
+                courseImage = `${baseUrl}/uploads/${course.image_url}`;
+            }
+            
+            if (!courseImage.startsWith('https') && courseImage.startsWith('http:')) {
+                courseImage = courseImage.replace('http://', 'https://');
+            }
+        }
 
-        // Properly encode the URL to handle spaces and special characters
+        console.log('Using image URL for Stripe:', courseImage);
+
         courseImage = encodeURI(courseImage);
-
-        // Ensure there are no spaces by replacing them with %20
-        courseImage = courseImage.replace(/ /g, '%20');
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: [{
@@ -121,7 +128,8 @@ router.post('/create-checkout-session', async (req, res) => {
             },
             mode: 'payment',
             success_url: `${process.env.FRONTEND_URL}/pay-page/success.html?courseId=${courseId}&userId=${userId}&session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.FRONTEND_URL}/pay-page/cancel.html`,
+            cancel_url: `${process.env.FRONTEND_URL}/course-preview/?id=${courseId}`,
+
         });
 
         res.json({ url: session.url });

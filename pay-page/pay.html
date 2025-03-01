@@ -301,7 +301,7 @@
           checkoutButton.disabled = true;
           checkoutButton.textContent = 'Processing...';
 
-          const response = await fetch("/create-checkout-session", {
+          const response = await fetch("/pay-page/create-checkout-session", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
