@@ -123,24 +123,7 @@ function addShowRepliesButton(parentElement, messageId, replies) {
         hideReplies(parentElement, messageId, replies);
     }
 }
-
-function showReplies(parentElement, parentMessageId, replies) {
-    // Завжди показуємо всі відповіді після додавання нової
-    renderReplies(replies, parentMessageId);
-
-    // Показуємо контейнер для відповідей
-    const repliesContainer = getRepliesContainer(parentElement);
-    if (repliesContainer) {
-        repliesContainer.style.display = 'block';
-    }
-
-    const showRepliesButton = document.getElementById(`show-replies-button-${parentMessageId}`);
-    if (showRepliesButton) {
-        showRepliesButton.dataset.expanded = 'true';
-        showRepliesButton.textContent = 'Hide replies';
-    }
-}
-
+ 
 function hideReplies(parentElement, messageId, replies) {
     // Якщо потрібно, приховуємо відповідей
     const repliesContainer = getRepliesContainer(parentElement);
@@ -338,54 +321,7 @@ const createMessageHTML = (message, isReply = false, replyLevel = 0) => {
 };
  
 
-const handleReply = async (messageId, replyText) => {
-    const parentMessage = document.querySelector(`.message[data-message-id="${messageId}"]`);
-    const parentUsername = parentMessage.querySelector('.username').textContent;
-
-    // Форматуємо текст відповіді з @-згадкою
-    const formattedReplyText = replyText.startsWith(`@${parentUsername}`) 
-        ? replyText 
-        : `@${parentUsername} ${replyText}`;
-
-    const replyMessage = {
-        user_id: localStorage.getItem('userId'),
-        parent_comment_id: messageId,
-        course_id: window.location.pathname.split('/course/').pop(),
-        content: formattedReplyText,
-        parent_user_id: parentUserId,
-    };
-
-    try {
-        const response = await fetch('http://localhost:8000/api/comments', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(replyMessage)
-        });
-
-        if (response.ok) {
-            const replyData = await response.json();
-            fetchComments(replyMessage.course_id);
-
-            // Після успішного додавання відповіді, розгортаємо всі відповіді для цього коментаря
-            const repliesContainer = document.getElementById(`replies-container-${messageId}`);
-            if (repliesContainer) {
-                repliesContainer.style.display = 'block'; // показуємо контейнер з відповідями
-            }
-
-            // Якщо є кнопка "Show replies", змінюємо її на "Hide replies"
-            const showRepliesButton = document.getElementById(`show-replies-button-${messageId}`);
-            if (showRepliesButton) {
-                showRepliesButton.dataset.expanded = 'true';
-                showRepliesButton.textContent = 'Hide replies';
-            }
-        } else {
-            throw new Error('Failed to send reply');
-        }
-    } catch (error) {
-        console.error('Error while sending reply:', error);
-    }
-};
-
+ 
 
 
 const updateMessageStyles = () => {
@@ -564,29 +500,153 @@ const sendMessage = async (content, parentId = null) => {
 
 // Відправка основного коментаря
 document.querySelector('.send').addEventListener('click', () => {
-const messageContent = document.querySelector('input[type="text"]').value.trim();
-if (messageContent) {
-    sendMessage(messageContent);
-    document.querySelector('input[type="text"]').value = '';  // Очистити поле вводу
-}
+    const messageContent = document.querySelector('input[type="text"]').value.trim();
+    
+    if (messageContent) {
+        sendMessage(messageContent);
+        document.querySelector('input[type="text"]').value = ''; // Очистити поле вводу
+
+        // Знайти всі приховані блоки відповідей та розгорнути їх
+        document.querySelectorAll('.replies-container').forEach(container => {
+            if (container.style.display === 'none') {
+                container.style.display = 'block';
+            }
+        });
+
+        // Оновити кнопки "Show replies" → "Hide replies"
+        document.querySelectorAll('.show-replies-button').forEach(button => {
+            if (button.dataset.expanded === 'false') {
+                button.dataset.expanded = 'true';
+                button.textContent = 'Hide replies';
+                localStorage.setItem(`replies-expanded-${button.dataset.messageId}`, 'true');
+            }
+        });
+    }
 });
+
 
 // Відправка відповіді
 document.querySelector('.discussion-thread').addEventListener('click', (event) => {
-if (event.target.classList.contains('send-reply')) {
-    const parentId = event.target.dataset.parentId;
-    const replyContent = event.target.previousElementSibling.value.trim();
-    if (replyContent) {
-        sendMessage(replyContent, parentId);
-        event.target.previousElementSibling.value = '';  // Очистити поле вводу
+    if (event.target.classList.contains('send-reply')) {
+        const parentId = event.target.dataset.parentId;
+        const replyContent = event.target.previousElementSibling.value.trim();
+        
+        // Знаходимо повідомлення, на яке відповідаємо
+        const messageElement = event.target.closest('.message');
+        
+        // Перевіряємо наявність контейнера відповідей
+        let repliesContainer = document.getElementById(`replies-container-${parentId}`);
+        
+        // Знаходимо кнопку "Show replies"
+        const showRepliesButton = document.getElementById(`show-replies-button-${parentId}`);
+        
+        // Якщо є кнопка показу відповідей, змінюємо її стан на "розгорнуто"
+        if (showRepliesButton) {
+            // Зберігаємо стан у localStorage
+            localStorage.setItem(`replies-expanded-${parentId}`, 'true');
+            localStorage.setItem(`replies-timestamp-${parentId}`, Date.now().toString());
+            
+            // Оновлюємо стан і текст кнопки
+            showRepliesButton.dataset.expanded = 'true';
+            showRepliesButton.textContent = 'Hide replies';
+            
+            // Якщо є контейнер відповідей, показуємо його
+            if (repliesContainer) {
+                repliesContainer.style.display = 'block';
+            }
+        }
+        
+        // Відправляємо повідомлення, тільки якщо є вміст
+        if (replyContent) {
+            // Функція для відправки повідомлення з автооновленням
+            sendMessage(replyContent, parentId);
+            event.target.previousElementSibling.value = '';  // Очистити поле вводу
+            
+            // При відправці нової відповіді, оновлюємо та показуємо всі відповіді
+            const courseId = window.location.pathname.split('/course/').pop();
+            
+            // Додаємо затримку, щоб дочекатися оновлення даних на сервері
+            setTimeout(() => {
+                fetchComments(courseId);  // Оновлюємо всі коментарі
+            }, 300);
+        }
     }
-}
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-const courseId = window.location.pathname.split('/course/').pop();
-fetchComments(courseId);
-});
+const handleReply = async (messageId, replyText) => {
+    const parentMessage = document.querySelector(`.message[data-message-id="${messageId}"]`);
+    if (!parentMessage) return;
+
+    const parentUsername = parentMessage.querySelector('.username').textContent;
+    const formattedReplyText = replyText.startsWith(`@${parentUsername}`) 
+        ? replyText 
+        : `@${parentUsername} ${replyText}`;
+
+    const replyMessage = {
+        user_id: localStorage.getItem('userId'),
+        parent_comment_id: messageId,
+        course_id: window.location.pathname.split('/course/').pop(),
+        content: formattedReplyText,
+    };
+
+    try {
+        const response = await fetch('http://localhost:8000/api/comments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(replyMessage),
+        });
+
+        if (response.ok) {
+            const replyData = await response.json();
+
+            // Перевіряємо чи необхідно змінити стан кнопки "Show replies"
+            const showRepliesButton = document.getElementById(`show-replies-button-${messageId}`);
+            if (showRepliesButton) {
+                showRepliesButton.dataset.expanded = 'true';
+                showRepliesButton.textContent = 'Hide replies';
+                localStorage.setItem(`replies-expanded-${messageId}`, 'true');
+                localStorage.setItem(`replies-timestamp-${messageId}`, Date.now().toString());
+
+                // Розгортаємо контейнер відповідей, якщо він є
+                const repliesContainer = document.getElementById(`replies-container-${messageId}`);
+                if (repliesContainer) {
+                    repliesContainer.style.display = 'block';
+                }
+            }
+            
+            // Оновлюємо коментарі щоб побачити нову відповідь
+            fetchComments(replyMessage.course_id);
+        } else {
+            throw new Error('Failed to send reply');
+        }
+    } catch (error) {
+        console.error('Error while sending reply:', error);
+    }
+};
+
+// Оновлена функція showReplies, яка також оновлює текст кнопки
+function showReplies(parentElement, parentMessageId, replies) {
+    // Рендеримо всі відповіді
+    renderReplies(replies, parentMessageId);
+
+    // Показуємо контейнер для відповідей
+    const repliesContainer = getRepliesContainer(parentElement) || 
+                            document.getElementById(`replies-container-${parentMessageId}`);
+    if (repliesContainer) {
+        repliesContainer.style.display = 'block';
+    }
+
+    // Оновлюємо стан і текст кнопки
+    const showRepliesButton = document.getElementById(`show-replies-button-${parentMessageId}`);
+    if (showRepliesButton) {
+        showRepliesButton.dataset.expanded = 'true';
+        showRepliesButton.textContent = 'Hide replies';
+        
+        // Оновлюємо localStorage
+        localStorage.setItem(`replies-expanded-${parentMessageId}`, 'true');
+        localStorage.setItem(`replies-timestamp-${parentMessageId}`, Date.now().toString());
+    }
+} 
 
 const initializeDiscussionListeners = () => {
 const sendButton = document.querySelector('.send');
