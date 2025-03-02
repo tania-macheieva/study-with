@@ -591,95 +591,99 @@
             function getCurrentLanguage() {
                 return localStorage.getItem('language') || 'en'; // Якщо мова не збережена, за замовчуванням англійська
             }
-            async function loadUserReplies() {
-                try {
-                    const userId = localStorage.getItem('userId');
-                    if (!userId) {
-                        console.warn('User ID не знайдено в localStorage');
-                        return;
-                    }
+                async function loadUserReplies() {
+                    try {
+                        const userId = localStorage.getItem('userId');
+                        if (!userId) {
+                            console.warn('User ID не знайдено в localStorage');
+                            return;
+                        }
 
-                    
-                    // Запит для отримання відповідей на коментарі користувача
-                    const repliesResponse = await fetch(`/api/comments/replies/${userId}`);
-                    if (!repliesResponse.ok) throw new Error('Не вдалося завантажити відповіді');
-                    const replies = await repliesResponse.json();
-                    
-                    // Запит для отримання головних коментарів до курсів цього користувача
-                    const mainCommentsResponse = await fetch(`/api/comments/course-owner/${userId}`);
-                    if (!mainCommentsResponse.ok) throw new Error('Не вдалося завантажити коментарі');
-                    const mainComments = await mainCommentsResponse.json();
+                        
+                        // Запит для отримання відповідей на коментарі користувача
+                        const repliesResponse = await fetch(`/api/comments/replies/${userId}`);
+                        if (!repliesResponse.ok) throw new Error('Не вдалося завантажити відповіді');
+                        const replies = await repliesResponse.json();
+                        
+                        // Запит для отримання головних коментарів до курсів цього користувача
+                        const mainCommentsResponse = await fetch(`/api/comments/course-owner/${userId}`);
+                        if (!mainCommentsResponse.ok) throw new Error('Не вдалося завантажити коментарі');
+                        const mainComments = await mainCommentsResponse.json();
 
-                    const messagesContainer = document.getElementById('messages-container');
-                    if (!messagesContainer) return;
-                    messagesContainer.innerHTML = '';
-                    const lang = getCurrentLanguage(); 
-                    
-                    if ((!replies || replies.length === 0) && (!mainComments || mainComments.length === 0)) {
-                        messagesContainer.innerHTML = `<p class="no-replies">${translations[lang].noReplies}</p>`;
-                        return;
-                    }
-            
-                    function truncateText(text, maxWords = 50) {
-                        const words = text.split(' ');
-                        return words.length > maxWords ? words.slice(0, maxWords).join(' ') + '...' : text;
-                    }
-            
-                    function createMessageItem(comment, isReply = false) {
-                        const truncatedContent = truncateText(comment.content);
-                        const userImage = comment.profile_image
-                            ? `<img src="${comment.profile_image}" alt="${comment.user_name}" class="user-avatar">`
-                            : `<div class="default-avatar">${comment.user_name[0]}</div>`;
-            
-                        const commentLink = `/course/${comment.course_id}#comment-${comment.comment_id}`;
-                        const courseThumbnail = comment.course_thumbnail
-                            ? `<img src="/uploads/${comment.course_thumbnail}" alt="${comment.course_name}" class="course-thumbnail">`
-                            : '';
-            
-                        return `
-                            <div class="message-item">
-                                <div class="message-header">
-                                    ${userImage}
-                                    <div>
-                                        <strong class="user-name">${comment.user_name}</strong>
-                                        <p class="comment-time">${new Date(comment.created_at).toLocaleString()}</p>
+                        const messagesContainer = document.getElementById('messages-container');
+                        if (!messagesContainer) return;
+                        messagesContainer.innerHTML = '';
+                        const lang = getCurrentLanguage(); 
+                        
+                        if ((!replies || replies.length === 0) && (!mainComments || mainComments.length === 0)) {
+                            messagesContainer.innerHTML = `<p class="no-replies">${translations[lang].noReplies}</p>`;
+                            return;
+                        }
+                
+                        function truncateText(text, maxWords = 50) {
+                            const words = text.split(' ');
+                            return words.length > maxWords ? words.slice(0, maxWords).join(' ') + '...' : text;
+                        }
+                
+                        function createMessageItem(comment, isReply = false) {
+                            const truncatedContent = truncateText(comment.content);
+                            const userImage = comment.profile_image
+                                ? `<img src="${comment.profile_image}" alt="${comment.user_name}" class="user-avatar">`
+                                : `<img src="/images/user-avatar.png" alt="Default Avatar" class="user-avatar">`;
+                        
+                            const commentLink = `/course/${comment.course_id}#comment-${comment.comment_id}`;
+                            const courseThumbnail = comment.course_thumbnail
+                                ? `<img src="/uploads/${comment.course_thumbnail}" alt="${comment.course_name}" class="course-thumbnail">`
+                                : '';
+                        
+                            // Додаємо різні класи для відповіді і головного коментаря
+                            const messageClass = isReply ? 'message-item reply' : 'message-item main-comment';
+                        
+                            return `
+                                <div class="${messageClass}">
+                                    <div class="message-header">
+                                        ${userImage}
+                                        <div>
+                                            <strong class="user-name">${comment.user_name}</strong>
+                                            <p class="comment-time">${new Date(comment.created_at).toLocaleString()}</p>
+                                        </div>
+                                        <div class="course-info">
+                                            ${courseThumbnail}
+                                            <p class="course-name">${comment.course_name}</p>
+                                        </div>  
                                     </div>
-                                    <div class="course-info">
-                                        ${courseThumbnail}
-                                        <p class="course-name">${comment.course_name}</p>
-                                    </div>  
+                        
+                                    <p class="comment-content">${truncatedContent}</p>
+                        
+                                    ${isReply ? `<div class="reply-to-container">
+                                        <p class="reply-to">${translations[lang].responseTo} <em>“${truncateText(comment.parent_comment_content)}”</em></p>
+                                    </div>` : ''}
+                        
+                                    <button onclick="location.href='${commentLink}'" class="go-to-comment">${translations[lang].goToCourse}</button>
                                 </div>
-                                
-                                <p class="comment-content">${truncatedContent}</p>
-                                
-                                ${isReply ? `<div class="reply-to-container">
-                                    <p class="reply-to">${translations[lang].responseTo} <em>“${truncateText(comment.parent_comment_content)}”</em></p>
-                                </div>` : ''}
-            
-                                <button onclick="location.href='${commentLink}'" class="go-to-comment">${translations[lang].goToCourse}</button>
-                            </div>
-                        `;
-                    }
-            
-                    // Додаємо відповіді на коментарі користувача
-                    replies.forEach(reply => {
-                        messagesContainer.innerHTML += createMessageItem(reply, true);
-                    });
-            
-                    // Додаємо головні коментарі до курсів користувача
-                    mainComments.forEach(comment => {
-                        messagesContainer.innerHTML += createMessageItem(comment, false);
-                    });
-            
-                } catch (error) {
-                    console.error('Помилка завантаження коментарів:', error);
-                    const messagesContainer = document.getElementById('messages-container');
-                    if (messagesContainer) {
-                        messagesContainer.innerHTML = `<p class="error-message">${translations[getCurrentLanguage()].contentNotFound}</p>`;
+                            `;
+                        }
+                        
+                
+                        // Додаємо відповіді на коментарі користувача
+                        replies.forEach(reply => {
+                            messagesContainer.innerHTML += createMessageItem(reply, true);
+                        });
+                
+                        // Додаємо головні коментарі до курсів користувача
+                        mainComments.forEach(comment => {
+                            messagesContainer.innerHTML += createMessageItem(comment, false);
+                        });
+                
+                    } catch (error) {
+                        console.error('Помилка завантаження коментарів:', error);
+                        const messagesContainer = document.getElementById('messages-container');
+                        if (messagesContainer) {
+                            messagesContainer.innerHTML = `<p class="error-message">${translations[getCurrentLanguage()].contentNotFound}</p>`;
+                        }
                     }
                 }
-            }
-            
+                
 
             // Головна функція для заповнення форми профілю
             async function populateProfileForm(userId) {

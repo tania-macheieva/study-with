@@ -951,7 +951,6 @@ p {
     width: 55px;
     height: 55px;
     border-radius: 50%;
-    background-color: #007bff;
     color: white;
     font-size: 22px;
     display: flex;
@@ -959,11 +958,7 @@ p {
     justify-content: center;
     margin-right: 15px;
     transition: background-color 0.3s ease;
-}
-
-.user-avatar:hover,
-.default-avatar:hover {
-    background-color: #0056b3;
+    object-fit: cover;  /* Додаємо властивість для кращої обробки зображень */
 }
 
 .user-name { 
@@ -1005,17 +1000,16 @@ p {
  
 /* Контент коментаря */
 .comment-content {
-    font-size: 15px;
-    margin: 15px 0;
-    line-height: 1.6;
+    font-size: 16px !important;
+    margin: 12px 0;
+    line-height: 1.5; 
     color: #333;
-    padding: 15px;
-    border-radius: 8px;
+    padding: 12px;
+    border-radius: 6px;
     background: linear-gradient(145deg, #f6f5f5, #ededed); /* Легкий градієнт */
     position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease-in-out;
-} 
+    overflow: hidden; 
+}    
 
 /* Стиль для кнопки переходу до курсу */
 .go-to-comment {
@@ -1047,10 +1041,12 @@ p {
     border-left: 3px solid #545f7a;
     margin-bottom: 15px;
     font-style: italic;
-    color: #555;
-    font-size: 14px;
+    color: #555; 
 }
- 
+
+.reply-to {
+    font-size: 16px !important;
+}
 /* Стилі для повідомлення, якщо немає відповідей */
 .error-message {
     color: red;
@@ -1063,4 +1059,24 @@ p {
     text-align: center;
     font-size: 16px;
     color: #777;
+}
+
+.message-item.main-comment {
+    background-color: #f1f8ff;
+}
+ 
+.message-item.reply {
+    background-color: #ffff; 
+  }
+
+.message-item.main-comment .comment-content {  
+    font-size: 16px; /* Трохи менший розмір шрифта */
+    margin: 12px 0; /* Менший вертикальний відступ */
+    line-height: 1.5; /* Стиснута висота рядка */
+    color: #333; /* Темно-сірий колір для тексту */
+    padding: 12px; /* Внутрішні відступи */
+    background: linear-gradient(145deg, #e4ebf2, #e3e9ef); 
+    position: relative;
+    overflow: hidden;
+    border-radius: 6px; 
 }

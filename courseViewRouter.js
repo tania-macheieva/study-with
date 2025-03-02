@@ -639,8 +639,8 @@ router.get('/comments/replies/:user_id', async (req, res) => {
                 c2.content AS parent_comment_content,
                 u2.name AS parent_username,
                 c.course_id,
-                cr.name AS course_name, -- Додано курс
-                cr.image_url AS course_thumbnail -- Додано зображення курсу
+                cr.name AS course_name,
+                cr.image_url AS course_thumbnail 
             FROM comments c
             JOIN users u ON c.user_id = u.id
             LEFT JOIN comments c2 ON c.parent_comment_id = c2.id
@@ -674,26 +674,26 @@ router.get('/comments/course-owner/:user_id', async (req, res) => {
                 c.created_at, 
                 u.name AS user_name, 
                 u.profile_image,
+                s.profile_image,
                 c.course_id,
                 cr.name AS course_name, 
                 cr.image_url AS course_thumbnail
             FROM comments c
             JOIN users u ON c.user_id = u.id
             JOIN all_courses cr ON c.course_id = cr.id
+            LEFT JOIN students s ON u.id = s.user_id     
             WHERE cr.author_id = $1 AND c.parent_comment_id IS NULL
             ORDER BY c.created_at DESC
         `;
-        const { rows } = await db.query(query, [user_id]); // Додаємо параметр
-        
+        const { rows } = await db.query(query, [user_id]);
 
         console.log(`Знайдено ${rows.length} головних коментарів`);
         res.json(rows);
     } catch (error) {
         console.error('Помилка отримання головних коментарів:', error);
         res.status(500).json({ error: 'Не вдалося отримати головні коментарі' });
-    }
+    } 
 });
-
 
 
 module.exports = router;
