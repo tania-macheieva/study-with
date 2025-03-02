@@ -315,4 +315,15 @@ BEFORE INSERT ON certificates
 FOR EACH ROW
 EXECUTE FUNCTION generate_certificate_number();
 
+CREATE TABLE notes (
+    id SERIAL PRIMARY KEY,
+    userId INTEGER NOT NULL,
+    courseId INTEGER NOT NULL,
+    lectureId INTEGER NULL,
+    text TEXT NOT NULL,
+    videoTimecode VARCHAR(50) NULL,
+    timestamp TIMESTAMP DEFAULT NOW(),
+    createdAt TIMESTAMP DEFAULT NOW(),
+    updatedAt TIMESTAMP DEFAULT NOW()
+);
 
