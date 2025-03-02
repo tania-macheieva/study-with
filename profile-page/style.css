@@ -467,6 +467,7 @@ p {
 
 .course img {
     width: 250px;
+    height: 180px;
     border-radius: 12px;
 }
 .courses-list {
@@ -720,6 +721,7 @@ p {
 
 .bookmark img {
     width: 250px;
+    height: 180px;
     border-radius: 12px;
 }
 
@@ -946,8 +948,8 @@ p {
 
 .user-avatar,
 .default-avatar {
-    width: 50px;
-    height: 50px;
+    width: 55px;
+    height: 55px;
     border-radius: 50%;
     background-color: #007bff;
     color: white;
@@ -964,29 +966,28 @@ p {
     background-color: #0056b3;
 }
 
-.user-name {
-    font-weight: bold;
+.user-name { 
     font-size: 18px;
     margin-bottom: 5px;
 }
 
 .comment-time {
-    color: #999;
-    font-size: 13px;
+    margin-left: auto;
+    font-size: 15px !important;
+    color: #666666 !important;
 }
- 
+
 .course-info {
     display: flex;
     align-items: center;
     margin-top: 15px;
     padding: 10px;
     border-radius: 8px; 
-    border: 1px solid #545f7a;
-    transition: background-color 0.3s ease; 
-    width: 75%;
-    margin-left: 5%;
+    border: 1px solid #545f7a; 
+    width: 85%;
+    margin-left: 3%; 
 }
- 
+
 .course-thumbnail {
     width: 50px;
     height: 50px;
@@ -996,10 +997,9 @@ p {
 } 
 
 .course-name {
-    font-size: 16px;
+    font-size: 16px !important;;
     font-weight: bold;
-    color: #545f7a;
-    cursor: pointer;
+    color: #545f7a; 
     transition: color 0.3s ease;
 }
  
@@ -1009,7 +1009,13 @@ p {
     margin: 15px 0;
     line-height: 1.6;
     color: #333;
-}
+    padding: 15px;
+    border-radius: 8px;
+    background: linear-gradient(145deg, #f6f5f5, #ededed); /* Легкий градієнт */
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+} 
 
 /* Стиль для кнопки переходу до курсу */
 .go-to-comment {
@@ -1023,7 +1029,7 @@ p {
     text-decoration: none;
     font-size: 14px;
     transition: background-color 0.3s ease;
-    display: inline-block;
+    display: inline-block; 
 }
 
 .go-to-comment:hover {

@@ -634,7 +634,8 @@ router.get('/comments/replies/:user_id', async (req, res) => {
                 c.created_at,
                 c.parent_comment_id,
                 u.name AS user_name, 
-                u.profile_image,
+                u.profile_image,    
+                s.profile_image, 
                 c2.content AS parent_comment_content,
                 u2.name AS parent_username,
                 c.course_id,
@@ -644,6 +645,8 @@ router.get('/comments/replies/:user_id', async (req, res) => {
             JOIN users u ON c.user_id = u.id
             LEFT JOIN comments c2 ON c.parent_comment_id = c2.id
             LEFT JOIN users u2 ON c2.user_id = u2.id
+            LEFT JOIN teachers t ON u.id = t.user_id
+            LEFT JOIN students s ON u.id = s.user_id
             JOIN all_courses cr ON c.course_id = cr.id
             WHERE EXISTS (
                 SELECT 1 FROM comments WHERE id = c.parent_comment_id AND user_id = $1
@@ -657,6 +660,37 @@ router.get('/comments/replies/:user_id', async (req, res) => {
     } catch (error) {
         console.error('Помилка отримання відповідей:', error);
         res.status(500).json({ error: 'Не вдалося отримати відповіді' });
+    }
+});
+router.get('/comments/course-owner/:user_id', async (req, res) => {
+    const { user_id } = req.params;
+    console.log(`Запит на головні коментарі для курсів user_id: ${user_id}`);
+
+    try {
+        const query = `
+            SELECT 
+                c.id AS comment_id, 
+                c.content, 
+                c.created_at, 
+                u.name AS user_name, 
+                u.profile_image,
+                c.course_id,
+                cr.name AS course_name, 
+                cr.image_url AS course_thumbnail
+            FROM comments c
+            JOIN users u ON c.user_id = u.id
+            JOIN all_courses cr ON c.course_id = cr.id
+            WHERE cr.author_id = $1 AND c.parent_comment_id IS NULL
+            ORDER BY c.created_at DESC
+        `;
+        const { rows } = await db.query(query, [user_id]); // Додаємо параметр
+        
+
+        console.log(`Знайдено ${rows.length} головних коментарів`);
+        res.json(rows);
+    } catch (error) {
+        console.error('Помилка отримання головних коментарів:', error);
+        res.status(500).json({ error: 'Не вдалося отримати головні коментарі' });
     }
 });
 

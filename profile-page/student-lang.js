@@ -49,7 +49,11 @@ const translations = {
         openAccount: 'Open Account',
         noCourses: 'You haven\'t enrolled in any courses yet.',
         btnShowLess: 'Show less',
-        noLinkedCourses: "You have no saved courses yet"
+        noLinkedCourses: "You have no saved courses yet",
+        contentNotFound: "Content not found.",
+        noReplies: "There are no notifications.",
+        responseTo: "Response to: ",
+        goToCourse: "Go to the course",
     },
     ua: {
         pageTitle: 'Study With | Профіль',
@@ -101,7 +105,12 @@ const translations = {
         openAccount: 'Відкрити акаунт',
         noCourses: 'Ви ще не записались на жодний курс.',
         btnShowLess: 'Показати менше',
-        noLinkedCourses: 'У вас ще немає збережених курсів'
+        noLinkedCourses: 'У вас ще немає збережених курсів',
+        contentNotFound: "Вміст не знайдено.",
+        noReplies: "Сповіщень немає.",
+        responseTo: "Відповідь на: ",
+        goToCourse: "Перейти до курсу",
+
     }
 };
 
@@ -533,16 +542,19 @@ tabLinks.forEach(tab => {
         applyLanguage(localStorage.getItem('language') || 'en');
     });
 });
+function getCurrentLanguage() {
+    return localStorage.getItem('language') || 'en'; // Якщо мова не збережена, за замовчуванням англійська
+}
 async function loadUserReplies() {
     try {
         const userId = localStorage.getItem('userId');
         if (!userId) {
-            console.warn('❗ User ID не знайдено в localStorage');
+            console.warn('User ID не знайдено в localStorage');
             return;
         }
 
         const response = await fetch(`/api/comments/replies/${userId}`);
-        if (!response.ok) throw new Error('❌ Не вдалося завантажити відповіді');
+        if (!response.ok) throw new Error('Не вдалося завантажити відповіді');
 
         const replies = await response.json();
         const messagesContainer = document.getElementById('messages-container');
@@ -550,8 +562,10 @@ async function loadUserReplies() {
         if (!messagesContainer) return;
         messagesContainer.innerHTML = '';
 
+        const lang = getCurrentLanguage(); // Отримуємо поточну мову
+
         if (!replies || replies.length === 0) {
-            messagesContainer.innerHTML = '<p class="no-replies">📭 Немає нових відповідей.</p>';
+            messagesContainer.innerHTML = `<p class="no-replies">${translations[lang].noReplies}</p>`;
             return;
         }
 
@@ -587,8 +601,8 @@ async function loadUserReplies() {
             messageItem.innerHTML = `
                 <div class="message-header">
                     ${userImage}
-                    <div class="user-inf">
-                        <p class="user-name">${reply.user_name}</p>
+                    <div>
+                        <strong class="user-name">${reply.user_name}</strong>
                         <p class="comment-time">${new Date(reply.created_at).toLocaleString()}</p>
                     </div>
                     <div class="course-info">
@@ -597,24 +611,23 @@ async function loadUserReplies() {
                     </div>  
                 </div>
                 
-                <p class="comment-content">💬 ${truncatedReply}</p>
+                <p class="comment-content">${truncatedReply}</p>
                 
-                <!-- Оновлене розміщення відповіді на коментар -->
                 <div class="reply-to-container">
-                    <p class="reply-to">Відповідь на: <em>“${truncatedParent}”</em></p>
+                    <p class="reply-to">${translations[lang].responseTo} <em>“${truncatedParent}”</em></p>
                 </div>
 
-                <button onclick="location.href='${commentLink}'" class="go-to-comment">Перейти до курсу</button>
+                <button onclick="location.href='${commentLink}'" class="go-to-comment">${translations[lang].goToCourse}</button>
             `;
 
             messagesContainer.appendChild(messageItem);
         });
 
     } catch (error) {
-        console.error('🚨 Помилка завантаження відповідей:', error);
+        console.error('Помилка завантаження відповідей:', error);
         const messagesContainer = document.getElementById('messages-container');
         if (messagesContainer) {
-            messagesContainer.innerHTML = '<p class="error-message"> Виникла помилка. Спробуйте пізніше.</p>';
+            messagesContainer.innerHTML = `<p class="error-message">${translations[getCurrentLanguage()].contentNotFound}</p>`;
         }
     }
 }
