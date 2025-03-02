@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('./db');
-const fetch = require('node-fetch');
+//const fetch = require('node-fetch');
 require('dotenv').config();
 
 router.get('/course/:courseId', async (req, res) => {
@@ -694,6 +694,98 @@ router.get('/comments/course-owner/:user_id', async (req, res) => {
         res.status(500).json({ error: 'Не вдалося отримати головні коментарі' });
     } 
 });
+// Додавання нової нотатки 
+router.post('/notes/add', async (req, res) => {
+    try {
+        const { userId, courseId,  lectureId, text, videoTimecode } = req.body;
+
+        if (!userId || !courseId || !text) {
+            return res.status(400).json({ error: 'userId, courseId та text обов\'язкові' });
+        }
+
+        const result = await db.query(
+            `INSERT INTO notes (userId, courseId, lectureId, text, videoTimecode, timestamp) 
+             VALUES ($1, $2, $3, $4, $5,  NOW()) RETURNING *`,
+            [userId, courseId,  lectureId, text, videoTimecode]
+        );
+
+        res.status(201).json(result.rows[0]);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Отримання нотаток для конкретного курсу та лекції
+router.get('/notes', async (req, res) => {
+    try {
+        const { userId, courseId, lectureId } = req.query;
+
+        if (!userId || !courseId || !lectureId) {
+            return res.status(400).json({ error: 'userId, courseId та lectureId обов\'язкові' });
+        }
+
+        const result = await db.query(
+            'SELECT * FROM notes WHERE userId = $1 AND courseId = $2 AND lectureId = $3 ORDER BY timestamp DESC',
+            [userId, courseId, lectureId]
+        );
+
+        res.json(result.rows); // Повертаємо всі нотатки для цієї лекції
+    } catch (error) {
+        console.error('Error retrieving notes:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+// Оновлення нотатки за ID
+router.put('/notes/:id', async (req, res) => {
+    try {
+        const { id } = req.params; // Отримуємо ID нотатки з URL
+        const { text } = req.body; // Отримуємо новий текст з тіла запиту
+
+        if (!text || text.trim() === '') {
+            return res.status(400).json({ error: 'Text cannot be empty' });
+        }
+
+        const result = await db.query(
+            `UPDATE notes 
+             SET text = $1, timestamp = NOW() 
+             WHERE id = $2 
+             RETURNING *`,
+            [text, id]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Note not found' });
+        }
+
+        res.json({ message: 'Note updated successfully', note: result.rows[0] });
+    } catch (error) {
+        console.error('Error updating note:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
+//  Видалення нотатки за ID
+router.delete('/notes/delete/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const result = await db.query(
+            'DELETE FROM notes WHERE id = $1 RETURNING *',
+            [id]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Note not found' });
+        }
+
+        res.json({ message: 'Note successfully deleted' });
+    } catch (error) {
+        console.error('Error deleting note:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 
 
 module.exports = router;

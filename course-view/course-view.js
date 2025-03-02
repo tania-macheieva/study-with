@@ -14,8 +14,48 @@ const VIDEO_SOURCE = {
 const NOTES = {
     list: [],
     
+    // Додавання нової нотатки (відправка на сервер)
+    add: async function(data ) {
+        console.log('📩 Відправка нотатки:',data );
+      
+     
+        try {
+            const response = await fetch('http://localhost:8000/api/notes/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data )
+            });
+            console.log('Server response:', response);
+            if (!response.ok) throw new Error('Error adding note');
+            
+            const newNote = await response.json();
+            this.list.push(newNote);
+            this.saveToLocalStorage();
+            return newNote;
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+    },
+
+    // Видалення нотатки на сервері
+    remove: async function(noteId) {
+        try {
+            const response = await fetch(`http://localhost:8000/api/notes/delete/${noteId}`, { method: 'DELETE' });
+            if (!response.ok) throw new Error('Помилка видалення нотатки');
+
+            this.list = this.list.filter(note => note.id !== noteId);
+            this.saveToLocalStorage();
+            return true;
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    },
+
+
     // Додавання нової нотатки
-    add: function(data) {
+    /*add: function(data) {
         const note = {
             id: Date.now(),
             text: data.text,
@@ -30,7 +70,7 @@ const NOTES = {
         this.list.push(note);
         this.saveToLocalStorage();
         return note;
-    },
+    },*/
     
     // Отримання всіх нотаток
     getAll: function() {
@@ -80,7 +120,10 @@ const allNotes = NOTES.getAll();
 const moduleNotes = NOTES.getByModule(1);
 
 
-const renderNotes = () => {
+const renderNotes =async (userId, courseId) => {
+    // Завантажуємо нотатки з сервера
+    const allNotes = await NOTES.fetchNotes(userId, courseId);
+
     const notesSection = document.createElement('section');
     notesSection.classList.add('notes-section');
     Object.assign(notesSection.style, {
@@ -107,9 +150,6 @@ const renderNotes = () => {
             </div>
         </div>
     `;
-
-    // Отримуємо всі нотатки
-    const allNotes = NOTES.getAll();
 
     // Створюємо контейнер для списку нотаток
     const notesListContainer = document.createElement('div');
@@ -258,12 +298,20 @@ const renderNotes = () => {
                                 fontSize: '12px',
                                 color: ' #283044'
                             });
+                                      
+                            deleteButton.addEventListener('click', async () => {
+                                const success = await NOTES.remove(note.id);
+                                if (success) {
+                                    renderNotes(userId, courseId); 
+                                }
+                            });                    
                     
                             noteActions.appendChild(editButton);
                             noteActions.appendChild(deleteButton);
                     
                             noteElement.appendChild(noteContent);
                             noteElement.appendChild(noteActions);
+                            //notesListContainer.appendChild(noteElement);
 
                             topicSection.appendChild(noteElement);
                         });
@@ -276,7 +324,10 @@ const renderNotes = () => {
             }
         });
     };
-
+   
+    // Отримуємо відео та додаємо кнопку
+    const videoElement = document.querySelector('video');
+    addNoteButtonToVideo(videoElement, 1, 101, 4619, 25268);
     // Додаємо обробники подій для кнопок фільтрів
     filtersSection.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -297,14 +348,56 @@ const renderNotes = () => {
 
     return notesSection;
 };
+const handleNoteButtonClick = async (videoElement, userId, courseId, topicId,lectureId) => {
+    const currentTime = videoElement.currentTime;  // Отримуємо поточний час відео
+
+    // Додаємо нотатку на сервер
+    const newNote = await NOTES.add({
+        userId,
+        courseId,
+        topicId:lectureId,
+        text: noteText,
+        videoTimecode: currentTime.toFixed(2) // Зберігаємо точний час у відео
+    });
+
+    if (newNote) {
+        renderNotes(userId, courseId);  // Оновлюємо список нотаток після додавання
+    }
+};
+
+// Додаємо кнопку нотатки до відео
+const addNoteButtonToVideo = (videoElement, userId, courseId, topicId, lectureId) => {
+    const noteButton = document.createElement('button');
+    noteButton.textContent = 'Add Note';
+    Object.assign(noteButton.style, {
+        position: 'absolute',
+        top: '10px',
+        right: '10px',
+        background: '#ffcc00',
+        border: 'none',
+        padding: '10px',
+        cursor: 'pointer'
+    });
+
+    noteButton.addEventListener('click', () => {
+        videoElement.pause();
+        const currentTime = formatVideoTime(videoElement.currentTime);
+        console.log('📩 Передаємо lectureId у showNotesModal():', lectureId);
+        showNotesModal(currentTime, userId, courseId, lectureId);
+    });
+    videoElement.parentElement.appendChild(noteButton);
+};
+
 
 NOTES.list = [];
 // Додавання нотатки до відео
-NOTES.add({
-    text: 'tvruertbevercwe',
-    videoTimecode: '0:19',
-    moduleId: 1,
-    topicId: 1,
+/*await NOTES.add({
+    userId: 1,   // Додай ID користувача
+    courseId: 101, // Додай ID курсу
+    text: 'ррррррр',
+    videoTimecode: '00:00',
+    moduleId: 4617,
+    topicId: 25258,
     contentType: 'video'
 });
 
@@ -330,9 +423,9 @@ NOTES.add({
     moduleId: 1,
     topicId: 2,
     contentType: 'video'
-});
+});*/
 
-const createVideoPlayer = (videoUrl, videoType, onComplete, lectureId) => {
+const createVideoPlayer = (videoUrl, videoType, userId, courseId, onComplete, lectureId, moduleId, topicId) => {
     const videoContainer = document.querySelector('.video-player');
     if (!videoContainer) return;
 
@@ -419,13 +512,14 @@ const createVideoPlayer = (videoUrl, videoType, onComplete, lectureId) => {
     notesButton.addEventListener('click', () => {
         videoElement.pause();
         const currentTime = formatVideoTime(videoElement.currentTime);
-        showNotesModal(currentTime, lectureId);
+        showNotesModal(currentTime, userId, courseId, lectureId);
     });
 
     return videoElement;
 };
 
-const saveNote = (noteData) => {
+
+/*const saveNote = (noteData) => {
     const existingNotes = JSON.parse(localStorage.getItem('videoNotes') || '[]');
     existingNotes.push({
         ...noteData,
@@ -434,6 +528,13 @@ const saveNote = (noteData) => {
     });
     localStorage.setItem('videoNotes', JSON.stringify(existingNotes));
     alert('Note saved successfully!');
+};*/
+const saveNote = async (noteData) => {
+    const newNote = await NOTES.add(noteData);
+    if (newNote) {
+        alert('Note saved successfully!');
+        await renderNotes(noteData.userId, noteData.courseId); // Оновлення списку нотаток
+    }
 };
 
 const formatVideoTime = (timeInSeconds) => {
@@ -442,7 +543,17 @@ const formatVideoTime = (timeInSeconds) => {
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 };
 
-const showNotesModal = (currentTime, lectureId) => {
+const showNotesModal = (currentTime, userId, lectureId) => {
+    console.log('We open a modal window with parameters:', { currentTime, userId, lectureId});
+    if (!lectureId) {
+        lectureId = localStorage.getItem('currentLectureId');
+        console.log('Extract lectureId from localStorage:', lectureId);
+    }
+
+    if (!lectureId) {
+        console.error('lectureId is still missing!');
+        return;
+    }
     const existingModal = document.querySelector('.notes-modal');
     if (existingModal) {
         existingModal.remove();
@@ -498,23 +609,191 @@ const showNotesModal = (currentTime, lectureId) => {
 
     modal.querySelector('.cancel-button').addEventListener('click', closeModal);
     overlay.addEventListener('click', closeModal);
-    modal.querySelector('.save-button').addEventListener('click', () => {
+    modal.querySelector('.save-button').addEventListener('click', async () => {
         const noteText = modal.querySelector('textarea').value;
         const timestamp = modal.querySelector('.video-timestamp').textContent;
         if (noteText.trim()) {
-            const topicElement = document.querySelector(`[data-topic-id="${lectureId}"]`);
-            const moduleElement = topicElement?.closest('.module');
-            
-            NOTES.add({
+            const userId = localStorage.getItem('userId');
+            const courseId = window.location.pathname.split('/course/').pop();
+            console.log('✅ Збереження нотатки з lectureId:', lectureId);
+           
+            await NOTES.add({
+                userId,
+                courseId,
+                lectureId,
                 text: noteText,
-                videoTimecode: timestamp,
-                moduleId: moduleElement ? parseInt(moduleElement.dataset.moduleId) : null,
-                topicId: parseInt(lectureId),
-                contentType: 'video'
+                videoTimecode: currentTime
             });
         }
         closeModal();
     });
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Кнопка відкриття списку нотаток
+    const notesTabButton = document.querySelector('.tabs .tab:nth-child(2)');
+
+    notesTabButton.addEventListener('click', async () => {
+        console.log('Open the modal notes window');
+
+        const userId = localStorage.getItem('userId');
+        const courseId = window.location.pathname.split('/course/').pop();
+        const savedLecture = localStorage.getItem('currentLecture');
+
+        if (!savedLecture) {
+            alert('No lecture selected.');
+            return;
+        }
+
+        const lectureId = JSON.parse(savedLecture); // Отримуємо ID лекції
+        console.log('We are loading notes for:', { userId, courseId, lectureId });
+
+        showNotesListModal(userId, courseId, lectureId);
+    });
+});
+
+// Функція для відкриття модального вікна зі списком нотаток
+const showNotesListModal = async (userId, courseId, lectureId) => {
+    console.log('🔍 Отримуємо нотатки:', { userId, courseId, lectureId });
+
+    const existingModal = document.querySelector('.notes-modal');
+    if (existingModal) existingModal.remove();
+
+    const modal = document.createElement('div');
+    modal.className = 'notes-modal';
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    `;
+   
+
+    modal.innerHTML = `
+        <h3 style="margin: 0 0 15px 0; font-size: 18px;">My Notes</h3>
+        <div class="notes-list" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;">Loading notes...</div>
+        <div class="button-group">
+            <button class="close-button">Close</button>
+        </div>
+    `;
+
+    Object.assign(modal.style, {
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '600px',
+        background: 'white',
+        padding: '20px',
+        borderRadius: '12px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        zIndex: '1000'
+    });
+ 
+    document.body.appendChild(overlay);
+    document.body.appendChild(modal);
+
+    const closeModal = () => {
+        modal.remove();
+        overlay.remove();
+    };
+
+    modal.querySelector('.close-button').addEventListener('click', closeModal);
+    overlay.addEventListener('click', closeModal);
+
+    // Отримання нотаток та оновлення списку
+    loadNotesList(userId, courseId, lectureId, modal.querySelector('.notes-list'));
+};
+
+// Завантаження списку нотаток
+const loadNotesList = async (userId, courseId, lectureId, container) => {
+    try {
+        const response = await fetch(`/api/notes?userId=${userId}&courseId=${courseId}&lectureId=${lectureId}`);
+        const notes = await response.json();
+        console.log('Notes received:', notes);
+
+        container.innerHTML = notes.length
+            ? notes.map(note => `
+                <div class="note-item" data-note-id="${note.id}" style="border: 1px solid #ddd; padding: 10px; border-radius: 6px; margin-bottom: 10px;">
+                    <p contenteditable="false" class="note-text" style="margin: 0; font-size: 14px;">${note.text}</p>
+                    <small style="color: #666;">Video time: ${note.videotimecode} | ${new Date(note.timestamp).toLocaleString()}</small>
+                    <div style="margin-top: 5px;">
+                        <button class="edit-button" style="margin-right: 5px;">Edit</button>
+                        <button class="delete-button" style="color: white; background: #283044">Delete</button>
+                    </div>
+                </div>
+            `).join('')
+            : '<p>No notes yet.</p>';
+
+        // Додаємо обробники подій для кнопок редагування та видалення
+        container.querySelectorAll('.edit-button').forEach(button =>
+            button.addEventListener('click', handleEditNote)
+        );
+
+        container.querySelectorAll('.delete-button').forEach(button =>
+            button.addEventListener('click', handleDeleteNote)
+        );
+    } catch (error) {
+        console.error('Error retrieving notes:', error);
+        container.innerHTML = '<p style="color: red;">Failed to load notes.</p>';
+    }
+};
+
+// Обробка редагування нотатки
+const handleEditNote = (event) => {
+    const noteElement = event.target.closest('.note-item');
+    const noteTextElement = noteElement.querySelector('.note-text');
+    const noteId = noteElement.dataset.noteId;
+
+    if (event.target.textContent === 'Edit') {
+        noteTextElement.contentEditable = 'true';
+        noteTextElement.focus();
+        event.target.textContent = 'Save';
+    } else {
+        noteTextElement.contentEditable = 'false';
+        event.target.textContent = 'Edit';
+        updateNote(noteId, noteTextElement.textContent.trim());
+    }
+};
+
+// Оновлення нотатки
+const updateNote = async (noteId, newText) => {
+    try {
+        const response = await fetch(`/api/notes/${noteId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: newText })
+        });
+
+        if (!response.ok) throw new Error('Failed to update note');
+        console.log('Note updated');
+    } catch (error) {
+        console.error('Error updating note:', error);
+    }
+};
+
+// Видалення нотатки
+const handleDeleteNote = async (event) => {
+    const noteElement = event.target.closest('.note-item');
+    const noteId = noteElement.dataset.noteId;
+
+    if (!confirm('Are you sure you want to delete this note?')) return;
+
+    try {
+        const response = await fetch(`/api/notes/${noteId}`, { method: 'DELETE' });
+        if (!response.ok) throw new Error('Failed to delete note');
+
+        console.log('✅ Нотатка видалена');
+        noteElement.remove();
+    } catch (error) {
+        console.error('❌ Помилка видалення нотатки:', error);
+    }
 };
 
 function createModuleHTML(module) {
@@ -838,7 +1117,16 @@ window.handleLectureClick = async function(lectureId) {
 
         const lectureData = await response.json();
         console.log('Lecture data:', lectureData);
-        
+        if (!lectureData.id) {
+            console.error('❌ lectureData.id відсутній!');
+            return;
+        }
+
+        localStorage.setItem('currentLecture', JSON.stringify(lectureData.id)); // Зберігаємо в localStorage
+        console.log('📌 Збережено в localStorage:', lectureData.id);
+        // Додаємо кнопку нотатки
+     
+
         const videoContainer = document.querySelector('.video-player');
         if (!videoContainer) return;
 
