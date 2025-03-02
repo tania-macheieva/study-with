@@ -437,9 +437,11 @@ const tabContents = {
         <button data-lang="updatePassword">Update password</button>
     `,
     "messages": `
-        <h2 data-lang="messages">Messages</h2>
-        <p data-lang="noMessages">You have no new messages yet.</p>
-    `,
+            <h2 data-lang="messages">Messages</h2>
+            <div id="messages-container">
+                <!-- Replies will be dynamically inserted here -->
+            </div>
+        `,
     "close-account": `
         <h2 data-lang="manageAccount">Manage Account Visibility</h2>
         <p data-lang="privatePublic">You can make your account private or public using the buttons below.</p>
@@ -524,13 +526,100 @@ tabLinks.forEach(tab => {
         modalContentContainer.innerHTML = tabContents[tabName] || "<p>Content not found.</p>";
         modal.style.display = "flex";
         
-        if (tabName === 'profile') {
-            loadStudentData();
+        if (tabName === 'messages') {
+            loadUserReplies();
         }
-        
+
         applyLanguage(localStorage.getItem('language') || 'en');
     });
 });
+async function loadUserReplies() {
+    try {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            console.warn('❗ User ID не знайдено в localStorage');
+            return;
+        }
+
+        const response = await fetch(`/api/comments/replies/${userId}`);
+        if (!response.ok) throw new Error('❌ Не вдалося завантажити відповіді');
+
+        const replies = await response.json();
+        const messagesContainer = document.getElementById('messages-container');
+
+        if (!messagesContainer) return;
+        messagesContainer.innerHTML = '';
+
+        if (!replies || replies.length === 0) {
+            messagesContainer.innerHTML = '<p class="no-replies">📭 Немає нових відповідей.</p>';
+            return;
+        }
+
+        replies.forEach(reply => {
+            const maxWords = 50;
+
+            // Функція для обрізання тексту
+            function truncateText(text) {
+                const words = text.split(' ');
+                return words.length > maxWords ? words.slice(0, maxWords).join(' ') + '...' : text;
+            }
+
+            // Обрізаємо коментар користувача
+            const truncatedReply = truncateText(reply.content);
+
+            // Обрізаємо батьківський коментар
+            const truncatedParent = truncateText(reply.parent_comment_content);
+
+            const userImage = reply.profile_image
+                ? `<img src="${reply.profile_image}" alt="${reply.user_name}" class="user-avatar">`
+                : `<div class="default-avatar">${reply.user_name[0]}</div>`;
+
+            // Формуємо URL з якірним посиланням на коментар
+            const commentLink = `/course/${reply.course_id}#comment-${reply.comment_id}`;
+
+            // Додаємо маленьку картинку курсу
+            const courseThumbnail = reply.course_thumbnail 
+                ? `<img src="/uploads/${reply.course_thumbnail}" alt="${reply.course_name}" class="course-thumbnail">`
+                : '';
+
+            const messageItem = document.createElement('div');
+            messageItem.classList.add('message-item');
+            messageItem.innerHTML = `
+                <div class="message-header">
+                    ${userImage}
+                    <div class="user-inf">
+                        <p class="user-name">${reply.user_name}</p>
+                        <p class="comment-time">${new Date(reply.created_at).toLocaleString()}</p>
+                    </div>
+                    <div class="course-info">
+                        ${courseThumbnail}
+                        <p class="course-name">${reply.course_name}</p>
+                    </div>  
+                </div>
+                
+                <p class="comment-content">💬 ${truncatedReply}</p>
+                
+                <!-- Оновлене розміщення відповіді на коментар -->
+                <div class="reply-to-container">
+                    <p class="reply-to">Відповідь на: <em>“${truncatedParent}”</em></p>
+                </div>
+
+                <button onclick="location.href='${commentLink}'" class="go-to-comment">Перейти до курсу</button>
+            `;
+
+            messagesContainer.appendChild(messageItem);
+        });
+
+    } catch (error) {
+        console.error('🚨 Помилка завантаження відповідей:', error);
+        const messagesContainer = document.getElementById('messages-container');
+        if (messagesContainer) {
+            messagesContainer.innerHTML = '<p class="error-message"> Виникла помилка. Спробуйте пізніше.</p>';
+        }
+    }
+}
+
+
 
 // Закриття модального вікна
 if (closeButton) {

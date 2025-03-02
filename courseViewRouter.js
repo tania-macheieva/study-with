@@ -622,6 +622,43 @@ router.post('/report', async (req, res) => {
         res.status(500).json({ error: 'Failed to report message' });
     }
 });
+router.get('/comments/replies/:user_id', async (req, res) => {
+    const { user_id } = req.params;
+    console.log(`Запит на replies для user_id: ${user_id}`);
+
+    try {
+        const query = `
+            SELECT 
+                c.id AS comment_id, 
+                c.content, 
+                c.created_at,
+                c.parent_comment_id,
+                u.name AS user_name, 
+                u.profile_image,
+                c2.content AS parent_comment_content,
+                u2.name AS parent_username,
+                c.course_id,
+                cr.name AS course_name, -- Додано курс
+                cr.image_url AS course_thumbnail -- Додано зображення курсу
+            FROM comments c
+            JOIN users u ON c.user_id = u.id
+            LEFT JOIN comments c2 ON c.parent_comment_id = c2.id
+            LEFT JOIN users u2 ON c2.user_id = u2.id
+            JOIN all_courses cr ON c.course_id = cr.id
+            WHERE EXISTS (
+                SELECT 1 FROM comments WHERE id = c.parent_comment_id AND user_id = $1
+            )
+            ORDER BY c.created_at DESC`;
+
+        const { rows } = await db.query(query, [user_id]);
+
+        console.log(`Знайдено ${rows.length} відповідей`);
+        res.json(rows);
+    } catch (error) {
+        console.error('Помилка отримання відповідей:', error);
+        res.status(500).json({ error: 'Не вдалося отримати відповіді' });
+    }
+});
 
 
 
