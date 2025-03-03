@@ -141,15 +141,6 @@ const renderNotes =async (userId, courseId) => {
     const filtersSection = document.createElement('div');
     filtersSection.classList.add('filters');
     filtersSection.style.fontFamily = 'Inter, sans-serif';
-    filtersSection.innerHTML = `
-        <div class="filters-right">
-            <div class="filter-group">
-                <button class="filter-btn active">Whole course</button>
-                <button class="filter-btn">Current module</button>
-                <button class="filter-btn">Current topic</button>
-            </div>
-        </div>
-    `;
 
     // Створюємо контейнер для списку нотаток
     const notesListContainer = document.createElement('div');
@@ -181,20 +172,18 @@ const renderNotes =async (userId, courseId) => {
 
     const filterNotes = (filter) => {
         notesListContainer.innerHTML = '';
-        const currentModule = document.querySelector('.module.active')?.dataset.moduleId;
-        const currentTopic = document.querySelector('.topic.active')?.dataset.topicId;
 
         Object.entries(notesByModules).forEach(([moduleId, moduleData]) => {
             let shouldShowModule = false;
 
-            switch(filter) {
-                case 'Whole course':
-                    shouldShowModule = Object.values(moduleData.topics).some(topic => topic.notes.length > 0);
-                    break;
-                case 'Current module':
-                    shouldShowModule = moduleId === currentModule;
-                    break;
-            }
+            // switch(filter) {
+            //     case 'Whole course':
+            //         shouldShowModule = Object.values(moduleData.topics).some(topic => topic.notes.length > 0);
+            //         break;
+            //     case 'Current module':
+            //         shouldShowModule = moduleId === currentModule;
+            //         break;
+            // }
 
             if (shouldShowModule) {
                 const moduleSection = document.createElement('div');
@@ -210,18 +199,6 @@ const renderNotes =async (userId, courseId) => {
 
                 Object.entries(moduleData.topics).forEach(([topicId, topicData]) => {
                     let shouldShowTopic = false;
-
-                    switch(filter) {
-                        case 'Whole course':
-                            shouldShowTopic = topicData.notes.length > 0;
-                            break;
-                        case 'Current module':
-                            shouldShowTopic = true;
-                            break;
-                        case 'Current topic':
-                            shouldShowTopic = topicId === currentTopic;
-                            break;
-                    }
 
                     if (shouldShowTopic) {
                         const topicSection = document.createElement('div');

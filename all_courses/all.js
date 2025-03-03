@@ -80,9 +80,9 @@ document.addEventListener("DOMContentLoaded", async function() {
              <div class="tooltip">${course.description}</div> 
             </div>
             <div class="course-image">
-                <img src="/uploads/${course.image_url || '/images/250x100.png'}" 
+                <img src="/uploads/${course.image_url || 'images/250x100.png'}" 
                      alt="${course.name}" 
-                     onerror="this.src='/images/250x100.png'" />
+                     onerror="this.src='images/250x100.png'" />
             </div>
             <div class="group-27">
                 <div class="price">${course.price === 0 ? 'Free' : `$${course.price}`}</div>

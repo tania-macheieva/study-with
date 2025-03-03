@@ -10,16 +10,6 @@ const createDiscussionTemplate = () => `
         </button>
     </div>
     <div class="filters">
-        <div class="filters-left">
-            <div class="checkbox-filter">
-                <input type="checkbox" id="questions-asked">
-                <label for="questions-asked">Questions I asked</label>
-            </div> 
-            <div class="checkbox-filter">
-                <input type="checkbox" id="questions-responses">
-                <label for="questions-responses">Questions with responses</label>
-            </div>
-        </div>
         <div class="filters-right">
             <div class="filter-group">
                 <button class="filter-btn active">Whole course</button>
