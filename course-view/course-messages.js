@@ -176,7 +176,8 @@ function renderReplies(replies, parentMessageId) {
             }).replace(/(\d+)\/(\d+)\/(\d{4})/, '$2/$1/$3');  
         };
 
-        const avatar = reply.teacher_profile_image || reply.student_profile_image || '/images/user-avatar.png';
+        const avatar = reply.teacher_profile_image || reply.student_profile_image || reply.profile_image || '/images/user-avatar.png';
+
         let messageContent = reply.content || '';
 
         let parentUsername = '';
@@ -265,7 +266,8 @@ const createMessageHTML = (message, isReply = false, replyLevel = 0) => {
     }
 
     const user = message.user || { name: message.user_name || 'Unknown User' };
-    const avatar = message.teacher_profile_image || message.student_profile_image || user.profile_image || '/images/user-avatar.png';
+    const avatar =  message.student_profile_image || message.profile_image || '/images/user-avatar.png';
+
 
     const formatDate = (isoString) => {
         const date = new Date(isoString);

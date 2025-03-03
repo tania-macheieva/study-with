@@ -627,9 +627,13 @@
                 
                         function createMessageItem(comment, isReply = false) {
                             const truncatedContent = truncateText(comment.content);
-                            const userImage = comment.profile_image
-                                ? `<img src="${comment.profile_image}" alt="${comment.user_name}" class="user-avatar">`
-                                : `<img src="/images/user-avatar.png" alt="Default Avatar" class="user-avatar">`;
+                            const userImage = comment.teacher_profile_image?.trim()
+                            ? `<img src="${comment.teacher_profile_image}" alt="${comment.user_name}" class="user-avatar">`
+                            : comment.student_profile_image?.trim()
+                            ? `<img src="${comment.student_profile_image}" alt="${comment.user_name}" class="user-avatar">`
+                            : comment.profile_image?.trim()
+                            ? `<img src="${comment.profile_image}" alt="${comment.user_name}" class="user-avatar">`
+                            : `<img src="/images/user-avatar.png" alt="Default Avatar" class="user-avatar">`;
                         
                             const commentLink = `/course/${comment.course_id}#comment-${comment.comment_id}`;
                             const courseThumbnail = comment.course_thumbnail
