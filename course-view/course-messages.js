@@ -5,9 +5,6 @@ const createDiscussionTemplate = () => `
         <button class="icon-button send">
             <img src="../images/send.svg" alt="Send">
         </button>
-        <button class="icon-button search">
-            <img src="../images/icons8-search-50.png" alt="Search">
-        </button>
     </div>
     <div class="filters">
         <div class="filters-right">
