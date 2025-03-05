@@ -1228,6 +1228,10 @@ discussionThread.addEventListener('keydown', function (e) {
     }
 });
 };
+// Add a global variable to track current sorting
+let currentCommentSorting = 'recent';
+
+// Modify the existing code to add sorting functionality
 const fetchComments = async (courseId) => {
     try {
         const response = await fetch(`http://localhost:8000/api/comments?course_id=${courseId}`);
@@ -1247,10 +1251,16 @@ const fetchComments = async (courseId) => {
 
         discussionThread.innerHTML = '';
 
-        // Sort main comments by date in descending order (newest first)
+        // Sort main comments based on current sorting preference
         const mainComments = comments
             .filter(comment => !comment.parent_comment_id)
-            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            .sort((a, b) => {
+                if (currentCommentSorting === 'recent') {
+                    return new Date(b.created_at) - new Date(a.created_at); // Newest first
+                } else {
+                    return new Date(a.created_at) - new Date(b.created_at); // Oldest first
+                }
+            });
 
         mainComments.forEach(comment => {
             const messageElement = createMessageHTML(comment);
@@ -1282,7 +1292,29 @@ const fetchComments = async (courseId) => {
         console.error('Error fetching comments:', error);
     }
 };
-  
+
+// Add event listeners for sorting buttons
+document.addEventListener('DOMContentLoaded', () => {
+    const recentButton = document.querySelector('.filter-group .filter-btn:first-child');
+    const oldestButton = document.querySelector('.filter-group .filter-btn:last-child');
+    const courseId = window.location.pathname.split('/course/').pop();
+
+    if (recentButton && oldestButton) {
+        recentButton.addEventListener('click', () => {
+            currentCommentSorting = 'recent';
+            recentButton.classList.add('active');
+            oldestButton.classList.remove('active');
+            fetchComments(courseId);
+        });
+
+        oldestButton.addEventListener('click', () => {
+            currentCommentSorting = 'oldest';
+            oldestButton.classList.add('active');
+            recentButton.classList.remove('active');
+            fetchComments(courseId);
+        });
+    }
+});
 
 // Допоміжна функція для отримання ланцюжка батьківських коментарів
 const getParentChain = (comment, allComments) => {
@@ -1298,9 +1330,6 @@ const getParentChain = (comment, allComments) => {
     return chain;
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-// renderDiscussion();
-// initializeFilters();
-initializeDiscussionListeners();
-// initializeTabs();
+document.addEventListener('DOMContentLoaded', () => { 
+initializeDiscussionListeners(); 
 });
