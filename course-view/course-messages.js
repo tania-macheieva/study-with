@@ -141,7 +141,14 @@ function renderReplies(replies, parentMessageId) {
     }    
     repliesContainer.innerHTML = '';
 
-    const sortedReplies = [...replies].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    // Sort replies based on the current sorting preference
+    const sortedReplies = [...replies].sort((a, b) => {
+        if (currentCommentSorting === 'recent') {
+            return new Date(b.created_at) - new Date(a.created_at); // Newest first
+        } else {
+            return new Date(a.created_at) - new Date(b.created_at); // Oldest first
+        }
+    });
  
     const replyMap = new Map(sortedReplies.map(reply => [reply.id, reply]));
 
@@ -222,6 +229,7 @@ function renderReplies(replies, parentMessageId) {
             const replyElement = createReplyElement(reply);
             repliesContainer.appendChild(replyElement);
             
+            // For nested replies, we continue with the same sorting logic
             processReplies(reply.id);
         });
     };
@@ -232,7 +240,6 @@ function renderReplies(replies, parentMessageId) {
     }
     updateMessageStyles();
 }
-
 
 const createMessageHTML = (message, isReply = false, replyLevel = 0) => { 
     const messageElement = document.createElement('div');
@@ -1172,7 +1179,6 @@ discussionThread.addEventListener('click', function (e) {
         }
     }
 });
-// Надсилання відповіді по Enter
 // Надсилання відповіді по Enter
 discussionThread.addEventListener('keydown', function (e) {
     if (e.key === 'Enter' && !e.shiftKey) {
