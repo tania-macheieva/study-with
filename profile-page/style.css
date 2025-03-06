@@ -9,7 +9,7 @@ body {
     display: flex;
     flex-direction:column;
     min-height: 100vh; 
-} 
+}  
 
 ::-webkit-scrollbar {
     width: 10px;
@@ -467,6 +467,7 @@ p {
 
 .course img {
     width: 250px;
+    height: 180px;
     border-radius: 12px;
 }
 .courses-list {
@@ -720,6 +721,7 @@ p {
 
 .bookmark img {
     width: 250px;
+    height: 180px;
     border-radius: 12px;
 }
 
@@ -916,5 +918,165 @@ p {
 .btn-view-all-4:hover {
     background-color: #0c101a;
 }  
+/* Стиль для контейнера з коментарями */
+#messages-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    background-color: #f4f7fa;
+    border-radius: 10px;
+}
 
+.message-item {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column; 
+}
+ 
 
+.message-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+} 
+
+.user-avatar,
+.default-avatar {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    color: white;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    transition: background-color 0.3s ease;
+    object-fit: cover;  /* Додаємо властивість для кращої обробки зображень */
+}
+
+.user-name { 
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.comment-time {
+    margin-left: auto;
+    font-size: 15px !important;
+    color: #666666 !important;
+}
+
+.course-info {
+    display: flex;
+    align-items: center;
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 8px; 
+    /* border: 1px solid #545f7a;  */
+    width: 85%;
+    margin-left: 3%; 
+}
+
+.course-thumbnail {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    object-fit: cover;
+    margin-right: 15px; 
+} 
+
+.course-name {
+    font-size: 16px !important;;
+    font-weight: bold;
+    color: #545f7a; 
+    transition: color 0.3s ease;
+}
+ 
+/* Контент коментаря */
+.comment-content {
+    font-size: 16px !important;
+    margin: 12px 0;
+    line-height: 1.5; 
+    color: #333;
+    padding: 12px;
+    border-radius: 6px;
+    background: linear-gradient(145deg, #f6f5f5, #ededed); /* Легкий градієнт */
+    position: relative;
+    overflow: hidden; 
+}    
+
+/* Стиль для кнопки переходу до курсу */
+.go-to-comment {
+    background-color: #545f7a;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 15px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+    display: inline-block; 
+}
+
+.go-to-comment:hover {
+    background-color: #545f7a;
+}
+
+.go-to-comment.small {
+    font-size: 13px;
+}
+
+/* Стилі для відповіді на коментар */
+.reply-to-container {
+    margin-top: 15px;
+    padding-left: 15px;
+    border-left: 3px solid #545f7a;
+    margin-bottom: 15px;
+    font-style: italic;
+    color: #555; 
+}
+
+.reply-to {
+    font-size: 16px !important;
+}
+/* Стилі для повідомлення, якщо немає відповідей */
+.error-message {
+    color: red;
+    font-weight: bold;
+    text-align: center;
+    font-size: 16px;
+}
+
+.no-replies {
+    text-align: center;
+    font-size: 16px;
+    color: #777;
+}
+
+.message-item.main-comment {
+    background-color: #f1f8ff;
+}
+ 
+.message-item.reply {
+    background-color: #ffff; 
+  }
+
+.message-item.main-comment .comment-content {  
+    font-size: 16px; /* Трохи менший розмір шрифта */
+    margin: 12px 0; /* Менший вертикальний відступ */
+    line-height: 1.5; /* Стиснута висота рядка */
+    color: #333; /* Темно-сірий колір для тексту */
+    padding: 12px; /* Внутрішні відступи */
+    background: linear-gradient(145deg, #e4ebf2, #e3e9ef); 
+    position: relative;
+    overflow: hidden;
+    border-radius: 6px; 
+}

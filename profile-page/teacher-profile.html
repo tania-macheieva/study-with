@@ -40,7 +40,7 @@
                     <div class="tab-container">
                         <div class="tabs">
                             <button class="tab-link" data-tab="messages">
-                                <img src="/images/messages.png" alt="Messages Icon" class="tab-icon" /> <span  data-lang="messages">Messages</span></button>
+                                <img src="/images/messages.png" alt="Messages Icon" class="tab-icon" /> <span  data-lang="messages">Notifications</span></button>
                             <button class="tab-link active" data-tab="public-profile">
                                 <img src="/images/publicprofile.png" alt="Public Profile Icon" class="tab-icon" /><span data-lang="publicProf">Public profile</span></button>
                             <button class="tab-link" data-tab="profile">
@@ -107,32 +107,34 @@
                     </div> -->
                     <div>
                         <div class="my-certificates">
-                            <h2>My certificates</h2>
+                            <h2 data-lang="myCertificates">My certificates</h2>
                             <div class="certificates-list">
-                                <div class="certificate">
-                                    <p class="p-1" data-lang="myCertificates">Certificate name 1</p>
+                                 <div class="certificate">
+                                    <p class="p-1" data-lang="certificateName">Certificate name 1</p>
                                     <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
                                     <button class="btn-download">
-                                        <img src="/images/download-certificate.png" alt="">
+                                        <img src="/images/download-certificate.png">
+                                    </button>
+                                </div> 
+                                <div class="certificate">
+                                    <p class="p-1" data-lang="certificateName">Certificate name 1</p>
+                                    <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
+                                    <button class="btn-download">
+                                        <img src="/images/download-certificate.png">
                                     </button>
                                 </div>
                                 <div class="certificate">
-                                    <p class="p-1" data-lang="myCertificates">Certificate name 2</p>
+                                    <p class="p-1" data-lang="certificateName">Certificate name 1</p>
                                     <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
                                     <button class="btn-download">
-                                        <img src="/images/download-certificate.png" alt="">
+                                        <img src="/images/download-certificate.png">
                                     </button>
                                 </div>
-                                <div class="certificate">
-                                    <p class="p-1" data-lang="myCertificates">Certificate name 3</p>
-                                    <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
-                                    <button class="btn-download">
-                                        <img src="/images/download-certificate.png" alt="">
-                                    </button>
-                                </div>
+                                
                             </div>
                             <button class="btn-view-all-3" data-lang="btnViewAll">View all</button>
                         </div>
+    
                         <div class="my-bookmarks">
                             <h2 data-lang="myBookmarks">My bookmarks</h2>
                             <div class="bookmarks-list">
@@ -152,6 +154,39 @@
 </body>
 
 <script>
+    function applyLanguage(lang) {
+        const langData = translations[lang];
+        if (!langData) return;
+    
+        document.querySelectorAll('[data-lang]').forEach(element => {
+            const langKey = element.getAttribute('data-lang');
+            if (langData[langKey]) {
+                if (element.tagName === 'INPUT') {
+                    element.setAttribute('placeholder', langData[langKey]);
+                } else if (element.tagName === 'BUTTON') {
+                    element.textContent = langData[langKey];
+                } else if (element.tagName === 'A') {
+                    element.textContent = langData[langKey];
+                } else if (element.tagName === 'SPAN') {
+                    element.textContent = langData[langKey];
+                } else {
+                    element.innerHTML = langData[langKey];
+                }
+            }
+        });
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        const userLang = localStorage.getItem('language') || 'en';
+        applyLanguage(userLang);
+    
+        document.getElementById('lang-switcher')?.addEventListener('change', (e) => {
+            const selectedLang = e.target.value;
+            localStorage.setItem('language', selectedLang);
+            applyLanguage(selectedLang);
+        });
+
+        });
+        
     function toggleViewAllButton(containerClass, buttonClass, threshold = 3) {
             const containers = document.querySelectorAll(`.${containerClass}`);
             containers.forEach(container => {
@@ -299,9 +334,7 @@
                     }
                 }
             });
-        });
-
-
+        }); 
         document.querySelectorAll('.btn-view-all-2').forEach(function (button) {
             button.addEventListener('click', function () {
                 const section = button.closest('.container-my');
@@ -518,9 +551,11 @@
         <button data-lang="updatePassword">Update password</button>
     `,
 
-            "messages": `
-            <h2 data-lang="messages">Messages</h2>
-            <p data-lang="noMessages">You have no new messages yet.</p>
+    "messages": `
+            <h2 data-lang="messages">Notifications</h2>
+            <div id="messages-container">
+                <!-- Replies will be dynamically inserted here -->
+            </div>
         `,
             "close-account": `
     <h2 data-lang="manageAccount">Manage Account Visibility</h2>
@@ -540,6 +575,121 @@
                     return '';
                 }
             }
+            
+            // Відкриття модального вікна
+            tabLinks.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.getAttribute('data-tab');
+                    modalContentContainer.innerHTML = tabContents[tabName] || "<p>Content not found.</p>";
+                    modal.style.display = "flex";
+                    
+                    if (tabName === 'messages') {
+                        loadUserReplies();
+                    }
+                    applyLanguage(localStorage.getItem('language') || 'en');
+                });
+            });
+            
+            function getCurrentLanguage() {
+                return localStorage.getItem('language') || 'en'; // Якщо мова не збережена, за замовчуванням англійська
+            }
+                async function loadUserReplies() {
+                    try {
+                        const userId = localStorage.getItem('userId');
+                        if (!userId) {
+                            console.warn('User ID не знайдено в localStorage');
+                            return;
+                        }
+
+                        
+                        // Запит для отримання відповідей на коментарі користувача
+                        const repliesResponse = await fetch(`/api/comments/replies/${userId}`);
+                        if (!repliesResponse.ok) throw new Error('Не вдалося завантажити відповіді');
+                        const replies = await repliesResponse.json();
+                        
+                        // Запит для отримання головних коментарів до курсів цього користувача
+                        const mainCommentsResponse = await fetch(`/api/comments/course-owner/${userId}`);
+                        if (!mainCommentsResponse.ok) throw new Error('Не вдалося завантажити коментарі');
+                        const mainComments = await mainCommentsResponse.json();
+
+                        const messagesContainer = document.getElementById('messages-container');
+                        if (!messagesContainer) return;
+                        messagesContainer.innerHTML = '';
+                        const lang = getCurrentLanguage(); 
+                        
+                        if ((!replies || replies.length === 0) && (!mainComments || mainComments.length === 0)) {
+                            messagesContainer.innerHTML = `<p class="no-replies">${translations[lang].noReplies}</p>`;
+                            return;
+                        }
+                
+                        function truncateText(text, maxWords = 50) {
+                            const words = text.split(' ');
+                            return words.length > maxWords ? words.slice(0, maxWords).join(' ') + '...' : text;
+                        }
+                
+                        function createMessageItem(comment, isReply = false) {
+                            const truncatedContent = truncateText(comment.content);
+                            const userImage = comment.teacher_profile_image?.trim()
+                            ? `<img src="${comment.teacher_profile_image}" alt="${comment.user_name}" class="user-avatar">`
+                            : comment.student_profile_image?.trim()
+                            ? `<img src="${comment.student_profile_image}" alt="${comment.user_name}" class="user-avatar">`
+                            : comment.profile_image?.trim()
+                            ? `<img src="${comment.profile_image}" alt="${comment.user_name}" class="user-avatar">`
+                            : `<img src="/images/user-avatar.png" alt="Default Avatar" class="user-avatar">`;
+                        
+                            const commentLink = `/course/${comment.course_id}#comment-${comment.comment_id}`;
+                            const courseThumbnail = comment.course_thumbnail
+                                ? `<img src="/uploads/${comment.course_thumbnail}" alt="${comment.course_name}" class="course-thumbnail">`
+                                : '';
+                        
+                            // Додаємо різні класи для відповіді і головного коментаря
+                            const messageClass = isReply ? 'message-item reply' : 'message-item main-comment';
+                        
+                            return `
+                                <div class="${messageClass}">
+                                    <div class="message-header">
+                                        ${userImage}
+                                        <div>
+                                            <strong class="user-name">${comment.user_name}</strong>
+                                            <p class="comment-time">${new Date(comment.created_at).toLocaleString()}</p>
+                                        </div>
+                                        <div class="course-info">
+                                            ${courseThumbnail}
+                                            <p class="course-name">${comment.course_name}</p>
+                                        </div>  
+                                    </div>
+                        
+                                    <p class="comment-content">${truncatedContent}</p>
+                        
+                                    ${isReply ? `<div class="reply-to-container">
+                                        <p class="reply-to">${translations[lang].responseTo} <em>“${truncateText(comment.parent_comment_content)}”</em></p>
+                                    </div>` : ''}
+                        
+                                    <button onclick="location.href='${commentLink}'" class="go-to-comment">${translations[lang].goToCourse}</button>
+                                </div>
+                            `;
+                        }
+                        
+                
+                        // Додаємо відповіді на коментарі користувача
+                        replies.forEach(reply => {
+                            messagesContainer.innerHTML += createMessageItem(reply, true);
+                        });
+                
+                        // Додаємо головні коментарі до курсів користувача
+                        mainComments.forEach(comment => {
+                            messagesContainer.innerHTML += createMessageItem(comment, false);
+                        });
+                
+                    } catch (error) {
+                        console.error('Помилка завантаження коментарів:', error);
+                        const messagesContainer = document.getElementById('messages-container');
+                        if (messagesContainer) {
+                            messagesContainer.innerHTML = `<p class="error-message">${translations[getCurrentLanguage()].contentNotFound}</p>`;
+                        }
+                    }
+                }
+                
 
             // Головна функція для заповнення форми профілю
             async function populateProfileForm(userId) {

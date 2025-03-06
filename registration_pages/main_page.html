@@ -9,12 +9,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <link rel="icon" href="../images/menu-logo.ico">
     <style>
+
+        
         html, body {
             margin: 0;
             padding: 0;
-            height: 100%;
+            height: 100vh;
             min-height: 720px;
-            overflow: hidden;
         }
 
         body {
@@ -186,15 +187,15 @@
                 </div>
                 <div class="buttons">
                     <a href="/reg-student" class="btn1">
-                        <div class="btn1-text">
+                        <div class="btn1-text" data-lang="createAcc">
                             Create an account as a
-                            <span class="highlight-word">Student</span>
+                            <span class="highlight-word" data-lang="student">Student</span>
                         </div>
                     </a>
                     <a href="/reg-teacher" class="btn2">
-                        <div class="btn2-text">
+                        <div class="btn2-text" data-lang="createAcc">
                             Create an account as a
-                            <span class="highlight-word">Teacher</span>
+                            <span class="highlight-word"data-lang="teacher">Teacher</span>
                         </div>
                     </a>
                 </div>
@@ -204,5 +205,6 @@
     <script src="../footer/footer.js"></script>
     <script src="../header/auth-header.js"></script>
     <script src="../registration_pages/main-lang.js"></script>
+    <script src="/no_mobile/no_mobile.js"></script>
 </body>
 </html>

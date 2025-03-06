@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('./db');
-const fetch = require('node-fetch');
+//const fetch = require('node-fetch');
 require('dotenv').config();
 
 router.get('/course/:courseId', async (req, res) => {
@@ -620,6 +620,171 @@ router.post('/report', async (req, res) => {
     } catch (error) {
         console.error('Error reporting message:', error);
         res.status(500).json({ error: 'Failed to report message' });
+    }
+});
+router.get('/comments/replies/:user_id', async (req, res) => {
+    const { user_id } = req.params;
+    console.log(`Запит на replies для user_id: ${user_id}`);
+
+    try {
+        const query = `
+            SELECT 
+                c.id AS comment_id, 
+                c.content, 
+                c.created_at,
+                c.parent_comment_id,
+                u.name AS user_name, 
+                u.profile_image,    
+                s.profile_image AS student_profile_image, 
+                c2.content AS parent_comment_content,
+                u2.name AS parent_username,
+                c.course_id,
+                cr.name AS course_name,
+                cr.image_url AS course_thumbnail 
+            FROM comments c
+            JOIN users u ON c.user_id = u.id
+            LEFT JOIN comments c2 ON c.parent_comment_id = c2.id
+            LEFT JOIN users u2 ON c2.user_id = u2.id
+            LEFT JOIN students s ON u.id = s.user_id
+            LEFT JOIN teachers t ON u.id = t.user_id
+            JOIN all_courses cr ON c.course_id = cr.id
+            WHERE EXISTS (
+                SELECT 1 FROM comments WHERE id = c.parent_comment_id AND user_id = $1
+            )
+            ORDER BY c.created_at DESC`;
+
+        const { rows } = await db.query(query, [user_id]);
+
+        console.log(`Знайдено ${rows.length} відповідей`);
+        res.json(rows);
+    } catch (error) {
+        console.error('Помилка отримання відповідей:', error);
+        res.status(500).json({ error: 'Не вдалося отримати відповіді' });
+    }
+});
+router.get('/comments/course-owner/:user_id', async (req, res) => {
+    const { user_id } = req.params;
+    console.log(`Запит на головні коментарі для курсів user_id: ${user_id}`);
+
+    try {
+        const query = `
+            SELECT 
+                c.id AS comment_id, 
+                c.content, 
+                c.created_at, 
+                u.name AS user_name, 
+                u.profile_image,
+                s.profile_image AS student_profile_image, 
+                c.course_id,
+                cr.name AS course_name, 
+                cr.image_url AS course_thumbnail
+            FROM comments c
+            JOIN users u ON c.user_id = u.id
+            JOIN all_courses cr ON c.course_id = cr.id
+            LEFT JOIN students s ON u.id = s.user_id     
+            LEFT JOIN teachers t ON u.id = t.user_id  -- Переконатися, що є з'єднання з викладачами
+            WHERE cr.author_id = $1 AND c.parent_comment_id IS NULL
+            ORDER BY c.created_at DESC;
+
+        `;
+        const { rows } = await db.query(query, [user_id]);
+
+        console.log(`Знайдено ${rows.length} головних коментарів`);
+        res.json(rows);
+    } catch (error) {
+        console.error('Помилка отримання головних коментарів:', error);
+        res.status(500).json({ error: 'Не вдалося отримати головні коментарі' });
+    } 
+});
+// Додавання нової нотатки 
+router.post('/notes/add', async (req, res) => {
+    try {
+        const { userId, courseId,  lectureId, text, videoTimecode } = req.body;
+
+        if (!userId || !courseId || !text) {
+            return res.status(400).json({ error: 'userId, courseId та text обов\'язкові' });
+        }
+
+        const result = await db.query(
+            `INSERT INTO notes (userId, courseId, lectureId, text, videoTimecode, timestamp) 
+             VALUES ($1, $2, $3, $4, $5,  NOW()) RETURNING *`,
+            [userId, courseId,  lectureId, text, videoTimecode]
+        );
+
+        res.status(201).json(result.rows[0]);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Отримання нотаток для конкретного курсу та лекції
+router.get('/notes', async (req, res) => {
+    try {
+        const { userId, courseId, lectureId } = req.query;
+
+        if (!userId || !courseId || !lectureId) {
+            return res.status(400).json({ error: 'userId, courseId та lectureId обов\'язкові' });
+        }
+
+        const result = await db.query(
+            'SELECT * FROM notes WHERE userId = $1 AND courseId = $2 AND lectureId = $3 ORDER BY timestamp DESC',
+            [userId, courseId, lectureId]
+        );
+
+        res.json(result.rows); // Повертаємо всі нотатки для цієї лекції
+    } catch (error) {
+        console.error('Error retrieving notes:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+// Оновлення нотатки за ID
+router.put('/notes/:id', async (req, res) => {
+    try {
+        const { id } = req.params; // Отримуємо ID нотатки з URL
+        const { text } = req.body; // Отримуємо новий текст з тіла запиту
+
+        if (!text || text.trim() === '') {
+            return res.status(400).json({ error: 'Text cannot be empty' });
+        }
+
+        const result = await db.query(
+            `UPDATE notes 
+             SET text = $1, timestamp = NOW() 
+             WHERE id = $2 
+             RETURNING *`,
+            [text, id]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Note not found' });
+        }
+
+        res.json({ message: 'Note updated successfully', note: result.rows[0] });
+    } catch (error) {
+        console.error('Error updating note:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
+//  Видалення нотатки за ID
+router.delete('/notes/delete/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const result = await db.query(
+            'DELETE FROM notes WHERE id = $1 RETURNING *',
+            [id]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Note not found' });
+        }
+
+        res.json({ message: 'Note successfully deleted' });
+    } catch (error) {
+        console.error('Error deleting note:', error);
+        res.status(500).json({ error: error.message });
     }
 });
 

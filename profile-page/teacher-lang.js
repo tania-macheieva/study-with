@@ -1,7 +1,6 @@
 const translations = {
     en: {
-        pageTitle: 'Study With | Teacher Profile',
-        username: 'Username',
+        pageTitle: 'Study With | Teacher Profile', 
         myCourses: 'My courses',
         courseName: 'Course name',
         courseProgress: 'Progress',
@@ -17,8 +16,7 @@ const translations = {
         btnViewAll: 'View all',
         publicProf: 'Public profile',
         profile: 'Profile',
-        security: 'Security',
-        messages: 'Messages',
+        security: 'Security', 
         closeAccount: 'Closing an account',
         infPublicProf: 'This is your public profile. You can see how it looks to other users.',
         editProf: 'Editing your profile',
@@ -68,11 +66,14 @@ const translations = {
         closeAccount: 'Close Account',
         openAccount: 'Open Account',
         noCourses: 'You haven\'t enrolled in any courses yet.',
-        btnResume: 'Resume'
+        btnResume: 'Resume',
+        contentNotFound: "Content not found.",
+        noReplies: "There are no notifications.",
+        responseTo: "Response to: ",
+        goToCourse: "Go to the course",
     },
     ua: {
-        pageTitle: 'Study With | Профіль Вчителя',
-        username: 'Ім’я користувача',
+        pageTitle: 'Study With | Профіль Вчителя', 
         myCourses: 'Мої курси',
         courseName: 'Назва курсу',
         courseProgress: 'Прогрес',
@@ -138,27 +139,18 @@ const translations = {
         closeAccount: 'Закрити акаунт',
         openAccount: 'Відкрити акаунт',
         noCourses: 'Ви ще не записались на жодний курс.',
-        btnResume: 'Продовжити'
+        btnResume: 'Продовжити',
+        contentNotFound: "Вміст не знайдено.",
+        noReplies: "Сповіщень немає.",
+        responseTo: "Відповідь на: ",
+        goToCourse: "Перейти до курсу",
     },
 };
 document.addEventListener('DOMContentLoaded', () => {
 const tabLinks = document.querySelectorAll('.tab-link');
     const modal = document.getElementById('modal');
     const modalContentContainer = document.getElementById('modal-content-container');
-    const closeButton = document.querySelector('.close-button');
-// Відкриття модального вікна
-tabLinks.forEach(tab => {
-    tab.addEventListener('click', () => {
-        const tabName = tab.getAttribute('data-tab');
-
-        // Додаємо вміст вкладки в модальне вікно
-        modalContentContainer.innerHTML = tabContents[tabName] || "<p>Content not found.</p>";
-        modal.style.display = "flex";
-
-        // Застосовуємо переклад для нового вмісту модального вікна
-        applyLanguage(localStorage.getItem('language') || 'en');
-    });
-});
+    const closeButton = document.querySelector('.close-button'); 
 
 // Закриття модального вікна
 closeButton.addEventListener('click', () => {
@@ -189,7 +181,6 @@ function applyLanguage(lang) {
     });
 }
 
-
 document.addEventListener('DOMContentLoaded', () => {
     const userLang = localStorage.getItem('language') || 'en'; 
     applyLanguage(userLang);
@@ -201,6 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function loadEnrolledCourses() {
+    
     try {
         const userId = localStorage.getItem('userId');
         console.log('Loading courses for user:', userId);
@@ -221,18 +213,20 @@ async function loadEnrolledCourses() {
             coursesContainer.innerHTML = '<p class="no-courses" data-lang="noCourses">You haven\'t enrolled in any courses yet.</p>';
             return;
         }
-
+     
         coursesContainer.innerHTML = courses.map(course => `
             <div class="course">
-                <p class="p-1">${course.name}</p>
+                <p class="p-1">${course.name || 'Без назви'}</p>
                 <div class="progress-bar">
                     <span style="width: ${course.progress || 0}%;"></span>
                 </div>
                 <p class="percent">${course.progress || 0}%</p>
-                <img src="${course.image_url || '/images/250x100.png'}" 
+                <img src="/uploads/${course.image_url || '/images/250x100.png'}" 
                      alt="${course.name}" 
                      onerror="this.src='/images/250x100.png'">
-                <button class="btn-resume" data-course-id="${course.id}">Resume</button>
+                <button class="btn-resume" data-course-id="${course.id}">
+                    ${translations[localStorage.getItem('language') || 'en'].btnResume}
+                </button>
             </div>
         `).join('');
 
@@ -376,6 +370,28 @@ async function toggleBookmark(courseId) {
         console.error('Помилка видалення закладки:', error);
         alert('Помилка видалення закладки'); 
     }
+}
+
+function applyLanguage(lang) {
+    const langData = translations[lang];
+    if (!langData) return;
+
+    document.querySelectorAll('[data-lang]').forEach(element => {
+        const langKey = element.getAttribute('data-lang');
+        if (langData[langKey]) {
+            if (element.tagName === 'INPUT') {
+                element.setAttribute('placeholder', langData[langKey]);
+            } else if (element.tagName === 'BUTTON') {
+                element.textContent = langData[langKey];
+            } else if (element.tagName === 'A') {
+                element.textContent = langData[langKey];
+            } else if (element.tagName === 'SPAN') {
+                element.textContent = langData[langKey];
+            } else {
+                element.innerHTML = langData[langKey];
+            }
+        }
+    });
 }
 
 function toggleViewAllButton(containerClass, buttonClass, threshold = 3) {
