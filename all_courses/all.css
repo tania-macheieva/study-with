@@ -189,7 +189,6 @@ h4.filters-apply {
   display: flex;
   margin-top: 60px;
   align-items: center;
-  margin-right: 4rem; /* 64px */
   position: relative;
   margin-bottom: 12px;
   gap:440px;
@@ -215,14 +214,13 @@ h4.filters-apply {
   min-width: 300px; /* Мінімальна ширина, щоб виглядало коректно */
 }
 .right-container {
-  margin-top: 1px;
+  align-self: flex-start; 
   align-items: flex-start;
-  position: relative; /* Виправлення */
+  position: relative;
   margin-bottom: 32px;
-  width: 100%; /* Ширина залишиться */
+  width: 100%;
   margin-right: 64px;
 }
-
 .Result, .Sort {
   font-weight: 600;
   font-size: 22px; 
