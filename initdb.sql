@@ -333,5 +333,6 @@ CREATE TABLE reviews (
     user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     rating INT CHECK (rating BETWEEN 1 AND 5) NOT NULL,
     review_text TEXT,
-    created_at TIMESTAMP DEFAULT NOW()
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP
 );
