@@ -5,17 +5,102 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!document.querySelector('.tabs-container')) {
             const tabsContainer = document.createElement('div');
             tabsContainer.className = 'tabs-container';
-            const reviewButton = document.createElement('button');
-            reviewButton.className = 'nav-review-button';
-            reviewButton.textContent = 'Submit review';
-            reviewButton.onclick = showReviewPopup;
+            
+            // Add tabs to container immediately
             const tabsParent = tabs.parentNode;
             tabsParent.insertBefore(tabsContainer, tabs);
             tabsContainer.appendChild(tabs);
-            tabsContainer.appendChild(reviewButton);
+            
+            // Check if we're on a course page
+            const courseId = document.body.dataset.courseId || window.location.pathname.split('/')[2];
+            if (!courseId) return;
+            
+            // Get the current user ID
+            const currentUserId = localStorage.getItem('userId');
+            if (!currentUserId) return;
+            
+            // Fetch the course author directly from the database
+            fetch(`/api/course-author/${courseId}`)
+            .then(response => {
+                if (!response.ok) {
+                throw new Error(`Error: ${response.status} ${response.statusText}`);
+                }
+                return response.json(); // Parse JSON only if status is OK
+            })
+            .then(data => {
+                // Only create the review button if the user is not the author
+                if (data.author_id.toString() !== currentUserId.toString()) {
+                    const reviewButton = document.createElement('button');
+                    reviewButton.className = 'nav-review-button';
+                    reviewButton.textContent = 'Submit review';
+                    reviewButton.onclick = showReviewPopup;
+                    tabsContainer.appendChild(reviewButton);
+                }
+            })
+            .catch(error => {
+                console.error('Error checking course author:', error);
+                // You could show a user-friendly message on the UI here
+            });
+ 
         }
     }
-
+    // Function to check if the current user is the author of the course
+    async function checkIfCurrentUserIsAuthor(userId, courseId) {
+        if (!userId || !courseId) return false;
+        
+        try {
+            // First check in localStorage cache if available
+            const authorIdKey = `course_${courseId}_author_id`;
+            const cachedAuthorId = localStorage.getItem(authorIdKey);
+            
+            if (cachedAuthorId) {
+                return cachedAuthorId === userId;
+            }
+            
+            // If not in cache, fetch course author information from a dedicated endpoint
+            const response = await fetch(`/api/course/${courseId}/author`);
+            if (!response.ok) return false;
+            
+            const authorData = await response.json();
+            const authorId = authorData.author_id;
+            
+            // Cache the author ID for future use
+            localStorage.setItem(authorIdKey, authorId);
+            
+            return authorId.toString() === userId.toString();
+        } catch (error) {
+            console.error('Error checking if user is author:', error);
+            return false;
+        }
+    }
+    async function showReviewButtonIfNotAuthor() {
+        const courseId = document.body.dataset.courseId || window.location.pathname.split('/')[2];
+        const currentUserId = localStorage.getItem('userId');
+        
+        if (!courseId || !currentUserId) return;
+        
+        try {
+            const response = await fetch(`/api/course-author/${courseId}`);
+            const data = await response.json();
+            
+            // Only add the review button if the user is not the author
+            if (data.author_id.toString() !== currentUserId.toString()) {
+                const tabsContainer = document.querySelector('.tabs-container');
+                if (tabsContainer && !tabsContainer.querySelector('.nav-review-button')) {
+                    const reviewButton = document.createElement('button');
+                    reviewButton.className = 'nav-review-button';
+                    reviewButton.textContent = 'Submit review';
+                    reviewButton.onclick = showReviewPopup;
+                    tabsContainer.appendChild(reviewButton);
+                }
+            }
+        } catch (error) {
+            console.error('Error checking course author:', error);
+        }
+    }
+    
+    // Call this function on page load
+    showReviewButtonIfNotAuthor();
     function createReviewPopup() {
         const overlay = document.createElement('div');
         overlay.className = 'review-popup-overlay';

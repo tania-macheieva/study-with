@@ -789,7 +789,6 @@ router.delete('/notes/delete/:id', async (req, res) => {
     }
 });
 
-// Backend route handler for review submission/update
 router.post('/course/:courseId/review', async (req, res) => {
     try {
         const { courseId } = req.params;
@@ -798,8 +797,6 @@ router.post('/course/:courseId/review', async (req, res) => {
         if (!userId || !rating || !review) {
             return res.status(400).json({ error: 'Missing required fields' });
         }
-
-        // Check if the user already has a review for this course
         const checkQuery = `
             SELECT id FROM reviews 
             WHERE course_id = $1 AND user_id = $2
@@ -819,7 +816,6 @@ router.post('/course/:courseId/review', async (req, res) => {
             result = await db.query(updateQuery, [rating, review, existingReviewId]);
             res.status(200).json({ message: 'Review updated successfully', review: result.rows[0] });
         } else {
-            // Create new review
             const insertQuery = `
                 INSERT INTO reviews (course_id, user_id, rating, review_text, created_at, updated_at)
                 VALUES ($1, $2, $3, $4, NOW(), NOW()) RETURNING *;
@@ -833,11 +829,10 @@ router.post('/course/:courseId/review', async (req, res) => {
     }
 });
 
-// Backend route handler for getting reviews, with optional userId filter
 router.get('/course/:courseId/reviews', async (req, res) => {
     try {
         const { courseId } = req.params;
-        const { userId } = req.query; // Optional filter by userId
+        const { userId } = req.query; 
         
         let query = `
             SELECT 
@@ -851,7 +846,6 @@ router.get('/course/:courseId/reviews', async (req, res) => {
         
         const queryParams = [courseId];
         
-        // If userId is provided, filter by it
         if (userId) {
             query += ` AND u.id = $2`;
             queryParams.push(userId);
@@ -868,7 +862,22 @@ router.get('/course/:courseId/reviews', async (req, res) => {
     }
 });
 
-
-
-
+// Backend route handler for getting course author information 
+router.get('/course-author/:courseId', async (req, res) => {
+    try {
+        const { courseId } = req.params;
+        
+        const query = 'SELECT author_id FROM all_courses WHERE id = $1';
+        const result = await db.query(query, [courseId]);
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Course not found' });
+        }
+        
+        res.json({ author_id: result.rows[0].author_id });
+    } catch (error) {
+        console.error('Error fetching course author:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 module.exports = router;
