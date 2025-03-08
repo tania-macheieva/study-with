@@ -102,50 +102,253 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Course ID not found');
             return;
         }
+        if (!reviewText.trim()) {
+            alert('Please write a review');
+            return;
+        }
     
         console.log('Submitting review with:', { courseId, userId, ratingValue, reviewText });
     
         try {
-            // Updated API endpoint path with /api prefix
-            const response = await fetch(`/api/course/${courseId}/review`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId, rating: ratingValue, review: reviewText })
-            });
-    
-            // Check if response is JSON before parsing
-            const contentType = response.headers.get('content-type');
-            let data;
+            // First save/update in localStorage
+            saveReviewToLocalStorage(userId, courseId, ratingValue, reviewText);
             
-            if (contentType && contentType.includes('application/json')) {
-                data = await response.json();
-            } else {
-                const textResponse = await response.text();
-                console.error('Non-JSON response:', textResponse);
-                throw new Error('Server returned non-JSON response');
-            }
-    
-            if (response.ok) {
-                alert('Thank you for your review!');
-                closeReviewPopup();
-            } else {
-                alert('Error submitting review: ' + (data.error || 'Unknown error'));
+            // Then send to backend
+            await saveReviewToDatabase(userId, courseId, ratingValue, reviewText);
+            
+            closeReviewPopup();
+            
+            // Refresh reviews display if applicable
+            if (typeof displayReviews === 'function') {
+                displayReviews();
             }
         } catch (error) {
             console.error('Failed to submit review:', error);
             alert('Failed to submit review. Please try again later.');
         }
     }
+    
+    // Function to save review to localStorage
+    function saveReviewToLocalStorage(userId, courseId, rating, reviewText) {
+        // Get existing reviews from localStorage
+        let reviews = JSON.parse(localStorage.getItem('courseReviews')) || [];
+        
+        // Check if user already has a review for this course
+        const existingReviewIndex = reviews.findIndex(r => 
+            r.userId === userId && r.courseId === courseId
+        );
+        
+        const now = new Date().toISOString();
+        
+        if (existingReviewIndex >= 0) {
+            // Update existing review
+            reviews[existingReviewIndex] = {
+                ...reviews[existingReviewIndex],
+                rating: rating,
+                reviewText: reviewText,
+                updatedAt: now
+            };
+        } else {
+            // Add new review
+            reviews.push({
+                id: Date.now().toString(),
+                userId: userId,
+                courseId: courseId,
+                rating: rating,
+                reviewText: reviewText,
+                createdAt: now,
+                updatedAt: now
+            });
+        }
+        
+        // Save updated reviews to localStorage
+        localStorage.setItem('courseReviews', JSON.stringify(reviews));
+        console.log('Review saved to localStorage');
+    }
+    
+    // Function to save review to database via API
+    async function saveReviewToDatabase(userId, courseId, rating, reviewText) {
+        try {
+            const response = await fetch(`/api/course/${courseId}/review`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    userId: userId, 
+                    rating: rating, 
+                    review: reviewText 
+                })
+            });
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`API error: ${response.status} - ${errorText}`);
+            }
+            
+            const data = await response.json();
+            console.log('Review saved to database:', data);
+            alert(data.message || 'Review submitted successfully!');
+            return data;
+        } catch (error) {
+            console.error('Error saving to database:', error);
+            throw error;
+        }
+    }
+
+    function checkExistingReview() {
+        const userId = localStorage.getItem('userId');
+        const courseId = document.body.dataset.courseId || window.location.pathname.split('/')[2];
+        
+        if (!userId || !courseId) return;
+        
+        try {
+            // Get reviews from localStorage
+            const reviews = JSON.parse(localStorage.getItem('courseReviews')) || [];
+            
+            // Find user's review for this course
+            const userReview = reviews.find(r => 
+                r.userId === userId && r.courseId === courseId
+            );
+            
+            if (userReview) {
+                // Pre-fill the form with existing review data
+                document.getElementById('reviewText').value = userReview.reviewText;
+                
+                // Select the appropriate rating button
+                const ratingBtn = document.querySelector(`.rating-btn[data-rating="${userReview.rating}"]`);
+                if (ratingBtn) {
+                    document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+                    ratingBtn.classList.add('selected');
+                }
+                
+                // Update submit button text to indicate editing
+                document.getElementById('submitReviewBtn').textContent = 'Update review';
+            }
+        } catch (error) {
+            console.error('Error checking existing review:', error);
+        }
+    }
+    
     function openReviewPopup() {
         document.getElementById('reviewPopupOverlay').style.display = 'flex';
         document.body.style.overflow = 'hidden';
+        checkExistingReview(); // Check for existing review when opening popup
     }
+    
     function closeReviewPopup() {
         document.getElementById('reviewPopupOverlay').style.display = 'none';
         document.body.style.overflow = '';
+        
+        // Reset form for next use
+        document.getElementById('reviewText').value = '';
+        document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+        document.getElementById('submitReviewBtn').textContent = 'Submit review';
+    }
+
+    // Function to display all reviews from localStorage
+    window.displayReviews = function() {
+        const courseId = document.body.dataset.courseId || window.location.pathname.split('/')[2];
+        const reviewsContainer = document.querySelector('.course-reviews');
+        if (!reviewsContainer || !courseId) return;
+        
+        const reviews = JSON.parse(localStorage.getItem('courseReviews')) || [];
+        const courseReviews = reviews.filter(r => r.courseId === courseId);
+        
+        if (courseReviews.length === 0) {
+            reviewsContainer.innerHTML = '<p>No reviews yet. Be the first to review this course!</p>';
+            return;
+        }
+        
+        // Sort reviews by date (newest first)
+        courseReviews.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+        
+        let reviewsHTML = '';
+        courseReviews.forEach(review => {
+            // You could fetch user details from another localStorage item if needed
+            const userName = `User ${review.userId}`; // Placeholder
+            
+            reviewsHTML += `
+                <div class="review-item">
+                    <div class="review-header">
+                        <span class="review-user">${userName}</span>
+                        <span class="review-rating">${review.rating}/5</span>
+                        <span class="review-date">${new Date(review.updatedAt).toLocaleDateString()}</span>
+                    </div>
+                    <div class="review-text">${review.reviewText}</div>
+                </div>
+            `;
+        });
+        
+        reviewsContainer.innerHTML = reviewsHTML;
+    };
+
+    // Function to fetch initial reviews from server and save to localStorage (optional)
+    async function fetchInitialReviews() {
+        const courseId = document.body.dataset.courseId || window.location.pathname.split('/')[2];
+        if (!courseId) return;
+        
+        try {
+            const response = await fetch(`/api/course/${courseId}/reviews`);
+            if (!response.ok) return;
+            
+            const data = await response.json();
+            if (!data.reviews || !data.reviews.length) return;
+            
+            // Convert server reviews to localStorage format and merge with existing
+            let localReviews = JSON.parse(localStorage.getItem('courseReviews')) || [];
+            
+            data.reviews.forEach(serverReview => {
+                // Check if review already exists in localStorage
+                const existingIndex = localReviews.findIndex(r => 
+                    r.userId === serverReview.user_id.toString() && 
+                    r.courseId === courseId
+                );
+                
+                if (existingIndex >= 0) {
+                    // If server review is newer, update local
+                    const serverDate = new Date(serverReview.updated_at || serverReview.created_at);
+                    const localDate = new Date(localReviews[existingIndex].updatedAt);
+                    
+                    if (serverDate > localDate) {
+                        localReviews[existingIndex] = {
+                            id: serverReview.id.toString(),
+                            userId: serverReview.user_id.toString(),
+                            courseId: courseId,
+                            rating: serverReview.rating.toString(),
+                            reviewText: serverReview.review_text,
+                            createdAt: serverReview.created_at,
+                            updatedAt: serverReview.updated_at || serverReview.created_at
+                        };
+                    }
+                } else {
+                    // Add server review to localStorage
+                    localReviews.push({
+                        id: serverReview.id.toString(),
+                        userId: serverReview.user_id.toString(),
+                        courseId: courseId,
+                        rating: serverReview.rating.toString(),
+                        reviewText: serverReview.review_text,
+                        createdAt: serverReview.created_at,
+                        updatedAt: serverReview.updated_at || serverReview.created_at
+                    });
+                }
+            });
+            
+            localStorage.setItem('courseReviews', JSON.stringify(localReviews));
+            displayReviews();
+        } catch (error) {
+            console.error('Error fetching initial reviews:', error);
+        }
     }
 
     setupTabsContainer();
     createReviewPopup();
     window.showReviewPopup = openReviewPopup;
+    
+    // Initial setup
+    fetchInitialReviews();
+    
+    // Display reviews on page load if container exists
+    if (document.querySelector('.course-reviews')) {
+        displayReviews();
+    }
 });
