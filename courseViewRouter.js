@@ -418,8 +418,6 @@ router.post('/module/:moduleId/test/submit', async (req, res) => {
     }
 });
 
-
-
 router.post('/comments', async (req, res) => {
     try {
         const { content, parent_comment_id, course_id, user_id } = req.body;
@@ -622,6 +620,7 @@ router.post('/report', async (req, res) => {
         res.status(500).json({ error: 'Failed to report message' });
     }
 });
+
 router.get('/comments/replies/:user_id', async (req, res) => {
     const { user_id } = req.params;
     console.log(`Запит на replies для user_id: ${user_id}`);
@@ -662,6 +661,7 @@ router.get('/comments/replies/:user_id', async (req, res) => {
         res.status(500).json({ error: 'Не вдалося отримати відповіді' });
     }
 });
+
 router.get('/comments/course-owner/:user_id', async (req, res) => {
     const { user_id } = req.params;
     console.log(`Запит на головні коментарі для курсів user_id: ${user_id}`);
@@ -696,6 +696,7 @@ router.get('/comments/course-owner/:user_id', async (req, res) => {
         res.status(500).json({ error: 'Не вдалося отримати головні коментарі' });
     } 
 });
+
 // Додавання нової нотатки 
 router.post('/notes/add', async (req, res) => {
     try {
@@ -737,6 +738,7 @@ router.get('/notes', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
 // Оновлення нотатки за ID
 router.put('/notes/:id', async (req, res) => {
     try {
@@ -766,7 +768,6 @@ router.put('/notes/:id', async (req, res) => {
     }
 });
 
-
 //  Видалення нотатки за ID
 router.delete('/notes/delete/:id', async (req, res) => {
     try {
@@ -787,6 +788,53 @@ router.delete('/notes/delete/:id', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+router.post('/course/:courseId/review', async (req, res) => {
+    try {
+        const { courseId } = req.params;
+        const { userId, rating, review } = req.body;
+
+        if (!userId || !rating || !review) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        const query = `
+            INSERT INTO reviews (course_id, user_id, rating, review_text, created_at)
+            VALUES ($1, $2, $3, $4, NOW()) RETURNING *;
+        `;
+        const result = await db.query(query, [courseId, userId, rating, review]);
+
+        res.status(201).json({ message: 'Review submitted successfully', review: result.rows[0] });
+    } catch (error) {
+        console.error('Error submitting review:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
+router.get('/course/:courseId/reviews', async (req, res) => {
+    try {
+        const { courseId } = req.params;
+
+        const query = `
+            SELECT 
+                r.id, r.rating, r.review_text, r.created_at,
+                u.id AS user_id, u.name AS user_name, u.profile_image
+            FROM reviews r
+            JOIN users u ON r.user_id = u.id
+            WHERE r.course_id = $1
+            ORDER BY r.created_at DESC
+        `;
+
+        const result = await db.query(query, [courseId]);
+
+        res.json({ reviews: result.rows });
+    } catch (error) {
+        console.error('Error fetching reviews:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 
 
 

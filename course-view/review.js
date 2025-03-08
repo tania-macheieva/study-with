@@ -13,10 +13,6 @@ document.addEventListener('DOMContentLoaded', function() {
             tabsParent.insertBefore(tabsContainer, tabs);
             tabsContainer.appendChild(tabs);
             tabsContainer.appendChild(reviewButton);
-            const oldButton = document.querySelector('button[onclick="showReviewPopup()"]');
-            if (oldButton && oldButton !== reviewButton) {
-                oldButton.remove();
-            }
         }
     }
 
@@ -29,22 +25,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const closeButton = document.createElement('div');
         closeButton.className = 'close-button';
         closeButton.id = 'closeReviewBtn';
-        const closeLine1 = document.createElement('div');
-        closeLine1.className = 'close-line';
-        const closeLine2 = document.createElement('div');
-        closeLine2.className = 'close-line';
-        closeButton.appendChild(closeLine1);
-        closeButton.appendChild(closeLine2);
+        closeButton.innerHTML = '<div class="close-line"></div><div class="close-line"></div>';
+        
         const content = document.createElement('div');
         content.className = 'review-content';
-        const title = document.createElement('h2');
-        title.innerHTML = 'Tell others about<br>your experience with the course!';
- 
+        content.innerHTML = '<h2>Tell others about<br>your experience with the course!</h2>';
+        
         const ratingSection = document.createElement('div');
         ratingSection.className = 'rating-section';
-        const ratingLabel = document.createElement('p');
-        ratingLabel.className = 'rating-label';
-        ratingLabel.textContent = 'Your rate:';
+        ratingSection.innerHTML = '<p class="rating-label">Your rate:</p>';
+        
         const ratingButtons = document.createElement('div');
         ratingButtons.className = 'rating-buttons';
         for (let i = 1; i <= 5; i++) {
@@ -54,23 +44,20 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.textContent = i + '/5';
             ratingButtons.appendChild(btn);
         }
-        ratingSection.appendChild(ratingLabel);
         ratingSection.appendChild(ratingButtons);
+
         const textContainer = document.createElement('div');
         textContainer.className = 'review-text-container';
-        const textarea = document.createElement('textarea');
-        textarea.id = 'reviewText';
-        textarea.placeholder = 'Write a review...';
-        textContainer.appendChild(textarea);
+        textContainer.innerHTML = '<textarea id="reviewText" placeholder="Write a review..."></textarea>';
+        
         const submitContainer = document.createElement('div');
         submitContainer.className = 'submit-container';
-        
         const submitBtn = document.createElement('button');
         submitBtn.id = 'submitReviewBtn';
         submitBtn.className = 'submit-btn';
         submitBtn.textContent = 'Submit review';
         submitContainer.appendChild(submitBtn);
-        content.appendChild(title);
+        
         content.appendChild(ratingSection);
         content.appendChild(textContainer);
         content.appendChild(submitContainer);
@@ -81,51 +68,84 @@ document.addEventListener('DOMContentLoaded', function() {
         overlay.style.display = 'none';
         setupEventListeners();
     }
+
     function setupEventListeners() {
-        const overlay = document.getElementById('reviewPopupOverlay');
-        const closeBtn = document.getElementById('closeReviewBtn');
-        const ratingBtns = document.querySelectorAll('.rating-btn');
-        const submitBtn = document.getElementById('submitReviewBtn');
-        closeBtn.addEventListener('click', closeReviewPopup);
-        overlay.addEventListener('click', function(e) {
-            if (e.target === overlay) {
-                closeReviewPopup();
-            }
+        document.getElementById('closeReviewBtn').addEventListener('click', closeReviewPopup);
+        document.getElementById('reviewPopupOverlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeReviewPopup();
         });
-        ratingBtns.forEach(btn => {
+        document.querySelectorAll('.rating-btn').forEach(btn => {
             btn.addEventListener('click', function() {
-                ratingBtns.forEach(b => b.classList.remove('selected'));
+                document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
                 this.classList.add('selected');
             });
         });
-        submitBtn.addEventListener('click', function() {
-            const selectedRating = document.querySelector('.rating-btn.selected');
-            const ratingValue = selectedRating ? selectedRating.dataset.rating : null;
-            const reviewText = document.getElementById('reviewText').value;
-            if (!ratingValue) {
-                alert('Please select a rating');
-                return;
-            }
-            console.log('Rating:', ratingValue);
-            console.log('Review:', reviewText);
-            closeReviewPopup();
-            alert('Thank you for your review!');
-        });
+        document.getElementById('submitReviewBtn').addEventListener('click', submitReview);
     }
 
+    async function submitReview() {
+        const selectedRating = document.querySelector('.rating-btn.selected');
+        const ratingValue = selectedRating ? selectedRating.dataset.rating : null;
+        const reviewText = document.getElementById('reviewText').value;
+        const userId = localStorage.getItem('userId');
+        const courseId = document.body.dataset.courseId || window.location.pathname.split('/')[2];
+    
+        if (!ratingValue) {
+            alert('Please select a rating');
+            return;
+        }
+        if (!userId) {
+            alert('User not logged in');
+            return;
+        }
+        if (!courseId) {
+            alert('Course ID not found');
+            return;
+        }
+    
+        console.log('Submitting review with:', { courseId, userId, ratingValue, reviewText });
+    
+        try {
+            // Updated API endpoint path with /api prefix
+            const response = await fetch(`/api/course/${courseId}/review`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, rating: ratingValue, review: reviewText })
+            });
+    
+            // Check if response is JSON before parsing
+            const contentType = response.headers.get('content-type');
+            let data;
+            
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                const textResponse = await response.text();
+                console.error('Non-JSON response:', textResponse);
+                throw new Error('Server returned non-JSON response');
+            }
+    
+            if (response.ok) {
+                alert('Thank you for your review!');
+                closeReviewPopup();
+            } else {
+                alert('Error submitting review: ' + (data.error || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Failed to submit review:', error);
+            alert('Failed to submit review. Please try again later.');
+        }
+    }
     function openReviewPopup() {
-        const overlay = document.getElementById('reviewPopupOverlay');
-        overlay.style.display = 'flex';
+        document.getElementById('reviewPopupOverlay').style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }
     function closeReviewPopup() {
-        const overlay = document.getElementById('reviewPopupOverlay');
-        overlay.style.display = 'none';
+        document.getElementById('reviewPopupOverlay').style.display = 'none';
         document.body.style.overflow = '';
     }
+
     setupTabsContainer();
     createReviewPopup();
-    window.openReviewPopup = openReviewPopup;
-    window.closeReviewPopup = closeReviewPopup;
     window.showReviewPopup = openReviewPopup;
 });
