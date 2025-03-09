@@ -327,3 +327,12 @@ CREATE TABLE notes (
     updatedAt TIMESTAMP DEFAULT NOW()
 );
 
+CREATE TABLE reviews (
+    id SERIAL PRIMARY KEY,
+    course_id INT NOT NULL REFERENCES all_courses(id) ON DELETE CASCADE,
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    rating INT CHECK (rating BETWEEN 1 AND 5) NOT NULL,
+    review_text TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP
+);
