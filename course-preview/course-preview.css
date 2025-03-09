@@ -393,11 +393,14 @@ main
 
 .speaker-image {
     width: 100%;
-    height: 288px;
+    height: 260px;
     background: #D9D9D9;
     border-radius: 8px;
-    margin: 20px 0;
-    flex-shrink: 0;
+    /* margin: 20px 0;
+    flex-shrink: 0; */
+    background-size: cover;
+    background-position: center;
+    margin: 0 auto 15px;
 }
 
 .speaker-name-link {
@@ -628,6 +631,8 @@ main
     height: 120px;
     border-radius: 8px;
     flex-shrink: 0;
+    background-size: cover;
+    /* background-position: center; */
 }
 
 .speaker-info {
