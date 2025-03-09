@@ -8,9 +8,19 @@ document.addEventListener("DOMContentLoaded", () => {
       display: none;
     }
 
+
     @media screen and (max-width: 480px) {
       body * {
         display: none; 
+      }
+
+      .login-container{
+      display: none;
+      }
+
+
+      div.login-form a {
+      display: none;
       }
 
       .text-container {
@@ -32,6 +42,14 @@ document.addEventListener("DOMContentLoaded", () => {
         height: 100vh; 
         margin: 0; 
         display: block;
+      }
+
+      a.btn2 {
+      display: none;
+      }
+
+      a.btn1 {
+      display: none;
       }
 
       body {
