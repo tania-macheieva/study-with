@@ -218,3 +218,9 @@ a.lang-btn {
     transform: scale(1.05);
     transition: all 0.1s ease;
 }
+
+@media screen and (max-width: 480px) {
+    .site-header {
+        display: none;
+    }
+}
