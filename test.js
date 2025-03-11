@@ -8,29 +8,39 @@ const CryptoJS = require('crypto-js');
 require('dotenv').config();
 const secretKey = process.env.ENCRYPT_SECRET;
 
+function encryptTestInfo(testInfo) {
+  try {
+    const testInfoStr = JSON.stringify(testInfo);
+    return CryptoJS.AES.encrypt(testInfoStr, secretKey).toString();
+  } catch (error) {
+    console.error('Error encrypting test info:', error);
+    return null;
+  }
+}
 
-
-  // Маршрут для збереження тесту
+// Маршрут для збереження тесту
 router.post('/save-test', async (req, res) => {
   //console.log('Request body:', req.body); 
-    const { title, questions } = req.body;
+  const { title, questions } = req.body;
   
-    // Перевірка валідності вхідних даних
-    if (!title || !Array.isArray(questions) || questions.length === 0) {
-      return res.status(400).json({ error: 'Invalid input data' });
-    }
-    let client; // Оголосіть змінну client на рівні маршруту
+  // Перевірка валідності вхідних даних
+  if (!title || !Array.isArray(questions) || questions.length === 0) {
+    return res.status(400).json({ error: 'Invalid input data' });
+  }
+  
+  let client; // Оголосіть змінну client на рівні маршруту
   try {
     client = await pool.connect(); // Створення клієнта з пулу
     await client.query('BEGIN'); // Початок транзакції
-      // Додавання тесту
+    
+    // Додавання тесту
     const testResult = await client.query(
       'INSERT INTO tests (title) VALUES ($1) RETURNING id',
       [title]
     );
     const testId = testResult.rows[0].id;
   
-     // Додавання питань та відповідей
+    // Додавання питань та відповідей
     for (const question of questions) {
       console.log('Processing question:', question); 
       // Перевірка валідності кожного питання
@@ -61,7 +71,7 @@ router.post('/save-test', async (req, res) => {
             [questionId, subquestionId, answer.answerText]
           );
         }
-      }else if (question.type === 'Open-ended') {
+      } else if (question.type === 'Open-ended') {
         for (const answer of question.answers) {
           console.log('Processing Open-ended answer:', answer); // Дебаг Open-ended відповіді
           if (typeof answer.answerText !== 'string' || answer.answerText.trim() === '') {
@@ -87,130 +97,161 @@ router.post('/save-test', async (req, res) => {
       }
     }
   
-  // Завершення транзакції
-  await client.query('COMMIT');
-  //  Шифруємо testId перед відправкою клієнту
-  const encryptedTestId = CryptoJS.AES.encrypt(testId.toString(), secretKey).toString();
-  res.status(200).json({ message: 'Test saved successfully', testId: encryptedTestId });
-} catch (error) {
-  if (client) {
-    await client.query('ROLLBACK'); // Відкат транзакції, якщо client створений
+    // Завершення транзакції
+    await client.query('COMMIT');
+    //  Шифруємо testId перед відправкою клієнту
+    const encryptedTestId = CryptoJS.AES.encrypt(testId.toString(), secretKey).toString();
+    res.status(200).json({ message: 'Test saved successfully', testId: encryptedTestId });
+  } catch (error) {
+    if (client) {
+      await client.query('ROLLBACK'); // Відкат транзакції, якщо client створений
+    }
+    console.error('Error saving test:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  } finally {
+    if (client) {
+      client.release(); // Звільнення клієнта після використання
+    }
   }
-  console.error('Error saving test:', error);
-  res.status(500).json({ error: 'Internal server error' });
-} finally {
-  if (client) {
-    client.release(); // Звільнення клієнта після використання
-  }
-}
 });
 
 // Маршрут для отримання даних тесту
 router.get('/get-test/:encryptedTestId', async (req, res) => {
-  //console.log('Request body:', req.params); 
   const { encryptedTestId } = req.params;
+  const { moduleId, courseId, testType } = req.query; // Додані параметри запиту
+  
   if (!encryptedTestId) {
     return res.status(400).json({ error: 'Test ID is required' });
   }
+  
   try {
-    // 🔹 Розшифровуємо testId
-    const bytes = CryptoJS.AES.decrypt(decodeURIComponent(encryptedTestId), secretKey);
-    const testId = bytes.toString(CryptoJS.enc.Utf8);
+    // Розшифровуємо testId
+    let testId;
+    let testInfo = null;
+    
+    try {
+      const bytes = CryptoJS.AES.decrypt(decodeURIComponent(encryptedTestId), secretKey);
+      const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+      
+      // Спробуємо розпарсити як JSON (для нового формату)
+      try {
+        testInfo = JSON.parse(decrypted);
+        testId = testInfo.testId || testInfo.id || decrypted;
+      } catch (e) {
+        // Якщо не JSON, використовуємо як простий ID (для старого формату)
+        testId = decrypted;
+      }
+    } catch (error) {
+      console.error('Error decrypting test ID:', error);
+      return res.status(400).json({ error: 'Invalid test ID' });
+    }
+    
     if (!testId) {
       return res.status(400).json({ error: 'Invalid test ID' });
-  }
-    // Отримуємо інформацію про тест
-    const testQuery = `
-      SELECT id, title, created_at 
-      FROM tests 
-      WHERE id = $1;
-    `;
-    const testResult = await pool.query(testQuery, [testId]);
+    }
 
+    const testResult = await pool.query('SELECT * FROM tests WHERE id = $1', [testId]);
+
+    // Перевірка, чи знайдено тест
     if (testResult.rows.length === 0) {
       return res.status(404).json({ error: 'Test not found' });
     }
 
     const test = testResult.rows[0];
 
-    // Отримуємо всі питання, підпитання та відповіді, пов’язані з тестом
+    // Отримуємо всі питання, підпитання та відповіді, пов'язані з тестом
     const query = `
       SELECT 
-  q.id AS question_id,
-  q.type AS question_type,
-  q.question_text,
-  q.created_at AS question_created_at,
-  sq.id AS subquestion_id,
-  sq.subquestion_text,
-  a.id AS answer_id,
-  a.answer_text,
-  a.is_correct,
-  a.created_at AS answer_created_at
-FROM questions q
-LEFT JOIN subquestions sq ON q.id = sq.question_id
-LEFT JOIN answers a ON q.id = a.question_id AND (sq.id = a.subquestion_id OR a.subquestion_id IS NULL)
-WHERE q.test_id = $1
-ORDER BY q.id, sq.id, a.id;
-
+        q.id AS question_id,
+        q.type AS question_type,
+        q.question_text,
+        q.created_at AS question_created_at,
+        sq.id AS subquestion_id,
+        sq.subquestion_text,
+        a.id AS answer_id,
+        a.answer_text,
+        a.is_correct,
+        a.created_at AS answer_created_at
+      FROM questions q
+      LEFT JOIN subquestions sq ON q.id = sq.question_id
+      LEFT JOIN answers a ON q.id = a.question_id AND (sq.id = a.subquestion_id OR a.subquestion_id IS NULL)
+      WHERE q.test_id = $1
+      ORDER BY q.id, sq.id, a.id
     `;
 
-    const result = await pool.query(query, [testId]);
-  
-    // Створюємо структуру для питань
-    const questions = [];
-    const questionMap = {};
-    const createAnswer = (id, text, isCorrect) => ({
-      id,
-      answerText: text,
-      isCorrect,
-    });
+    // Виконуємо запит і зберігаємо результати
+    const questionsResult = await pool.query(query, [testId]);
+    console.log('Questions query result length:', questionsResult.rows.length);
 
-    result.rows.forEach((row) => {
-      const {
-        question_id,
-        question_type,
-        question_text,
-        subquestion_id,
-        subquestion_text,
-        answer_id,
-        answer_text,
-        is_correct,
-      } = row;
-      //console.log('Request body:', row); 
-       // Додаємо питання, якщо воно ще не оброблено
-       if (!questionMap[question_id]) {
-        questionMap[question_id] = {
-          id: question_id,
-          type: question_type,
-          questionText: question_text,
-          subquestions: [],
+    // Обробляємо результати запиту та формуємо масив питань
+    test.questions = [];
+    const questionsMap = new Map();
+
+    for (const row of questionsResult.rows) {
+      if (!questionsMap.has(row.question_id)) {
+        // Створюємо новий об'єкт питання
+        questionsMap.set(row.question_id, {
+          id: row.question_id,
+          type: row.question_type,
+          questionText: row.question_text,
           answers: [],
-        };
-        questions.push(questionMap[question_id]);
+          subquestions: []
+        });
+        
+        // Додаємо питання до масиву
+        test.questions.push(questionsMap.get(row.question_id));
       }
-
-      const question = questionMap[question_id];
-
-      if (subquestion_id) {
-        let subquestion = question.subquestions.find((sq) => sq.id === subquestion_id);
-        if (!subquestion) {
-          subquestion = {
-            id: subquestion_id,
-            subquestionText: subquestion_text,
-            answers: [],
-          };
-          question.subquestions.push(subquestion);
+      
+      // Обробляємо відповіді в залежності від типу питання
+      if (row.answer_id) {
+        const question = questionsMap.get(row.question_id);
+        
+        if (row.question_type === 'Matching' && row.subquestion_id) {
+          // Для питань типу Matching зберігаємо підпитання та відповіді окремо
+          let subquestion = question.subquestions.find(sq => sq.id === row.subquestion_id);
+          
+          if (!subquestion) {
+            subquestion = {
+              id: row.subquestion_id,
+              subquestionText: row.subquestion_text,
+              answers: []
+            };
+            question.subquestions.push(subquestion);
+          }
+          
+          subquestion.answers.push({
+            id: row.answer_id,
+            answerText: row.answer_text,
+            isCorrect: row.is_correct
+          });
+        } else {
+          // Для інших типів питань додаємо відповіді напряму
+          question.answers.push({
+            id: row.answer_id,
+            answerText: row.answer_text,
+            isCorrect: row.is_correct
+          });
         }
-        if (answer_id) {
-          subquestion.answers.push(createAnswer(answer_id, answer_text, is_correct));
-        }
-      } else if (answer_id) {
-        question.answers.push(createAnswer(answer_id, answer_text, is_correct));
       }
-    });
+    }
 
-    test.questions = questions;
+    console.log('Final test questions count:', test.questions.length);
 
+    // Додаємо інформацію про тест
+    if (!testInfo) {
+      testInfo = { 
+        testId: testId
+      };
+      
+      // Додаємо інформацію з параметрів запиту, якщо вона є
+      if (moduleId) testInfo.moduleId = moduleId;
+      if (courseId) testInfo.courseId = courseId;
+      if (testType) testInfo.type = testType;
+    }
+
+    // Додаємо цю інформацію до відповіді
+    test._testInfo = testInfo;
+    
     res.json(test);
   } catch (error) {
     console.error('Error fetching test data:', error);
@@ -221,46 +262,15 @@ ORDER BY q.id, sq.id, a.id;
   }
 });
 
-
 // Налаштування Nodemailer для Gmail
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: process.env.EMAIL_USER,         // ваша електронна пошта
-    pass: process.env.EMAIL_PASSWORD,// Використовуйте пароль додатку (App Password)
+    pass: process.env.EMAIL_PASSWORD,     // Використовуйте пароль додатку (App Password)
   },
 });
 
-
-// Маршрут для отримання пар відповідей
-/*router.post('/api/matching-pairs', async (req, res) => {
-  try {
-    console.log('Received request body:', req.body);
-    const { questionId } = req.body;
-
-    if (!questionId) {
-      return res.status(400).json({ error: 'Missing questionId' });
-    }
-    const query = `
-      SELECT 
-        sq.id AS subquestion_id, 
-        sq.subquestion_text, 
-        a.id AS answer_id, 
-        a.answer_text
-      FROM subquestions sq
-      JOIN answers a ON sq.id = a.subquestion_id
-      WHERE sq.question_id =  $1;
-    `;
-
-    const { rows } = await pool.query(query, [questionId]);
-    console.log('Received request body:', rows);
-    res.json(rows);
-  } catch (error) {
-    console.error('Database error:', error);
-    res.status(500).json({ error: 'Database query failed' });
-  }
- 
-});*/
 // Маршрут для надсилання результатів тесту
 router.post('/send-test-results', async (req, res) => {
   try {
@@ -326,6 +336,5 @@ router.post('/send-test-results', async (req, res) => {
     res.status(500).json({ error: 'Server error occurred while sending test results.' });
   }
 });
-
 
 module.exports = router;

@@ -812,8 +812,28 @@ function createModuleHTML(module) {
         return '/images/file-icon.svg';
     };
 
-    const { completed, total } = module.progress;
-    const remaining = total - completed;
+    // Оновлений розрахунок прогресу, який враховує тести модулів
+    const totalLectures = module.lectures.length;
+    const completedLectures = module.lectures.filter(lecture => lecture.completed).length;
+    
+    // Додаємо кількість тестів модуля (1 якщо є test_link)
+    const hasModuleTest = module.test_link ? 1 : 0;
+    
+    // Додаємо статус завершення тесту модуля
+    const isModuleTestCompleted = module.is_module_test_completed ? 1 : 0;
+    
+    // Загальна кількість "елементів" в модулі: лекції + тест модуля
+    const totalItems = totalLectures + hasModuleTest;
+    
+    // Загальна кількість пройдених "елементів"
+    const completedItems = completedLectures + isModuleTestCompleted;
+    
+    // Розрахунок прогресу
+    const progress = {
+        completed: completedItems,
+        total: totalItems,
+        remaining: totalItems - completedItems
+    };
     
     return `
         <section class="module" data-module-id="${module.id}">
@@ -826,9 +846,9 @@ function createModuleHTML(module) {
             ${module.lectures.length > 0 ? `
                 <div class="module-content">
                     <div class="module-progress">
-                        <span>${completed}/${total} complete</span>
+                        <span>${progress.completed}/${progress.total} complete</span>
                         <span class="separator">|</span>
-                        <span>${remaining} left</span>
+                        <span>${progress.remaining} left</span>
                     </div>
                     <ul class="topics">
                         ${module.lectures.map(lecture => `
@@ -845,9 +865,13 @@ function createModuleHTML(module) {
                     </ul>
                     ${module.test_link ? `
                         <div class="module-test">
-                            <li onclick="openModuleTest('${module.test_link}')" 
-                                class="topic-item test-item"
-                                data-content-type="test">
+                            <li onclick="handleModuleTestClick(${module.id}, '${module.test_link}')" 
+                                class="topic-item test-item ${module.is_module_test_completed ? 'completed' : ''}"
+                                data-content-type="test"
+                                data-module-id="${module.id}"
+                                data-test-link="${module.test_link}"
+                                style="background-color: ${module.is_module_test_completed ? '#e8f5e9' : 'transparent'}"
+                            >
                                 <img src="/images/test-icon.svg" class="topic-icon" alt="test icon" />
                                 <span class="topic-title">Module Test</span>
                             </li>
@@ -1020,7 +1044,7 @@ async function handleTestComplete(testData) {
     }
 }
 
-window.openModuleTest = async function(testLink) {
+window.openModuleTest = async function(testLink, moduleId) {
     const videoContainer = document.querySelector('.video-player');
     if (!videoContainer) return;
 
@@ -1047,13 +1071,8 @@ window.openModuleTest = async function(testLink) {
 
         iframe.src = testLink;
         
-        window.addEventListener('message', function(event) {
-            if (event.origin !== window.location.origin) return;
-            
-            if (event.data.type === 'testComplete') {
-                handleTestComplete(event.data);
-            }
-        });
+        // Додаємо обробник для отримання повідомлення про завершення тесту
+        window.addEventListener('message', handleTestCompleteMessage);
 
         testContainer.appendChild(iframe);
         videoContainer.appendChild(testContainer);
@@ -1075,7 +1094,7 @@ window.openModuleTest = async function(testLink) {
             </div>
         `;
     }
-}
+};
 
 async function initializeLecturesState() {
     try {
@@ -1489,6 +1508,7 @@ async function loadCourseData() {
                     id: module.id,
                     title: module.title,
                     test_link: module.test_link, 
+                    is_module_test_completed: module.is_module_test_completed || false,
                     lectures: lectures.map(lecture => ({
                         id: lecture.id,
                         title: lecture.title,
@@ -1503,11 +1523,17 @@ async function loadCourseData() {
                 };
             });
             
-            courseMeta = {
-                test_link: courseData.test_link
+            // Зберігаємо дані про курс включно з інформацією про фінальний тест
+            const courseMeta = {
+                id: courseData.id,
+                name: courseData.name,
+                description: courseData.description,
+                test_link: courseData.test_link,
+                is_course_test_completed: courseData.is_course_test_completed
             };
             
-            renderCourseContent();
+            // Передаємо дані про курс в функцію рендерингу
+            renderCourseContent(courseMeta);
             applyCompletedLecturesStyles();
  
             let firstUncompletedLecture = null;
@@ -1532,7 +1558,7 @@ async function loadCourseData() {
     } catch (error) {
         console.error('Error loading course data:', error);
     }
- }
+}
 
 function applyCompletedLecturesStyles() {
     const topics = document.querySelectorAll('.topic-item');
@@ -1797,7 +1823,7 @@ function initializeTopicListeners() {
     });
  }
 
-async function updateProgress() {
+ async function updateProgress() {
     try {
         const courseId = window.location.pathname.split('/course/').pop();
         const userId = localStorage.getItem('userId');
@@ -1806,6 +1832,7 @@ async function updateProgress() {
         if (!response.ok) throw new Error('Failed to fetch progress');
         
         const progressData = await response.json();
+        console.log('Progress data:', progressData);
         
         const progressBar = document.querySelector('.progress-bar span');
         const progressText = document.querySelector('.progress-text .percent');
@@ -1814,6 +1841,43 @@ async function updateProgress() {
             progressBar.style.width = `${progressData.progress}%`;
             progressText.textContent = `${Math.round(progressData.progress)}%`;
         }
+        
+        // Оновлюємо статус лекцій
+        document.querySelectorAll('.topic-item').forEach(topic => {
+            const lectureId = topic.dataset.topicId;
+            if (lectureId && progressData.completedLectureIds && 
+                progressData.completedLectureIds.includes(parseInt(lectureId))) {
+                topic.classList.add('completed');
+                topic.style.backgroundColor = '#e8f5e9';
+            }
+        });
+        
+        // Оновлюємо статус модульних тестів
+        if (progressData.completedModuleTests > 0) {
+            document.querySelectorAll('.test-item').forEach(testItem => {
+                const moduleId = testItem.dataset.moduleId;
+                if (moduleId) {
+                    // Тут потрібно перевірити, чи цей тест завершено
+                    // Для цього можна додати список завершених тестів у відповідь API
+                    // Або зробити окремий запит для перевірки
+                    testItem.classList.add('completed');
+                    testItem.style.backgroundColor = '#e8f5e9';
+                }
+            });
+        }
+        
+        // Оновлюємо статус фінального тесту
+        if (progressData.completedFinalTest) {
+            const finalTestSection = document.querySelector('.final-test-section');
+            if (finalTestSection) {
+                finalTestSection.classList.add('completed');
+                finalTestSection.style.backgroundColor = '#e8f5e9';
+            }
+        }
+        
+        // Також можна оновити загальні дані по прогресу курсу
+        console.log(`Course progress: ${progressData.completedItems}/${progressData.totalItems} items (${progressData.progress}%)`);
+        
     } catch (error) {
         console.error('Error updating progress:', error);
     }
@@ -1905,3 +1969,257 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Error initializing course view:', error);
     }
 });
+
+// Оновлена функція completeModuleTest
+async function completeModuleTest(moduleId, score = 100) {
+    try {
+        console.log(`Completing module test for moduleId: ${moduleId}`);
+        const userId = localStorage.getItem('userId');
+        
+        if (!userId) {
+            console.error('User ID not found in localStorage');
+            alert('Error: User ID not found. Please log in again.');
+            return false;
+        }
+        
+        // Важливо: перевіряємо, чи тест цього модуля вже був завершений
+        const moduleItem = document.querySelector(`[data-module-id="${moduleId}"]`);
+        const testItem = moduleItem?.querySelector('.test-item');
+        
+        // Якщо цей тест уже позначено як пройдений, не потрібно відправляти запит знову
+        if (testItem && testItem.classList.contains('completed')) {
+            console.log(`Module test ${moduleId} already completed`);
+            alert('Test already completed!');
+            return true;
+        }
+        
+        console.log('Sending test completion data:', { userId, moduleId, score });
+        
+        // Відправляємо запит на завершення тесту
+        const response = await fetch(`/api/module/${moduleId}/test/complete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                userId,
+                score
+            })
+        });
+
+        console.log('Server response status:', response.status);
+        
+        // Клонуємо відповідь, щоб можна було прочитати її кілька разів
+        const responseClone = response.clone();
+        
+        if (!response.ok) {
+            let errorMessage = 'Failed to complete module test';
+            try {
+                const errorData = await responseClone.json();
+                errorMessage = errorData.error || errorMessage;
+            } catch (e) {
+                try {
+                    errorMessage = await response.text();
+                } catch (e2) {
+                    // Залишаємо базове повідомлення
+                }
+            }
+            throw new Error(errorMessage);
+        }
+
+        // Оновлюємо інтерфейс після успішного запиту
+        await updateProgress();
+        
+        if (testItem) {
+            testItem.classList.add('completed');
+            testItem.style.backgroundColor = '#e8f5e9';
+        }
+        
+        console.log(`Module test ${moduleId} completed successfully`);
+        return true;
+
+    } catch (error) {
+        console.error('Error completing module test:', error);
+        alert(`Помилка завершення тесту: ${error.message}`);
+        return false;
+    }
+}
+
+function handleTestCompleteMessage(event) {
+    console.log('Received message from iframe:', event.data);
+    
+    if (event.data && event.data.type === 'testComplete') {
+        console.log('Received test complete message:', event.data);
+        
+        let testType = event.data.testType || 'module';
+        let moduleId = parseInt(event.data.moduleId || 0);
+        let courseId = parseInt(event.data.courseId || 0);
+        let score = parseInt(event.data.score || 100);
+        
+        // Debug logging
+        console.log('Processing test completion with:', {
+            testType,
+            moduleId,
+            courseId,
+            score
+        });
+        
+        // Якщо moduleId та courseId не передані, спробуємо отримати їх з активного елемента
+        if (moduleId === 0 && courseId === 0) {
+            const activeTestItem = document.querySelector('.test-item.active');
+            if (activeTestItem) {
+                moduleId = parseInt(activeTestItem.dataset.moduleId || 0);
+                // Перевіряємо, чи тест вже пройдений
+                if (activeTestItem.classList.contains('completed')) {
+                    console.log('Test already completed, no need to call completeModuleTest');
+                    alert('Test has already been completed');
+                    return;
+                }
+                console.log('Found active test with moduleId:', moduleId);
+            } else {
+                // Перевіряємо, чи це фінальний тест курсу
+                const finalTestSection = document.querySelector('.final-test-section');
+                if (finalTestSection) {
+                    courseId = parseInt(finalTestSection.dataset.courseId || 0);
+                    testType = 'course';
+                    // Перевіряємо, чи тест вже пройдений
+                    if (finalTestSection.classList.contains('completed')) {
+                        console.log('Final test already completed, no need to call completeCourseTest');
+                        alert('Final test has already been completed');
+                        return;
+                    }
+                    console.log('Found final test with courseId:', courseId);
+                }
+            }
+        }
+        
+        console.log('Final test parameters:', { testType, moduleId, courseId });
+        
+        if (testType === 'module' && moduleId > 0) {
+            completeModuleTest(moduleId, score);
+        } else if (testType === 'course' && courseId > 0) {
+            completeCourseTest(courseId, score);
+        } else {
+            console.error('Could not determine test type or ID');
+            alert('Помилка: Неможливо завершити тест - відсутній ID модуля або курсу');
+        }
+    }
+}
+
+// Функція для завершення фінального тесту курсу
+async function completeCourseTest(courseId, score = 100) {
+    try {
+        console.log(`Completing course test for courseId: ${courseId}`);
+        const userId = localStorage.getItem('userId');
+        const response = await fetch(`/api/course/${courseId}/test/complete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                userId,
+                score
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to complete course test');
+        }
+
+        // Оновлюємо відображення прогресу
+        await updateProgress();
+        
+        // Оновлюємо стилі для фінального тесту
+        const finalTestItem = document.querySelector('.final-test-section');
+        if (finalTestItem) {
+            finalTestItem.classList.add('completed');
+            finalTestItem.style.backgroundColor = '#e8f5e9';
+        }
+        
+        console.log(`Course test ${courseId} completed successfully`);
+
+    } catch (error) {
+        console.error('Error completing course test:', error);
+    }
+}
+
+window.handleModuleTestClick = function(moduleId, testLink) {
+    console.log(`Handling module test click: moduleId=${moduleId}, testLink=${testLink}`);
+    openModuleTest(testLink, moduleId);
+}
+
+// Функція для обробки кліку по фінальному тесту курсу
+window.handleCourseTestClick = function(courseId, testLink) {
+    console.log(`Handling course test click: courseId=${courseId}, testLink=${testLink}`);
+    openModuleTest(testLink, null);
+}
+
+// Оновлений HTML для модульних тестів (використовується у createModuleHTML)
+function renderModuleTest(module) {
+    if (!module.test_link) return '';
+    
+    return `
+        <div class="module-test">
+            <li onclick="handleModuleTestClick(${module.id}, '${module.test_link}')" 
+                class="topic-item test-item ${module.is_module_test_completed ? 'completed' : ''}"
+                data-content-type="test"
+                data-module-id="${module.id}"
+                data-test-link="${module.test_link}"
+                style="background-color: ${module.is_module_test_completed ? '#e8f5e9' : 'transparent'}"
+            >
+                <img src="/images/test-icon.svg" class="topic-icon" alt="test icon" />
+                <span class="topic-title">Module Test</span>
+            </li>
+        </div>
+    `;
+}
+
+// Оновлений HTML для фінального тесту (використовується у renderCourseContent)
+function renderFinalTest(courseData) {
+    const courseId = courseData.id;
+    const testLink = courseData.test_link;
+    const isCompleted = courseData.is_course_test_completed;
+    
+    if (!testLink) return ''; // Немає фінального тесту
+    
+    return `
+        <section class="final-test-section ${isCompleted ? 'completed' : ''}" 
+                 data-course-id="${courseId}"
+                 style="background-color: ${isCompleted ? '#e8f5e9' : 'transparent'}">
+            <div class="module-header">
+                <h2>Фінальний тест курсу</h2>
+            </div>
+            <div class="test-content" 
+                 onclick="handleCourseTestClick(${courseId}, '${testLink}')"
+                 style="cursor: pointer; padding: 15px 20px;">
+                <img src="/images/test-icon.svg" alt="Test icon" class="topic-icon" />
+                <span class="topic-title">Пройти фінальний тест</span>
+            </div>
+        </section>
+    `;
+}
+
+function renderCourseContent(courseData) {
+    const courseContent = document.querySelector('.course-content');
+    if (!courseContent) return;
+    
+    courseContent.innerHTML = `
+        <div class="course-header">
+            <h1>Зміст курсу</h1>
+            <button class="toggle-all" aria-label="Toggle all content"></button>
+        </div>
+    `;
+    
+    // Відображаємо всі модулі
+    COURSE_MODULES.forEach(module => {
+        courseContent.insertAdjacentHTML('beforeend', createModuleHTML(module));
+    });
+    
+    // Додаємо фінальний тест, якщо він є
+    if (courseData && courseData.test_link) {
+        courseContent.insertAdjacentHTML('beforeend', renderFinalTest(courseData));
+    }
+    
+    initializeModuleListeners();
+}

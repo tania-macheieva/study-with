@@ -327,3 +327,21 @@ CREATE TABLE notes (
     updatedAt TIMESTAMP DEFAULT NOW()
 );
 
+CREATE TABLE test_progress (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    module_id INTEGER REFERENCES modules(id) ON DELETE CASCADE,
+    course_id INTEGER REFERENCES all_courses(id) ON DELETE CASCADE,
+    test_type VARCHAR(20) CHECK (test_type IN ('module', 'course')),
+    completed BOOLEAN DEFAULT false,
+    completed_at TIMESTAMP,
+    score INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, module_id, test_type),
+    UNIQUE(user_id, course_id, test_type)
+);
+
+CREATE INDEX idx_test_progress_user_id ON test_progress(user_id);
+CREATE INDEX idx_test_progress_module_id ON test_progress(module_id);
+CREATE INDEX idx_test_progress_course_id ON test_progress(course_id);
+
