@@ -79,25 +79,7 @@ router.post('/create-checkout-session', async (req, res) => {
         const teacherAmountCents = coursePriceCents - platformFeeCents; 
 
         const transferGroup = `course_${courseId}_${Date.now()}`;
-        let courseImage = 'https://placehold.co/600x400?text=Course+Image';
 
-        if (course.image_url) {
-            const baseUrl = process.env.FRONTEND_URL;
-            
-            if (course.image_url.startsWith('http')) {
-                courseImage = course.image_url;
-            } else {
-                courseImage = `${baseUrl}/uploads/${course.image_url}`;
-            }
-            
-            if (!courseImage.startsWith('https') && courseImage.startsWith('http:')) {
-                courseImage = courseImage.replace('http://', 'https://');
-            }
-        }
-
-        console.log('Using image URL for Stripe:', courseImage);
-
-        courseImage = encodeURI(courseImage);
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: [{
@@ -106,7 +88,6 @@ router.post('/create-checkout-session', async (req, res) => {
                     product_data: {
                         name: course.name,
                         description: course.description || 'Course purchase',
-                        images: [courseImage],
                     },
                     unit_amount: coursePriceCents
                 },

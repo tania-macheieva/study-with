@@ -5,21 +5,8 @@ const createDiscussionTemplate = () => `
         <button class="icon-button send">
             <img src="../images/send.svg" alt="Send">
         </button>
-        <button class="icon-button search">
-            <img src="../images/icons8-search-50.png" alt="Search">
-        </button>
     </div>
     <div class="filters">
-        <div class="filters-left">
-            <div class="checkbox-filter">
-                <input type="checkbox" id="questions-asked">
-                <label for="questions-asked">Questions I asked</label>
-            </div> 
-            <div class="checkbox-filter">
-                <input type="checkbox" id="questions-responses">
-                <label for="questions-responses">Questions with responses</label>
-            </div>
-        </div>
         <div class="filters-right">
             <div class="filter-group">
                 <button class="filter-btn active">Whole course</button>
@@ -154,7 +141,14 @@ function renderReplies(replies, parentMessageId) {
     }    
     repliesContainer.innerHTML = '';
 
-    const sortedReplies = [...replies].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    // Sort replies based on the current sorting preference
+    const sortedReplies = [...replies].sort((a, b) => {
+        if (currentCommentSorting === 'recent') {
+            return new Date(b.created_at) - new Date(a.created_at); // Newest first
+        } else {
+            return new Date(a.created_at) - new Date(b.created_at); // Oldest first
+        }
+    });
  
     const replyMap = new Map(sortedReplies.map(reply => [reply.id, reply]));
 
@@ -176,7 +170,8 @@ function renderReplies(replies, parentMessageId) {
             }).replace(/(\d+)\/(\d+)\/(\d{4})/, '$2/$1/$3');  
         };
 
-        const avatar = reply.teacher_profile_image || reply.student_profile_image || '/images/user-avatar.png';
+        const avatar = reply.teacher_profile_image || reply.student_profile_image || reply.profile_image || '/images/user-avatar.png';
+
         let messageContent = reply.content || '';
 
         let parentUsername = '';
@@ -234,6 +229,7 @@ function renderReplies(replies, parentMessageId) {
             const replyElement = createReplyElement(reply);
             repliesContainer.appendChild(replyElement);
             
+            // For nested replies, we continue with the same sorting logic
             processReplies(reply.id);
         });
     };
@@ -244,7 +240,6 @@ function renderReplies(replies, parentMessageId) {
     }
     updateMessageStyles();
 }
-
 
 const createMessageHTML = (message, isReply = false, replyLevel = 0) => { 
     const messageElement = document.createElement('div');
@@ -265,7 +260,8 @@ const createMessageHTML = (message, isReply = false, replyLevel = 0) => {
     }
 
     const user = message.user || { name: message.user_name || 'Unknown User' };
-    const avatar = message.teacher_profile_image || message.student_profile_image || user.profile_image || '/images/user-avatar.png';
+    const avatar =  message.student_profile_image || message.profile_image || '/images/user-avatar.png';
+
 
     const formatDate = (isoString) => {
         const date = new Date(isoString);
@@ -1184,7 +1180,6 @@ discussionThread.addEventListener('click', function (e) {
     }
 });
 // Надсилання відповіді по Enter
-// Надсилання відповіді по Enter
 discussionThread.addEventListener('keydown', function (e) {
     if (e.key === 'Enter' && !e.shiftKey) {
         const activeInput = e.target;
@@ -1239,6 +1234,10 @@ discussionThread.addEventListener('keydown', function (e) {
     }
 });
 };
+// Add a global variable to track current sorting
+let currentCommentSorting = 'recent';
+
+// Modify the existing code to add sorting functionality
 const fetchComments = async (courseId) => {
     try {
         const response = await fetch(`http://localhost:8000/api/comments?course_id=${courseId}`);
@@ -1258,10 +1257,16 @@ const fetchComments = async (courseId) => {
 
         discussionThread.innerHTML = '';
 
-        // Sort main comments by date in descending order (newest first)
+        // Sort main comments based on current sorting preference
         const mainComments = comments
             .filter(comment => !comment.parent_comment_id)
-            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            .sort((a, b) => {
+                if (currentCommentSorting === 'recent') {
+                    return new Date(b.created_at) - new Date(a.created_at); // Newest first
+                } else {
+                    return new Date(a.created_at) - new Date(b.created_at); // Oldest first
+                }
+            });
 
         mainComments.forEach(comment => {
             const messageElement = createMessageHTML(comment);
@@ -1293,7 +1298,29 @@ const fetchComments = async (courseId) => {
         console.error('Error fetching comments:', error);
     }
 };
-  
+
+// Add event listeners for sorting buttons
+document.addEventListener('DOMContentLoaded', () => {
+    const recentButton = document.querySelector('.filter-group .filter-btn:first-child');
+    const oldestButton = document.querySelector('.filter-group .filter-btn:last-child');
+    const courseId = window.location.pathname.split('/course/').pop();
+
+    if (recentButton && oldestButton) {
+        recentButton.addEventListener('click', () => {
+            currentCommentSorting = 'recent';
+            recentButton.classList.add('active');
+            oldestButton.classList.remove('active');
+            fetchComments(courseId);
+        });
+
+        oldestButton.addEventListener('click', () => {
+            currentCommentSorting = 'oldest';
+            oldestButton.classList.add('active');
+            recentButton.classList.remove('active');
+            fetchComments(courseId);
+        });
+    }
+});
 
 // Допоміжна функція для отримання ланцюжка батьківських коментарів
 const getParentChain = (comment, allComments) => {
@@ -1309,9 +1336,6 @@ const getParentChain = (comment, allComments) => {
     return chain;
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-// renderDiscussion();
-// initializeFilters();
-initializeDiscussionListeners();
-// initializeTabs();
+document.addEventListener('DOMContentLoaded', () => { 
+initializeDiscussionListeners(); 
 });

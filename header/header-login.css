@@ -214,3 +214,9 @@ body {
 a.lang-btn {
     cursor: pointer;
 }
+
+@media screen and (max-width: 480px) {
+    .site-header {
+        display: none;
+    }
+}

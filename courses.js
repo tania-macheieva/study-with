@@ -683,6 +683,12 @@ router.get('/:id/full', async (req, res) => {
               c.*,
               cat.name as category_name,
               el.name as education_level,
+              u.id as author_id,
+              u.name as author_name,
+              u.profile_image as author_profile_image,
+              t.nickname as author_nickname,
+              t.about as author_about,
+              t.experience as author_experience,
               (
                   SELECT json_agg(
                       json_build_object(
@@ -711,6 +717,8 @@ router.get('/:id/full', async (req, res) => {
           FROM all_courses c
           LEFT JOIN categories cat ON c.category_id = cat.id
           LEFT JOIN education_levels el ON c.education_level_id = el.id
+          LEFT JOIN users u ON c.author_id = u.id
+          LEFT JOIN teachers t ON u.id = t.user_id
           WHERE c.id = $1 AND c.status = 'published';
       `;
 
@@ -730,13 +738,21 @@ router.get('/:id/full', async (req, res) => {
           category: course.category_name,
           level: course.education_level,
           image_url: course.image_url,
-          modules: course.modules || []
+          modules: course.modules || [],
+          author: {
+              id: course.author_id,
+              name: course.author_name,
+              profile_image: course.author_profile_image,
+              nickname: course.author_nickname,
+              about: course.author_about,
+              experience: course.author_experience
+          }
       });
 
-  } catch (err) {
-      console.error('Помилка отримання курсу:', err);
-      res.status(500).json({ error: 'Внутрішня помилка сервера' });
-  }
+    } catch (err) {
+        console.error('Помилка отримання курсу:', err);
+        res.status(500).json({ error: 'Внутрішня помилка сервера' });
+    }
 });
 
 //-тут

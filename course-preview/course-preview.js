@@ -380,24 +380,20 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
         }
     ];
 
-    const speakers = [
-        {
-            name: "Speaker name 1",
-            image: "#D9D9D9",
-            achievements: "here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements  here should be the speaker's achievementshere should be the speaker's achievements here should be the speaker's achievementshere should be the speaker's achievements here should be the speaker's achievementshere should be the speaker's achievements here should be the speaker's achievements"
-        },
-        {
-            name: "Speaker name 2",
-            image: "#C9C9C9",
-            achievements: "Another speaker achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements "
-        },
-        {
-            name: "Speaker name 3",
-            image: "#B9B9B9",
-            achievements: "Third speaker achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements here should be the speaker's achievements "
-        }
-    ];
+    let speakers = [];
 
+    if (courseData && courseData.author) {
+        speakers = [{
+            name: courseData.author.name || 'Невідомий автор',
+            nickname: courseData.author.nickname || '',
+            image: courseData.author.profile_image || '/images/user-avatar.png',
+            achievements: courseData.author.about || 
+                        courseData.author.experience || 
+                        'Інформація про автора відсутня'
+        }];
+    }
+
+    
     let currentReviewIndex = 0;
     let currentSpeakerIndex = 0;
 
@@ -448,15 +444,22 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
     }
 
     function updateSpeaker() {
-        const speaker = speakers[currentSpeakerIndex];
+    if (speakers.length === 0) {
         const speakersSection = document.querySelector('.speakers-section');
         const whiteCard = speakersSection.querySelector('.white-card');
-        
+        whiteCard.innerHTML = `<p>Інформація про автора відсутня</p>`;
+        return;
+    }
+    
+    const speaker = speakers[currentSpeakerIndex];
+    const speakersSection = document.querySelector('.speakers-section');
+    const whiteCard = speakersSection.querySelector('.white-card');
+    
         whiteCard.innerHTML = `
-            <a href="#" class="speaker-name-link">${speaker.name}</a>
-            <div class="speaker-image" style="background-color: ${speaker.image}"></div>
-            <p>${speaker.achievements}</p>
-        `;
+    <a href="/public-profile/${speaker.id || courseData.author.id}" class="speaker-name-link" target="_blank">${speaker.name} ${speaker.nickname ? `(${speaker.nickname})` : ''}</a>
+    <div class="speaker-image" style="background-image: url('${speaker.image}')"></div>
+    <p>${speaker.achievements}</p>
+`;
     }
 
     const reviewsSection = document.querySelector('.reviews-section');
@@ -590,43 +593,44 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
                     });
                 });
             } else if (section.classList.contains('speakers-section')) {
-                modalContainer.style.display = 'block';
-                modalContainer.innerHTML = `
-                    <div class="modal-overlay">
-                        <div class="modal-content">
-                            <button class="modal-close">×</button>
-                            <div class="white-card">
-                                <div class="speakers-container">
-                                    ${speakers.map((speaker, index) => `
-                                        <div class="speaker-card-modal${index !== speakers.length - 1 ? ' with-border' : ''}">
-                                            <div class="speaker-content">
-                                                <div class="speaker-image-small" style="background-color: ${speaker.image}"></div>
-                                                <div class="speaker-info">
-                                                    <a href="#" class="speaker-name-link">${speaker.name}</a>
-                                                    <p class="speaker-achievements">${speaker.achievements}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    `).join('')}
+                if (speakers.length === 0) {
+                    modalContainer.style.display = 'block';
+                    modalContainer.innerHTML = `
+                        <div class="modal-overlay">
+                            <div class="modal-content">
+                                <button class="modal-close">×</button>
+                                <div class="white-card">
+                                    <p>Інформація про автора відсутня</p>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                `;
-            } else {
-                const content = section.querySelector('.white-card').cloneNode(true);
-                
-                modalContainer.style.display = 'block';
-                modalContainer.innerHTML = `
-                    <div class="modal-overlay">
-                        <div class="modal-content">
-                            <button class="modal-close">×</button>
-                            ${content.outerHTML}
+                    `;
+                } else {
+                    modalContainer.style.display = 'block';
+                    modalContainer.innerHTML = `
+                        <div class="modal-overlay">
+                            <div class="modal-content">
+                                <button class="modal-close">×</button>
+                                <div class="white-card">
+                                    <div class="speakers-container">
+                                        ${speakers.map((speaker, index) => `
+                                            <div class="speaker-card-modal${index !== speakers.length - 1 ? ' with-border' : ''}">
+                                                <div class="speaker-content">
+                                                    <div class="speaker-image-small" style="background-image: url('${speaker.image}')"></div>
+                                                    <div class="speaker-info">
+                                                        <a href="#" class="speaker-name-link">${speaker.name} ${speaker.nickname ? `(${speaker.nickname})` : ''}</a>
+                                                        <p class="speaker-achievements">${speaker.achievements}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                }
             }
-
             const modalOverlay = modalContainer.querySelector('.modal-overlay');
             const modalClose = modalContainer.querySelector('.modal-close');
             

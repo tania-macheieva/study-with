@@ -2,14 +2,16 @@ const translations = {
     en: {
         pageTitle: 'StudyWith | Register',
         welcomeText: 'Welcome to StudyWith!<br>Learn, connect, succeed together!',
-        studentAccount: 'Create an account as a student',
-        teacherAccount: 'Create an account as a teacher',
+        createAcc:'Create an account as a',
+        student:'Student',
+        teacher:'Teacher',
     },
     ua: {
         pageTitle: 'StudyWith | Реєстрація',
         welcomeText: 'Ласкаво просимо в StudyWith!<br>Навчайтеся, спілкуйтеся, досягайте разом!',
-        studentAccount: 'Створити акаунт як студент',
-        teacherAccount: 'Створити акаунт як викладач',
+        createAcc:'Створити аккаунт як',
+        student:'Студент',
+        teacher:'Викладач',
     },
 };
 
@@ -18,8 +20,11 @@ function applyLanguage(lang) {
 
     document.title = langData.pageTitle;
     document.querySelector('[data-lang="welcomeText"]').innerHTML = langData.welcomeText;
-    document.querySelector('[data-lang="studentAccount"]').textContent = langData.studentAccount;
-    document.querySelector('[data-lang="teacherAccount"]').textContent = langData.teacherAccount;
+    document.querySelectorAll('[data-lang="createAcc"]').forEach(el => {
+        el.firstChild.textContent = langData.createAcc + " ";
+    });
+    document.querySelector('[data-lang="student"]').textContent = langData.student;
+    document.querySelector('[data-lang="teacher"]').textContent = langData.teacher;
 }
 
 document.addEventListener('DOMContentLoaded', () => {

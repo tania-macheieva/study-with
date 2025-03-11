@@ -107,32 +107,34 @@
                     </div> -->
                     <div>
                         <div class="my-certificates">
-                            <h2>My certificates</h2>
+                            <h2 data-lang="myCertificates">My certificates</h2>
                             <div class="certificates-list">
-                                <div class="certificate">
-                                    <p class="p-1" data-lang="myCertificates">Certificate name 1</p>
+                                 <div class="certificate">
+                                    <p class="p-1" data-lang="certificateName">Certificate name 1</p>
                                     <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
                                     <button class="btn-download">
-                                        <img src="/images/download-certificate.png" alt="">
+                                        <img src="/images/download-certificate.png">
+                                    </button>
+                                </div> 
+                                <div class="certificate">
+                                    <p class="p-1" data-lang="certificateName">Certificate name 1</p>
+                                    <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
+                                    <button class="btn-download">
+                                        <img src="/images/download-certificate.png">
                                     </button>
                                 </div>
                                 <div class="certificate">
-                                    <p class="p-1" data-lang="myCertificates">Certificate name 2</p>
+                                    <p class="p-1" data-lang="certificateName">Certificate name 1</p>
                                     <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
                                     <button class="btn-download">
-                                        <img src="/images/download-certificate.png" alt="">
+                                        <img src="/images/download-certificate.png">
                                     </button>
                                 </div>
-                                <div class="certificate">
-                                    <p class="p-1" data-lang="myCertificates">Certificate name 3</p>
-                                    <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
-                                    <button class="btn-download">
-                                        <img src="/images/download-certificate.png" alt="">
-                                    </button>
-                                </div>
+                                
                             </div>
                             <button class="btn-view-all-3" data-lang="btnViewAll">View all</button>
                         </div>
+    
                         <div class="my-bookmarks">
                             <h2 data-lang="myBookmarks">My bookmarks</h2>
                             <div class="bookmarks-list">
@@ -627,9 +629,13 @@
                 
                         function createMessageItem(comment, isReply = false) {
                             const truncatedContent = truncateText(comment.content);
-                            const userImage = comment.profile_image
-                                ? `<img src="${comment.profile_image}" alt="${comment.user_name}" class="user-avatar">`
-                                : `<img src="/images/user-avatar.png" alt="Default Avatar" class="user-avatar">`;
+                            const userImage = comment.teacher_profile_image?.trim()
+                            ? `<img src="${comment.teacher_profile_image}" alt="${comment.user_name}" class="user-avatar">`
+                            : comment.student_profile_image?.trim()
+                            ? `<img src="${comment.student_profile_image}" alt="${comment.user_name}" class="user-avatar">`
+                            : comment.profile_image?.trim()
+                            ? `<img src="${comment.profile_image}" alt="${comment.user_name}" class="user-avatar">`
+                            : `<img src="/images/user-avatar.png" alt="Default Avatar" class="user-avatar">`;
                         
                             const commentLink = `/course/${comment.course_id}#comment-${comment.comment_id}`;
                             const courseThumbnail = comment.course_thumbnail

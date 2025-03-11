@@ -583,11 +583,14 @@ async function loadUserReplies() {
 
             // Обрізаємо батьківський коментар
             const truncatedParent = truncateText(reply.parent_comment_content);
-
-            const userImage = reply.profile_image
-                ? `<img src="${reply.profile_image}" alt="${reply.user_name}" class="user-avatar">`
-                : `<div class="default-avatar">${reply.user_name[0]}</div>`;
-
+            const userImage = reply.teacher_profile_image?.trim() 
+            ? `<img src="${reply.teacher_profile_image}" alt="${reply.user_name}" class="user-avatar">`
+            : reply.student_profile_image?.trim()
+            ? `<img src="${reply.student_profile_image}" alt="${reply.user_name}" class="user-avatar">`
+            : reply.profile_image?.trim()
+            ? `<img src="${reply.profile_image}" alt="${reply.user_name}" class="user-avatar">`
+            : `<div class="default-avatar">${reply.user_name[0]}</div>`;
+        
             // Формуємо URL з якірним посиланням на коментар
             const commentLink = `/course/${reply.course_id}#comment-${reply.comment_id}`;
 

@@ -141,15 +141,6 @@ const renderNotes =async (userId, courseId) => {
     const filtersSection = document.createElement('div');
     filtersSection.classList.add('filters');
     filtersSection.style.fontFamily = 'Inter, sans-serif';
-    filtersSection.innerHTML = `
-        <div class="filters-right">
-            <div class="filter-group">
-                <button class="filter-btn active">Whole course</button>
-                <button class="filter-btn">Current module</button>
-                <button class="filter-btn">Current topic</button>
-            </div>
-        </div>
-    `;
 
     // Створюємо контейнер для списку нотаток
     const notesListContainer = document.createElement('div');
@@ -181,20 +172,18 @@ const renderNotes =async (userId, courseId) => {
 
     const filterNotes = (filter) => {
         notesListContainer.innerHTML = '';
-        const currentModule = document.querySelector('.module.active')?.dataset.moduleId;
-        const currentTopic = document.querySelector('.topic.active')?.dataset.topicId;
 
         Object.entries(notesByModules).forEach(([moduleId, moduleData]) => {
             let shouldShowModule = false;
 
-            switch(filter) {
-                case 'Whole course':
-                    shouldShowModule = Object.values(moduleData.topics).some(topic => topic.notes.length > 0);
-                    break;
-                case 'Current module':
-                    shouldShowModule = moduleId === currentModule;
-                    break;
-            }
+            // switch(filter) {
+            //     case 'Whole course':
+            //         shouldShowModule = Object.values(moduleData.topics).some(topic => topic.notes.length > 0);
+            //         break;
+            //     case 'Current module':
+            //         shouldShowModule = moduleId === currentModule;
+            //         break;
+            // }
 
             if (shouldShowModule) {
                 const moduleSection = document.createElement('div');
@@ -210,18 +199,6 @@ const renderNotes =async (userId, courseId) => {
 
                 Object.entries(moduleData.topics).forEach(([topicId, topicData]) => {
                     let shouldShowTopic = false;
-
-                    switch(filter) {
-                        case 'Whole course':
-                            shouldShowTopic = topicData.notes.length > 0;
-                            break;
-                        case 'Current module':
-                            shouldShowTopic = true;
-                            break;
-                        case 'Current topic':
-                            shouldShowTopic = topicId === currentTopic;
-                            break;
-                    }
 
                     if (shouldShowTopic) {
                         const topicSection = document.createElement('div');
@@ -676,10 +653,36 @@ const showNotesListModal = async (userId, courseId, lectureId) => {
    
 
     modal.innerHTML = `
-        <h3 style="margin: 0 0 15px 0; font-size: 18px;">My Notes</h3>
-        <div class="notes-list" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;">Loading notes...</div>
-        <div class="button-group">
-            <button class="close-button">Close</button>
+       <div class="modal-header" style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        ">
+            <h3 style="margin: 0; font-size: 18px;">My Notes</h3>
+            <button class="close-button" style="
+                background: none;
+                border: none;
+                cursor: pointer;
+                font-size: 20px;
+                color: #333; /* Чорний хрестик */
+                padding: 10px;
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+                transition: color 0.2s ease;
+            " aria-label="Close">
+                ✖
+            </button>
+        </div>
+        <div class="notes-list" style="
+            max-height: 350px;
+            overflow-y: auto;
+            padding-right: 10px;
+        ">
+           Loading notes...
         </div>
     `;
 
@@ -692,8 +695,12 @@ const showNotesListModal = async (userId, courseId, lectureId) => {
         background: 'white',
         padding: '20px',
         borderRadius: '12px',
+        paddingBottom: '60px',
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        zIndex: '1000'
+        zIndex: '1000',
+        display: 'flex',
+        flexDirection: 'column',
+        
     });
  
     document.body.appendChild(overlay);
@@ -720,12 +727,19 @@ const loadNotesList = async (userId, courseId, lectureId, container) => {
 
         container.innerHTML = notes.length
             ? notes.map(note => `
-                <div class="note-item" data-note-id="${note.id}" style="border: 1px solid #ddd; padding: 10px; border-radius: 6px; margin-bottom: 10px;">
-                    <p contenteditable="false" class="note-text" style="margin: 0; font-size: 14px;">${note.text}</p>
+                <div class="note-item" data-note-id="${note.id}" style="border: 1px solid #ddd; padding: 10px; border-radius: 6px; margin-bottom: 10px;  max-width: 580px; ">
+                    <p contenteditable="false" class="note-text" style="
+                    margin: 0; 
+                    font-size: 14px; 
+                    max-width: 520px;  
+                    word-wrap: break-word;
+                    overflow-wrap: break-word;
+                    white-space: normal;
+                    ">${note.text}</p>
                     <small style="color: #666;">Video time: ${note.videotimecode} | ${new Date(note.timestamp).toLocaleString()}</small>
-                    <div style="margin-top: 5px;">
+                    <div style="margin-top: 5px; ">
                         <button class="edit-button" style="margin-right: 5px;">Edit</button>
-                        <button class="delete-button" style="color: white; background: #283044">Delete</button>
+                        <button class="delete-button" data-note-id="${note.id}" style="color: white; background: #283044;">Delete</button>
                     </div>
                 </div>
             `).join('')
@@ -780,21 +794,29 @@ const updateNote = async (noteId, newText) => {
 
 // Видалення нотатки
 const handleDeleteNote = async (event) => {
-    const noteElement = event.target.closest('.note-item');
-    const noteId = noteElement.dataset.noteId;
-
-    if (!confirm('Are you sure you want to delete this note?')) return;
-
+    const noteId = event.target.getAttribute('data-note-id');
+    if (!noteId) {
+        console.error(' Error: noteId missed!');
+        return;
+    }
     try {
-        const response = await fetch(`/api/notes/${noteId}`, { method: 'DELETE' });
-        if (!response.ok) throw new Error('Failed to delete note');
+        console.log(`Delete note with ID: ${noteId}`);
 
-        console.log('✅ Нотатка видалена');
-        noteElement.remove();
+        const response = await fetch(`/api/notes/delete/${noteId}`, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to delete note');
+        }
+
+        console.log('Note deleted succesfully!');
+        document.querySelector(`[data-note-id="${noteId}"]`).remove();// Видаляємо з DOM
     } catch (error) {
-        console.error('❌ Помилка видалення нотатки:', error);
+        console.error('Error deleting note:', error);
     }
 };
+
 
 function createModuleHTML(module) {
     const getIconByFileType = (fileType) => {

@@ -329,83 +329,83 @@
                     }
             
             
-                uploadInput.addEventListener('change', function (event) {
-                    const file = event.target.files[0];
-                    if (file) {
-                        if (file.size > 1 * 1024 * 1024) { 
-                            alert('The file size exceeds 1 MB. Please upload a smaller file.');
-                            uploadInput.value = '';
-                            return;
-                        }
+               // uploadInput.addEventListener('change', function (event) {
+                    //const file = event.target.files[0];
+                    //if (file) {
+                        //if (file.size > 1 * 1024 * 1024) { 
+                          //  alert('The file size exceeds 1 MB. Please upload a smaller file.');
+                          //  uploadInput.value = '';
+                         //   return;
+                       // }
 
-                        const reader = new FileReader();
-                        reader.onload = function (e) {
-                            profileImage.src = e.target.result;
-                            removeImageButton.style.display = 'inline-block';
-                            confirmImageButton.style.display = 'inline-block';
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                });
+                       // const reader = new FileReader();
+                      //  reader.onload = function (e) {
+                      //      profileImage.src = e.target.result;
+                     //       removeImageButton.style.display = 'inline-block';
+                       //     confirmImageButton.style.display = 'inline-block';
+                   //     };
+                 //       reader.readAsDataURL(file);
+               //     }
+                //});
 
-                    confirmImageButton.addEventListener('click', async function () {
-                        const file = uploadInput.files[0];
-                        if (!file) {
-                            alert('Please select an image to upload.');
-                            return;
-                        }
+        //        confirmImageButton.addEventListener('click', async function () {
+        //            const file = uploadInput.files[0];
+        //            if (!file) {
+        //                alert('Please select an image to upload.');
+        //                return;
+        //            }
+//
+        //            const userId = localStorage.getItem('userId');
+        //            const email = localStorage.getItem('email');
+        //            if (!email || !userId) {
+        //                alert('User information is not available. Please log in again.');
+        //                return;
+        //            }
+//
+        //            console.log('Starting image upload...');
+//
+        //            const formData = new FormData();
+        //            formData.append('profileImage', file);
+        //            formData.append('email', email);
+        //            formData.append('userId', userId);
+//
+        //            try {
+        //                const response = await fetch('http://localhost:8000/auth/upload-student-profile-image', {
+        //                    method: 'POST',
+        //                    body: formData,
+        //                });
+//
+        //                const result = await response.json();
+        //                console.log('Upload response:', result);
+//
+        //                if (response.ok) {
+        //                    alert('Profile image updated successfully!');
+        //                    const imageUrl = result.filePath.startsWith('http')
+        //                        ? result.filePath
+        //                        : `http://localhost:8000${result.filePath}`;
+        //                    profileImage.src = imageUrl;
+        //                } else {
+        //                    alert(`Error: ${result.error}`);
+        //                }
+        //            } catch (error) {
+        //                console.error('Error uploading profile image:', error);
+        //                alert('An error occurred while uploading the profile image.');
+        //            }
 
-                        const userId = localStorage.getItem('userId');
-                        const email = localStorage.getItem('email');
-                        if (!email || !userId) {
-                            alert('User information is not available. Please log in again.');
-                            return;
-                        }
+        //            removeImageButton.style.display = 'none';
+        //            confirmImageButton.style.display = 'none';
+        //        });
+        //    removeImageButton.addEventListener('click', function () {
+        //        profileImage.src = '/images/user-avatar.png';
+        //        uploadInput.value = '';
+        //        removeImageButton.style.display = 'none';
+       //         confirmImageButton.style.display = 'none';
+        //    }); 
 
-                        console.log('Starting image upload...');
-
-                        const formData = new FormData();
-                        formData.append('profileImage', file);
-                        formData.append('email', email);
-                        formData.append('userId', userId);
-
-                        try {
-                            const response = await fetch('http://localhost:8000/auth/upload-student-profile-image', {
-                                method: 'POST',
-                                body: formData,
-                            });
-
-                            const result = await response.json();
-                            console.log('Upload response:', result);
-
-                            if (response.ok) {
-                                alert('Profile image updated successfully!');
-                                const imageUrl = result.filePath.startsWith('http')
-                                    ? result.filePath
-                                    : `http://localhost:8000${result.filePath}`;
-                                profileImage.src = imageUrl;
-                            } else {
-                                alert(`Error: ${result.error}`);
-                            }
-                        } catch (error) {
-                            console.error('Error uploading profile image:', error);
-                            alert('An error occurred while uploading the profile image.');
-                        }
-
-                        removeImageButton.style.display = 'none';
-                        confirmImageButton.style.display = 'none';
-                    });
-                removeImageButton.addEventListener('click', function () {
-                    profileImage.src = '/images/user-avatar.png';
-                    uploadInput.value = '';
-                    removeImageButton.style.display = 'none';
-                    confirmImageButton.style.display = 'none';
-                }); 
-
-            profileImage.addEventListener('click', function () {
-                removeImageButton.style.display = 'inline-block';
-                confirmImageButton.style.display = 'inline-block';
-            });
+       // profileImage.addEventListener('click', function () {
+        //    removeImageButton.style.display = 'inline-block';
+          //  confirmImageButton.style.display = 'inline-block';
+        //});
 
             function updateUsername(data) {
                 const usernameElement = document.getElementById('username');
@@ -486,60 +486,76 @@
             }
 
             document.addEventListener('DOMContentLoaded', () => {
-                const becomeTeacherButton = document.getElementById('become-teacher-btn');
+                    const becomeTeacherButton = document.getElementById('become-teacher-btn');
 
-                if (becomeTeacherButton) {
-                    becomeTeacherButton.addEventListener('click', async () => {
-                        const authData = getAuthData();
+                    if (becomeTeacherButton) {
+                        becomeTeacherButton.addEventListener('click', async () => {
+                            const authData = getAuthData();
 
-                        if (!authData.token || !authData.email) {
-                            alert("Please log in before becoming a teacher.");
-                            window.location.href = "/login.html";
-                            return;
-                        }
-
-                        const userConfirmed = confirm(
-                            "Are you sure you want to become a teacher? If you click 'OK', your role will be updated to 'teacher'."
-                        );
-
-                        if (!userConfirmed) return;
-
-                        try {
-                            const response = await fetch("http://localhost:8000/auth/student-to-teacher", {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    "Authorization": `Bearer ${authData.token}`,
-                                },
-                                body: JSON.stringify({ email: authData.email, role: "teacher" }),
-                            });
-
-                            const data = await response.json();
-
-                            if (response.ok) {
-                                alert("You are now a teacher! Please provide the necessary details to create a teacher profile and verify your qualifications.");
-                                sessionStorage.setItem("currentStep", "0");
-                                window.location.href = "/registration_pages/full_reg_teacher.html";
-                            } else {
-                                alert(data.error || "Failed to update role.");
+                            if (!authData.token || !authData.email) {
+                                alert("Please log in before becoming a teacher.");
+                                window.location.href = "/login.html";
+                                return;
                             }
-                        } catch (error) {
-                            console.error("Error updating role:", error);
-                            alert("An error occurred. Please try again later.");
-                        }
-                    });
-                }
-            });
 
-            function getAuthData() {
-                return {
-                    token: localStorage.getItem('token'),
-                    userId: localStorage.getItem('userId'),
-                    role: localStorage.getItem('role'),
-                    name: localStorage.getItem('name'),
-                    email: localStorage.getItem('email'),
-                };
-            }
+                            const userConfirmed = confirm(
+                                "Are you sure you want to become a teacher? If you click 'OK', your role will be updated to 'teacher'."
+                            );
+
+                            if (!userConfirmed) return;
+
+                            try {
+                                // Make sure the token is properly formatted in the Authorization header
+                                console.log("Using token:", authData.token); // For debugging
+
+                                const response = await fetch("http://localhost:8000/auth/student-to-teacher", {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                        "Authorization": `Bearer ${authData.token}`,
+                                    },
+                                    body: JSON.stringify({
+                                        email: authData.email,
+                                        role: "teacher"
+                                    }),
+                                    // Add credentials to ensure cookies are sent with the request
+                                    credentials: 'include'
+                                });
+
+                                if (response.status === 403) {
+                                    // Handle expired token
+                                    alert("Your session may have expired. Please log in again.");
+                                    localStorage.removeItem('token');
+                                    window.location.href = "login/login.html";
+                                    return;
+                                }
+
+                                const data = await response.json();
+
+                                if (response.ok) {
+                                    alert("You are now a teacher! Please provide the necessary details to create a teacher profile and verify your qualifications.");
+                                    sessionStorage.setItem("currentStep", "0");
+                                    window.location.href = "/registration_pages/full_reg_teacher.html";
+                                } else {
+                                    alert(data.error || "Failed to update role.");
+                                }
+                            } catch (error) {
+                                console.error("Error updating role:", error);
+                                alert("An error occurred. Please try again later.");
+                            }
+                        });
+                    }
+                });
+
+                function getAuthData() {
+                    return {
+                        token: localStorage.getItem('token'),
+                        userId: localStorage.getItem('userId'),
+                        role: localStorage.getItem('role'),
+                        name: localStorage.getItem('name'),
+                        email: localStorage.getItem('email'),
+                    };
+                }
                 document.addEventListener('DOMContentLoaded', () => {
 
                         handleProfileImage();

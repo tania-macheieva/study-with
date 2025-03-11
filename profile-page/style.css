@@ -978,7 +978,7 @@ p {
     margin-top: 15px;
     padding: 10px;
     border-radius: 8px; 
-    border: 1px solid #545f7a; 
+    /* border: 1px solid #545f7a;  */
     width: 85%;
     margin-left: 3%; 
 }
