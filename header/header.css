@@ -27,7 +27,6 @@ a.lang-btn {
 } 
 
 .site-header {
-    background-color: #fff;
     padding: 10px 20px;
     display: flex;
     justify-content: space-between;
@@ -35,7 +34,10 @@ a.lang-btn {
     position: sticky;
     top: 0;
     z-index: 1000;
-    box-shadow: 0px  2px 5px rgba(0, 0, 0, 0.15);
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.15);
+    background: rgba(255, 255, 255, 0.2); 
+    backdrop-filter: blur(10px); 
+    -webkit-backdrop-filter: blur(10px);  
 }
 
 .container {
@@ -104,6 +106,7 @@ a.lang-btn {
 .search {
     position: relative; /* Дозволяє позиціювати іконку відносно контейнера */
     display: inline-block; 
+    color: rgba(225, 223, 223, 0.2); 
 }
   /* Поле для вводу */
 .search input[type="text"]  { 
