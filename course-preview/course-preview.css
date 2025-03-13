@@ -115,7 +115,7 @@ main
 .content-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center; /* Змінено на center для вирівнювання елементів по центру */
     margin-bottom: 24px;
     gap: 20px;
 }
@@ -125,9 +125,23 @@ main
     font-weight: 600;
     margin: 30px 0;
     word-wrap: break-word;
-    max-width: calc(100% - 80px);
+    flex-grow: 1;
     text-align: left;
     color: #283044;
+}
+
+.course-rating {
+    position: absolute;
+    right: 80px;
+    top: 30px;
+}
+
+
+.rating-value {
+    font-size: 20px;
+    font-weight: 600;
+    color: #283044;
+    margin-right: 10px;
 }
 
 /* Кнопки дій */

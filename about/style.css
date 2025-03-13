@@ -193,13 +193,18 @@ body {
     font-weight: 700;
     color: #283044;
     font-size: 20px;
-    display: inline-block;
+    display: block;
     padding: 5px 10px;
     margin-top: 5px;
     text-transform: uppercase;
     letter-spacing: 1px;
     border-bottom: 2px solid #283044;
     transition: all 0.3s ease;
+}
+.team-member-name {
+    font-size: 22px !important;
+    color: #283044 !important;
+    font-weight: 700 !important;
 }
 
 .card,
