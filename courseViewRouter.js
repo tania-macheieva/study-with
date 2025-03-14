@@ -992,6 +992,45 @@ router.post('/course/:courseId/test/complete', async (req, res) => {
 });
 
 
+//         if (!userId || !rating || !review) {
+//             return res.status(400).json({ error: 'Missing required fields' });
+//         }
+//         const checkQuery = `
+//             SELECT id FROM reviews 
+//             WHERE course_id = $1 AND user_id = $2
+//         `;
+//         const checkResult = await db.query(checkQuery, [courseId, userId]);
+        
+//         let result;
+//         if (checkResult.rows.length > 0) {
+//             // Update existing review
+//             const existingReviewId = checkResult.rows[0].id;
+//             const updateQuery = `
+//                 UPDATE reviews 
+//                 SET rating = $1, review_text = $2, updated_at = NOW() 
+//                 WHERE id = $3
+//                 RETURNING *;
+//             `;
+//             result = await db.query(updateQuery, [rating, review, existingReviewId]);
+//             res.status(200).json({ message: 'Review updated successfully', review: result.rows[0] });
+//         } else {
+//             const insertQuery = `
+//                 INSERT INTO reviews (course_id, user_id, rating, review_text, created_at, updated_at)
+//                 VALUES ($1, $2, $3, $4, NOW(), NOW()) RETURNING *;
+//             `;
+//             result = await db.query(insertQuery, [courseId, userId, rating, review]);
+//             res.status(201).json({ message: 'Review submitted successfully', review: result.rows[0] });
+//         }
+//     } catch (error) {
+//         console.error('Error submitting review:', error);
+//         res.status(500).json({ error: 'Internal server error' });
+//     }
+// });
+router.post('/course/:courseId/review', async (req, res) => {
+    try {
+        const { courseId } = req.params;
+        const { userId, rating, review } = req.body;
+
         if (!userId || !rating || !review) {
             return res.status(400).json({ error: 'Missing required fields' });
         }
@@ -1078,4 +1117,6 @@ router.get('/course-author/:courseId', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+
 module.exports = router;

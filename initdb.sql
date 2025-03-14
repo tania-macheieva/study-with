@@ -345,3 +345,15 @@ CREATE INDEX idx_test_progress_user_id ON test_progress(user_id);
 CREATE INDEX idx_test_progress_module_id ON test_progress(module_id);
 CREATE INDEX idx_test_progress_course_id ON test_progress(course_id);
 
+CREATE TABLE reviews (
+    id SERIAL PRIMARY KEY,
+    course_id INT NOT NULL REFERENCES all_courses(id) ON DELETE CASCADE,
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    rating INT CHECK (rating BETWEEN 1 AND 5) NOT NULL,
+    review_text TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP
+);
+
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP;
+UPDATE reviews SET updated_at = created_at WHERE updated_at IS NULL;
