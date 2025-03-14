@@ -126,18 +126,29 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
 
         // Обробка відгуків
+        // When processing reviews data
         if (courseData.reviews && courseData.reviews.length > 0) {
-            reviews = courseData.reviews.map(review => ({
-                id: review.id,
-                username: review.username || review.user_name || 'Користувач',
-                rate: `${review.rating}/5`,
-                numericRate: review.rating,
-                text: review.review_text || "",
-                date: new Date(review.updated_at || review.created_at),
-                profileImage: review.profile_image || '/images/user-avatar.png' // Add this line
-            }));
+            console.log("Raw review data:", courseData.reviews);
             
+            reviews = courseData.reviews.map(review => {
+                console.log("Processing review:", review);
+                console.log("Profile image value:", review.profile_image);
+                
+                return {
+                    id: review.id,
+                    username: review.username || review.user_name || 'Користувач',
+                    rate: `${review.rating}/5`,
+                    numericRate: review.rating,
+                    text: review.review_text || "",
+                    date: new Date(review.updated_at || review.created_at),
+                    profileImage: review.profile_image || '/images/user-avatar.png'
+
+                };
+            });
+            
+            console.log("Processed reviews:", reviews);
             updateReview();
+
         } else {
             const reviewsSection = document.querySelector('.reviews-section');
             const whiteCard = reviewsSection.querySelector('.white-card');

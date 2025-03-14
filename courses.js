@@ -714,31 +714,28 @@ router.get('/:id/full', async (req, res) => {
             FROM modules m
             WHERE m.course_id = c.id
         ) as modules,(
-            SELECT json_agg(
-              json_build_object(
-                'id', r.id,
-                'user_id', r.user_id,
-                'username', u.name,
-                'rating', r.rating,
-                'review_text', r.review_text,
-                'created_at', r.created_at,
-                'updated_at', r.updated_at,
-                'profile_image', CASE 
-                    WHEN u.role = 'teacher' THEN u.profile_image
-                    WHEN u.role = 'student' THEN COALESCE(s.profile_image, u.profile_image) 
-                    ELSE '/images/user-avatar.png'
-                END
-              ))
-              FROM reviews r
-              JOIN users u ON r.user_id = u.id
-              LEFT JOIN students s ON r.user_id = s.user_id
-              WHERE r.course_id = c.id
-            )as reviews
+          SELECT json_agg(
+            json_build_object(
+              'id', r.id,
+              'user_id', r.user_id,
+              'username', u.name,
+              'rating', r.rating,
+              'review_text', r.review_text,
+              'created_at', r.created_at,
+              'updated_at', r.updated_at,
+              'profile_image', COALESCE(s.profile_image, u.profile_image)
+            ))
+            FROM reviews r
+            JOIN users u ON r.user_id = u.id
+            LEFT JOIN students s ON u.id = s.user_id
+            WHERE r.course_id = c.id
+          ) as reviews
         FROM all_courses c
         LEFT JOIN categories cat ON c.category_id = cat.id
         LEFT JOIN education_levels el ON c.education_level_id = el.id
         LEFT JOIN users u ON c.author_id = u.id
         LEFT JOIN teachers t ON u.id = t.user_id
+        LEFT JOIN students s ON u.id = s.user_id 
         WHERE c.id = $1 AND c.status = 'published';
     `;
     const result = await pool.query(query, [id]);
