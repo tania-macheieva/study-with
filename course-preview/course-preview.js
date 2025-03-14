@@ -41,6 +41,17 @@ document.addEventListener('DOMContentLoaded', async function() {
         detailsMainValues[0].textContent = courseData.level;
         detailsMainValues[1].textContent = '6 weeks';
         detailsMainValues[2].textContent = courseData.price === 0 ? 'Безкоштовно' : `$${courseData.price}`;
+
+        if (courseData.reviews && courseData.reviews.length > 0) {
+            const totalRating = courseData.reviews.reduce((sum, review) => sum + review.rating, 0);
+            const averageRating = (totalRating / courseData.reviews.length).toFixed(1);
+
+            const ratingSpan = document.querySelector('.rating-value');
+            if (ratingSpan) {
+                ratingSpan.textContent = averageRating;
+            }
+        }
+        
     
         const userId = localStorage.getItem('userId');
         const saveButton = document.querySelector('.save-btn');
@@ -128,11 +139,10 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Обробка відгуків
         // When processing reviews data
         if (courseData.reviews && courseData.reviews.length > 0) {
-            console.log("Raw review data:", courseData.reviews);
+            
             
             reviews = courseData.reviews.map(review => {
-                console.log("Processing review:", review);
-                console.log("Profile image value:", review.profile_image);
+                
                 
                 return {
                     id: review.id,
@@ -146,7 +156,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 };
             });
             
-            console.log("Processed reviews:", reviews);
+            
             updateReview();
 
         } else {

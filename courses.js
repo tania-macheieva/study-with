@@ -744,6 +744,15 @@ router.get('/:id/full', async (req, res) => {
         return res.status(404).json({ error: 'Курс не знайдено' });
     }
     const course = result.rows[0];
+
+    let averageRating = 0;
+    if (course.reviews) { 
+      const ratings = course.reviews.map(review => review.rating);
+      if (ratings.length > 0) {
+          averageRating = ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length;
+          averageRating = parseFloat(averageRating.toFixed(1));
+      }
+    }
     
     res.json({
         id: course.id,
@@ -755,6 +764,7 @@ router.get('/:id/full', async (req, res) => {
         image_url: course.image_url,
         modules: course.modules || [],
         reviews: course.reviews || [],
+        average_rating: averageRating, 
         author: {
             id: course.author_id,
             name: course.author_name,
