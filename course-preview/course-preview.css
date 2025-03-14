@@ -337,7 +337,12 @@ main
     border-radius: 8px;
     float: left;
     margin-right: 10px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
+
+
 
 .user-info {
     margin-left: 67px;

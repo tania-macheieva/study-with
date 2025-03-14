@@ -1,5 +1,10 @@
 document.addEventListener('DOMContentLoaded', async function() {
     let courseData = null;
+    let speakers = [];
+    let reviews = [];
+    let currentReviewIndex = 0;
+    let currentSpeakerIndex = 0;
+
     const urlParams = new URLSearchParams(window.location.search);
     const courseId = urlParams.get('id');
 
@@ -77,6 +82,8 @@ document.addEventListener('DOMContentLoaded', async function() {
                     await  updateBookmark();
                     showNotification(`Курс ${isBookmarked ? 'додано в закладки' : 'видалено із закладок'}`, 'success');
 
+
+
                 } catch (error) {
                     console.error('Помилка зміни закладки:', error);
                     showNotification('Помилка зміни закладки', 'error');
@@ -84,11 +91,11 @@ document.addEventListener('DOMContentLoaded', async function() {
             });
         }
 
-      // Відображення модулів курсу 
-      if (!courseData || !courseData.modules) {
-        console.warn("Модулі курсу відсутні або не завантажилися.");
-        return;
-    }
+        // Відображення модулів курсу 
+        if (!courseData || !courseData.modules) {
+            console.warn("Модулі курсу відсутні або не завантажилися.");
+            return;
+        }
     
         const modulesSection = Array.from(document.querySelectorAll('.section')).find(section => 
             section.querySelector('.info-label').textContent.trim() === 'Course modules'
@@ -117,6 +124,26 @@ document.addEventListener('DOMContentLoaded', async function() {
                 `;
             }
         }
+
+        // Обробка відгуків
+        if (courseData.reviews && courseData.reviews.length > 0) {
+            reviews = courseData.reviews.map(review => ({
+                id: review.id,
+                username: review.username || review.user_name || 'Користувач',
+                rate: `${review.rating}/5`,
+                numericRate: review.rating,
+                text: review.review_text || "",
+                date: new Date(review.updated_at || review.created_at),
+                profileImage: review.profile_image || '/images/user-avatar.png' // Add this line
+            }));
+            
+            updateReview();
+        } else {
+            const reviewsSection = document.querySelector('.reviews-section');
+            const whiteCard = reviewsSection.querySelector('.white-card');
+            whiteCard.innerHTML = `<p>Відгуки відсутні</p>`;
+        }
+
     }catch (error) {
     console.error('Помилка завантаження курсу:', error);
         
@@ -341,47 +368,8 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
     }
     
     initializeDescription();
-
-    const reviews = [
-        {
-            username: "username 1",
-            rate: "5/5",
-            numericRate: 5,
-            text: "",
-            date: new Date('2025-01-11T10:30:00')
-        },
-        {
-            username: "username 2",
-            rate: "4/5",
-            numericRate: 4,
-            text: "вдлмпркртеимщврьскгумркгаьсрчускшгцмерсозачбркусцмшгпьб...",
-            date: new Date('2025-01-10T15:45:00')
-        },
-        {
-            username: "username 3",
-            rate: "4/5",
-            numericRate: 4,
-            text: "журмтшжщуйцшрмезщсцгмєщкптгйцшщ5мх4тгьєйцщахзкегьм...",
-            date: new Date('2025-01-08T09:20:00')
-        },
-        {
-            username: "username 4",
-            rate: "1/5",
-            numericRate: 1,
-            text: "",
-            date: new Date('2024-01-05T11:15:00')
-        },
-        {
-            username: "username 5",
-            rate: "3/5",
-            numericRate: 3,
-            text: "",
-            date: new Date('2023-12-29T16:40:00')
-        }
-    ];
-
-    let speakers = [];
-
+    
+    
     if (courseData && courseData.author) {
         speakers = [{
             name: courseData.author.name || 'Невідомий автор',
@@ -394,9 +382,7 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
     }
 
     
-    let currentReviewIndex = 0;
-    let currentSpeakerIndex = 0;
-
+    
 
     function formatReviewDate(date) {
         const now = new Date();
@@ -428,21 +414,29 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
     }
 
     function updateReview() {
+        if (reviews.length === 0) {
+            const reviewsSection = document.querySelector('.reviews-section');
+            const whiteCard = reviewsSection.querySelector('.white-card');
+            whiteCard.innerHTML = `<p>Відгуки відсутні</p>`;
+            return;
+        }
+
         const sortedReviews = sortReviews(reviews);
         const review = sortedReviews[currentReviewIndex];
         const reviewsSection = document.querySelector('.reviews-section');
         const whiteCard = reviewsSection.querySelector('.white-card');
         
         whiteCard.innerHTML = `
-            <div class="user-avatar"></div>
+            <div class="user-avatar" style="background-image: url('${review.profileImage}')"></div>
             <div class="user-info">
                 <div class="username">${review.username}</div>
                 <div class="rating">rate: ${review.rate}</div>
             </div>
-            <div class="review-text">${review.text}</div>
+            <div class="review-date">${formatReviewDate(review.date)}</div>
+            <div class="review-text">${review.text || 'Без коментаря'}</div>
         `;
     }
-
+ 
     function updateSpeaker() {
     if (speakers.length === 0) {
         const speakersSection = document.querySelector('.speakers-section');
@@ -528,7 +522,7 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
         
         return sortedReviews.map(review => `
             <div class="review-card">
-                <div class="user-avatar"></div>
+                <div class="user-avatar" style="background-image: url('${review.profileImage}')"></div>
                 <div class="user-info">
                     <div class="username">${review.username}</div>
                     <div class="rating">Rate: ${review.rate}</div>
