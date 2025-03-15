@@ -1134,7 +1134,8 @@ router.get('/profile/student/:id', async (req, res) => {
             SELECT 
                 u.id,
                 u.name, 
-                u.email, 
+                u.email,
+                u.user_password, 
                 s.profile_image,
                 u.role,
                 s.nickname,

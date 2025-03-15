@@ -255,6 +255,7 @@
                 async function loadStudentProfile() {
                         try {
                             const userId = localStorage.getItem('userId');
+                            const password = localStorage.getItem('password');
                             if (!userId) {
                                 console.error('User not authenticated');
                                 return;
@@ -267,6 +268,16 @@
 
                             const data = await response.json();
                             console.log("Received profile data:", data);
+                            sessionStorage.setItem("userId", data.id);
+                            sessionStorage.setItem("name", data.name);
+                            sessionStorage.setItem("email", data.email);
+                            sessionStorage.setItem("role", data.role);
+                            // Збереження пароля в sessionStorage (тільки якщо він є)
+                            if (data.user_password) {
+                                sessionStorage.setItem("password", data.user_password);
+                            } else {
+                                sessionStorage.removeItem("password"); // Видаляємо, якщо його немає
+                            }                          
 
                             const profileImage = document.getElementById('profile-image');
                             if (profileImage) {
@@ -487,7 +498,6 @@
 
             document.addEventListener('DOMContentLoaded', () => {
                     const becomeTeacherButton = document.getElementById('become-teacher-btn');
-
                     if (becomeTeacherButton) {
                         becomeTeacherButton.addEventListener('click', async () => {
                             const authData = getAuthData();
@@ -533,8 +543,22 @@
                                 const data = await response.json();
 
                                 if (response.ok) {
+                                    sessionStorage.setItem("isStudentBecomingTeacher", "true");
+                                    // ❌ НЕ перезаписувати, якщо це новий вчитель
+                                    sessionStorage.setItem("userId", authData.userId);
+                                    sessionStorage.setItem("role", "teacher");
+                                    sessionStorage.setItem("name", authData.name);
+                                    sessionStorage.setItem("email", authData.email);
+                                    sessionStorage.setItem("password", authData.password || ""); // Уникнути null
+                
+    
+                                    // Видаляємо токен, щоб примусово розлогінити користувача
+                                    localStorage.removeItem('token');
+                                   
+
                                     alert("You are now a teacher! Please provide the necessary details to create a teacher profile and verify your qualifications.");
                                     sessionStorage.setItem("currentStep", "0");
+                                    console.log("📌 Password перед редиректом:", sessionStorage.getItem("password"));
                                     window.location.href = "/registration_pages/full_reg_teacher.html";
                                 } else {
                                     alert(data.error || "Failed to update role.");
@@ -554,6 +578,7 @@
                         role: localStorage.getItem('role'),
                         name: localStorage.getItem('name'),
                         email: localStorage.getItem('email'),
+                        password: sessionStorage.getItem('password'),
                     };
                 }
                 document.addEventListener('DOMContentLoaded', () => {

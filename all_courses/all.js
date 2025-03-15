@@ -1,12 +1,52 @@
 document.addEventListener("DOMContentLoaded", async function() {
     let displayedCourses = 6;
     let currentCourses = [];
+    
+    // Parse URL parameters right at the beginning
+    const urlParams = new URLSearchParams(window.location.search);
+    const categoryParam = urlParams.get('category');
   
     async function loadInitialCourses() {
       try {
         const response = await fetch('/api/courses');
         if (!response.ok) throw new Error('Failed to fetch courses');
         currentCourses = await response.json();
+        
+        // Apply category filter if it exists in URL parameters
+        if (categoryParam) {
+          // Map the category name from URL to the corresponding theme option
+          const categoryMappings = {
+            'programming': '1',
+            'design': '2',
+            'marketing': '3',
+            'business': '4',
+            'languages': '5',
+            'finance': '6',
+            'development': '7',
+            'art': '8',
+            'photography': '9', 
+            'psychology': '10',  
+            'health': '11',    
+            'cooking': '12', 
+            'science': '13', 
+            'game-development': '14', 
+            'childcare': '15'   
+          };
+          
+          const themeOptionNumber = categoryMappings[categoryParam];
+          if (themeOptionNumber) {
+            const checkbox = document.querySelector(`input[name="theme-option-${themeOptionNumber}"]`);
+            if (checkbox) {
+              checkbox.checked = true;
+              // Filter courses based on the selected category
+              filterCourses();
+              // Exit the function early as we've already rendered the courses
+              return;
+            }
+          }
+        }
+        
+        // If no category filter was applied, render all courses
         renderCourses();
         updateResultsCount();
       } catch (error) {
@@ -17,6 +57,7 @@ document.addEventListener("DOMContentLoaded", async function() {
     }
   
     function filterCourses() {
+        // Your existing filterCourses function
         let filteredCourses = [...currentCourses];
   
         const selectedThemes = Array.from(document.querySelectorAll('input[name^="theme-option-"]:checked'))
@@ -211,6 +252,26 @@ document.addEventListener("DOMContentLoaded", async function() {
         renderCourses();
     });
   
-    await loadInitialCourses();
+    
     updateResultsCount();
+
+    document.addEventListener("DOMContentLoaded", async function() {
+        // Get the category from URL parameters (add this to your existing code)
+        const urlParams = new URLSearchParams(window.location.search);
+        const categoryParam = urlParams.get('category');
+        
+        // Your existing code for loading initial courses
+        await loadInitialCourses();
+        
+        // If a category was specified in the URL, apply that filter
+        if (categoryParam) {
+          // Check the corresponding category checkbox if it exists
+          const categoryCheckbox = document.querySelector(`input[name="theme-option-${categoryParam}"]`);
+          if (categoryCheckbox) {
+            categoryCheckbox.checked = true;
+            filterCourses(); // Apply the filter
+          }
+        }
+      });
+      await loadInitialCourses();
   });

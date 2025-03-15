@@ -49,6 +49,7 @@ body {
 }
 .page {
   animation: fadeIn 0.9s ease-in-out;
+  padding-bottom: 15px;
 }
 
 @keyframes fadeIn {
@@ -257,18 +258,18 @@ h4.filters-apply {
 }
 
 .course_group {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-  height: 380px;
-  position: relative;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  box-sizing: border-box;
-}
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    height: 380px;
+    position: relative;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+  }
 
 .rectangle-1 {
   width: 100%;

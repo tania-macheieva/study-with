@@ -80,11 +80,18 @@ if (teacherForm) {
         console.log("Teacher data to save:", teacherData);
 
         try {
+            // Очищуємо дані студента перед збереженням нового вчителя
+            sessionStorage.removeItem("isStudentBecomingTeacher");
+            sessionStorage.removeItem("userId");
+            sessionStorage.removeItem("role");
+            sessionStorage.removeItem("name");
+            sessionStorage.removeItem("email");
+            sessionStorage.removeItem("password");
             // Зберігаємо в sessionStorage
-            localStorage.setItem("userEmail", email); // Email окремо для подальшого використання
             sessionStorage.setItem("teacherData", JSON.stringify(teacherData));
             sessionStorage.setItem("currentStep", "0"); // Початковий крок
-
+            sessionStorage.setItem("isStudentBecomingTeacher", "false"); 
+            console.log("🔹 Redirecting to full registration with data:", sessionStorage.getItem("teacherData"));
             // Перенаправляємо на другу сторінку
             window.location.href = "/registration_pages/full_reg_teacher.html";
         } catch (error) {
