@@ -2,14 +2,66 @@ document.addEventListener("DOMContentLoaded", () => {
     const steps = document.querySelectorAll(".form-step");
     const progressIndicator = document.querySelector(".progress-bar__indicator");
     const stepIndicators = document.querySelectorAll(".progress-bar__steps span");
-
+    /*function getAuthData() {
+        return {
+            userId: sessionStorage.getItem("userId"),
+            token: localStorage.getItem("token"),
+            role: sessionStorage.getItem("role"),
+            name: sessionStorage.getItem("name"),
+            email: sessionStorage.getItem("email")
+        };
+    }*/
     // Завантажуємо стан із sessionStorage або починаємо з 2-го кроку
     let currentStep = parseInt(sessionStorage.getItem("currentStep")) || 2;
 
     // Приводимо крок до індексу масиву (крок 2 = індекс 0)
     let stepIndex = currentStep - 2; 
-     // Об'єкт для зберігання даних форми
-     let formData = JSON.parse(sessionStorage.getItem("teacherData")) || {};
+    
+    let formData;
+    // Визначаємо, чи це студент, який стає вчителем
+    const userId = sessionStorage.getItem("userId");
+    const role = sessionStorage.getItem("role");
+    const isStudentBecomingTeacher = userId && role === "teacher";
+
+    console.log("Is student becoming teacher:", isStudentBecomingTeacher);
+    console.log("User ID:", userId);
+    console.log("Role:", role);
+
+  // Визначаємо, який сценарій використовується
+if (isStudentBecomingTeacher) {
+    // Якщо студент стає вчителем, використовуємо дані з сесії
+    formData = {
+        userId: userId,
+        name: sessionStorage.getItem("name"),
+        email: sessionStorage.getItem("email"),
+        password: sessionStorage.getItem("password") || ""
+    };
+    
+    console.log("Using student data:", formData);
+} else {
+    // Звичайна реєстрація вчителя, використовуємо збережені дані з форми
+    formData = JSON.parse(sessionStorage.getItem("teacherData"));
+    
+    if (!formData) {
+        console.error("No teacher data found in sessionStorage!");
+        alert("Registration data is missing. Please start the registration process again.");
+        window.location.href = "/registration_pages/reg_teacher.html";
+        return;
+    }
+    
+    console.log("Using teacher registration data:", formData);
+}
+    // Зберігаємо оновлені дані в sessionStorage для використання далі
+sessionStorage.setItem("teacherData", JSON.stringify(formData));
+
+console.log("Initial form data:", formData);
+
+// Об'єкт для зберігання даних форми
+     /*let formData = JSON.parse(sessionStorage.getItem("teacherData"));
+     if (!formData) {
+         console.error("No teacher data found in sessionStorage!");
+         formData = {};
+     }*/
 
     function updateStep(index) {
         console.log("Switching to step index:", index);
@@ -178,22 +230,53 @@ function validateStep(stepIndex) {
 
 finishButton.addEventListener("click", async () => {
     saveCurrentStepData(); // Зберігаємо дані з поточного кроку.
-
-    // Завантажуємо дані з першої сторінки
-    const teacherData = JSON.parse(sessionStorage.getItem("teacherData")) || {};
-    console.log("Loaded teacher data from first page:", teacherData);
+    
+    const isStudentBecomingTeacher = sessionStorage.getItem("isStudentBecomingTeacher") === "true";
+    console.log("🔹 Is student becoming a teacher?", isStudentBecomingTeacher);
+    
+    let teacherData;
 
     // Перевіряємо, чи є необхідні дані
-    if (!teacherData || !teacherData.email) {
-        console.warn("No data found in sessionStorage. Redirecting to registration page.");
-        alert("No data found. Redirecting to registration page.");
+        
+    /*if (!teacherData || !teacherData.name || !teacherData.email ) {
+        alert("Missing basic registration data. Please start registration again.");
         window.location.href = "/registration_pages/reg_teacher.html";
         return;
+    }*/
+    if (isStudentBecomingTeacher) {
+    // ✅ Студент стає вчителем → Використовуємо його дані
+        teacherData = {
+            userId: sessionStorage.getItem("userId"),
+            name: sessionStorage.getItem("name"),
+            email: sessionStorage.getItem("email"),
+            password: sessionStorage.getItem("password") || "", 
+            role: "teacher"
+        };
+        console.log("🎯 Student is becoming a teacher. Using student profile data:", teacherData);
+    } else {
+    // Новий вчитель → Використовуємо збережені дані
+        teacherData = sessionStorage.getItem("teacherData")
+            ? JSON.parse(sessionStorage.getItem("teacherData"))
+            : {};
+         console.log("🎯 New teacher registration. Using teacherData:", teacherData);
     }
+        // Оновлюємо sessionStorage
+    sessionStorage.setItem("teacherData", JSON.stringify(teacherData));
+    
+    console.log("📌 Final teacherData after check:", teacherData);
 
     // Завантажуємо дані з другої сторінки
-    const formDataObject = {
-        ...teacherData, // Додаємо дані з першої сторінки
+    const finalData = {
+         // Базові дані користувача
+         name: teacherData.name,
+         email: teacherData.email,
+         password: teacherData.password,
+         
+         // Якщо це студент що стає вчителем, додаємо userId
+         ...(isStudentBecomingTeacher && { userId: teacherData.userId}),
+         
+         // Дані з форми
+      
         dob: document.getElementById("dob").value.trim(),
         gender: document.querySelector('input[name="gender"]:checked')?.value || "",
         country: document.getElementById("country").value.trim(),
@@ -204,10 +287,10 @@ finishButton.addEventListener("click", async () => {
         professional_experience: document.getElementById("experience").value.trim(),
         about: document.getElementById("about").value.trim(),
     };
-    console.log("Combined form data:", formDataObject);
+    console.log("Combined form data:", finalData );
     // Перевіряємо, чи всі обов'язкові поля заповнені
     const requiredFields = ["name", "email", "password", "phone_number", "dob", "gender", "country", "city", "specialty"];
-    const missingFields = requiredFields.filter((field) => !formDataObject[field]);
+    const missingFields = requiredFields.filter((field) => !finalData[field]);
 
     if (missingFields.length > 0) {
         alert(`Please fill in all required fields: ${missingFields.join(", ")}`);
@@ -217,7 +300,7 @@ finishButton.addEventListener("click", async () => {
     const formData = new FormData();
 
     // Додаємо всі текстові дані в FormData
-    for (const [key, value] of Object.entries(formDataObject)) {
+    for (const [key, value] of Object.entries(finalData)) {
         formData.append(key, value || "");
     }
 
@@ -239,6 +322,8 @@ finishButton.addEventListener("click", async () => {
         console.log("Server response:", result);
         alert("Your registration has been submitted successfully!");
        /* sessionStorage.clear();*/ // Очищуємо дані після завершення
+       sessionStorage.removeItem("teacherData"); // Очищуємо дані після завершення
+       sessionStorage.removeItem("currentStep");
         window.location.href = "/"; // Перенаправлення на головну сторінку
     } catch (error) {
         if (error instanceof TypeError && error.message === "Failed to fetch") {
