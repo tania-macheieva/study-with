@@ -47,37 +47,49 @@
         Categories of courses
       </h1>
       <div class="Category">
-        <div class="category_box" data-lang="categoryBoxProgramming">
+        <div class="category_box" data-lang="categoryBoxProgramming" data-category="programming">
           Programming
         </div>
-        <div class="category_box" data-lang="categoryBoxDesign">Design</div>
-        <div class="category_box" data-lang="categoryBoxMarketing">
+        <div class="category_box" data-lang="categoryBoxDesign" data-category="design">
+          Design
+        </div>
+        <div class="category_box" data-lang="categoryBoxMarketing" data-category="marketing">
           Marketing
         </div>
-        <div class="category_box" data-lang="categoryBoxBusiness">
+        <div class="category_box" data-lang="categoryBoxBusiness" data-category="business">
           Business
         </div>
-        <div class="category_box" data-lang="categoryBoxLanguages">
+        <div class="category_box" data-lang="categoryBoxLanguages" data-category="languages">
           Languages
         </div>
-        <div class="category_box" data-lang="categoryBoxFinance">Finance</div>
-        <div class="category_box" data-lang="categoryBoxPersonalDevelopment">
+        <div class="category_box" data-lang="categoryBoxFinance" data-category="finance">
+          Finance
+        </div>
+        <div class="category_box" data-lang="categoryBoxPersonalDevelopment" data-category="development">
           Personal Development
         </div>
-        <div class="category_box" data-lang="categoryBoxArt">Art</div>
-        <div class="category_box" data-lang="categoryBoxPhotography">
+        <div class="category_box" data-lang="categoryBoxArt" data-category="art">
+          Art
+        </div>
+        <div class="category_box" data-lang="categoryBoxPhotography" data-category="photography">
           Photography
         </div>
-        <div class="category_box" data-lang="categoryBoxPsychology">
+        <div class="category_box" data-lang="categoryBoxPsychology" data-category="psychology">
           Psychology
         </div>
-        <div class="category_box" data-lang="categoryBoxHealth">Health</div>
-        <div class="category_box" data-lang="categoryBoxCooking">Cooking</div>
-        <div class="category_box" data-lang="categoryBoxScience">Science</div>
-        <div class="category_box" data-lang="categoryBoxGameDevelopment">
+        <div class="category_box" data-lang="categoryBoxHealth" data-category="health">
+          Health
+        </div>
+        <div class="category_box" data-lang="categoryBoxCooking" data-category="cooking">
+          Cooking
+        </div>
+        <div class="category_box" data-lang="categoryBoxScience" data-category="science">
+          Science
+        </div>
+        <div class="category_box" data-lang="categoryBoxGameDevelopment" data-category="game-development">
           Game Development
         </div>
-        <div class="category_box" data-lang="categoryBoxChildcare">
+        <div class="category_box" data-lang="categoryBoxChildcare" data-category="childcare">
           Childcare
         </div>
       </div>
@@ -180,8 +192,22 @@
       const userLang = localStorage.getItem("language");
       applyLanguage(userLang);
     });
+
+    document.addEventListener("DOMContentLoaded", function() {
+      const categoryBoxes = document.querySelectorAll(".category_box");
+      
+      categoryBoxes.forEach(box => {
+        box.addEventListener("click", function() {
+          const category = this.getAttribute("data-category");
+          console.log("Category clicked:", category);
+          
+          // Redirect to the ALL-courses page with the category parameter
+          window.location.href = `/all-courses?category=${category}`;
+        });
+      });
+    }); 
   </script>
-  <script src="/mobileview.js"></script>
+  <script src="/mobileview.js"></script> 
 </body>
 
 </html>

@@ -212,8 +212,26 @@ document.addEventListener("DOMContentLoaded", async function () {
       coursesWrapper.innerHTML = "<p>Помилка завантаження курсів.</p>";
     }
   }
+  document.addEventListener("DOMContentLoaded", function() {
+    console.log("Category script loaded");
+    
+    // Find all category boxes
+    const categoryBoxes = document.querySelectorAll(".category_box");
+    console.log("Found category boxes:", categoryBoxes.length);
+    
+    // Add click event to each category box
+    categoryBoxes.forEach(box => {
+      box.addEventListener("click", function() {
+        // Get the category from data attribute
+        const category = this.getAttribute("data-category");
+        console.log("Category clicked:", category);
+        
+        // Redirect to the courses page with the category parameter
+        window.location.href = `/courses?category=${category}`;
+      });
+    });
+  });
   
-
   // Load courses
   loadCourses();
 });

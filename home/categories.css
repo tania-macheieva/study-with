@@ -1,12 +1,9 @@
-/* Центрування контейнера категорій з відступами по боках */
 .categories-outer-container {
     position: relative;
     max-width: 90%; 
     margin: 0 auto; 
-    padding: 0 20px; /* Додаємо відступи з боків */
+    padding: 0 20px;
 }
-
-/* Стилі для Categories */
 
 .Categories {
     margin: 40px 64px;
@@ -29,11 +26,10 @@
     margin-left: 30px;
 }
 
-/* Стилі для категорій */
 .category_box {
     border-radius: 17px;
     width: 260px;
-    height: 70px;
+    height: 70px; 
     background: #DCECFC;
     border: 1px solid #DCECFC;
     box-shadow: 12px 17px 51px rgba(0, 0, 0, 0.1);
@@ -60,29 +56,28 @@
     transform: scale(0.95) rotateZ(1.7deg);
 }
 
-/* Респонсивність для категорій */
 @media (max-width: 1200px) {
     .category_box {
-        width: 220px; /* Для кращого вигляду на великих екранах */
+        width: 220px; 
     }
 }
 
 @media (max-width: 1024px) {
     .category_box {
-        width: 200px; /* Зменшення ширини категорій на менших екранах */
+        width: 200px; 
     }
 }
 
 @media (max-width: 768px) {
     .categories-outer-container {
-        padding: 0 40px; /* Збільшуємо відступи для малих екранів */
+        padding: 0 40px; 
     }
 
     .Category {
-        gap: 24px; /* Зменшення відстані між категоріями */
+        gap: 24px;
     }
 
     .category_box {
-        width: 160px; /* Зменшення ширини категорій на малих екранах */
+        width: 160px; 
     }
 }
