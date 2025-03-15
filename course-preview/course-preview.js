@@ -39,8 +39,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     
         const detailsMainValues = document.querySelectorAll('.details-main .detail-value');
         detailsMainValues[0].textContent = courseData.level;
-        detailsMainValues[1].textContent = '6 weeks';
-        detailsMainValues[2].textContent = courseData.price === 0 ? 'Безкоштовно' : `$${courseData.price}`;
+        const lang = getCurrentLanguage();
+        detailsMainValues[1].textContent = `6 ${translations[lang].weeks}`;
+        detailsMainValues[2].textContent = courseData.price === 0 
+        ? translations[lang].free 
+        : `$${courseData.price}`;
 
         if (courseData.reviews && courseData.reviews.length > 0) {
             const totalRating = courseData.reviews.reduce((sum, review) => sum + review.rating, 0);
@@ -51,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 ratingSpan.textContent = averageRating;
             }
         }
-        
+
     
         const userId = localStorage.getItem('userId');
         const saveButton = document.querySelector('.save-btn');
@@ -69,8 +72,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             // =================== 🆕 Обробник "Додати/Видалити із закладок" ===================
             saveButton.addEventListener('click', async function () {
                 if (!userId) {
-                    showNotification('Будь ласка, увійдіть у систему, щоб додати курс у закладки.', 'error');
-                    return;
+                    showNotification(translations[getCurrentLanguage()].pleaseLogin, 'error');                    return;
                 }
 
                 try {
@@ -91,8 +93,10 @@ document.addEventListener('DOMContentLoaded', async function() {
                     updateBookmarkButton(saveButton, isBookmarked);
                     // Оновлюємо стан кнопки закладки
                     await  updateBookmark();
-                    showNotification(`Курс ${isBookmarked ? 'додано в закладки' : 'видалено із закладок'}`, 'success');
-
+                    const notificationText = isBookmarked 
+                        ? translations[getCurrentLanguage()].bookmarkAdded 
+                        : translations[getCurrentLanguage()].bookmarkRemoved;
+                    showNotification(notificationText, 'success');
 
 
                 } catch (error) {
@@ -123,14 +127,14 @@ document.addEventListener('DOMContentLoaded', async function() {
                             ? module.lectures.map(lecture => `
                                 <div class="topic">${lecture.title}</div>
                             `).join('')
-                            : '<div class="topic">Немає доступних лекцій</div>'
+                            : `<div class="topic">${translations[getCurrentLanguage()].noLectures}</div>`
                         }
                     </div>
                 `).join('');
             } else {
                 modulesContainer.innerHTML = `
                     <div class="module">
-                        <h3>Інформація про модулі відсутня</h3>
+                        <h3>${translations[getCurrentLanguage()].noModules}</h3>
                     </div>
                 `;
             }
@@ -162,7 +166,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         } else {
             const reviewsSection = document.querySelector('.reviews-section');
             const whiteCard = reviewsSection.querySelector('.white-card');
-            whiteCard.innerHTML = `<p>Відгуки відсутні</p>`;
+            whiteCard.innerHTML = `<p>${translations[getCurrentLanguage()].noReviews}</p>`;
         }
 
     }catch (error) {
@@ -412,11 +416,11 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
         yesterday.setDate(yesterday.getDate() - 1);
         
         if (date >= today) {
-            return 'today';
+            return translations[getCurrentLanguage()].today;
         }
         
         if (date >= yesterday && date < today) {
-            return 'yesterday';
+            return translations[getCurrentLanguage()].yesterday;
         }
         
         return date.toLocaleDateString('uk-UA', {
@@ -451,10 +455,10 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
             <div class="user-avatar" style="background-image: url('${review.profileImage}')"></div>
             <div class="user-info">
                 <div class="username">${review.username}</div>
-                <div class="rating">rate: ${review.rate}</div>
+                <div class="rating">${translations[getCurrentLanguage()].rateLabel} ${review.rate}</div>
             </div>
             <div class="review-date">${formatReviewDate(review.date)}</div>
-            <div class="review-text">${review.text || 'Без коментаря'}</div>
+            <div class="review-text">${review.text || translations[getCurrentLanguage()].noComment}</div>
         `;
     }
  
@@ -462,7 +466,7 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
     if (speakers.length === 0) {
         const speakersSection = document.querySelector('.speakers-section');
         const whiteCard = speakersSection.querySelector('.white-card');
-        whiteCard.innerHTML = `<p>Інформація про автора відсутня</p>`;
+        whiteCard.innerHTML = `<p>${translations[getCurrentLanguage()].noAuthorInfo}</p>`;
         return;
     }
     
@@ -580,7 +584,7 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
                                         <div class="rate-percentage">${percentages[rate]}%</div>
                                     </div>
                                 `).join('')}
-                                <button class="filter-btn active" data-rate="all">Show all</button>
+                                <button class="filter-btn active" data-rate="all">${translations[getCurrentLanguage()].showAll}</button>
                             </div>
                             <div class="white-card">
                                 <div class="reviews-container">
@@ -686,7 +690,7 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
             updateSignUpButton(enrollmentStatus, courseId, courseData);
         } else {
             // Set up button for non-logged in users
-            signUpButton.textContent = 'Sign Up';
+            signUpButton.textContent = translations[getCurrentLanguage()].signup;
             signUpButton.addEventListener('click', () => {
                 const returnUrl = encodeURIComponent(window.location.href);
                 window.location.href = `/login?redirect=${returnUrl}`;
@@ -699,12 +703,12 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
         if (!signUpButton) return;
         
         if (enrollmentStatus.isEnrolled) {
-            signUpButton.textContent = 'Перейти до навчання';
+            signUpButton.textContent = translations[getCurrentLanguage()].goToCourse;
             signUpButton.addEventListener('click', () => {
                 window.location.href = `/course/${courseId}`;
             });
         } else {
-            signUpButton.textContent = 'Sign Up';
+            signUpButton.textContent = translations[getCurrentLanguage()].signup;
             signUpButton.addEventListener('click', () => handleCourseEnrollment(courseId, courseData));
         }
     }
