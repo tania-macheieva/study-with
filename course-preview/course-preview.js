@@ -35,10 +35,12 @@ document.addEventListener('DOMContentLoaded', async function() {
             ? `/uploads/${courseData.image_url}` 
             : '/images/default-course.png';
         document.querySelector('.course-description').textContent = courseData.description;
-        document.querySelector('.detail-category .detail-value').textContent = courseData.category;
+        document.querySelector('.detail-category .detail-value').textContent =
+            translations[getCurrentLanguage()][courseData.category] || courseData.category;
     
         const detailsMainValues = document.querySelectorAll('.details-main .detail-value');
-        detailsMainValues[0].textContent = courseData.level;
+            detailsMainValues[0].textContent = 
+            translations[getCurrentLanguage()][courseData.level] || courseData.level;
         const lang = getCurrentLanguage();
         detailsMainValues[1].textContent = `6 ${translations[lang].weeks}`;
         detailsMainValues[2].textContent = courseData.price === 0 
