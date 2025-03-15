@@ -112,9 +112,8 @@ document.addEventListener('DOMContentLoaded', async function() {
             return;
         }
     
-        const modulesSection = Array.from(document.querySelectorAll('.section')).find(section => 
-            section.querySelector('.info-label').textContent.trim() === 'Course modules'
-        );
+        const modulesSection = document.querySelector('.modules-section');
+
 
         if (modulesSection) {
             const modulesContainer = modulesSection.querySelector('.white-card');
@@ -442,7 +441,7 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
         if (reviews.length === 0) {
             const reviewsSection = document.querySelector('.reviews-section');
             const whiteCard = reviewsSection.querySelector('.white-card');
-            whiteCard.innerHTML = `<p>Відгуки відсутні</p>`;
+            whiteCard.innerHTML = `<p>${translations[getCurrentLanguage()].noReviews}</p>`;
             return;
         }
 
@@ -542,8 +541,8 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
         const sortedReviews = sortReviews(filteredReviews);
         
         if (sortedReviews.length === 0) {
-            return '<div class="no-reviews">there are no reviews with this rating.</div>';
-        }
+            return `<div class="no-reviews">${translations[getCurrentLanguage()].noReviewsWithRating}</div>`;
+      }
         
         return sortedReviews.map(review => `
             <div class="review-card">
