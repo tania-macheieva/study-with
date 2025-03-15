@@ -117,19 +117,21 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Calculate offset
     let offsetX = position * (courseWidth + gap);
-    
+
     // FIXED: Adjust the final position to ensure the last item appears at the edge
     const maxPosition = Math.max(0, totalCourses - visibleCourses);
     if (position === maxPosition && totalCourses > visibleCourses) {
       // Calculate the total content width
-      const totalContentWidth = totalCourses * courseWidth + (totalCourses - 1) * gap;
+      const totalContentWidth =
+        totalCourses * courseWidth + (totalCourses - 1) * gap;
       // Calculate the container width
       const containerWidth = coursesElement.clientWidth;
       // Set the offset to align the last item with the right edge
       offsetX = totalContentWidth - containerWidth;
-      
+
       // Add extra offset for the right margin
-      const marginRight = parseInt(window.getComputedStyle(coursesWrapper).marginRight) || 24;
+      const marginRight =
+        parseInt(window.getComputedStyle(coursesWrapper).marginRight) || 24;
       offsetX += marginRight;
     }
 
@@ -163,18 +165,21 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Load courses from API
   async function loadCourses() {
     try {
+      // Get the language from localStorage or default to "en"
+      const lang = localStorage.getItem("language") || "en"; 
+  
       const response = await fetch("/api/courses");
       if (!response.ok) throw new Error("Failed to fetch courses");
       const courses = await response.json();
-
+  
       // Clear wrapper
       coursesWrapper.innerHTML = "";
-
+    
       // Add courses from API
       courses.forEach((course) => {
         const courseElement = document.createElement("div");
         courseElement.className = "course_group";
-
+  
         courseElement.innerHTML = `
           <div class="course_name">${course.name}</div>
           <div class="description">${course.description
@@ -187,19 +192,19 @@ document.addEventListener("DOMContentLoaded", async function () {
                 onerror="this.src='/images/250x100.png'" />
           </div>
           <div class="price">${
-            course.price === 0 ? "Free →" : `$${course.price} →`
+            course.price === 0 ? translations[lang].free : `$${course.price} →`
           }</div>
         `;
-
+  
         // Add click handler to navigate to course
         courseElement.style.cursor = "pointer";
         courseElement.addEventListener("click", () => {
           window.location.href = `/course-preview?id=${course.id}`;
         });
-
+  
         coursesWrapper.appendChild(courseElement);
       });
-
+  
       // Update carousel after loading
       setTimeout(updateCarousel, 200);
     } catch (error) {
@@ -207,6 +212,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       coursesWrapper.innerHTML = "<p>Помилка завантаження курсів.</p>";
     }
   }
+  
 
   // Load courses
   loadCourses();
