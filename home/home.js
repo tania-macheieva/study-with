@@ -118,7 +118,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Calculate offset
     let offsetX = position * (courseWidth + gap);
 
-    // FIXED: Adjust the final position to ensure the last item appears at the edge
     const maxPosition = Math.max(0, totalCourses - visibleCourses);
     if (position === maxPosition && totalCourses > visibleCourses) {
       // Calculate the total content width
@@ -175,17 +174,31 @@ document.addEventListener("DOMContentLoaded", async function () {
       // Clear wrapper
       coursesWrapper.innerHTML = "";
     
+      // Define character limit for the description
+      const descriptionCharLimit = 250; // You can adjust this number
+    
       // Add courses from API
       courses.forEach((course) => {
         const courseElement = document.createElement("div");
         courseElement.className = "course_group";
+
+        // Create truncated description for the visible text
+        const shortDescription = course.description
+          .split(" ")
+          .slice(0, 10)
+          .join(" ");
+          
+        // Create truncated description for the tooltip that respects character limit
+        const tooltipDescription = course.description.length > descriptionCharLimit 
+          ? course.description.substring(0, descriptionCharLimit) + "..." 
+          : course.description;
   
         courseElement.innerHTML = `
           <div class="course_name">${course.name}</div>
-          <div class="description">${course.description
-            .split(" ")
-            .slice(0, 10)
-            .join(" ")}...</div>
+          <div class="description-container">
+            <div class="description">${shortDescription}...</div>
+            <div class="tooltip">${tooltipDescription}</div>
+          </div>
           <div class="course-image">
             <img src="/uploads/${course.image_url || "images/250x100.png"}" 
                 alt="${course.name}" 
@@ -204,7 +217,24 @@ document.addEventListener("DOMContentLoaded", async function () {
   
         coursesWrapper.appendChild(courseElement);
       });
-  
+      
+      // Add tooltip event listeners after all courses are created
+      document.querySelectorAll('.description-container').forEach(container => {
+        const description = container.querySelector('.description');
+        const tooltip = container.querySelector('.tooltip'); 
+        
+        // Make container position relative for absolute positioning of tooltip
+        container.style.position = "relative";
+        
+        description.addEventListener('mouseenter', () => {
+          tooltip.style.display = 'block';
+        });
+    
+        description.addEventListener('mouseleave', () => {
+          tooltip.style.display = 'none';
+        });
+      });
+
       // Update carousel after loading
       setTimeout(updateCarousel, 200);
     } catch (error) {
@@ -212,26 +242,27 @@ document.addEventListener("DOMContentLoaded", async function () {
       coursesWrapper.innerHTML = "<p>Помилка завантаження курсів.</p>";
     }
   }
-  document.addEventListener("DOMContentLoaded", function() {
-    console.log("Category script loaded");
-    
-    // Find all category boxes
-    const categoryBoxes = document.querySelectorAll(".category_box");
-    console.log("Found category boxes:", categoryBoxes.length);
-    
-    // Add click event to each category box
-    categoryBoxes.forEach(box => {
-      box.addEventListener("click", function() {
-        // Get the category from data attribute
-        const category = this.getAttribute("data-category");
-        console.log("Category clicked:", category);
-        
-        // Redirect to the courses page with the category parameter
-        window.location.href = `/courses?category=${category}`;
-      });
+  
+  // Initial load of courses
+  loadCourses();
+});
+
+// Separate event listener for category boxes
+document.addEventListener("DOMContentLoaded", function() {
+  console.log("Category script loaded");
+  
+  // Find all category boxes
+  const categoryBoxes = document.querySelectorAll(".category_box");
+  console.log("Found category boxes:", categoryBoxes.length);
+  
+  // Add click event to each category box
+  categoryBoxes.forEach(box => {
+    box.addEventListener("click", function() {
+      // Get the category from data attribute
+      const category = this.getAttribute("data-category");
+      console.log("Category clicked:", category);
+      
+      window.location.href = `/courses?category=${category}`;
     });
   });
-  
-  // Load courses
-  loadCourses();
 });

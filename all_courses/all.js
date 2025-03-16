@@ -114,11 +114,20 @@ document.addEventListener("DOMContentLoaded", async function() {
             courseElement.className = 'course_group';
             courseElement.style.cursor = 'pointer';
             
+            // Define character limit for the description (matching first script)
+            const descriptionCharLimit = 250;
+            const shortDescription = course.description.split(' ').slice(0, 10).join(' ');
+            
+            // Create truncated description for the tooltip that respects character limit
+            const tooltipDescription = course.description.length > descriptionCharLimit 
+              ? course.description.substring(0, descriptionCharLimit) + "..." 
+              : course.description;
+            
             courseElement.innerHTML = `
             <div class="course_name">${course.name}</div>
             <div class="description-container">
-            <div class="description">${course.description.split(' ').slice(0, 10).join(' ')}...</div>
-             <div class="tooltip">${course.description}</div> 
+                <div class="description">${shortDescription}...</div>
+                <div class="tooltip">${tooltipDescription}</div> 
             </div>
             <div class="course-image">
                 <img src="/uploads/${course.image_url || 'images/250x100.png'}" 
@@ -128,35 +137,37 @@ document.addEventListener("DOMContentLoaded", async function() {
             <div class="group-27">
                 <div class="price">${course.price === 0 ? 'Free' : `$${course.price}`}</div>
             </div>
-        `;
+            `;
             
             courseElement.addEventListener('click', () => {
                 window.location.href = `/course-preview?id=${course.id}`;
             });
-            document.querySelectorAll('.description-container').forEach(container => {
-                const description = container.querySelector('.description');
-                const tooltip = container.querySelector('.tooltip');
-            
-                description.addEventListener('mouseenter', (event) => {
-                    tooltip.style.display = 'block';
-            
-                    // Отримуємо координати миші
-                    const mouseX = event.clientX;
-                    const mouseY = event.clientY;
-            
-                    // Встановлюємо позицію тултипа біля миші
-                    tooltip.style.left = `${mouseX + 15}px`;
-                    tooltip.style.top = `${mouseY + 15}px`;
-                });
-            
-                description.addEventListener('mouseleave', () => {
-                    tooltip.style.display = 'none';
-                });
-            });
             
             coursesContainer.appendChild(courseElement);
         });
-  
+    
+        // Add tooltip event listeners after all courses are appended to DOM
+        document.querySelectorAll('.description-container').forEach(container => {
+            const description = container.querySelector('.description');
+            const tooltip = container.querySelector('.tooltip');
+            
+            // Position the container correctly
+            container.style.position = "relative";
+            
+            description.addEventListener('mouseenter', () => {
+                tooltip.style.display = 'block';
+                
+                // Position the tooltip directly below the description
+                tooltip.style.position = 'absolute';
+                tooltip.style.left = '0';
+                tooltip.style.top = '100%'; // Position directly below the description
+                tooltip.style.zIndex = '1000';
+            });
+            
+            description.addEventListener('mouseleave', () => {
+                tooltip.style.display = 'none';
+            });
+        });
     
         const loadMoreButton = document.querySelector(".more-btn");
         if (loadMoreButton) {
@@ -254,24 +265,6 @@ document.addEventListener("DOMContentLoaded", async function() {
   
     
     updateResultsCount();
-
-    document.addEventListener("DOMContentLoaded", async function() {
-        // Get the category from URL parameters (add this to your existing code)
-        const urlParams = new URLSearchParams(window.location.search);
-        const categoryParam = urlParams.get('category');
-        
-        // Your existing code for loading initial courses
-        await loadInitialCourses();
-        
-        // If a category was specified in the URL, apply that filter
-        if (categoryParam) {
-          // Check the corresponding category checkbox if it exists
-          const categoryCheckbox = document.querySelector(`input[name="theme-option-${categoryParam}"]`);
-          if (categoryCheckbox) {
-            categoryCheckbox.checked = true;
-            filterCourses(); // Apply the filter
-          }
-        }
-      });
-      await loadInitialCourses();
-  });
+    
+    await loadInitialCourses();
+});
