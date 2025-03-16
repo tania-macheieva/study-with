@@ -13,6 +13,8 @@
     rel="stylesheet" />
   <link rel="stylesheet" href="../home/home.css" />
   <link rel="icon" href="../images/menu-logo.ico" />
+  <link rel="stylesheet" href="/scroll-to-top/scroll-to-top.css">
+  <script src="/scroll-to-top/scroll-to-top.js"></script>
 </head>
 
 <body>
@@ -95,7 +97,9 @@
       </div>
     </div>
   </div>
-  
+  <button id="scrollToTopBtn" class="scroll-to-top-btn">
+    <i class="fas fa-chevron-up"></i>
+  </button>
   <script src="/cookie/cookie.js"></script>
   <script src="../header/auth-header.js"></script>
   <script src="../footer/footer.js"></script>
@@ -193,21 +197,21 @@
       applyLanguage(userLang);
     });
 
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
       const categoryBoxes = document.querySelectorAll(".category_box");
-      
+
       categoryBoxes.forEach(box => {
-        box.addEventListener("click", function() {
+        box.addEventListener("click", function () {
           const category = this.getAttribute("data-category");
           console.log("Category clicked:", category);
-          
+
           // Redirect to the ALL-courses page with the category parameter
           window.location.href = `/all-courses?category=${category}`;
         });
       });
     }); 
   </script>
-  <script src="/mobileview.js"></script> 
+  <script src="/mobileview.js"></script>
 </body>
 
 </html>

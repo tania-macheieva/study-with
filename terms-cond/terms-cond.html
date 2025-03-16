@@ -1,313 +1,330 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title data-lang="title">StudyWith | Умови та положення</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="icon" href="../images/menu-logo.ico">
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
 
-      ::-webkit-scrollbar {
-  width: 10px;
-}
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-lang="title">StudyWith | Умови та положення</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="/scroll-to-top/scroll-to-top.css">
+  <script src="/scroll-to-top/scroll-to-top.js"></script>
+  <link rel="icon" href="../images/menu-logo.ico">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-::-webkit-scrollbar-track {
-  background: #FFFFFF;
-  margin: 5px 2px;
-  margin-top: 60px;
-  border-radius: 2px;
-}
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
 
-::-webkit-scrollbar-thumb {
-  background: #283044;
-  border-radius: 12px;
-  min-height: 40px;
-}
+    ::-webkit-scrollbar-track {
+      background: #FFFFFF;
+      margin: 5px 2px;
+      margin-top: 60px;
+      border-radius: 2px;
+    }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #506088;
-}
+    ::-webkit-scrollbar-thumb {
+      background: #283044;
+      border-radius: 12px;
+      min-height: 40px;
+    }
 
-::-webkit-scrollbar:horizontal {
-  height: 10px;
-}
+    ::-webkit-scrollbar-thumb:hover {
+      background: #506088;
+    }
 
-::-webkit-scrollbar-track-horizontal {
-  background: #FFFFFF;
-  margin: 2px 5px;
-  border-radius: 2px;
-}
+    ::-webkit-scrollbar:horizontal {
+      height: 10px;
+    }
 
-::-webkit-scrollbar-thumb-horizontal {
-  background: #283044;
-  border-radius: 12px;
-  min-width: 40px;
-}
+    ::-webkit-scrollbar-track-horizontal {
+      background: #FFFFFF;
+      margin: 2px 5px;
+      border-radius: 2px;
+    }
 
-::-webkit-scrollbar-thumb-horizontal:hover {
-  background: #506088;
-}
+    ::-webkit-scrollbar-thumb-horizontal {
+      background: #283044;
+      border-radius: 12px;
+      min-width: 40px;
+    }
 
-      body {
-        margin: 0;
-        padding: 0;
-        font-family: "Inter", sans-serif;
-        background-color: #f8f9fa;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-      }
+    ::-webkit-scrollbar-thumb-horizontal:hover {
+      background: #506088;
+    }
 
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Inter", sans-serif;
+      background-color: #f8f9fa;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    main.content-area {
+      flex: 1;
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background: white;
+    }
+
+    h2,
+    h3 {
+      color: #283044;
+    }
+
+    h2 {
+      font-size: 32px;
+      margin-bottom: 24px;
+      font-weight: 600;
+    }
+
+    h3 {
+      font-size: 24px;
+      margin: 32px 0 16px;
+      font-weight: 500;
+    }
+
+    p,
+    li {
+      color: #4a4a4a;
+      line-height: 1.6;
+      margin-bottom: 16px;
+      font-size: 16px;
+    }
+
+    ul {
+      padding-left: 24px;
+      margin-bottom: 24px;
+    }
+
+    li {
+      margin-bottom: 12px;
+    }
+
+    .contact-section {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid #e1e4e8;
+    }
+
+    a {
+      color: #2563eb;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    a:hover {
+      color: #1d4ed8;
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
       main.content-area {
-        flex: 1;
-        width: 100%;
-        max-width: 1000px;
-        margin: 0 auto;
-        padding: 40px 20px;
-        background: white;
-      }
-
-      h2,
-      h3 {
-        color: #283044;
+        padding: 24px 16px;
       }
 
       h2 {
-        font-size: 32px;
-        margin-bottom: 24px;
-        font-weight: 600;
+        font-size: 28px;
       }
 
       h3 {
-        font-size: 24px;
-        margin: 32px 0 16px;
-        font-weight: 500;
+        font-size: 20px;
       }
+    }
+  </style>
+</head>
 
-      p,
-      li {
-        color: #4a4a4a;
-        line-height: 1.6;
-        margin-bottom: 16px;
-        font-size: 16px;
-      }
-
-      ul {
-        padding-left: 24px;
-        margin-bottom: 24px;
-      }
-
-      li {
-        margin-bottom: 12px;
-      }
-
-      .contact-section {
-        margin-top: 48px;
-        padding-top: 24px;
-        border-top: 1px solid #e1e4e8;
-      }
-
-      a {
-        color: #2563eb;
-        text-decoration: none;
-        transition: color 0.2s;
-      }
-
-      a:hover {
-        color: #1d4ed8;
-        text-decoration: underline;
-      }
-
-      @media (max-width: 768px) {
-        main.content-area {
-          padding: 24px 16px;
-        }
-
-        h2 {
-          font-size: 28px;
-        }
-
-        h3 {
-          font-size: 20px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <script src="../header/auth-header.js"></script>
-    <main class="content-area">
-      <h2 data-lang="termsTitle">Умови та положення</h2>
-      <p data-lang="welcomeMsg">
-        Ласкаво просимо до StudyWith! Використовуючи нашу платформу, ви
-        погоджуєтесь з наступними умовами та положеннями. Будь ласка, уважно
-        прочитайте їх.
-      </p>
-
-      <h3 data-lang="sectionAcceptance">1. Прийняття умов</h3>
-      <p data-lang="acceptanceMsg">
-        Реєструючись або користуючись нашим вебсайтом, ви погоджуєтесь з цими
-        Умовами та Положеннями. Якщо ви не згодні, будь ласка, не використовуйте
-        платформу.
-      </p>
-
-      <h3 data-lang="sectionEligibility" class="student-content teacher-content" hidden> Право на використання</h3>
-      <p data-lang="eligibilityMsg" class="student-content" hidden>
-        Ви повинні бути не молодші 18 років або мати згоду батьків/опікунів для
-        використання наших послуг.
-      </p>
-      <p data-lang="eligibilityMsgT" class="teacher-content" hidden>Ви повинні бути не молодші 18 років для реєстрації та використання наших послуг як викладач.</p>
-
-      <h3 data-lang="sectionAccounts">3. Облікові записи користувачів</h3>
-      <ul>
-        <li data-lang="accountsPoint1">
-          Ви несете відповідальність за збереження конфіденційності своїх
-          облікових даних.
-        </li>
-        <li data-lang="accountsPoint2">
-          Ви погоджуєтесь надавати точну та актуальну інформацію під час
-          реєстрації.
-        </li>
-      </ul>
-
-      <h3 data-lang="sectionContent">4. Контент курсу</h3>
-      <ul>
-        <li data-lang="contentPoint1">
-          Контент на платформі є лише для освітніх цілей.
-        </li>
-        <li data-lang="contentPoint2" class="student-content" hidden>
-          Ми не гарантуємо, що завершення курсу призведе до конкретних кар'єрних
-          можливостей.
-        </li>
-        <li data-lang="contentPoint3">
-          Інструктори зберігають авторські права на свої матеріали, але надають
-          нам ліцензію на їх публікацію на нашій платформі.
-        </li>
-        <li data-lang="contentPoint4" class="teacher-content" hidden>Контент, створений вчителем, повинен бути унікальним, якісним та відповідати освітнім стандартам.
-        </li>
-        <li data-lang="contentPoint5" class="teacher-content" hidden>Заборонено завантажувати матеріали, які містять неналежний контент (мова ненависті, дискримінація, незаконний контент тощо).
-        </li>
-        <li data-lang="contentPoint6" class="teacher-content" hidden>Контент повинен відповідати темі курсу та бути орієнтованим на учнів.
-        </li>
-      </ul>
-
-      <h3 data-lang="sectionMoney" class="teacher-content" hidden>Монетизація та виплати</h3>
-      <ul>
-        <li data-lang="li1" class="teacher-content" hidden>
-          Вчителі отримують частку від продажів курсів відповідно до політики платформи.
-        </li>
-        <li data-lang="li2" class="teacher-content" hidden>
-          Вчителі отримують 70% від виручки від продажу курсів, а 30% утримуються платформою як комісія за надання доступу до сервісу та інші послуги.
-        </li>
-        <li data-lang="li3" class="teacher-content" hidden>
-        </li>
-      </ul>
-
-      <h3 data-lang="sectionPayments">5. Платежі та повернення</h3>
-      <ul>
-        <li data-lang="paymentsPoint1">
-          Платежі за курси не підлягають поверненню, якщо не зазначено інше в
-          нашій політиці повернення коштів.
-        </li>
-        <li data-lang="paymentsPoint2">
-          Плата за підписку (якщо застосовується) буде автоматично списана, якщо
-          не скасувати її до поновлення.
-        </li>
-      </ul>
-
-      <h3 data-lang="sectionIp" class="student-content teacher-content" hidden>6. Інтелектуальна власність</h3>
-      <ul>
-        <li data-lang="ipPoint1" class="student-content" hidden>
-          Всі матеріали на платформі, включаючи тексти, зображення та відео,
-          захищені авторським правом.
-        </li>
-        <li data-lang="ipPoint2" class="student-content" hidden>
-          Ви не маєте права відтворювати, розповсюджувати чи ділитися контентом
-          без явного дозволу.
-        </li>
-        <li data-lang="ipPoint3" class="teacher-content" hidden>Вчитель залишається власником авторських прав на створений контент.
-        </li>
-        <li data-lang="ipPoint4" class="teacher-content" hidden>Платформа отримує ліцензію на публікацію, поширення та просування цього контенту.
-        </li>
-        <li data-lang="ipPoint5" class="teacher-content" hidden>Заборонено завантажувати контент, права на який належать третім особам, без їхньої згоди.
-        </li>
-      </ul>
-
-      <h3 data-lang="sectionConduct">7. Поведінка користувачів</h3>
-      <ul>
-        <li data-lang="conductPoint1">
-          Ви погоджуєтесь не використовувати платформу для незаконних або
-          несанкціонованих цілей.
-        </li>
-        <li data-lang="conductPoint2" class="student-content" hidden>
-          Насильство, мова ненависті або неприпустима поведінка щодо
-          інструкторів, співробітників чи інших користувачів призведе до
-          припинення облікового запису.
-        </li>
-        <li data-lang="conductPoint3" class="teacher-content" hidden>Вчителі зобов'язуються дотримуватися професійної етики у спілкуванні з учнями та іншими користувачами.
-        </li>
-        <li data-lang="conductPoint4" class="teacher-content" hidden>У разі скарг від учнів або інших користувачів платформа залишає за собою право призупинити обліковий запис.
-        </li>
-      </ul>
-
-      <h3 data-lang="sectionThirdParty">8. Посилання на сторонні сайти</h3>
-      <p data-lang="thirdPartyMsg">
-        Наша платформа може містити посилання на сторонні вебсайти. Ми не несемо
-        відповідальності за їхній контент або практики.
-      </p>
-
-      <h3 data-lang="sectionModifications">9. Модифікації</h3>
-      <p data-lang="modificationsMsg">
-        Ми залишаємо за собою право змінювати ці Умови та Положення в будь-який
-        час. Продовження використання платформи після оновлення означає вашу
-        згоду з оновленими умовами.
-      </p>
-      <p data-lang="modificationsMsg1" class="teacher-content" hidden>
-      Вчитель повинен періодично переглядати Умови та погоджуватися з оновленнями, щоб продовжувати користуватися платформою.
+<body>
+  <script src="../header/auth-header.js"></script>
+  <main class="content-area">
+    <h2 data-lang="termsTitle">Умови та положення</h2>
+    <p data-lang="welcomeMsg">
+      Ласкаво просимо до StudyWith! Використовуючи нашу платформу, ви
+      погоджуєтесь з наступними умовами та положеннями. Будь ласка, уважно
+      прочитайте їх.
     </p>
-      <h3 data-lang="sectionTermination">10. Припинення</h3>
-      <p data-lang="terminationMsg">
-        Ми залишаємо за собою право призупинити або припинити ваш акаунт за
-        порушення цих Умов та Положень.
-      </p>
-      <p data-lang="terminationMsg1" class="teacher-content" hidden>Вчитель може припинити використання платформи в будь-який момент, повідомивши адміністрацію.</p>
 
-      <h3 data-lang="sectionDisclaimer">11. Відмова від відповідальності</h3>
-      <p data-lang="disclaimerMsg">
-        Платформа та її контент надаються "як є" без жодних гарантій. Ми не
-        гарантуємо безперервну або безпомилкову роботу.
-      </p>
+    <h3 data-lang="sectionAcceptance">1. Прийняття умов</h3>
+    <p data-lang="acceptanceMsg">
+      Реєструючись або користуючись нашим вебсайтом, ви погоджуєтесь з цими
+      Умовами та Положеннями. Якщо ви не згодні, будь ласка, не використовуйте
+      платформу.
+    </p>
 
-      <h3 data-lang="sectionLaw">12. Законодавство</h3>
-      <p data-lang="lawMsg">
-        Ці Умови та Положення регулюються законами України.
-      </p>
+    <h3 data-lang="sectionEligibility" class="student-content teacher-content" hidden> Право на використання</h3>
+    <p data-lang="eligibilityMsg" class="student-content" hidden>
+      Ви повинні бути не молодші 18 років або мати згоду батьків/опікунів для
+      використання наших послуг.
+    </p>
+    <p data-lang="eligibilityMsgT" class="teacher-content" hidden>Ви повинні бути не молодші 18 років для реєстрації та
+      використання наших послуг як викладач.</p>
 
-      <div class="contact-section">
-        <p data-lang="contactMsg">
-          Якщо у вас є питання або зауваження, будь ласка, звертайтесь до нас на
-          адресу
-          <a href="mailto:studywith.connect@gmail.com"
-            >studywith.connect@gmail.com</a
-          >
-        </p>
-        <p>
-          <strong data-lang="lastUpdated">Останнє оновлення:</strong> 21.02.2025
-        </p>
-      </div>
-    </main>
-    <script src="/terms-cond/lang.js"></script>
-    <script src="../footer/footer.js"></script>
-    <script src="/terms-cond/teacherview.js"></script>
-  </body>
+    <h3 data-lang="sectionAccounts">3. Облікові записи користувачів</h3>
+    <ul>
+      <li data-lang="accountsPoint1">
+        Ви несете відповідальність за збереження конфіденційності своїх
+        облікових даних.
+      </li>
+      <li data-lang="accountsPoint2">
+        Ви погоджуєтесь надавати точну та актуальну інформацію під час
+        реєстрації.
+      </li>
+    </ul>
+
+    <h3 data-lang="sectionContent">4. Контент курсу</h3>
+    <ul>
+      <li data-lang="contentPoint1">
+        Контент на платформі є лише для освітніх цілей.
+      </li>
+      <li data-lang="contentPoint2" class="student-content" hidden>
+        Ми не гарантуємо, що завершення курсу призведе до конкретних кар'єрних
+        можливостей.
+      </li>
+      <li data-lang="contentPoint3">
+        Інструктори зберігають авторські права на свої матеріали, але надають
+        нам ліцензію на їх публікацію на нашій платформі.
+      </li>
+      <li data-lang="contentPoint4" class="teacher-content" hidden>Контент, створений вчителем, повинен бути унікальним,
+        якісним та відповідати освітнім стандартам.
+      </li>
+      <li data-lang="contentPoint5" class="teacher-content" hidden>Заборонено завантажувати матеріали, які містять
+        неналежний контент (мова ненависті, дискримінація, незаконний контент тощо).
+      </li>
+      <li data-lang="contentPoint6" class="teacher-content" hidden>Контент повинен відповідати темі курсу та бути
+        орієнтованим на учнів.
+      </li>
+    </ul>
+
+    <h3 data-lang="sectionMoney" class="teacher-content" hidden>Монетизація та виплати</h3>
+    <ul>
+      <li data-lang="li1" class="teacher-content" hidden>
+        Вчителі отримують частку від продажів курсів відповідно до політики платформи.
+      </li>
+      <li data-lang="li2" class="teacher-content" hidden>
+        Вчителі отримують 70% від виручки від продажу курсів, а 30% утримуються платформою як комісія за надання доступу
+        до сервісу та інші послуги.
+      </li>
+      <li data-lang="li3" class="teacher-content" hidden>
+      </li>
+    </ul>
+
+    <h3 data-lang="sectionPayments">5. Платежі та повернення</h3>
+    <ul>
+      <li data-lang="paymentsPoint1">
+        Платежі за курси не підлягають поверненню, якщо не зазначено інше в
+        нашій політиці повернення коштів.
+      </li>
+      <li data-lang="paymentsPoint2">
+        Плата за підписку (якщо застосовується) буде автоматично списана, якщо
+        не скасувати її до поновлення.
+      </li>
+    </ul>
+
+    <h3 data-lang="sectionIp" class="student-content teacher-content" hidden>6. Інтелектуальна власність</h3>
+    <ul>
+      <li data-lang="ipPoint1" class="student-content" hidden>
+        Всі матеріали на платформі, включаючи тексти, зображення та відео,
+        захищені авторським правом.
+      </li>
+      <li data-lang="ipPoint2" class="student-content" hidden>
+        Ви не маєте права відтворювати, розповсюджувати чи ділитися контентом
+        без явного дозволу.
+      </li>
+      <li data-lang="ipPoint3" class="teacher-content" hidden>Вчитель залишається власником авторських прав на створений
+        контент.
+      </li>
+      <li data-lang="ipPoint4" class="teacher-content" hidden>Платформа отримує ліцензію на публікацію, поширення та
+        просування цього контенту.
+      </li>
+      <li data-lang="ipPoint5" class="teacher-content" hidden>Заборонено завантажувати контент, права на який належать
+        третім особам, без їхньої згоди.
+      </li>
+    </ul>
+
+    <h3 data-lang="sectionConduct">7. Поведінка користувачів</h3>
+    <ul>
+      <li data-lang="conductPoint1">
+        Ви погоджуєтесь не використовувати платформу для незаконних або
+        несанкціонованих цілей.
+      </li>
+      <li data-lang="conductPoint2" class="student-content" hidden>
+        Насильство, мова ненависті або неприпустима поведінка щодо
+        інструкторів, співробітників чи інших користувачів призведе до
+        припинення облікового запису.
+      </li>
+      <li data-lang="conductPoint3" class="teacher-content" hidden>Вчителі зобов'язуються дотримуватися професійної
+        етики у спілкуванні з учнями та іншими користувачами.
+      </li>
+      <li data-lang="conductPoint4" class="teacher-content" hidden>У разі скарг від учнів або інших користувачів
+        платформа залишає за собою право призупинити обліковий запис.
+      </li>
+    </ul>
+
+    <h3 data-lang="sectionThirdParty">8. Посилання на сторонні сайти</h3>
+    <p data-lang="thirdPartyMsg">
+      Наша платформа може містити посилання на сторонні вебсайти. Ми не несемо
+      відповідальності за їхній контент або практики.
+    </p>
+
+    <h3 data-lang="sectionModifications">9. Модифікації</h3>
+    <p data-lang="modificationsMsg">
+      Ми залишаємо за собою право змінювати ці Умови та Положення в будь-який
+      час. Продовження використання платформи після оновлення означає вашу
+      згоду з оновленими умовами.
+    </p>
+    <p data-lang="modificationsMsg1" class="teacher-content" hidden>
+      Вчитель повинен періодично переглядати Умови та погоджуватися з оновленнями, щоб продовжувати користуватися
+      платформою.
+    </p>
+    <h3 data-lang="sectionTermination">10. Припинення</h3>
+    <p data-lang="terminationMsg">
+      Ми залишаємо за собою право призупинити або припинити ваш акаунт за
+      порушення цих Умов та Положень.
+    </p>
+    <p data-lang="terminationMsg1" class="teacher-content" hidden>Вчитель може припинити використання платформи в
+      будь-який момент, повідомивши адміністрацію.</p>
+
+    <h3 data-lang="sectionDisclaimer">11. Відмова від відповідальності</h3>
+    <p data-lang="disclaimerMsg">
+      Платформа та її контент надаються "як є" без жодних гарантій. Ми не
+      гарантуємо безперервну або безпомилкову роботу.
+    </p>
+
+    <h3 data-lang="sectionLaw">12. Законодавство</h3>
+    <p data-lang="lawMsg">
+      Ці Умови та Положення регулюються законами України.
+    </p>
+
+    <div class="contact-section">
+      <p data-lang="contactMsg">
+        Якщо у вас є питання або зауваження, будь ласка, звертайтесь до нас на
+        адресу
+        <a href="mailto:studywith.connect@gmail.com">studywith.connect@gmail.com</a>
+      </p>
+      <p>
+        <strong data-lang="lastUpdated">Останнє оновлення:</strong> 21.02.2025
+      </p>
+    </div>
+  </main>
+  <button id="scrollToTopBtn" class="scroll-to-top-btn">
+    <i class="fas fa-chevron-up"></i>
+  </button>
+  <script src="/terms-cond/lang.js"></script>
+  <script src="../footer/footer.js"></script>
+  <script src="/terms-cond/teacherview.js"></script>
+</body>
+
 </html>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="../profile-page/style.css">
     <link rel="icon" href="../images/menu-logo.ico">
+    <link rel="stylesheet" href="/scroll-to-top/scroll-to-top.css">
+    <script src="/scroll-to-top/scroll-to-top.js"></script>
 </head>
 
 <body>
@@ -23,7 +26,7 @@
                         <img id="profile-image" class="profile-image" src="/images/user-avatar.png" alt="user image">
                     </label>
                     <input type="file" id="upload-image" accept="image/*" style="display: none;">
-                    
+
                     <div class="action-buttons">
                         <button id="confirm-image" style="display: none;" title="Confirm">
                             <i class="fas fa-check"></i>
@@ -45,16 +48,21 @@
                     <div class="tab-container">
                         <div class="tabs">
                             <button class="tab-link" data-tab="messages">
-                                <img src="/images/messages.png" alt="Messages Icon" class="tab-icon" /> <span  data-lang="messages">Messages</span></button>
+                                <img src="/images/messages.png" alt="Messages Icon" class="tab-icon" /> <span
+                                    data-lang="messages">Messages</span></button>
                             <button class="tab-link active" data-tab="public-profile">
-                                <img src="/images/publicprofile.png" alt="Public Profile Icon" class="tab-icon" /><span data-lang="publicProf">Public profile</span></button>
+                                <img src="/images/publicprofile.png" alt="Public Profile Icon" class="tab-icon" /><span
+                                    data-lang="publicProf">Public profile</span></button>
                             <button class="tab-link" data-tab="profile">
-                                <img src="/images/changeprofile.png" alt="Profile Icon" class="tab-icon" /><span data-lang="profile">Profile</span></button>
+                                <img src="/images/changeprofile.png" alt="Profile Icon" class="tab-icon" /><span
+                                    data-lang="profile">Profile</span></button>
                             <button class="tab-link" data-tab="security">
-                                <img src="/images/security.png" alt="Security Icon" class="tab-icon" /><span  data-lang="security">Security</span></button>
-                            
+                                <img src="/images/security.png" alt="Security Icon" class="tab-icon" /><span
+                                    data-lang="security">Security</span></button>
+
                             <button class="tab-link" data-tab="close-account">
-                                <img src="/images/closeaccount.png" alt="Close Account Icon" class="tab-icon" /><span  data-lang="closeAccount">Closing an account</span></button>
+                                <img src="/images/closeaccount.png" alt="Close Account Icon" class="tab-icon" /><span
+                                    data-lang="closeAccount">Closing an account</span></button>
                         </div>
                     </div>
 
@@ -77,13 +85,6 @@
                     <div class="my-certificates">
                         <h2 data-lang="myCertificates">My certificates</h2>
                         <div class="certificates-list">
-                             <div class="certificate">
-                                <p class="p-1" data-lang="certificateName">Certificate name 1</p>
-                                <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
-                                <button class="btn-download">
-                                    <img src="/images/download-certificate.png">
-                                </button>
-                            </div> 
                             <div class="certificate">
                                 <p class="p-1" data-lang="certificateName">Certificate name 1</p>
                                 <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
@@ -98,7 +99,14 @@
                                     <img src="/images/download-certificate.png">
                                 </button>
                             </div>
-                            
+                            <div class="certificate">
+                                <p class="p-1" data-lang="certificateName">Certificate name 1</p>
+                                <p class="p-2" data-lang="completedOn">Completed on dd/mm/yyyy</p>
+                                <button class="btn-download">
+                                    <img src="/images/download-certificate.png">
+                                </button>
+                            </div>
+
                         </div>
                         <button class="btn-view-all-3" data-lang="btnViewAll">View all</button>
                     </div>
@@ -112,252 +120,255 @@
                 </div>
             </main>
         </div>
-</div>
-        <script src="../footer/footer.js"></script>
-        
-        <script src="../profile-page/student-lang.js"></script>
-        
-        <script>
-            function handleProfileImage() {
-                    const uploadInput = document.getElementById('upload-image');
-                    const profileImage = document.getElementById('profile-image');
-                    const removeImageButton = document.getElementById('remove-image');
-                    const confirmImageButton = document.getElementById('confirm-image');
+    </div>
+    <button id="scrollToTopBtn" class="scroll-to-top-btn">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+    <script src="../footer/footer.js"></script>
 
-                    // Load profile image on page load
-                    async function loadProfileImage() {
-                        const userId = localStorage.getItem('userId');
-                        if (!userId) return;
+    <script src="../profile-page/student-lang.js"></script>
 
-                        try {
-                            const response = await fetch(`http://localhost:8000/auth/profile-image/${userId}`);
-                            const data = await response.json();
+    <script>
+        function handleProfileImage() {
+            const uploadInput = document.getElementById('upload-image');
+            const profileImage = document.getElementById('profile-image');
+            const removeImageButton = document.getElementById('remove-image');
+            const confirmImageButton = document.getElementById('confirm-image');
 
-                            if (data.profileImage) {
-                                profileImage.src = data.profileImage.startsWith('http')
-                                    ? data.profileImage
-                                    : `http://localhost:8000${data.profileImage}`;
-                            }
-                        } catch (error) {
-                            console.error('Error loading profile image:', error);
-                            profileImage.src = '/images/user-avatar.png';
-                        }
+            // Load profile image on page load
+            async function loadProfileImage() {
+                const userId = localStorage.getItem('userId');
+                if (!userId) return;
+
+                try {
+                    const response = await fetch(`http://localhost:8000/auth/profile-image/${userId}`);
+                    const data = await response.json();
+
+                    if (data.profileImage) {
+                        profileImage.src = data.profileImage.startsWith('http')
+                            ? data.profileImage
+                            : `http://localhost:8000${data.profileImage}`;
+                    }
+                } catch (error) {
+                    console.error('Error loading profile image:', error);
+                    profileImage.src = '/images/user-avatar.png';
+                }
+            }
+
+            // Handle file selection
+            uploadInput.addEventListener('change', function (event) {
+                const file = event.target.files[0];
+                if (file) {
+                    if (file.size > 1 * 1024 * 1024) {
+                        alert('The file size exceeds 1 MB. Please upload a smaller file.');
+                        uploadInput.value = '';
+                        return;
                     }
 
-                    // Handle file selection
-                    uploadInput.addEventListener('change', function (event) {
-                        const file = event.target.files[0];
-                        if (file) {
-                            if (file.size > 1 * 1024 * 1024) {
-                                alert('The file size exceeds 1 MB. Please upload a smaller file.');
-                                uploadInput.value = '';
-                                return;
-                            }
-
-                            const reader = new FileReader();
-                            reader.onload = function (e) {
-                                profileImage.src = e.target.result;
-                                removeImageButton.style.display = 'inline-block';
-                                confirmImageButton.style.display = 'inline-block';
-                            };
-                            reader.readAsDataURL(file);
-                        }
-                    });
-
-                    // Handle image removal (reset to default)
-                    removeImageButton.addEventListener('click', async function () {
-                        const userId = localStorage.getItem('userId');
-                        if (!userId) return;
-
-                        try {
-                            const response = await fetch('http://localhost:8000/auth/reset-profile-image', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({ userId }),
-                            });
-
-                            if (response.ok) {
-                                profileImage.src = '/images/user-avatar.png';
-                                uploadInput.value = '';
-                                removeImageButton.style.display = 'none';
-                                confirmImageButton.style.display = 'none';
-                                alert('Profile image reset successfully');
-                            } else {
-                                throw new Error('Failed to reset profile image');
-                            }
-                        } catch (error) {
-                            console.error('Error resetting profile image:', error);
-                            alert('Failed to reset profile image');
-                        }
-                    });
-
-                    // Handle image confirmation and upload
-                    confirmImageButton.addEventListener('click', async function () {
-                        const file = uploadInput.files[0];
-                        if (!file) {
-                            alert('Please select an image to upload.');
-                            return;
-                        }
-
-                        const userId = localStorage.getItem('userId');
-                        const email = localStorage.getItem('email');
-                        if (!email || !userId) {
-                            alert('User information is not available. Please log in again.');
-                            return;
-                        }
-
-                        const formData = new FormData();
-                        formData.append('profileImage', file);
-                        formData.append('email', email);
-                        formData.append('userId', userId);
-
-                        try {
-                            const response = await fetch('http://localhost:8000/auth/upload-student-profile-image', {
-                                method: 'POST',
-                                body: formData,
-                            });
-
-                            const result = await response.json();
-
-                            if (response.ok) {
-                                alert('Profile image updated successfully!');
-                                const imageUrl = result.filePath.startsWith('http')
-                                    ? result.filePath
-                                    : `http://localhost:8000${result.filePath}`;
-                                profileImage.src = imageUrl;
-                                removeImageButton.style.display = 'none';
-                                confirmImageButton.style.display = 'none';
-                            } else {
-                                throw new Error(result.error || 'Failed to upload image');
-                            }
-                        } catch (error) {
-                            console.error('Error uploading profile image:', error);
-                            alert('Failed to upload profile image');
-                        }
-                    });
-
-                    // Show buttons when clicking on profile image
-                    profileImage.addEventListener('click', function () {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        profileImage.src = e.target.result;
                         removeImageButton.style.display = 'inline-block';
                         confirmImageButton.style.display = 'inline-block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Handle image removal (reset to default)
+            removeImageButton.addEventListener('click', async function () {
+                const userId = localStorage.getItem('userId');
+                if (!userId) return;
+
+                try {
+                    const response = await fetch('http://localhost:8000/auth/reset-profile-image', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ userId }),
                     });
 
-                    // Initial load
-                    loadProfileImage();
+                    if (response.ok) {
+                        profileImage.src = '/images/user-avatar.png';
+                        uploadInput.value = '';
+                        removeImageButton.style.display = 'none';
+                        confirmImageButton.style.display = 'none';
+                        alert('Profile image reset successfully');
+                    } else {
+                        throw new Error('Failed to reset profile image');
+                    }
+                } catch (error) {
+                    console.error('Error resetting profile image:', error);
+                    alert('Failed to reset profile image');
+                }
+            });
+
+            // Handle image confirmation and upload
+            confirmImageButton.addEventListener('click', async function () {
+                const file = uploadInput.files[0];
+                if (!file) {
+                    alert('Please select an image to upload.');
+                    return;
                 }
 
-                // Initialize when DOM is loaded
-                document.addEventListener('DOMContentLoaded', handleProfileImage);
-            
-                // Функція завантаження профілю з сервера
-                async function loadStudentProfile() {
-                        try {
-                            const userId = localStorage.getItem('userId');
-                            const password = localStorage.getItem('password');
-                            if (!userId) {
-                                console.error('User not authenticated');
-                                return;
-                            }
+                const userId = localStorage.getItem('userId');
+                const email = localStorage.getItem('email');
+                if (!email || !userId) {
+                    alert('User information is not available. Please log in again.');
+                    return;
+                }
 
-                            const response = await fetch(`http://localhost:8000/auth/profile/student/${userId}`);
-                            if (!response.ok) {
-                                throw new Error(`HTTP error: ${response.status}`);
-                            }
+                const formData = new FormData();
+                formData.append('profileImage', file);
+                formData.append('email', email);
+                formData.append('userId', userId);
 
-                            const data = await response.json();
-                            console.log("Received profile data:", data);
-                            sessionStorage.setItem("userId", data.id);
-                            sessionStorage.setItem("name", data.name);
-                            sessionStorage.setItem("email", data.email);
-                            sessionStorage.setItem("role", data.role);
-                            // Збереження пароля в sessionStorage (тільки якщо він є)
-                            if (data.user_password) {
-                                sessionStorage.setItem("password", data.user_password);
-                            } else {
-                                sessionStorage.removeItem("password"); // Видаляємо, якщо його немає
-                            }                          
+                try {
+                    const response = await fetch('http://localhost:8000/auth/upload-student-profile-image', {
+                        method: 'POST',
+                        body: formData,
+                    });
 
-                            const profileImage = document.getElementById('profile-image');
-                            if (profileImage) {
-                                if (data.profile_image) {
-                                    const imageUrl = data.profile_image.startsWith('http')
-                                        ? data.profile_image
-                                        : `http://localhost:8000${data.profile_image}`;
-                                    profileImage.src = imageUrl;
-                                } else {
-                                    profileImage.src = '/images/user-avatar.png';
-                                }
-                            }
+                    const result = await response.json();
 
-                            const usernameElement = document.getElementById('username');
-                            if (usernameElement) {
-                                if (data.nickname) {
-                                    usernameElement.textContent = data.nickname;
-                                    localStorage.setItem('nickname', data.nickname);
-                                } else {
-                                    usernameElement.textContent = ''; 
-                                    localStorage.setItem('nickname', '');
-                                }
-                            }
-                            return data;
-                        } catch (err) {
-                            console.error('Error loading profile:', err);
-                            const profileImage = document.getElementById('profile-image');
-                            if (profileImage) {
-                                profileImage.src = '/images/user-avatar.png';
-                            }
-
-                            const usernameElement = document.getElementById('username');
-                            if (usernameElement) {
-                                usernameElement.textContent = ''; 
-                            }
-                        }
+                    if (response.ok) {
+                        alert('Profile image updated successfully!');
+                        const imageUrl = result.filePath.startsWith('http')
+                            ? result.filePath
+                            : `http://localhost:8000${result.filePath}`;
+                        profileImage.src = imageUrl;
+                        removeImageButton.style.display = 'none';
+                        confirmImageButton.style.display = 'none';
+                    } else {
+                        throw new Error(result.error || 'Failed to upload image');
                     }
-                    async function updateDefaultProfileImage(userId) {
-                        try {
-                            const defaultImagePath = '/images/user-avatar.png';
-                            const response = await fetch('http://localhost:8000/auth/update-default-image', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({
-                                    userId,
-                                    defaultImagePath
-                                })
-                            });
+                } catch (error) {
+                    console.error('Error uploading profile image:', error);
+                    alert('Failed to upload profile image');
+                }
+            });
 
-                            if (!response.ok) {
-                                throw new Error('Failed to update default image');
-                            }
+            // Show buttons when clicking on profile image
+            profileImage.addEventListener('click', function () {
+                removeImageButton.style.display = 'inline-block';
+                confirmImageButton.style.display = 'inline-block';
+            });
 
-                            console.log('Default image path updated in database');
-                        } catch (error) {
-                            console.error('Error updating default image:', error);
-                        }
+            // Initial load
+            loadProfileImage();
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', handleProfileImage);
+
+        // Функція завантаження профілю з сервера
+        async function loadStudentProfile() {
+            try {
+                const userId = localStorage.getItem('userId');
+                const password = localStorage.getItem('password');
+                if (!userId) {
+                    console.error('User not authenticated');
+                    return;
+                }
+
+                const response = await fetch(`http://localhost:8000/auth/profile/student/${userId}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log("Received profile data:", data);
+                sessionStorage.setItem("userId", data.id);
+                sessionStorage.setItem("name", data.name);
+                sessionStorage.setItem("email", data.email);
+                sessionStorage.setItem("role", data.role);
+                // Збереження пароля в sessionStorage (тільки якщо він є)
+                if (data.user_password) {
+                    sessionStorage.setItem("password", data.user_password);
+                } else {
+                    sessionStorage.removeItem("password"); // Видаляємо, якщо його немає
+                }
+
+                const profileImage = document.getElementById('profile-image');
+                if (profileImage) {
+                    if (data.profile_image) {
+                        const imageUrl = data.profile_image.startsWith('http')
+                            ? data.profile_image
+                            : `http://localhost:8000${data.profile_image}`;
+                        profileImage.src = imageUrl;
+                    } else {
+                        profileImage.src = '/images/user-avatar.png';
                     }
-            
-            
-               // uploadInput.addEventListener('change', function (event) {
-                    //const file = event.target.files[0];
-                    //if (file) {
-                        //if (file.size > 1 * 1024 * 1024) { 
-                          //  alert('The file size exceeds 1 MB. Please upload a smaller file.');
-                          //  uploadInput.value = '';
-                         //   return;
-                       // }
+                }
 
-                       // const reader = new FileReader();
-                      //  reader.onload = function (e) {
-                      //      profileImage.src = e.target.result;
-                     //       removeImageButton.style.display = 'inline-block';
-                       //     confirmImageButton.style.display = 'inline-block';
-                   //     };
-                 //       reader.readAsDataURL(file);
-               //     }
-                //});
+                const usernameElement = document.getElementById('username');
+                if (usernameElement) {
+                    if (data.nickname) {
+                        usernameElement.textContent = data.nickname;
+                        localStorage.setItem('nickname', data.nickname);
+                    } else {
+                        usernameElement.textContent = '';
+                        localStorage.setItem('nickname', '');
+                    }
+                }
+                return data;
+            } catch (err) {
+                console.error('Error loading profile:', err);
+                const profileImage = document.getElementById('profile-image');
+                if (profileImage) {
+                    profileImage.src = '/images/user-avatar.png';
+                }
+
+                const usernameElement = document.getElementById('username');
+                if (usernameElement) {
+                    usernameElement.textContent = '';
+                }
+            }
+        }
+        async function updateDefaultProfileImage(userId) {
+            try {
+                const defaultImagePath = '/images/user-avatar.png';
+                const response = await fetch('http://localhost:8000/auth/update-default-image', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId,
+                        defaultImagePath
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update default image');
+                }
+
+                console.log('Default image path updated in database');
+            } catch (error) {
+                console.error('Error updating default image:', error);
+            }
+        }
+
+
+        // uploadInput.addEventListener('change', function (event) {
+        //const file = event.target.files[0];
+        //if (file) {
+        //if (file.size > 1 * 1024 * 1024) { 
+        //  alert('The file size exceeds 1 MB. Please upload a smaller file.');
+        //  uploadInput.value = '';
+        //   return;
+        // }
+
+        // const reader = new FileReader();
+        //  reader.onload = function (e) {
+        //      profileImage.src = e.target.result;
+        //       removeImageButton.style.display = 'inline-block';
+        //     confirmImageButton.style.display = 'inline-block';
+        //     };
+        //       reader.readAsDataURL(file);
+        //     }
+        //});
 
         //        confirmImageButton.addEventListener('click', async function () {
         //            const file = uploadInput.files[0];
@@ -365,30 +376,30 @@
         //                alert('Please select an image to upload.');
         //                return;
         //            }
-//
+        //
         //            const userId = localStorage.getItem('userId');
         //            const email = localStorage.getItem('email');
         //            if (!email || !userId) {
         //                alert('User information is not available. Please log in again.');
         //                return;
         //            }
-//
+        //
         //            console.log('Starting image upload...');
-//
+        //
         //            const formData = new FormData();
         //            formData.append('profileImage', file);
         //            formData.append('email', email);
         //            formData.append('userId', userId);
-//
+        //
         //            try {
         //                const response = await fetch('http://localhost:8000/auth/upload-student-profile-image', {
         //                    method: 'POST',
         //                    body: formData,
         //                });
-//
+        //
         //                const result = await response.json();
         //                console.log('Upload response:', result);
-//
+        //
         //                if (response.ok) {
         //                    alert('Profile image updated successfully!');
         //                    const imageUrl = result.filePath.startsWith('http')
@@ -410,190 +421,191 @@
         //        profileImage.src = '/images/user-avatar.png';
         //        uploadInput.value = '';
         //        removeImageButton.style.display = 'none';
-       //         confirmImageButton.style.display = 'none';
+        //         confirmImageButton.style.display = 'none';
         //    }); 
 
-       // profileImage.addEventListener('click', function () {
+        // profileImage.addEventListener('click', function () {
         //    removeImageButton.style.display = 'inline-block';
-          //  confirmImageButton.style.display = 'inline-block';
+        //  confirmImageButton.style.display = 'inline-block';
         //});
 
-            function updateUsername(data) {
-                const usernameElement = document.getElementById('username');
-                if (usernameElement) {
-                    const displayName = data.nickname || data.name || 'User';
-                    usernameElement.textContent = displayName;
-                }
+        function updateUsername(data) {
+            const usernameElement = document.getElementById('username');
+            if (usernameElement) {
+                const displayName = data.nickname || data.name || 'User';
+                usernameElement.textContent = displayName;
+            }
+        }
+
+        async function updateStudentProfile(profileData) {
+            const userId = localStorage.getItem('userId');
+            if (!profileData) {
+                profileData = {
+                    name: localStorage.getItem('name'),
+                    nickname: localStorage.getItem('nickname'),
+                    dateOfBirth: localStorage.getItem('dateOfBirth'),
+                    phoneNumber: localStorage.getItem('phoneNumber'),
+                    additionalInfo: localStorage.getItem('additionalInfo')
+                };
             }
 
-            async function updateStudentProfile(profileData) {
-                const userId = localStorage.getItem('userId');
-                if (!profileData) {
-                    profileData = {
-                        name: localStorage.getItem('name'),
-                        nickname: localStorage.getItem('nickname'),
-                        dateOfBirth: localStorage.getItem('dateOfBirth'),
-                        phoneNumber: localStorage.getItem('phoneNumber'),
-                        additionalInfo: localStorage.getItem('additionalInfo')
-                    };
-                }
+            const formattedDate = profileData.dateOfBirth ? new Date(profileData.dateOfBirth).toISOString().split('T')[0] : null;
 
-                const formattedDate = profileData.dateOfBirth ? new Date(profileData.dateOfBirth).toISOString().split('T')[0] : null;
-
-                try {
-                    const response = await fetch('http://localhost:8000/auth/update-student-profile', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            userId,
-                            name: profileData.name,
-                            nickname: profileData.nickname,
-                            dateOfBirth: formattedDate,
-                            phoneNumber: profileData.phoneNumber,
-                            additionalInfo: profileData.additionalInfo
-                        })
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('Failed to update profile');
-                    }
-
-                    const result = await response.json();
-
-                    if (result.success) {
-                        localStorage.setItem('name', profileData.name);
-                        localStorage.setItem('nickname', profileData.nickname);
-                        localStorage.setItem('dateOfBirth', formattedDate);
-                        localStorage.setItem('phoneNumber', profileData.phoneNumber);
-                        localStorage.setItem('additionalInfo', profileData.additionalInfo);
-
-                        updateUsername(profileData.nickname || profileData.name);
-
-                        const phoneElement = document.getElementById('phone-number');
-                        if (phoneElement) {
-                            phoneElement.textContent = profileData.phoneNumber;
-                        }
-
-                        const birthDateElement = document.getElementById('birth-date');
-                        if (birthDateElement) {
-                            birthDateElement.textContent = formattedDate;
-                        }
-
-                        const additionalInfoElement = document.getElementById('additional-info');
-                        if (additionalInfoElement) {
-                            additionalInfoElement.textContent = profileData.additionalInfo;
-                        }
-
-                        if (profileData.name !== localStorage.getItem('name')) {
-                            alert('Profile updated successfully!');
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error updating profile:', error);
-                    alert('Failed to update profile. Please try again.');
-                }
-            }
-
-            document.addEventListener('DOMContentLoaded', () => {
-                    const becomeTeacherButton = document.getElementById('become-teacher-btn');
-                    if (becomeTeacherButton) {
-                        becomeTeacherButton.addEventListener('click', async () => {
-                            const authData = getAuthData();
-
-                            if (!authData.token || !authData.email) {
-                                alert("Please log in before becoming a teacher.");
-                                window.location.href = "/login.html";
-                                return;
-                            }
-
-                            const userConfirmed = confirm(
-                                "Are you sure you want to become a teacher? If you click 'OK', your role will be updated to 'teacher'."
-                            );
-
-                            if (!userConfirmed) return;
-
-                            try {
-                                // Make sure the token is properly formatted in the Authorization header
-                                console.log("Using token:", authData.token); // For debugging
-
-                                const response = await fetch("http://localhost:8000/auth/student-to-teacher", {
-                                    method: "POST",
-                                    headers: {
-                                        "Content-Type": "application/json",
-                                        "Authorization": `Bearer ${authData.token}`,
-                                    },
-                                    body: JSON.stringify({
-                                        email: authData.email,
-                                        role: "teacher"
-                                    }),
-                                    // Add credentials to ensure cookies are sent with the request
-                                    credentials: 'include'
-                                });
-
-                                if (response.status === 403) {
-                                    // Handle expired token
-                                    alert("Your session may have expired. Please log in again.");
-                                    localStorage.removeItem('token');
-                                    window.location.href = "login/login.html";
-                                    return;
-                                }
-
-                                const data = await response.json();
-
-                                if (response.ok) {
-                                    sessionStorage.setItem("isStudentBecomingTeacher", "true");
-                                    // ❌ НЕ перезаписувати, якщо це новий вчитель
-                                    sessionStorage.setItem("userId", authData.userId);
-                                    sessionStorage.setItem("role", "teacher");
-                                    sessionStorage.setItem("name", authData.name);
-                                    sessionStorage.setItem("email", authData.email);
-                                    sessionStorage.setItem("password", authData.password || ""); // Уникнути null
-                
-    
-                                    // Видаляємо токен, щоб примусово розлогінити користувача
-                                    localStorage.removeItem('token');
-                                   
-
-                                    alert("You are now a teacher! Please provide the necessary details to create a teacher profile and verify your qualifications.");
-                                    sessionStorage.setItem("currentStep", "0");
-                                    console.log("📌 Password перед редиректом:", sessionStorage.getItem("password"));
-                                    window.location.href = "/registration_pages/full_reg_teacher.html";
-                                } else {
-                                    alert(data.error || "Failed to update role.");
-                                }
-                            } catch (error) {
-                                console.error("Error updating role:", error);
-                                alert("An error occurred. Please try again later.");
-                            }
-                        });
-                    }
+            try {
+                const response = await fetch('http://localhost:8000/auth/update-student-profile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId,
+                        name: profileData.name,
+                        nickname: profileData.nickname,
+                        dateOfBirth: formattedDate,
+                        phoneNumber: profileData.phoneNumber,
+                        additionalInfo: profileData.additionalInfo
+                    })
                 });
 
-                function getAuthData() {
-                    return {
-                        token: localStorage.getItem('token'),
-                        userId: localStorage.getItem('userId'),
-                        role: localStorage.getItem('role'),
-                        name: localStorage.getItem('name'),
-                        email: localStorage.getItem('email'),
-                        password: sessionStorage.getItem('password'),
-                    };
+                if (!response.ok) {
+                    throw new Error('Failed to update profile');
                 }
-                document.addEventListener('DOMContentLoaded', () => {
 
-                        handleProfileImage();
+                const result = await response.json();
 
-                        loadStudentProfile();
+                if (result.success) {
+                    localStorage.setItem('name', profileData.name);
+                    localStorage.setItem('nickname', profileData.nickname);
+                    localStorage.setItem('dateOfBirth', formattedDate);
+                    localStorage.setItem('phoneNumber', profileData.phoneNumber);
+                    localStorage.setItem('additionalInfo', profileData.additionalInfo);
 
-                        loadEnrolledCourses();
-                        loadSavedBookmarks();
+                    updateUsername(profileData.nickname || profileData.name);
 
-                        const userLang = localStorage.getItem('language') || 'en';
-                        applyLanguage(userLang);
-                    });
-        </script>
+                    const phoneElement = document.getElementById('phone-number');
+                    if (phoneElement) {
+                        phoneElement.textContent = profileData.phoneNumber;
+                    }
+
+                    const birthDateElement = document.getElementById('birth-date');
+                    if (birthDateElement) {
+                        birthDateElement.textContent = formattedDate;
+                    }
+
+                    const additionalInfoElement = document.getElementById('additional-info');
+                    if (additionalInfoElement) {
+                        additionalInfoElement.textContent = profileData.additionalInfo;
+                    }
+
+                    if (profileData.name !== localStorage.getItem('name')) {
+                        alert('Profile updated successfully!');
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                alert('Failed to update profile. Please try again.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const becomeTeacherButton = document.getElementById('become-teacher-btn');
+            if (becomeTeacherButton) {
+                becomeTeacherButton.addEventListener('click', async () => {
+                    const authData = getAuthData();
+
+                    if (!authData.token || !authData.email) {
+                        alert("Please log in before becoming a teacher.");
+                        window.location.href = "/login.html";
+                        return;
+                    }
+
+                    const userConfirmed = confirm(
+                        "Are you sure you want to become a teacher? If you click 'OK', your role will be updated to 'teacher'."
+                    );
+
+                    if (!userConfirmed) return;
+
+                    try {
+                        // Make sure the token is properly formatted in the Authorization header
+                        console.log("Using token:", authData.token); // For debugging
+
+                        const response = await fetch("http://localhost:8000/auth/student-to-teacher", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${authData.token}`,
+                            },
+                            body: JSON.stringify({
+                                email: authData.email,
+                                role: "teacher"
+                            }),
+                            // Add credentials to ensure cookies are sent with the request
+                            credentials: 'include'
+                        });
+
+                        if (response.status === 403) {
+                            // Handle expired token
+                            alert("Your session may have expired. Please log in again.");
+                            localStorage.removeItem('token');
+                            window.location.href = "login/login.html";
+                            return;
+                        }
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            sessionStorage.setItem("isStudentBecomingTeacher", "true");
+                            // ❌ НЕ перезаписувати, якщо це новий вчитель
+                            sessionStorage.setItem("userId", authData.userId);
+                            sessionStorage.setItem("role", "teacher");
+                            sessionStorage.setItem("name", authData.name);
+                            sessionStorage.setItem("email", authData.email);
+                            sessionStorage.setItem("password", authData.password || ""); // Уникнути null
+
+
+                            // Видаляємо токен, щоб примусово розлогінити користувача
+                            localStorage.removeItem('token');
+
+
+                            alert("You are now a teacher! Please provide the necessary details to create a teacher profile and verify your qualifications.");
+                            sessionStorage.setItem("currentStep", "0");
+                            console.log("📌 Password перед редиректом:", sessionStorage.getItem("password"));
+                            window.location.href = "/registration_pages/full_reg_teacher.html";
+                        } else {
+                            alert(data.error || "Failed to update role.");
+                        }
+                    } catch (error) {
+                        console.error("Error updating role:", error);
+                        alert("An error occurred. Please try again later.");
+                    }
+                });
+            }
+        });
+
+        function getAuthData() {
+            return {
+                token: localStorage.getItem('token'),
+                userId: localStorage.getItem('userId'),
+                role: localStorage.getItem('role'),
+                name: localStorage.getItem('name'),
+                email: localStorage.getItem('email'),
+                password: sessionStorage.getItem('password'),
+            };
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+
+            handleProfileImage();
+
+            loadStudentProfile();
+
+            loadEnrolledCourses();
+            loadSavedBookmarks();
+
+            const userLang = localStorage.getItem('language') || 'en';
+            applyLanguage(userLang);
+        });
+    </script>
     </div>
 </body>
+
 </html>
