@@ -150,6 +150,13 @@
                 element.textContent = langData[langKey];
               } else if (element.tagName === "P") {
                 element.textContent = langData[langKey];
+              } else if (element.classList.contains("caption")) {
+                const teamMemberNameEl = element.querySelector(".team-member-name");
+                if (teamMemberNameEl) {
+                  teamMemberNameEl.textContent = langData[langKey];
+                } else {
+                  element.innerHTML = `<div class="team-member-name">${langData[langKey]}</div>`;
+              }
               } else {
                 element.innerHTML = langData[langKey];
               }
