@@ -357,3 +357,5 @@ CREATE TABLE reviews (
 
 ALTER TABLE reviews ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP;
 UPDATE reviews SET updated_at = created_at WHERE updated_at IS NULL;
+
+ALTER TABLE test_progress DROP CONSTRAINT test_progress_user_id_course_id_test_type_key;
