@@ -1068,7 +1068,12 @@ async function handleTestComplete(testData) {
 
 window.openModuleTest = async function(testLink, moduleId) {
     const videoContainer = document.querySelector('.video-player');
-    if (!videoContainer) return;
+    if (!videoContainer) {
+        console.error('Контейнер для відео не знайдено');
+        return;
+    }
+    
+    console.log(`Відкриваємо тест модуля: testLink=${testLink}, moduleId=${moduleId}`);
 
     videoContainer.innerHTML = '';
 
@@ -1090,8 +1095,28 @@ window.openModuleTest = async function(testLink, moduleId) {
             height: '100%',
             border: 'none'
         });
+        
+        // Отримуємо поточний courseId з URL
+        const courseId = window.location.pathname.split('/course/').pop();
+        console.log(`Поточний courseId: ${courseId}`);
 
-        iframe.src = testLink;
+        // Додаємо додаткові параметри до URL тесту для покращення ідентифікації
+        const hasQueryParams = testLink.includes('?');
+        const separator = hasQueryParams ? '&' : '?';
+        
+        // Додаємо moduleId та courseId як параметри URL якщо вони не були включені раніше
+        let updatedTestLink = testLink;
+        if (moduleId && !testLink.includes('moduleId=')) {
+            updatedTestLink += `${separator}moduleId=${moduleId}`;
+        }
+        
+        if (courseId && !updatedTestLink.includes('courseId=')) {
+            const newSeparator = updatedTestLink.includes('?') ? '&' : '?';
+            updatedTestLink += `${newSeparator}courseId=${courseId}`;
+        }
+        
+        console.log(`Оновлене посилання на тест: ${updatedTestLink}`);
+        iframe.src = updatedTestLink;
         
         // Додаємо обробник для отримання повідомлення про завершення тесту
         window.addEventListener('message', handleTestCompleteMessage);
@@ -1099,20 +1124,24 @@ window.openModuleTest = async function(testLink, moduleId) {
         testContainer.appendChild(iframe);
         videoContainer.appendChild(testContainer);
 
+        // Оновлюємо активний елемент в навігації
         document.querySelectorAll('.topic-item').forEach(item => {
             item.classList.remove('active');
         });
 
-        const testItem = document.querySelector(`[data-test-link="${testLink}"]`);
+        const testItem = document.querySelector(`[data-module-id="${moduleId}"]`);
         if (testItem) {
             testItem.classList.add('active');
+            console.log(`Тестовий елемент позначено як активний`);
+        } else {
+            console.log(`Не знайдено елемент тесту для moduleId: ${moduleId}`);
         }
 
     } catch (error) {
-        console.error('Error opening test:', error);
+        console.error('Помилка відкриття тесту:', error);
         videoContainer.innerHTML = `
             <div class="error-container" style="padding: 20px; color: red;">
-                Error loading test: ${error.message}
+                Помилка завантаження тесту: ${error.message}
             </div>
         `;
     }
@@ -1992,30 +2021,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// Оновлена функція completeModuleTest
 async function completeModuleTest(moduleId, score = 100) {
     try {
-        console.log(`Completing module test for moduleId: ${moduleId}`);
+        console.log(`Завершення модульного тесту для moduleId: ${moduleId}`);
         const userId = localStorage.getItem('userId');
         
         if (!userId) {
-            console.error('User ID not found in localStorage');
-            alert('Error: User ID not found. Please log in again.');
+            console.error('ID користувача не знайдено в localStorage');
+            alert('Помилка: ID користувача не знайдено. Будь ласка, увійдіть знову.');
             return false;
         }
         
-        // Важливо: перевіряємо, чи тест цього модуля вже був завершений
-        const moduleItem = document.querySelector(`[data-module-id="${moduleId}"]`);
-        const testItem = moduleItem?.querySelector('.test-item');
+        // Знаходимо courseId для цього модуля
+        const courseId = window.location.pathname.split('/course/').pop();
+        console.log(`Використовуємо courseId: ${courseId} для модуля: ${moduleId}`);
         
-        // Якщо цей тест уже позначено як пройдений, не потрібно відправляти запит знову
-        if (testItem && testItem.classList.contains('completed')) {
-            console.log(`Module test ${moduleId} already completed`);
-            alert('Test already completed!');
-            return true;
-        }
-        
-        console.log('Sending test completion data:', { userId, moduleId, score });
+        console.log('Відправка даних про завершення тесту:', { userId, moduleId, courseId, score });
         
         // Відправляємо запит на завершення тесту
         const response = await fetch(`/api/module/${moduleId}/test/complete`, {
@@ -2025,17 +2046,18 @@ async function completeModuleTest(moduleId, score = 100) {
             },
             body: JSON.stringify({ 
                 userId,
-                score
+                score,
+                courseId // Додаємо courseId до запиту
             })
         });
 
-        console.log('Server response status:', response.status);
+        console.log('Статус відповіді сервера:', response.status);
         
         // Клонуємо відповідь, щоб можна було прочитати її кілька разів
         const responseClone = response.clone();
         
         if (!response.ok) {
-            let errorMessage = 'Failed to complete module test';
+            let errorMessage = 'Не вдалося завершити модульний тест';
             try {
                 const errorData = await responseClone.json();
                 errorMessage = errorData.error || errorMessage;
@@ -2052,78 +2074,109 @@ async function completeModuleTest(moduleId, score = 100) {
         // Оновлюємо інтерфейс після успішного запиту
         await updateProgress();
         
+        // Знаходимо та оновлюємо елемент тесту
+        const testItem = document.querySelector(`.test-item[data-module-id="${moduleId}"]`);
         if (testItem) {
             testItem.classList.add('completed');
             testItem.style.backgroundColor = '#e8f5e9';
+            console.log(`Елемент тесту для модуля ${moduleId} оновлено`);
+        } else {
+            console.log(`Елемент тесту для модуля ${moduleId} не знайдено в DOM`);
         }
         
-        console.log(`Module test ${moduleId} completed successfully`);
+        alert('Тест успішно завершено!');
+        console.log(`Модульний тест ${moduleId} успішно завершено`);
         return true;
 
     } catch (error) {
-        console.error('Error completing module test:', error);
+        console.error('Помилка завершення модульного тесту:', error);
         alert(`Помилка завершення тесту: ${error.message}`);
         return false;
     }
 }
 
 function handleTestCompleteMessage(event) {
-    console.log('Received message from iframe:', event.data);
+    console.log('Отримано повідомлення від iframe:', event.data);
     
     if (event.data && event.data.type === 'testComplete') {
-        console.log('Received test complete message:', event.data);
+        console.log('Отримано повідомлення про завершення тесту:', event.data);
         
         let testType = event.data.testType || 'module';
         let moduleId = parseInt(event.data.moduleId || 0);
         let courseId = parseInt(event.data.courseId || 0);
         let score = parseInt(event.data.score || 100);
         
-        // Debug logging
-        console.log('Processing test completion with:', {
+        console.log('Параметри тесту:', {
             testType,
             moduleId,
             courseId,
             score
         });
         
-        // Якщо moduleId та courseId не передані, спробуємо отримати їх з активного елемента
-        if (moduleId === 0 && courseId === 0) {
-            const activeTestItem = document.querySelector('.test-item.active');
-            if (activeTestItem) {
-                moduleId = parseInt(activeTestItem.dataset.moduleId || 0);
-                // Перевіряємо, чи тест вже пройдений
-                if (activeTestItem.classList.contains('completed')) {
-                    console.log('Test already completed, no need to call completeModuleTest');
-                    alert('Test has already been completed');
-                    return;
-                }
-                console.log('Found active test with moduleId:', moduleId);
-            } else {
-                // Перевіряємо, чи це фінальний тест курсу
-                const finalTestSection = document.querySelector('.final-test-section');
-                if (finalTestSection) {
-                    courseId = parseInt(finalTestSection.dataset.courseId || 0);
-                    testType = 'course';
-                    // Перевіряємо, чи тест вже пройдений
-                    if (finalTestSection.classList.contains('completed')) {
-                        console.log('Final test already completed, no need to call completeCourseTest');
-                        alert('Final test has already been completed');
-                        return;
-                    }
-                    console.log('Found final test with courseId:', courseId);
-                }
+        // Якщо moduleId не було передано, спробуємо отримати його з URL iframe
+        if (!moduleId || isNaN(moduleId)) {
+            const iframe = document.querySelector('iframe');
+            if (iframe && iframe.src) {
+                const url = new URL(iframe.src);
+                moduleId = parseInt(url.searchParams.get('moduleId') || 0);
+                courseId = parseInt(url.searchParams.get('courseId') || 0);
+                console.log(`Отримано параметри з URL iframe: moduleId=${moduleId}, courseId=${courseId}`);
             }
         }
         
-        console.log('Final test parameters:', { testType, moduleId, courseId });
+        // Отримуємо ID з активного елемента DOM
+        if (!moduleId || isNaN(moduleId)) {
+            const activeTestItem = document.querySelector('.test-item.active');
+            if (activeTestItem) {
+                moduleId = parseInt(activeTestItem.dataset.moduleId || 0);
+                console.log(`Отримано moduleId з активного елемента: ${moduleId}`);
+            }
+        }
         
-        if (testType === 'module' && moduleId > 0) {
-            completeModuleTest(moduleId, score);
-        } else if (testType === 'course' && courseId > 0) {
-            completeCourseTest(courseId, score);
+        // ID поточного курсу з URL
+        const currentCourseId = window.location.pathname.split('/course/').pop();
+        console.log(`ID поточного курсу: ${currentCourseId}`);
+        
+        if (!courseId && currentCourseId) {
+            courseId = parseInt(currentCourseId);
+        }
+        
+        // Фінальна перевірка параметрів
+        if (moduleId && courseId) {
+            console.log(`Викликаємо API для завершення тесту: moduleId=${moduleId}, courseId=${courseId}`);
+            
+            // Надсилаємо запит на API
+            fetch(`/api/module/${moduleId}/test/complete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: localStorage.getItem('userId'),
+                    moduleId: moduleId,
+                    courseId: courseId,
+                    score: score
+                })
+            })
+            .then(response => {
+                console.log(`Статус відповіді API: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Відповідь API:', data);
+                
+                if (data.success) {
+                    alert('Тест успішно завершено! Сторінка буде перезавантажена.');
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    alert('Помилка при завершенні тесту: ' + (data.error || 'Невідома помилка'));
+                }
+            })
+            .catch(error => {
+                console.error('Помилка при викликі API:', error);
+                alert('Помилка при завершенні тесту. Спробуйте ще раз.');
+            });
         } else {
-            console.error('Could not determine test type or ID');
-            alert('Помилка: Неможливо завершити тест - відсутній ID модуля або курсу');
+            console.error('Недостатньо параметрів для завершення тесту');
+            alert('Помилка: Не вдалося визначити параметри тесту');
         }
     }
 }
@@ -2167,8 +2220,60 @@ async function completeCourseTest(courseId, score = 100) {
 }
 
 window.handleModuleTestClick = function(moduleId, testLink) {
-    console.log(`Handling module test click: moduleId=${moduleId}, testLink=${testLink}`);
-    openModuleTest(testLink, moduleId);
+    console.log(`Обробка кліку по тесту модуля: moduleId=${moduleId}, testLink=${testLink}`);
+    
+    // Зберігаємо ідентифікатор модуля в localStorage для легкого доступу
+    localStorage.setItem('currentModuleTest', moduleId);
+    
+    // Змінюємо стан елементу в DOM
+    const testItem = document.querySelector(`.test-item[data-module-id="${moduleId}"]`);
+    if (testItem) {
+        document.querySelectorAll('.topic-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        testItem.classList.add('active');
+    }
+    
+    // Отримуємо посилання на тест з API, яке включає зашифрований testId
+    fetchModuleTestLink(moduleId)
+        .then(updatedTestLink => {
+            if (updatedTestLink) {
+                console.log(`Отримано оновлене посилання: ${updatedTestLink}`);
+                openModuleTest(updatedTestLink, moduleId);
+            } else {
+                console.log(`Використовуємо оригінальне посилання: ${testLink}`);
+                openModuleTest(testLink, moduleId);
+            }
+        })
+        .catch(error => {
+            console.error('Помилка отримання оновленого посилання:', error);
+            openModuleTest(testLink, moduleId);
+        });
+};
+
+async function fetchModuleTestLink(moduleId) {
+    try {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            console.warn('userId не знайдено в localStorage');
+            return null;
+        }
+
+        console.log(`Запит оновленого посилання для модуля ${moduleId}`);
+        const response = await fetch(`/api/module/${moduleId}/test?userId=${userId}`);
+        
+        if (!response.ok) {
+            throw new Error(`Помилка отримання посилання на тест: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Отримано дані тесту:', data);
+        
+        return data.testLink || null;
+    } catch (error) {
+        console.error('Помилка запиту посилання на тест:', error);
+        return null;
+    }
 }
 
 // Функція для обробки кліку по фінальному тесту курсу

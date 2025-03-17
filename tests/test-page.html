@@ -319,6 +319,44 @@
  </form>
 
  <script>
+  function getUrlParams() {
+    const params = {};
+    const searchParams = new URLSearchParams(window.location.search);
+    
+    for (const [key, value] of searchParams.entries()) {
+        params[key] = value;
+    }
+    
+    return params;
+}
+
+// Функція для відправки повідомлення про завершення тесту
+function completeTest() {
+    const params = getUrlParams();
+    console.log('URL parameters:', params);
+    
+    // Відправляємо повідомлення батьківському вікну
+    window.parent.postMessage({
+        type: 'testComplete',
+        moduleId: params.moduleId,
+        courseId: params.courseId,
+        testId: params.testId,
+        score: 100 // або інше значення залежно від результатів тесту
+    }, '*');
+    
+    console.log('Повідомлення про завершення тесту відправлено');
+}
+
+// Додаємо обробник для кнопки завершення тесту
+document.addEventListener('DOMContentLoaded', function() {
+    const completeButton = document.getElementById('completeTestButton');
+    
+    if (completeButton) {
+        completeButton.addEventListener('click', completeTest);
+    } else {
+        console.warn('Кнопка завершення тесту не знайдена');
+    }
+});
 document.addEventListener('DOMContentLoaded', () => {
   const secretKey = 'testSecretIdEncription';
 
