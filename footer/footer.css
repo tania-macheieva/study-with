@@ -7,7 +7,7 @@ body {
 .logo {
     display: flex;
     align-items: center;    
-    gap: 10px;
+    
     font-family: "Inter";
     font-weight: bold;
     font-size: 20px;
@@ -16,6 +16,7 @@ body {
 }
 
 .logo img {
+    margin-left: 32px;
     width: 35px;
     height: auto;
 }
