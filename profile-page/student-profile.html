@@ -79,7 +79,9 @@
                         <h2 data-lang="myCourses">My courses</h2>
                         <div class="courses-list" id="enrolled-courses">
                         </div>
-                        <button class="btn-view-all-1" data-lang="btnViewAll">View all</button>
+                        <div class="btn-container">
+                            <button class="btn-view-all-1" data-lang="btnViewAll">View all</button>
+                        </div>
                     </div>
 
                     <div class="my-certificates">
@@ -108,14 +110,18 @@
                             </div>
 
                         </div>
-                        <button class="btn-view-all-3" data-lang="btnViewAll">View all</button>
+                        <div class="btn-container">
+                            <button class="btn-view-all-3" data-lang="btnViewAll">View all</button>
+                        </div>
                     </div>
 
                     <div class="my-bookmarks">
                         <h2 data-lang="myBookmarks">My bookmarks</h2>
                         <div class="bookmarks-list">
                         </div>
-                        <button class="btn-view-all-4" data-lang="btnViewAll">View all</button>
+                        <div class="btn-container">
+                            <button class="btn-view-all-4" data-lang="btnViewAll">View all</button>
+                        </div>
                     </div>
                 </div>
             </main>
@@ -598,8 +604,7 @@
 
             loadStudentProfile();
 
-            loadEnrolledCourses();
-            loadSavedBookmarks();
+            
 
             const userLang = localStorage.getItem('language') || 'en';
             applyLanguage(userLang);

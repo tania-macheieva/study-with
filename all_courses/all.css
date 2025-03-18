@@ -215,12 +215,15 @@ h4.filters-apply {
   min-width: 300px; /* Мінімальна ширина, щоб виглядало коректно */
 }
 .right-container {
-  align-self: flex-start; 
-  align-items: flex-start;
+  /*align-self: flex-start; 
+  align-items: flex-start;*/
   position: relative;
   margin-bottom: 32px;
   width: 100%;
   margin-right: 64px;
+  display: flex;
+  flex-direction: column; /* Щоб елементи розташовувалися один під одним */
+  align-items: center; 
 }
 .Result, .Sort {
   font-weight: 600;
@@ -344,6 +347,7 @@ h4.filters-apply {
   overflow: visible;
 }
 
+
 .more-btn {
   background-color: #283044;
   color: #fff;
@@ -357,11 +361,10 @@ h4.filters-apply {
   border: none;
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease-in-out;
-  position: relative; 
-  left: 60%; 
-  transform: translate(-12%, -50%); 
-  margin-bottom: 32px;
-  margin-top: 60px;
+  margin-top: 40px;
+  display: block; 
+  margin: 40px auto;
+
 }
 
 .more-btn:hover {

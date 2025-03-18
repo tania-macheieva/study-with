@@ -76,7 +76,9 @@
                         <div class="courses-list" id="enrolled-courses">
                             <!-- Курси будуть додані з бд -->
                         </div>
-                        <button class="btn-view-all-1" data-lang="btnViewAll">View all</button>
+                        <div class="btn-container">
+                            <button class="btn-view-all-1" data-lang="btnViewAll">View all</button>
+                        </div>
                     </div>
                     <!-- <div class="my-courses">
                         <h2 data-lang="myCourses">My courses</h2>
@@ -138,14 +140,18 @@
                                 </div>
 
                             </div>
-                            <button class="btn-view-all-3" data-lang="btnViewAll">View all</button>
+                            <div class="btn-container">
+                                <button class="btn-view-all-3" data-lang="btnViewAll">View all</button>
+                            </div>
                         </div>
 
                         <div class="my-bookmarks">
                             <h2 data-lang="myBookmarks">My bookmarks</h2>
                             <div class="bookmarks-list">
                             </div>
-                            <button class="btn-view-all-4" data-lang="btnViewAll">View all</button>
+                            <div class="btn-container">
+                                <button class="btn-view-all-4" data-lang="btnViewAll">View all</button>
+                            </div>
                         </div>
                     </div>
 
@@ -195,21 +201,7 @@
 
     });
 
-    function toggleViewAllButton(containerClass, buttonClass, threshold = 3) {
-        const containers = document.querySelectorAll(`.${containerClass}`);
-        containers.forEach(container => {
-            const items = container.querySelectorAll(':scope > div');
-            const viewAllButton = container.parentElement.querySelector(`.${buttonClass}`);
 
-            if (viewAllButton) {
-                if (items.length > threshold) {
-                    viewAllButton.style.display = 'block';
-                } else {
-                    viewAllButton.style.display = 'none';
-                }
-            }
-        });
-    }
     document.addEventListener('DOMContentLoaded', function () {
         const uploadInput = document.getElementById('upload-image');
         const profileImage = document.getElementById('profile-image');
@@ -325,74 +317,51 @@
                 alert('An error occurred while uploading the profile image.');
             }
         });
+ /*       function toggleViewAllButton(containerClass, buttonClass, threshold = 3) {
+    const containers = document.querySelectorAll(`.${containerClass}`);
+
+    containers.forEach(container => {
+        const items = container.querySelectorAll('.course'); // Шукаємо конкретно `.course`
+        const viewAllButton = container.closest('.my-courses').querySelector(`.${buttonClass}`);
+
+        if (!viewAllButton) {
+            console.warn(`❌ Кнопку ${buttonClass} не знайдено у`, container);
+            return;
+        }
+
+        if (items.length > threshold) {
+            viewAllButton.style.display = 'block';
+        } else {
+            viewAllButton.style.display = 'none';
+        }
+    });
+}
+    document.addEventListener('click', function (event) {
+    if (event.target.classList.contains('btn-view-all-1')) {
+        const button = event.target;
+        const section = button.closest('.my-courses');
+        const list = section.querySelector('.courses-list');
+
+        if (!list) {
+            console.error("❌ Список курсів не знайдено!");
+            return;
+        }
+
+        list.classList.toggle('expanded');
+
+        // Логіка відображення карток
+        const courses = list.querySelectorAll('.course:nth-child(n+4)');
+        if (list.classList.contains('expanded')) {
+            courses.forEach(course => course.style.display = 'block');
+            button.textContent = 'View less';
+        } else {
+            courses.forEach(course => course.style.display = 'none');
+            button.textContent = 'View all';
+        }
+    }
+});*/
 
 
-        document.querySelectorAll('.btn-view-all-1').forEach(function (button) {
-            button.addEventListener('click', function () {
-                const section = button.closest('.container-my');
-                const list = section.querySelector('.courses-list');
-
-                if (list) {
-                    if (list.classList.contains('expanded')) {
-                        list.classList.remove('expanded');
-                        button.textContent = 'View all';
-                    } else {
-                        list.classList.add('expanded');
-                        button.textContent = 'View less';
-                    }
-                }
-            });
-        });
-        document.querySelectorAll('.btn-view-all-2').forEach(function (button) {
-            button.addEventListener('click', function () {
-                const section = button.closest('.container-my');
-                const list = section.querySelector('.groups-list');
-
-                if (list) {
-                    if (list.classList.contains('expanded')) {
-                        list.classList.remove('expanded');
-                        button.textContent = 'View all';
-                    } else {
-                        list.classList.add('expanded');
-                        button.textContent = 'View less';
-                    }
-                }
-            });
-        });
-
-        document.querySelectorAll('.btn-view-all-3').forEach(function (button) {
-            button.addEventListener('click', function () {
-                const section = button.closest('.container-my');
-                const list = section.querySelector('.certificates-list');
-
-                if (list) {
-                    if (list.classList.contains('expanded')) {
-                        list.classList.remove('expanded');
-                        button.textContent = 'View all';
-                    } else {
-                        list.classList.add('expanded');
-                        button.textContent = 'View less';
-                    }
-                }
-            });
-        });
-
-        document.querySelectorAll('.btn-view-all-4').forEach(function (button) {
-            button.addEventListener('click', function () {
-                const section = button.closest('.container-my');
-                const list = section.querySelector('.bookmarks-list');
-
-                if (list) {
-                    if (list.classList.contains('expanded')) {
-                        list.classList.remove('expanded');
-                        button.textContent = 'View all';
-                    } else {
-                        list.classList.add('expanded');
-                        button.textContent = 'View less';
-                    }
-                }
-            });
-        });
 
         document.querySelectorAll('.btn-download').forEach(function (button) {
             button.addEventListener('click', function () {
@@ -1107,9 +1076,9 @@
             fetchTeacherProfile();
             //loadEnrolledCourses();
         });
-        toggleViewAllButton('courses-list', 'btn-view-all-1');
+       /* toggleViewAllButton('courses-list', 'btn-view-all-1');
         toggleViewAllButton('certificates-list', 'btn-view-all-3');
-        toggleViewAllButton('bookmarks-list', 'btn-view-all-4');
+        toggleViewAllButton('bookmarks-list', 'btn-view-all-4');*/
     });
 
 </script>
