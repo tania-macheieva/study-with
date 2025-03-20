@@ -215,8 +215,7 @@ body {
 
 .hidden {
     opacity: 0;
-    transform: translateY(50px);
-    transition: opacity 1s ease, transform 1s ease;
+    transition: opacity 1s ease;
 }
 
 .visible {
