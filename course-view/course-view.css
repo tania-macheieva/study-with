@@ -226,7 +226,9 @@ body {
     gap: 10px;
     cursor: pointer;
     background-color: transparent !important;
-    transition: none !important;
+    padding-left: 10px; 
+    border-left: 4px solid rgba(102, 187, 106, 0); /* Прозорий бордер за замовчуванням */
+    transition: background-color 0.3s ease, border-left 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
 }
 
 .topics li.completed::before {
@@ -234,28 +236,62 @@ body {
     position: absolute;
     left: -40px;
     top: 50%;
-    transform: translateY(-50%);
-    width: 18px;
-    height: 18px;
-    font-size: 14px;
-    color: #283044;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    transform: translateY(-50%) scale(1.2); /* Збільшуємо галочку для кращого вигляду */
+    font-size: 18px;
+    color: #66bb6a;
+    transition: transform 0.3s ease, color 0.3s ease;
+    margin-left: 10px;
 }
 
+/* Ефекти при наведенні та фокусі */
 .topic-item:hover,
 .topic-item:focus,
-.topic-item.active,
-.topic-item.active:hover,
-.topic-item.active:focus {
-    background-color: transparent !important;
+.topic-item.active {
+    background-color: #f1f1f1;
+    border-left: 4px solid #66bb6a; /* Зміна бордера при наведенні з анімацією */
+    transform: translateX(5px); /* Легке зсування для кращого ефекту */
+    opacity: 1; /* Встановлюємо непрозорість при наведенні */
 }
 
+/* Стиль для завершених елементів */
 .topic-item.completed {
-    background-color: #e8f5e9 !important;
+    background-color: #e8f5e9;
+    color: #283044;
+    padding-left: 10px; 
+    transition: all 0.3s ease;
 }
 
+/* Плавний перехід при фокусі */
+.topic-item:focus {
+    outline: 2px solid #66bb6a;
+    background-color: #d4f5d4;
+    box-shadow: 0 0 5px rgba(102, 187, 106, 0.5); /* Легке світіння для фокусу */
+}
+
+/* Покращення доступності для активних та фокусованих елементів */
+.topic-item:focus,
+.topic-item:active {
+    color: #283044;
+}
+
+
+/* Плавне переміщення під час завантаження */
+.topic-item {
+    opacity: 0;
+    animation: fadeIn 0.5s ease-out forwards; /* Анімація з появою */
+}
+
+/* Анімація для появи елементів */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}   
 /* Module Styles */
 .module {
     display: none;

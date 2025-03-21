@@ -874,11 +874,13 @@ function createModuleHTML(module) {
                     </div>
                     <ul class="topics">
                         ${module.lectures.map(lecture => `
-                            <li onclick="handleLectureClick(${lecture.id}, '${lecture.contentType}')" 
+                            <li onclick="handleLectureClick(${lecture.id}, '${lecture.contentType}')"
                                 data-topic-id="${lecture.id}" 
                                 data-content-type="${lecture.contentType}"
                                 class="topic-item ${lecture.completed ? 'completed' : ''}"
                                 style="background-color: ${lecture.completed ? '#e8f5e9' : 'transparent'}"
+                                aria-label="Lecture: ${lecture.title}, ${lecture.completed ? 'Completed' : 'Not completed'}"
+                                aria-selected="${lecture.completed ? 'true' : 'false'}"
                             >
                                 <img src="${getIconByFileType(lecture.file_type)}" class="topic-icon" alt="lecture type icon" />
                                 <span class="topic-title">${lecture.title}</span>
@@ -887,12 +889,14 @@ function createModuleHTML(module) {
                     </ul>
                     ${module.test_link ? `
                         <div class="module-test">
-                            <li onclick="handleModuleTestClick(${module.id}, '${module.test_link}')" 
+                            <li onclick="handleModuleTestClick(${module.id}, '${module.test_link}')"
                                 class="topic-item test-item ${module.is_module_test_completed ? 'completed' : ''}"
                                 data-content-type="test"
                                 data-module-id="${module.id}"
                                 data-test-link="${module.test_link}"
                                 style="background-color: ${module.is_module_test_completed ? '#e8f5e9' : 'transparent'}"
+                                aria-label="Module Test, ${module.is_module_test_completed ? 'Completed' : 'Not completed'}"
+                                aria-selected="${module.is_module_test_completed ? 'true' : 'false'}"
                             >
                                 <img src="/images/test-icon.svg" class="topic-icon" alt="test icon" />
                                 <span class="topic-title">Module Test</span>
@@ -902,6 +906,7 @@ function createModuleHTML(module) {
                 </div>
             ` : ''}
         </section>
+
     `;
 }
 
