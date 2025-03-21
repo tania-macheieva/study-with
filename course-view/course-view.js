@@ -941,6 +941,7 @@ function renderCourseContent() {
     initializeModuleListeners();
 }
 
+
 function renderTestQuestions(questions) {
     if (!questions || !Array.isArray(questions)) return '<p>No questions available</p>';
     
@@ -1487,43 +1488,49 @@ window.completeLecture = async function(lectureId) {
 
 const initializeModuleListeners = () => {
     const toggleAll = document.querySelector('.toggle-all');
-    const courseContent = document.querySelector('.course-content');
+    const courseContent = document.querySelector('.course-content');    
     const moduleToggles = document.querySelectorAll('.toggle-module');
     
-    toggleAll?.addEventListener('click', () => {
-        toggleAll.classList.toggle('collapsed');
-        courseContent.classList.toggle('collapsed');
-        const modules = document.querySelectorAll('.module');
-        
-        if (courseContent.classList.contains('collapsed')) {
-            modules.forEach(module => {
-                module.classList.add('collapsed');
-                const moduleContent = module.querySelector('.module-content');
-                if (moduleContent) {
-                    moduleContent.style.display = 'none';
-                }
-                const toggleButton = module.querySelector('.toggle-module');
-                if (toggleButton) {
-                    toggleButton.classList.add('collapsed');
-                }
-            });
-        } else {
-            modules.forEach(module => {
-                module.classList.remove('collapsed');
-                const moduleContent = module.querySelector('.module-content');
-                if (moduleContent) {
-                    moduleContent.style.display = 'block';
-                }
-                const toggleButton = module.querySelector('.toggle-module');
-                if (toggleButton) {
-                    toggleButton.classList.remove('collapsed');
-                }
-            });
-        }
-    });
+    // Перевірка, чи існує toggleAll
+    if (toggleAll) {
+        toggleAll.addEventListener('click', () => {
+            console.log('Toggle All button clicked');  // Перевірка, чи натискається кнопка
+            toggleAll.classList.toggle('collapsed');
+            courseContent.classList.toggle('collapsed');
+            const modules = document.querySelectorAll('.module');
+            
+            if (courseContent.classList.contains('collapsed')) {
+                modules.forEach(module => {
+                    module.classList.add('collapsed');
+                    const moduleContent = module.querySelector('.module-content');
+                    if (moduleContent) {
+                        moduleContent.style.display = 'none';
+                    }
+                    const toggleButton = module.querySelector('.toggle-module');
+                    if (toggleButton) {
+                        toggleButton.classList.add('collapsed');
+                    }
+                });
+            } else {
+                modules.forEach(module => {
+                    module.classList.remove('collapsed');
+                    const moduleContent = module.querySelector('.module-content');
+                    if (moduleContent) {
+                        moduleContent.style.display = 'block';
+                    }
+                    const toggleButton = module.querySelector('.toggle-module');
+                    if (toggleButton) {
+                        toggleButton.classList.remove('collapsed');
+                    }
+                });
+            }
+        });
+    }
 
+    // Перевірка, чи є елементи toggleModule
     moduleToggles.forEach(toggle => {
         toggle.addEventListener('click', (e) => {
+            console.log('Toggle Module button clicked');  // Перевірка, чи натискається кнопка
             e.stopPropagation();
             const module = toggle.closest('.module');
             const moduleContent = module.querySelector('.module-content');
@@ -1536,6 +1543,8 @@ const initializeModuleListeners = () => {
     });
 };
 
+// Додаємо слухач події на завантаження документа
+document.addEventListener('DOMContentLoaded', initializeModuleListeners);
 
 async function loadCourseData() {
     try {
@@ -2352,6 +2361,5 @@ function renderCourseContent(courseData) {
     if (courseData && courseData.test_link) {
         courseContent.insertAdjacentHTML('beforeend', renderFinalTest(courseData));
     }
-    
-    initializeModuleListeners();
+     
 }
