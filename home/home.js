@@ -25,14 +25,15 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Get parent element of coursesElement
   const coursesParent = coursesElement.parentNode;
 
-  // Create wrapper for courses
+  // Create wrapper for courses with all styles in one batch
   const coursesWrapper = document.createElement("div");
   coursesWrapper.className = "courses-wrapper";
-  coursesWrapper.style.display = "flex";
-  coursesWrapper.style.transition = "transform 0.3s ease";
-  coursesWrapper.style.gap = "24px";
-  // Add right margin to ensure proper alignment
-  coursesWrapper.style.marginRight = "24px";
+  Object.assign(coursesWrapper.style, {
+    display: "flex",
+    transition: "transform 0.3s ease",
+    gap: "24px",
+    marginRight: "24px"
+  });
 
   // Move existing courses to wrapper
   while (coursesElement.firstChild) {
@@ -65,60 +66,72 @@ document.addEventListener("DOMContentLoaded", async function () {
   let totalCourses = 0;
   let courseWidth = 0;
   let gap = 24; // Default value that will be updated
+  let isUpdating = false; // Flag to prevent concurrent updates
 
-  // Function to update carousel state
+  // Function to update carousel state with optimizations
   function updateCarousel() {
-    const courseElements = coursesWrapper.querySelectorAll(".course_group");
-    if (courseElements.length === 0) return;
+    if (isUpdating) return; // Prevent concurrent updates
+    isUpdating = true;
+    
+    // Use requestAnimationFrame for smoother updates
+    requestAnimationFrame(() => {
+      const courseElements = coursesWrapper.querySelectorAll(".course_group");
+      if (courseElements.length === 0) {
+        isUpdating = false;
+        return;
+      }
 
-    totalCourses = courseElements.length;
+      totalCourses = courseElements.length;
 
-    // Get width of a single course
-    courseWidth = courseElements[0].offsetWidth;
+      // Get width of a single course
+      courseWidth = courseElements[0].offsetWidth;
 
-    // Get computed style to determine exact gap value
-    const computedStyle = window.getComputedStyle(coursesWrapper);
-    gap = parseInt(computedStyle.getPropertyValue("gap")) || 24;
+      // Get computed style once to determine exact gap value
+      const computedStyle = window.getComputedStyle(coursesWrapper);
+      gap = parseInt(computedStyle.getPropertyValue("gap")) || 24;
 
-    const containerWidth = coursesElement.clientWidth;
+      const containerWidth = coursesElement.clientWidth;
 
-    // Calculate number of visible courses
-    visibleCourses = Math.floor(containerWidth / (courseWidth + gap));
-    if (visibleCourses <= 0) visibleCourses = 1; // Ensure at least one course is visible
+      // Calculate number of visible courses
+      visibleCourses = Math.floor(containerWidth / (courseWidth + gap));
+      if (visibleCourses <= 0) visibleCourses = 1; // Ensure at least one course is visible
 
-    // Calculate maximum position
-    const maxPosition = Math.max(0, totalCourses - visibleCourses);
+      // Calculate maximum position
+      const maxPosition = Math.max(0, totalCourses - visibleCourses);
 
-    // Ensure position doesn't exceed maximum
-    if (position > maxPosition) {
-      position = maxPosition;
-    }
+      // Ensure position doesn't exceed maximum
+      if (position > maxPosition) {
+        position = maxPosition;
+      }
 
-    updatePosition();
+      updatePosition();
 
-    // Show/hide navigation buttons depending on number of courses
-    if (totalCourses <= visibleCourses) {
-      prevBtn.style.display = "none";
-      nextBtn.style.display = "none";
-    } else {
-      prevBtn.style.display = "flex";
-      nextBtn.style.display = "flex";
+      // Show/hide navigation buttons depending on number of courses
+      const shouldShowButtons = totalCourses > visibleCourses;
+      prevBtn.style.display = shouldShowButtons ? "flex" : "none";
+      nextBtn.style.display = shouldShowButtons ? "flex" : "none";
 
-      // Update button states
-      prevBtn.style.opacity = position > 0 ? "1" : "0.5";
-      nextBtn.style.opacity = position < maxPosition ? "1" : "0.5";
-    }
+      if (shouldShowButtons) {
+        // Update button states
+        prevBtn.style.opacity = position > 0 ? "1" : "0.5";
+        nextBtn.style.opacity = position < maxPosition ? "1" : "0.5";
+      }
+      
+      isUpdating = false;
+    });
   }
 
-  // Update carousel position
+  // Update carousel position with optimizations
   function updatePosition() {
     const courseElements = coursesWrapper.querySelectorAll(".course_group");
     if (courseElements.length === 0) return;
 
-    // Calculate offset
-    let offsetX = position * (courseWidth + gap);
-
+    // Calculate maxPosition only once
     const maxPosition = Math.max(0, totalCourses - visibleCourses);
+    
+    // Prepare transform value
+    let offsetX;
+    
     if (position === maxPosition && totalCourses > visibleCourses) {
       // Calculate the total content width
       const totalContentWidth =
@@ -132,36 +145,60 @@ document.addEventListener("DOMContentLoaded", async function () {
       const marginRight =
         parseInt(window.getComputedStyle(coursesWrapper).marginRight) || 24;
       offsetX += marginRight;
+    } else {
+      // Regular position calculation
+      offsetX = position * (courseWidth + gap);
     }
 
-    // Apply transformation
-    coursesWrapper.style.transform = `translateX(-${offsetX}px)`;
+    // Apply transformation (use transform3d for hardware acceleration)
+    coursesWrapper.style.transform = `translate3d(-${offsetX}px, 0, 0)`;
 
     // Update button states
     prevBtn.style.opacity = position > 0 ? "1" : "0.5";
     nextBtn.style.opacity = position < maxPosition ? "1" : "0.5";
   }
 
-  // Event handlers for navigation
+  // Debounce function to limit resize event handling
+  function debounce(func, wait) {
+    let timeout;
+    return function() {
+      const context = this;
+      const args = arguments;
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(context, args), wait);
+    };
+  }
+
+  // Event handlers for navigation with throttling
+  let isNavigating = false;
+  
   prevBtn.addEventListener("click", function () {
-    if (position > 0) {
-      position--;
-      updatePosition();
-    }
+    if (isNavigating || position <= 0) return;
+    
+    isNavigating = true;
+    position--;
+    updatePosition();
+    
+    // Allow next navigation after animation completes
+    setTimeout(() => { isNavigating = false; }, 350);
   });
 
   nextBtn.addEventListener("click", function () {
     const maxPosition = Math.max(0, totalCourses - visibleCourses);
-    if (position < maxPosition) {
-      position++;
-      updatePosition();
-    }
+    if (isNavigating || position >= maxPosition) return;
+    
+    isNavigating = true;
+    position++;
+    updatePosition();
+    
+    // Allow next navigation after animation completes
+    setTimeout(() => { isNavigating = false; }, 350);
   });
 
-  // Update carousel on window resize
-  window.addEventListener("resize", updateCarousel);
+  // Update carousel on window resize with debouncing
+  window.addEventListener("resize", debounce(updateCarousel, 150));
 
-  // Load courses from API
+  // Load courses from API with optimizations
   async function loadCourses() {
     try {
       // Get the language from localStorage or default to "en"
@@ -173,9 +210,15 @@ document.addEventListener("DOMContentLoaded", async function () {
   
       // Clear wrapper
       coursesWrapper.innerHTML = "";
+      
+      // Create document fragment for batch DOM operations
+      const fragment = document.createDocumentFragment();
     
       // Define character limit for the description
-      const descriptionCharLimit = 250; // You can adjust this number
+      const descriptionCharLimit = 250;
+      
+      // Prepare all tooltip elements
+      const tooltipContainers = [];
     
       // Add courses from API
       courses.forEach((course) => {
@@ -188,20 +231,21 @@ document.addEventListener("DOMContentLoaded", async function () {
           .slice(0, 10)
           .join(" ");
           
-        // Create truncated description for the tooltip that respects character limit
+        // Create truncated description for the tooltip
         const tooltipDescription = course.description.length > descriptionCharLimit 
           ? course.description.substring(0, descriptionCharLimit) + "..." 
           : course.description;
   
         courseElement.innerHTML = `
           <div class="course_name">${course.name}</div>
-          <div class="description-container">
+          <div class="description-container" style="position: relative;">
             <div class="description">${shortDescription}...</div>
-            <div class="tooltip">${tooltipDescription}</div>
+            <div class="tooltip" style="display: none;">${tooltipDescription}</div>
           </div>
           <div class="course-image">
             <img src="/uploads/${course.image_url || "images/250x100.png"}" 
                 alt="${course.name}" 
+                loading="lazy"
                 onerror="this.src='/images/250x100.png'" />
           </div>
           <div class="price">${
@@ -214,17 +258,20 @@ document.addEventListener("DOMContentLoaded", async function () {
         courseElement.addEventListener("click", () => {
           window.location.href = `/course-preview?id=${course.id}`;
         });
+        
+        // Store reference to tooltip container
+        tooltipContainers.push(courseElement.querySelector('.description-container'));
   
-        coursesWrapper.appendChild(courseElement);
+        fragment.appendChild(courseElement);
       });
       
-      // Add tooltip event listeners after all courses are created
-      document.querySelectorAll('.description-container').forEach(container => {
+      // Append all elements at once
+      coursesWrapper.appendChild(fragment);
+      
+      // Add tooltip event listeners to all containers in a batch
+      tooltipContainers.forEach(container => {
         const description = container.querySelector('.description');
-        const tooltip = container.querySelector('.tooltip'); 
-        
-        // Make container position relative for absolute positioning of tooltip
-        container.style.position = "relative";
+        const tooltip = container.querySelector('.tooltip');
         
         description.addEventListener('mouseenter', () => {
           tooltip.style.display = 'block';
@@ -235,8 +282,40 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
       });
 
-      // Update carousel after loading
-      setTimeout(updateCarousel, 200);
+      // Track when images are loaded
+      let loadedImages = 0;
+      const totalImages = courses.length;
+      
+      if (totalImages === 0) {
+        // If no images to load, update carousel immediately
+        updateCarousel();
+      } else {
+        // Find all course images
+        const images = coursesWrapper.querySelectorAll('.course-image img');
+        
+        // Event listener for image load or error
+        const imageLoadHandler = () => {
+          loadedImages++;
+          if (loadedImages === totalImages) {
+            // All images loaded (or failed), update carousel
+            updateCarousel();
+          }
+        };
+        
+        // Add load and error handlers to all images
+        images.forEach(img => {
+          img.addEventListener('load', imageLoadHandler);
+          img.addEventListener('error', imageLoadHandler);
+          
+          // If image is already loaded (from cache)
+          if (img.complete) {
+            imageLoadHandler();
+          }
+        });
+        
+        // Set a timeout as fallback if images don't load
+        setTimeout(updateCarousel, 1000);
+      }
     } catch (error) {
       console.error("Error loading courses:", error);
       coursesWrapper.innerHTML = "<p>Помилка завантаження курсів.</p>";
@@ -249,20 +328,19 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 // Separate event listener for category boxes
 document.addEventListener("DOMContentLoaded", function() {
-  console.log("Category script loaded");
-  
   // Find all category boxes
   const categoryBoxes = document.querySelectorAll(".category_box");
-  console.log("Found category boxes:", categoryBoxes.length);
   
-  // Add click event to each category box
-  categoryBoxes.forEach(box => {
-    box.addEventListener("click", function() {
-      // Get the category from data attribute
+  // Batch category box event listeners
+  if (categoryBoxes.length > 0) {
+    const categoryHandler = function() {
       const category = this.getAttribute("data-category");
-      console.log("Category clicked:", category);
-      
       window.location.href = `/courses?category=${category}`;
+    };
+    
+    // Add click event to each category box
+    categoryBoxes.forEach(box => {
+      box.addEventListener("click", categoryHandler);
     });
-  });
+  }
 });
