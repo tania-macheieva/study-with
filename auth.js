@@ -1336,5 +1336,88 @@ router.get('/profile-image/:userId', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch profile image.' });
     }
 });
-  
+
+
+router.get('/api/public-profile/:id', async (req, res) => {
+    try {
+        const userId = req.params.id;
+        console.log(`Request received for profile ID: ${req.params.id}`);
+
+        // Використовуємо існуючий маршрут для отримання даних профілю
+        const profileResult = await pool.query(
+            `SELECT 
+                u.name AS real_name,
+                u.profile_image,
+                u.phone_number,
+                t.nickname,
+                t.about,
+                t.education,
+                t.experience,
+                t.hobbies,
+                t.language,
+                t.certificates,
+                t.dob,
+                t.country,
+                t.city,
+                t.zip_code,
+                t.specialty,
+                t.professional_experience,
+                t.author_stripe_account,
+                (
+                    SELECT json_agg(
+                        json_build_object(
+                            'id', c.id,
+                            'name', c.name,
+                            'price', c.price,
+                            'description', c.description,
+                            'image_url', c.image_url,
+                            'status', c.status,
+                            'created_at', c.created_at
+                        )
+                    )
+                    FROM all_courses c
+                    WHERE c.author_id = u.id
+                ) AS courses
+            FROM users u
+            LEFT JOIN teachers t ON u.id = t.user_id
+            WHERE u.id = $1
+            GROUP BY u.id, t.id, u.profile_image`,
+            [userId]
+        );
+        
+        const reviewsResult = await pool.query(
+            `SELECT 
+                u.name AS student_name,
+                r.rating,
+                r.review_text AS comment,
+                r.created_at
+            FROM reviews r
+            JOIN users u ON r.user_id = u.id
+            JOIN all_courses c ON r.course_id = c.id
+            WHERE c.author_id = $1
+            ORDER BY r.created_at DESC
+            LIMIT 10`,
+            [userId]
+        );
+        
+        const profile = profileResult.rows[0];
+        const reviews = reviewsResult.rows;
+        
+        if (!profile) {
+            return res.status(404).json({ error: 'Profile not found' });
+        }
+        
+        if (profile.certificates) {
+            profile.certificates = Buffer.from(profile.certificates).toString('base64');
+        }
+        
+        res.status(200).json({
+            ...profile,
+            reviews: reviews
+        });
+    } catch (error) {
+        console.error('Error fetching teacher profile:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 module.exports = router;

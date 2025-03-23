@@ -475,7 +475,7 @@ document.addEventListener('DOMContentLoaded', initializeSaveButton);
     const speakersSection = document.querySelector('.speakers-section');
     const whiteCard = speakersSection.querySelector('.white-card');
     
-        whiteCard.innerHTML = `
+    whiteCard.innerHTML = `
     <a href="/public-profile/${speaker.id || courseData.author.id}" class="speaker-name-link" target="_blank">${speaker.name} ${speaker.nickname ? `(${speaker.nickname})` : ''}</a>
     <div class="speaker-image" style="background-image: url('${speaker.image}')"></div>
     <p>${speaker.achievements}</p>

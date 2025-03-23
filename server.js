@@ -129,7 +129,7 @@ app.get('/test-page', (req, res) => {
     res.sendFile(path.join(__dirname, './tests/test-page.html')); 
 });
 
-app.get('/public-profile', (req, res) => {
+app.get('/public-profile/:id', (req, res) => {
     res.sendFile(path.join(__dirname, 'profile-page/public-profile.html')); 
 });
 app.use('/pay-page', stripeRoutes);

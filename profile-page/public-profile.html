@@ -75,7 +75,7 @@
                         </ul>
                     </div> 
                 </aside>
-            </div>
+            </div> 
 
             <div class="right-p">
                 <h2 data-lang="aboutMe"><img src="/images/about-me.png" alt="about-me-ico" width="27px " height="27px">About me</h2>
@@ -116,23 +116,23 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-                // Ensure translations are available before running
-                if (typeof translations === 'undefined') {
-                    console.error('Translations object not loaded');
-                    return;
-                }
-            });
-
-            function getTranslation(key) {
-                const userLang = localStorage.getItem('language') || 'en';
-
-                if (!translations || !translations[userLang]) {
-                    console.warn(`No translations found for language: ${userLang}`);
-                    return key; // Fallback to the original key
-                }
-
-                return translations[userLang][key] || key;
+            // Ensure translations are available before running
+            if (typeof translations === 'undefined') {
+                console.error('Translations object not loaded');
+                return;
             }
+        });
+
+        function getTranslation(key) {
+            const userLang = localStorage.getItem('language') || 'en';
+
+            if (!translations || !translations[userLang]) {
+                console.warn(`No translations found for language: ${userLang}`);
+                return key; // Fallback to the original key
+            }
+
+            return translations[userLang][key] || key;
+        }
     </script>
     <script src="../header/auth-header.js"></script>
     <script src="../footer/footer.js"></script>
