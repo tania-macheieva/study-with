@@ -420,6 +420,8 @@
                 modal.style.display = "flex";
             });
         });
+        
+        const userId = localStorage.getItem('userId') || '';
 
         // Зміст для кожної вкладки
         const tabContents = {
@@ -428,7 +430,7 @@
             <div class="iframe-container">
                 <iframe 
                     id="public-profile-iframe"
-                    src="/profile-page/public-profile.html" 
+                    src="/public-profile/${userId}"  
                     style="width: 100%; height: 800px; border: none;"
                 ></iframe>
             </div>
