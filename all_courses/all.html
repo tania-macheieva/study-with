@@ -12,6 +12,9 @@
     />
     <link rel="stylesheet" href="../all_courses/all.css" />
     <link rel="icon" href="../images/menu-logo.ico" />
+    <link rel="stylesheet" href="/scroll-to-top/scroll-to-top.css">
+    <link rel="stylesheet" href="/preloader/preloader.css">
+    <script src="/scroll-to-top/scroll-to-top.js"></script>
   </head>
   <body>
     <div class="page">
@@ -148,14 +151,23 @@
           </div>
         </div>
         <div class="courses"></div>
+        
+          <button class="more-btn" data-lang="loadMore">Load More</button>
+      
       </div>
+     
+     
     </div>
 
-    <button class="more-btn" data-lang="loadMore">Load More</button>
+    
+    <button id="scrollToTopBtn" class="scroll-to-top-btn">
+      <i class="fas fa-chevron-up"></i>
+    </button>
     <div id="pixel-cat">
       <img src="/images/pixelcat.gif" alt="Pixel Cat" />
     </div>
     </div>
+    <script src="/preloader/preloader.js"></script>
     <script>
       const translations = {
         en: {

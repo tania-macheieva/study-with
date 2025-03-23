@@ -475,8 +475,28 @@ p {
     grid-template-columns: repeat(3, 1fr); 
     gap: 40px; 
     overflow: hidden;
-    transition: height 0.5s ease-in-out; 
+    transition: height 0.5s ease-in-out;
+    
 }
+.courses-list .course:nth-child(n+4) {
+    display: none; /* Ховаємо зайві картки */
+}
+
+.courses-list.expanded .course:nth-child(n+4) {
+    display: block; /* Показуємо всі картки після натискання */
+}
+
+/*.courses-list {
+    /*display: grid;
+    grid-template-columns: repeat(3, 1fr); 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 40px;
+    overflow: hidden;
+    transition: height 0.5s ease-in-out;
+}*/
 .btn-resume { 
     width: 100%;
     font-family: "Inter", sans-serif;
@@ -539,6 +559,39 @@ p {
     font-size: 18px;
     margin-bottom: 8px;
     text-align: left;
+}
+.btn-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.btn-view-all-1,
+.btn-view-all-2,
+.btn-view-all-3,
+.btn-view-all-4{
+    text-align: center; 
+    padding: 8px 20px;
+    font-size: 18px;
+    font-family: "Inter", sans-serif;
+    font-weight: 640;
+    background: #283044;
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+  
+}
+
+.btn-view-all-1:hover,
+.btn-view-all-2:hover,
+.btn-view-all-3:hover,
+.btn-view-all-4:hover{
+    background-color: #545F7A;
+    color: #ffffff;
+    transform: translateY(-2px);
 }
 
 @media (max-width: 1360px) {

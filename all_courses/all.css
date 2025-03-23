@@ -215,12 +215,15 @@ h4.filters-apply {
   min-width: 300px; /* Мінімальна ширина, щоб виглядало коректно */
 }
 .right-container {
-  align-self: flex-start; 
-  align-items: flex-start;
+  /*align-self: flex-start; 
+  align-items: flex-start;*/
   position: relative;
   margin-bottom: 32px;
   width: 100%;
   margin-right: 64px;
+  display: flex;
+  flex-direction: column; /* Щоб елементи розташовувалися один під одним */
+  align-items: center; 
 }
 .Result, .Sort {
   font-weight: 600;
@@ -344,6 +347,7 @@ h4.filters-apply {
   overflow: visible;
 }
 
+
 .more-btn {
   background-color: #283044;
   color: #fff;
@@ -357,11 +361,10 @@ h4.filters-apply {
   border: none;
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease-in-out;
-  position: relative; 
-  left: 60%; 
-  transform: translate(-12%, -50%); 
-  margin-bottom: 32px;
-  margin-top: 60px;
+  margin-top: 40px;
+  display: block; 
+  margin: 40px auto;
+
 }
 
 .more-btn:hover {
@@ -572,34 +575,42 @@ display: none;
   margin-left: 8px;
 }
 
+/* Add this to your existing CSS file */
 .description-container {
   position: relative;
   display: inline-block;
-}
-
-.description {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 200px; /* Обрізаємо текст */
-  cursor: pointer;
+  width: 100%;
 }
 
 .tooltip {
   display: none;
-  position: fixed; 
-  background-color: #DCECFC;;
+  position: absolute;
+  background-color: #DCECFC;
   color: black;
-  padding: 8px;
+  padding: 10px;
   border-radius: 5px;
-  max-width: 300px;
+  width: 100%;
+  max-width: 245px;
+  max-height: 180px;
   white-space: normal;
   z-index: 1000;
   font-size: 14px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+  top: 100%; /* Position directly below the description */
+  left: 0;
+  margin-top: 5px; /* Small gap between description and tooltip */
+  overflow-y: auto; /* Allow scrolling for long descriptions */
 }
 
-/* Показуємо текст при наведенні */
-.description-container:hover .tooltip {
-  visibility: visible;
-  opacity: 1;
+.description {
+  color: #283044;
+  font-family: 'Inter', SemiBold;
+  font-size: 14px;
+  font-weight: 300;
+  position: static;
+  line-height: 1.4;
+  margin-bottom: 20px;
+  width: 100%;
+  z-index: 1;
+  cursor: help;
 }

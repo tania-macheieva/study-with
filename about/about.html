@@ -16,6 +16,9 @@
     />
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" href="../images/menu-logo.ico">
+    <link rel="stylesheet" href="/scroll-to-top/scroll-to-top.css">
+    <link rel="stylesheet" href="/preloader/preloader.css">
+    <script src="/scroll-to-top/scroll-to-top.js"></script>
   </head>
 
   <body>
@@ -97,6 +100,10 @@
           </div>
         </div>
       </div>
+      <button id="scrollToTopBtn" class="scroll-to-top-btn">
+        <i class="fas fa-chevron-up"></i>
+      </button>
+      <script src="/preloader/preloader.js"></script>
       <script>
         const translations = {
           en: {
@@ -145,6 +152,13 @@
                 element.textContent = langData[langKey];
               } else if (element.tagName === "P") {
                 element.textContent = langData[langKey];
+              } else if (element.classList.contains("caption")) {
+                const teamMemberNameEl = element.querySelector(".team-member-name");
+                if (teamMemberNameEl) {
+                  teamMemberNameEl.textContent = langData[langKey];
+                } else {
+                  element.innerHTML = `<div class="team-member-name">${langData[langKey]}</div>`;
+              }
               } else {
                 element.innerHTML = langData[langKey];
               }

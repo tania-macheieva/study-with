@@ -250,38 +250,83 @@ router.post('/lecture/:lectureId/complete', async (req, res) => {
 });
 
 async function updateCourseProgress(userId, courseId) {
-    // Запит враховує як лекції, так і тести в загальному прогресі
-    const query = `
-        WITH course_stats AS (
-            SELECT 
-                COUNT(DISTINCT l.id) as total_lectures,
-                COUNT(DISTINCT CASE WHEN lp.completed = true THEN l.id END) as completed_lectures,
-                COUNT(DISTINCT CASE WHEN m.test_link IS NOT NULL THEN m.id END) as total_module_tests,
-                COUNT(DISTINCT CASE WHEN tp_module.completed = true THEN m.id END) as completed_module_tests,
-                MAX(CASE WHEN c.test_link IS NOT NULL THEN 1 ELSE 0 END) as has_final_test,
-                MAX(CASE WHEN tp_course.completed = true THEN 1 ELSE 0 END) as completed_final_test
-            FROM all_courses c
-            JOIN modules m ON c.id = m.course_id
-            JOIN lectures l ON m.id = l.module_id
-            LEFT JOIN lecture_progress lp ON l.id = lp.lecture_id AND lp.user_id = $1
-            LEFT JOIN test_progress tp_module ON m.id = tp_module.module_id 
-                AND tp_module.user_id = $1 
-                AND tp_module.test_type = 'module'
-            LEFT JOIN test_progress tp_course ON c.id = tp_course.course_id 
-                AND tp_course.user_id = $1 
-                AND tp_course.test_type = 'course'
-            WHERE c.id = $2
-        )
-        UPDATE enrollments e
-        SET progress = (
-            (cs.completed_lectures + cs.completed_module_tests + cs.completed_final_test)::float / 
-            NULLIF((cs.total_lectures + cs.total_module_tests + cs.has_final_test), 0) * 100
-        )
-        FROM course_stats cs
-        WHERE e.course_id = $2 AND e.user_id = $1
-    `;
+    console.log(`Оновлення загального прогресу курсу: userId=${userId}, courseId=${courseId}`);
+    
+    try {
+        // Запит враховує як лекції, так і тести в загальному прогресі
+        const query = `
+            WITH course_stats AS (
+                SELECT 
+                    COUNT(DISTINCT l.id) as total_lectures,
+                    COUNT(DISTINCT CASE WHEN lp.completed = true THEN l.id END) as completed_lectures,
+                    COUNT(DISTINCT CASE WHEN m.test_link IS NOT NULL THEN m.id END) as total_module_tests,
+                    COUNT(DISTINCT CASE WHEN tp_module.completed = true THEN m.id END) as completed_module_tests,
+                    MAX(CASE WHEN c.test_link IS NOT NULL THEN 1 ELSE 0 END) as has_final_test,
+                    MAX(CASE WHEN tp_course.completed = true THEN 1 ELSE 0 END) as completed_final_test
+                FROM all_courses c
+                JOIN modules m ON c.id = m.course_id
+                JOIN lectures l ON m.id = l.module_id
+                LEFT JOIN lecture_progress lp ON l.id = lp.lecture_id AND lp.user_id = $1
+                LEFT JOIN test_progress tp_module ON m.id = tp_module.module_id 
+                    AND tp_module.user_id = $1 
+                    AND tp_module.test_type = 'module'
+                LEFT JOIN test_progress tp_course ON c.id = tp_course.course_id 
+                    AND tp_course.user_id = $1 
+                    AND tp_course.test_type = 'course'
+                WHERE c.id = $2
+            )
+            SELECT
+                cs.total_lectures,
+                cs.completed_lectures,
+                cs.total_module_tests,
+                cs.completed_module_tests,
+                cs.has_final_test,
+                cs.completed_final_test,
+                -- Загальна кількість "елементів" курсу: лекції + тести модулів + фінальний тест
+                (cs.total_lectures + cs.total_module_tests + cs.has_final_test) as total_items,
+                -- Загальна кількість завершених "елементів"
+                (cs.completed_lectures + cs.completed_module_tests + cs.completed_final_test) as completed_items,
+                -- Розрахунок відсотка прогресу
+                CASE 
+                    WHEN (cs.total_lectures + cs.total_module_tests + cs.has_final_test) > 0 
+                    THEN ROUND(((cs.completed_lectures + cs.completed_module_tests + cs.completed_final_test)::float / 
+                          (cs.total_lectures + cs.total_module_tests + cs.has_final_test)::float * 100)::numeric, 2)
+                    ELSE 0
+                END as progress_percentage
+            FROM course_stats cs
+        `;
 
-    await db.query(query, [userId, courseId]);
+        const result = await db.query(query, [userId, courseId]);
+        const progressData = result.rows[0];
+        
+        if (progressData) {
+            console.log(`Статистика курсу:`, progressData);
+
+            // Оновлюємо загальний прогрес в таблиці enrollments
+            // Важливо: конвертуємо progress_percentage в ціле число
+            const progressInt = Math.round(parseFloat(progressData.progress_percentage));
+            
+            console.log(`Конвертований прогрес: ${progressInt}%`);
+            
+            const updateQuery = `
+                UPDATE enrollments 
+                SET progress = $1, last_accessed = CURRENT_TIMESTAMP
+                WHERE course_id = $2 AND user_id = $3
+            `;
+            
+            await db.query(updateQuery, [
+                progressInt, 
+                courseId, 
+                userId
+            ]);
+            
+            console.log(`Прогрес курсу оновлено до ${progressInt}%`);
+        } else {
+            console.warn(`Не вдалося отримати статистику курсу`);
+        }
+    } catch (error) {
+        console.error('Помилка оновлення прогресу курсу:', error);
+    }
 }
 
 router.post('/progress/:courseId', async (req, res) => {
@@ -908,51 +953,103 @@ router.delete('/notes/delete/:id', async (req, res) => {
 
 router.post('/module/:moduleId/test/complete', async (req, res) => {
     const { moduleId } = req.params;
-    const { userId, score = 100 } = req.body;
+    const { userId, score = 100, courseId } = req.body;
+    
+    console.log(`Отримано запит на завершення тесту модуля:`, {
+        moduleId,
+        userId,
+        score,
+        courseId
+    });
     
     if (!userId || !moduleId) {
+        console.error('Відсутній userId або moduleId');
         return res.status(400).json({ error: 'User ID and Module ID are required' });
     }
     
     try {
-        // Отримуємо course_id для цього модуля
-        const moduleResult = await db.query(
-            'SELECT course_id FROM modules WHERE id = $1',
-            [moduleId]
-        );
+        // Отримуємо course_id для цього модуля, якщо він не був переданий в запиті
+        let actualCourseId = courseId;
         
-        if (moduleResult.rows.length === 0) {
-            return res.status(404).json({ error: 'Module not found' });
+        if (!actualCourseId) {
+            const moduleResult = await db.query(
+                'SELECT course_id FROM modules WHERE id = $1',
+                [moduleId]
+            );
+            
+            if (moduleResult.rows.length === 0) {
+                console.error(`Модуль з id=${moduleId} не знайдено в базі даних`);
+                return res.status(404).json({ error: 'Module not found' });
+            }
+            
+            actualCourseId = moduleResult.rows[0].course_id;
         }
         
-        const courseId = moduleResult.rows[0].course_id;
+        console.log(`Визначено courseId: ${actualCourseId} для модуля: ${moduleId}`);
         
-        // Перевіряємо, чи існує запис про завершення тесту
-        const testProgressResult = await db.query(
-            'SELECT * FROM test_progress WHERE user_id = $1 AND course_id = $2 AND test_type = $3',
-            [userId, courseId, 'module']
-        );
+        // Перевіряємо на існуючі записи для конкретного модуля
+        const checkQuery = `
+            SELECT * FROM test_progress 
+            WHERE user_id = $1 
+            AND module_id = $2 
+            AND test_type = 'module'
+        `;
+        const existingResult = await db.query(checkQuery, [userId, moduleId]);
         
-        if (testProgressResult.rows.length > 0) {
-            // Якщо запис вже існує, оновлюємо його
-            await db.query(
-                'UPDATE test_progress SET score = $1, completed = true, completed_at = NOW() WHERE user_id = $2 AND course_id = $3 AND test_type = $4',
-                [score, userId, courseId, 'module']
-            );
+        if (existingResult.rows.length > 0) {
+            // Оновлюємо існуючий запис
+            console.log(`Оновлюємо існуючий запис з id=${existingResult.rows[0].id}`);
+            const updateQuery = `
+                UPDATE test_progress 
+                SET completed = true, 
+                    completed_at = NOW(), 
+                    score = $1,
+                    course_id = $2  
+                WHERE id = $3 
+                RETURNING *
+            `;
+            await db.query(updateQuery, [score, actualCourseId, existingResult.rows[0].id]);
         } else {
-            // Якщо запису немає, створюємо новий
-            await db.query(
-                'INSERT INTO test_progress (user_id, module_id, course_id, test_type, completed, score, completed_at) VALUES ($1, $2, $3, $4, true, $5, NOW())',
-                [userId, moduleId, courseId, 'module', score]
-            );
+            // Створюємо новий запис, без попереднього видалення
+            console.log(`Створюємо новий запис для test_progress`);
+            const insertQuery = `
+                INSERT INTO test_progress 
+                (user_id, module_id, course_id, test_type, completed, score, completed_at) 
+                VALUES ($1, $2, $3, 'module', true, $4, NOW()) 
+                ON CONFLICT (user_id, module_id, test_type) DO UPDATE
+                SET completed = true, completed_at = NOW(), score = $4, course_id = $3
+                RETURNING *
+            `;
+            await db.query(insertQuery, [userId, moduleId, actualCourseId, score]);
         }
+        
+        // Додатково перевіряємо, чи запис був успішно створений/оновлений
+        const verifyQuery = `
+            SELECT * FROM test_progress 
+            WHERE user_id = $1 
+            AND module_id = $2 
+            AND test_type = 'module'
+        `;
+        const verifyResult = await db.query(verifyQuery, [userId, moduleId]);
+        
+        if (verifyResult.rows.length === 0) {
+            console.error('Помилка: запис не був створений/оновлений');
+            throw new Error('Failed to save test progress');
+        }
+        
+        console.log('Запис успішно збережено:', verifyResult.rows[0]);
         
         // Оновлюємо загальний прогрес курсу
-        await updateCourseProgress(userId, courseId);
+        await updateCourseProgress(userId, actualCourseId);
         
-        res.status(200).json({ success: true });
+        // Відправляємо успішну відповідь
+        res.status(200).json({ 
+            success: true, 
+            message: 'Test completed successfully',
+            data: verifyResult.rows[0]
+        });
     } catch (error) {
-        console.error('Error completing module test:', error);
+        console.error('Помилка завершення модульного тесту:', error);
         res.status(500).json({ error: error.message });
     }
 });

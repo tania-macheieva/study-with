@@ -308,7 +308,7 @@ async function loadSavedBookmarks() {
 
         if (courses.length === 0) {
             bookmarksList.innerHTML = `<p class="no-courses">${translations[localStorage.getItem('language') || 'en'].noLinkedCourses}</p>`;
-            manageViewAllButton('btn-view-all-4', 0);
+            toggleViewAllButton('bookmarks-list', 'btn-view-all-4');
             return;
         }
 
@@ -330,20 +330,15 @@ async function loadSavedBookmarks() {
                 await toggleBookmark(courseId); 
             });
         });
-
-        manageViewAllButton('btn-view-all-4', courses.length);
-        initializeViewAllButtons();
-
-
+        toggleViewAllButton('bookmarks-list', 'btn-view-all-4');
     } catch (error) {
         console.error('Помилка завантаження збережених курсів:', error);
         const bookmarksList = document.querySelector('.bookmarks-list');
         if (bookmarksList) {
             bookmarksList.innerHTML = '<p class="error-message">Помилка завантаження збережених курсів</p>';
         }
-        manageViewAllButton('btn-view-all-4', 0);
+        toggleViewAllButton('bookmarks-list', 'btn-view-all-4');
     }
-
 }
 // Функція для перемикання стану закладки (Додати / Видалити)
 async function toggleBookmark(courseId) {
@@ -396,21 +391,61 @@ function applyLanguage(lang) {
 
 function toggleViewAllButton(containerClass, buttonClass, threshold = 3) {
     const containers = document.querySelectorAll(`.${containerClass}`);
-    containers.forEach(container => {
-        const items = container.querySelectorAll(':scope > div');
-        const viewAllButton = container.parentElement.querySelector(`.${buttonClass}`);
 
-        if (viewAllButton) {
-            if (items.length > threshold) {
-                viewAllButton.style.display = 'block';
-            } else {
-                viewAllButton.style.display = 'none';
-            }
+    containers.forEach(container => {
+        const items = container.querySelectorAll('.course, .certificate, .bookmark'); // Шукаємо `.course`
+        const viewAllButton = container.closest('.my-courses, .my-certificates, .my-bookmarks').querySelector(`.${buttonClass}`);
+
+        if (!viewAllButton) {
+            console.warn(` Кнопку ${buttonClass} не знайдено у`, container);
+            return;
+        }
+
+        if (items.length > threshold) {
+            viewAllButton.style.display = 'block';
+        } else {
+            viewAllButton.style.display = 'none';
+          
         }
     });
 }
+document.addEventListener('click', function (event) {
+    if (event.target.classList.contains('.btn-view-all-1, .btn-view-all-3, .btn-view-all-4')) {
+        const button = event.target;
+        let section, list;
+
+        if (button.classList.contains('btn-view-all-1')) {
+            section = button.closest('.my-courses');
+            list = section.querySelector('.courses-list');
+        } else if (button.classList.contains('btn-view-all-3')) {
+            section = button.closest('.my-certificates');
+            list = section.querySelector('.certificates-list');
+        } else if (button.classList.contains('btn-view-all-4')) {
+            section = button.closest('.my-bookmarks');
+            list = section.querySelector('.bookmarks-list');
+        }
+
+        if (!list) {
+            console.error("Список елементів не знайдено!");
+            return;
+        }
+
+        list.classList.toggle('expanded');
+
+        const items = list.querySelectorAll('.course:nth-child(n+4), .bookmark:nth-child(n+4)');
+        if (list.classList.contains('expanded')) {
+            items.forEach(item => item.style.display = 'block');
+            button.textContent = 'View less';
+        } else {
+            items.forEach(item => item.style.display = 'none');
+            button.textContent = 'View all';
+        }
+    }
+});
+
+
 // Функція для керування кнопкою "Показати більше/менше"
-function manageViewAllButton(containerClass, itemsCount) {
+/*function manageViewAllButton(containerClass, itemsCount) {
     const viewAllBtn = document.querySelector(`.${containerClass}`);
     if (viewAllBtn) {
         // Показуємо кнопку тільки якщо елементів більше 3
@@ -420,7 +455,7 @@ function manageViewAllButton(containerClass, itemsCount) {
         const lang = localStorage.getItem('language') || 'en';
         viewAllBtn.textContent = translations[lang].btnViewAll;
     }
-}
+}*/
 // Функція для ініціалізації всіх кнопок
 function initializeViewAllButtons() {
     const buttonConfigs = [
@@ -453,7 +488,10 @@ function initializeViewAllButtons() {
 }
 
 
-    loadEnrolledCourses();
+// 🔹 Викликаємо функції при завантаженні сторінки
+window.addEventListener('DOMContentLoaded', () => {
     loadSavedBookmarks();
-    toggleViewAllButton('courses-list', 'btn-view-all-1');
+    loadEnrolledCourses();
+    initializeViewAllButtons();
+});
 });
