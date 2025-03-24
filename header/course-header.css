@@ -34,13 +34,10 @@ header {
 .left-s {
     display: flex;
     align-items: center;
-    gap: 80px;
+    gap: 8px; /* Відстань між стрілкою та Home */
 }
 
 .left-s h2 {
-    display: flex;
-    align-items: center;
-    gap: 8px;
     margin: 0;
     color: #333;
 }
@@ -48,18 +45,24 @@ header {
 .home {
     font-size: 18px;
     font-weight: normal;
+    display: flex;
+    cursor: pointer;
 }
 
 .course-n {
     font-size: 18px;
     font-weight: 600;
-    margin-left: auto;
+    margin-left: 80px !important; 
+    display: flex;
+    align-items: center;
 }
 
 img {
     width: 20px;
     height: 20px;
+    margin-right: 10px;
 }
+
 
 /*#endregion */
 
@@ -161,7 +164,7 @@ img {
     z-index: 10;
 }
 
-.dropdown-menu a {
+.dropdown-menu button {
     display: flex;
     align-items: center;
     padding: 10px 15px;
@@ -170,17 +173,17 @@ img {
     border-bottom: 1px solid #eee;
 }
 
-.dropdown-menu a:last-child {
+.dropdown-menu button:last-child {
     border-bottom: none;
 }
 
-.dropdown-menu a img {
+.dropdown-menu button img {
     width: 16px;
     height: 16px;
     margin-right: 10px;
 }
 
-.dropdown-menu a:hover {
+.dropdown-menu button:hover {
     background-color: #f0f0f0;
 }
 

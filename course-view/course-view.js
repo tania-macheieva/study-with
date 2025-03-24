@@ -874,11 +874,13 @@ function createModuleHTML(module) {
                     </div>
                     <ul class="topics">
                         ${module.lectures.map(lecture => `
-                            <li onclick="handleLectureClick(${lecture.id}, '${lecture.contentType}')" 
+                            <li onclick="handleLectureClick(${lecture.id}, '${lecture.contentType}')"
                                 data-topic-id="${lecture.id}" 
                                 data-content-type="${lecture.contentType}"
                                 class="topic-item ${lecture.completed ? 'completed' : ''}"
                                 style="background-color: ${lecture.completed ? '#e8f5e9' : 'transparent'}"
+                                aria-label="Lecture: ${lecture.title}, ${lecture.completed ? 'Completed' : 'Not completed'}"
+                                aria-selected="${lecture.completed ? 'true' : 'false'}"
                             >
                                 <img src="${getIconByFileType(lecture.file_type)}" class="topic-icon" alt="lecture type icon" />
                                 <span class="topic-title">${lecture.title}</span>
@@ -887,12 +889,14 @@ function createModuleHTML(module) {
                     </ul>
                     ${module.test_link ? `
                         <div class="module-test">
-                            <li onclick="handleModuleTestClick(${module.id}, '${module.test_link}')" 
+                            <li onclick="handleModuleTestClick(${module.id}, '${module.test_link}')"
                                 class="topic-item test-item ${module.is_module_test_completed ? 'completed' : ''}"
                                 data-content-type="test"
                                 data-module-id="${module.id}"
                                 data-test-link="${module.test_link}"
                                 style="background-color: ${module.is_module_test_completed ? '#e8f5e9' : 'transparent'}"
+                                aria-label="Module Test, ${module.is_module_test_completed ? 'Completed' : 'Not completed'}"
+                                aria-selected="${module.is_module_test_completed ? 'true' : 'false'}"
                             >
                                 <img src="/images/test-icon.svg" class="topic-icon" alt="test icon" />
                                 <span class="topic-title">Module Test</span>
@@ -902,6 +906,7 @@ function createModuleHTML(module) {
                 </div>
             ` : ''}
         </section>
+
     `;
 }
 
@@ -985,49 +990,49 @@ function renderCourseContent() {
         });
 }
 
-window.handleFinalTestClick = async function(courseId) {
-    console.log(`Обробка кліку по фінальному тесту для курсу: ${courseId}`);
+// window.handleFinalTestClick = async function(courseId) {
+//     console.log(`Обробка кліку по фінальному тесту для курсу: ${courseId}`);
     
-    const userId = localStorage.getItem('userId');
-    if (!userId) {
-        alert('Необхідно авторизуватися');
-        return;
-    }
+//     const userId = localStorage.getItem('userId');
+//     if (!userId) {
+//         alert('Необхідно авторизуватися');
+//         return;
+//     }
 
-    try {
-        // Отримуємо посилання на фінальний тест з API
-        const response = await fetch(`/api/course/${courseId}/test?userId=${userId}`);
+//     try {
+//         // Отримуємо посилання на фінальний тест з API
+//         const response = await fetch(`/api/course/${courseId}/test?userId=${userId}`);
         
-        if (!response.ok) {
-            const errorData = await response.text();
-            console.error('Помилка від сервера:', errorData);
-            throw new Error(`Помилка отримання посилання на тест: ${response.status}`);
-        }
+//         if (!response.ok) {
+//             const errorData = await response.text();
+//             console.error('Помилка від сервера:', errorData);
+//             throw new Error(`Помилка отримання посилання на тест: ${response.status}`);
+//         }
         
-        const testData = await response.json();
-        console.log('Отримано дані тесту:', testData);
+//         const testData = await response.json();
+//         console.log('Отримано дані тесту:', testData);
         
-        if (testData.testLink) {
-            // Відкриваємо тест у iframe
-            openModuleTest(testData.testLink, null, courseId);
+//         if (testData.testLink) {
+//             // Відкриваємо тест у iframe
+//             openModuleTest(testData.testLink, null, courseId);
             
-            // Оновлюємо активний елемент у навігації
-            document.querySelectorAll('.topic-item').forEach(item => {
-                item.classList.remove('active');
-            });
+//             // Оновлюємо активний елемент у навігації
+//             document.querySelectorAll('.topic-item').forEach(item => {
+//                 item.classList.remove('active');
+//             });
             
-            const finalTestSection = document.querySelector('.final-test-section');
-            if (finalTestSection) {
-                finalTestSection.classList.add('active');
-            }
-        } else {
-            throw new Error('Посилання на тест не отримано');
-        }
-    } catch (error) {
-        console.error('Помилка відкриття фінального тесту:', error);
-        alert('Помилка при відкритті тесту: ' + error.message);
-    }
-};
+//             const finalTestSection = document.querySelector('.final-test-section');
+//             if (finalTestSection) {
+//                 finalTestSection.classList.add('active');
+//             }
+//         } else {
+//             throw new Error('Посилання на тест не отримано');
+//         }
+//     } catch (error) {
+//         console.error('Помилка відкриття фінального тесту:', error);
+//         alert('Помилка при відкритті тесту: ' + error.message);
+//     }
+// };
 
 function renderTestQuestions(questions) {
     if (!questions || !Array.isArray(questions)) return '<p>No questions available</p>';
@@ -1572,43 +1577,49 @@ window.completeLecture = async function(lectureId) {
 
 const initializeModuleListeners = () => {
     const toggleAll = document.querySelector('.toggle-all');
-    const courseContent = document.querySelector('.course-content');
+    const courseContent = document.querySelector('.course-content');    
     const moduleToggles = document.querySelectorAll('.toggle-module');
     
-    toggleAll?.addEventListener('click', () => {
-        toggleAll.classList.toggle('collapsed');
-        courseContent.classList.toggle('collapsed');
-        const modules = document.querySelectorAll('.module');
-        
-        if (courseContent.classList.contains('collapsed')) {
-            modules.forEach(module => {
-                module.classList.add('collapsed');
-                const moduleContent = module.querySelector('.module-content');
-                if (moduleContent) {
-                    moduleContent.style.display = 'none';
-                }
-                const toggleButton = module.querySelector('.toggle-module');
-                if (toggleButton) {
-                    toggleButton.classList.add('collapsed');
-                }
-            });
-        } else {
-            modules.forEach(module => {
-                module.classList.remove('collapsed');
-                const moduleContent = module.querySelector('.module-content');
-                if (moduleContent) {
-                    moduleContent.style.display = 'block';
-                }
-                const toggleButton = module.querySelector('.toggle-module');
-                if (toggleButton) {
-                    toggleButton.classList.remove('collapsed');
-                }
-            });
-        }
-    });
+    // Перевірка, чи існує toggleAll
+    if (toggleAll) {
+        toggleAll.addEventListener('click', () => {
+            console.log('Toggle All button clicked');  // Перевірка, чи натискається кнопка
+            toggleAll.classList.toggle('collapsed');
+            courseContent.classList.toggle('collapsed');
+            const modules = document.querySelectorAll('.module');
+            
+            if (courseContent.classList.contains('collapsed')) {
+                modules.forEach(module => {
+                    module.classList.add('collapsed');
+                    const moduleContent = module.querySelector('.module-content');
+                    if (moduleContent) {
+                        moduleContent.style.display = 'none';
+                    }
+                    const toggleButton = module.querySelector('.toggle-module');
+                    if (toggleButton) {
+                        toggleButton.classList.add('collapsed');
+                    }
+                });
+            } else {
+                modules.forEach(module => {
+                    module.classList.remove('collapsed');
+                    const moduleContent = module.querySelector('.module-content');
+                    if (moduleContent) {
+                        moduleContent.style.display = 'block';
+                    }
+                    const toggleButton = module.querySelector('.toggle-module');
+                    if (toggleButton) {
+                        toggleButton.classList.remove('collapsed');
+                    }
+                });
+            }
+        });
+    }
 
+    // Перевірка, чи є елементи toggleModule
     moduleToggles.forEach(toggle => {
         toggle.addEventListener('click', (e) => {
+            console.log('Toggle Module button clicked');  // Перевірка, чи натискається кнопка
             e.stopPropagation();
             const module = toggle.closest('.module');
             const moduleContent = module.querySelector('.module-content');
@@ -1621,6 +1632,8 @@ const initializeModuleListeners = () => {
     });
 };
 
+// Додаємо слухач події на завантаження документа
+document.addEventListener('DOMContentLoaded', initializeModuleListeners);
 
 async function loadCourseData() {
     try {
@@ -2418,4 +2431,26 @@ function renderFinalTest(courseData) {
             </div>
         </section>
     `;
+}
+
+function renderCourseContent(courseData) {
+    const courseContent = document.querySelector('.course-content');
+    if (!courseContent) return;
+    
+    courseContent.innerHTML = `
+        <div class="course-header">
+            <h1>Зміст курсу</h1>
+            <button class="toggle-all" aria-label="Toggle all content"></button>
+        </div>
+    `;
+    
+    // Відображаємо всі модулі
+    COURSE_MODULES.forEach(module => {
+        courseContent.insertAdjacentHTML('beforeend', createModuleHTML(module));
+    });
+    
+    // Додаємо фінальний тест, якщо він є
+    if (courseData && courseData.test_link) {
+        courseContent.insertAdjacentHTML('beforeend', renderFinalTest(courseData));
+    }
 }
