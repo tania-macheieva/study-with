@@ -550,29 +550,43 @@ document.addEventListener('DOMContentLoaded', () => {
                     completeButton.classList.add('send-test-btn');
                     // Змініть блок відправки повідомлення в кнопці Complete Test
                     completeButton.addEventListener('click', () => {
-                      const urlParams = new URLSearchParams(window.location.search);
-        const moduleId = urlParams.get('moduleId') || 0;
-        const courseId = urlParams.get('courseId') || 0;
-                        try {
-                            // Отримуємо інформацію про тест з testData, а не з decryptedTestId
-                            const testInfo = testData._testInfo || {};
-                            
-                            // Відправляємо повідомлення батьківському вікну
-                            window.parent.postMessage({
-                                type: 'testComplete',
-                                testType: testInfo.type || 'module', // Використовуємо 'module' як дефолтне значення замість 'unknown'
-                                moduleId: parseInt(testInfo.moduleId || moduleId), // Використовуємо значення з URL, якщо нема в testInfo
-                                courseId: parseInt(testInfo.courseId || courseId), // Використовуємо значення з URL, якщо нема в testInfo
-                                score: 100 // За замовчуванням 100%
-                            }, '*');
-                            
-                            console.log('Sent test completion message to parent window:', testInfo);
-                            alert('Test completed successfully!');
-                        } catch (err) {
-                            console.error('Error sending completion message:', err);
-                            alert('Error completing test. Please try again.');
-                        }
-                    });
+    const urlParams = new URLSearchParams(window.location.search);
+    const moduleId = urlParams.get('moduleId');
+    const courseId = urlParams.get('courseId');
+    const testType = urlParams.get('testType') || (moduleId ? 'module' : 'course');
+    
+    try {
+        // Отримуємо інформацію про тест
+        const testInfo = testData._testInfo || {};
+        
+        // Визначаємо тип тесту на основі параметрів або moduleId
+        let finalTestType = testInfo.type || testType;
+        if (!finalTestType) {
+            finalTestType = moduleId ? 'module' : 'course';
+        }
+        
+        console.log('Test completion parameters:', {
+            testType: finalTestType,
+            moduleId: parseInt(moduleId || testInfo.moduleId || 0),
+            courseId: parseInt(courseId || testInfo.courseId || 0)
+        });
+        
+        // Відправляємо повідомлення батьківському вікну
+        window.parent.postMessage({
+            type: 'testComplete',
+            testType: finalTestType,
+            moduleId: parseInt(moduleId || testInfo.moduleId || 0),
+            courseId: parseInt(courseId || testInfo.courseId || 0),
+            score: 100 // За замовчуванням 100%
+        }, '*');
+        
+        console.log('Sent test completion message to parent window');
+        alert('Test completed successfully!');
+    } catch (err) {
+        console.error('Error sending completion message:', err);
+        alert('Error completing test. Please try again.');
+    }
+});
                     
                     buttonsContainer.appendChild(completeButton);
                 } else {

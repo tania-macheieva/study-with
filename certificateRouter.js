@@ -207,6 +207,15 @@ router.post('/certificate/generate', async (req, res) => {
         }
         
         const courseName = courseResult.rows[0].name;
+        console.log('Course name:', courseName);
+        
+        // Очищення назви курсу від спеціальних символів для формування імені файлу
+        const sanitizedCourseName = courseName
+            .replace(/[^\w\sа-яА-ЯіІїЇєЄ\-\.]/g, '') // видаляємо всі символи крім букв, цифр, пробілів, дефісів і крапок
+            .replace(/\s+/g, '_') // замінюємо пробіли на підкреслення
+            .substring(0, 50); // обмежуємо довжину
+        
+        console.log('Sanitized course name:', sanitizedCourseName);
         
         const currentDate = new Date();
         const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}.${(currentDate.getMonth() + 1).toString().padStart(2, '0')}.${currentDate.getFullYear()}`;
@@ -241,9 +250,18 @@ router.post('/certificate/generate', async (req, res) => {
             boldFontExists
         });
         
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename=Certificate_${courseName.replace(/\s+/g, '_')}.pdf`);
+        // Створюємо безпечну назву файлу і правильно кодуємо її для HTTP-заголовка
+        const safeCertificateFileName = `Certificate_${sanitizedCourseName}.pdf`;
+        const encodedFileName = encodeURIComponent(safeCertificateFileName);
         
+        console.log('Using filename:', safeCertificateFileName);
+        console.log('Encoded filename:', encodedFileName);
+        
+        // Правильно встановлюємо заголовки
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodedFileName}`);
+        
+        // Створюємо PDF
         const doc = new PDFDocument({
             layout: 'landscape',
             size: 'A4',

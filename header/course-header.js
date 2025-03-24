@@ -499,11 +499,23 @@ function updateHeaderWithCertificateButton() {
 
 function updateCertificateButtonVisibility(progress) {
     const certificateButton = document.querySelector('.certificate-btn');
+    
     if (certificateButton) {
-        certificateButton.style.display = progress >= 100 ? 'flex' : 'none';
+        // Курс завершений, якщо прогрес 100%
+        // Не перевіряємо додатково статус фінального тесту, оскільки він вже врахований у прогресі
+        if (progress >= 100) {
+            certificateButton.style.display = 'flex';
+            console.log('Кнопка отримання сертифіката відображена (прогрес 100%)');
+        } else {
+            certificateButton.style.display = 'none';
+            console.log('Кнопка отримання сертифіката прихована (прогрес менше 100%)');
+        }
+    } else {
+        console.log('Кнопка отримання сертифіката не знайдена в DOM');
     }
 }
 
+// Модифікована функція setProgress для компонента HeaderComponent
 HeaderComponent.prototype.setProgress = function(progress) {
     const progressBar = this.querySelector('.progress-bar span');
     const progressText = this.querySelector('.progress-text .percent');
@@ -512,6 +524,7 @@ HeaderComponent.prototype.setProgress = function(progress) {
         progressBar.style.width = `${progress}%`;
         progressText.textContent = `${Math.round(progress)}%`;
         
+        // Викликаємо функцію видимості кнопки сертифіката
         updateCertificateButtonVisibility(progress);
     }
 };
