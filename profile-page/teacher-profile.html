@@ -363,6 +363,36 @@
 });*/
 
 
+function addCertificateToList(courseName, completionDate) {
+    const certificatesList = document.querySelector('.certificates-list');
+    if (!certificatesList) return;
+
+    const certificateDiv = document.createElement('div');
+    certificateDiv.className = 'certificate';
+    certificateDiv.innerHTML = `
+        <p class="p-1" data-lang="certificateName">${courseName}</p>
+        <p class="p-2" data-lang="completedOn">Completed on ${completionDate}</p>
+        <button class="btn-download">
+            <img src="/images/download-certificate.png" alt="Download Certificate">
+        </button>
+    `;
+
+    certificatesList.appendChild(certificateDiv);
+}
+
+function updateCourseProgress(courseId, progress) {
+    if (progress >= 100) {
+        const currentDate = new Date();
+        const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getFullYear()}`;
+        
+        fetch(`/api/courses/${courseId}`)
+            .then(response => response.json())
+            .then(courseData => {
+                addCertificateToList(courseData.name, formattedDate);
+            })
+            .catch(error => console.error('Помилка отримання даних курсу:', error));
+    }
+}
 
         document.querySelectorAll('.btn-download').forEach(function (button) {
             button.addEventListener('click', function () {

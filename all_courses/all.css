@@ -596,10 +596,10 @@ display: none;
   z-index: 1000;
   font-size: 14px;
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
-  top: 100%; /* Position directly below the description */
+  top: 100%; 
   left: 0;
-  margin-top: 5px; /* Small gap between description and tooltip */
-  overflow-y: auto; /* Allow scrolling for long descriptions */
+  margin-top: 5px; 
+  overflow-y: auto; 
 }
 
 .description {

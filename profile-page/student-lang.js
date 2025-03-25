@@ -10,7 +10,7 @@ const translations = {
         btnViewAll1: 'View all',
         myCertificates: 'My certificates',
         certificateName: 'Certificate name', 
-        completedOn: 'Completed on dd/mm/yyyy',
+        completedOn: 'Completed on',
         btnDownload: 'Download',
         myBookmarks: 'My bookmarks',
         bookmarkName: 'Bookmark name',
@@ -66,7 +66,7 @@ const translations = {
         btnViewAll1: 'Показати все',
         myCertificates: 'Мої сертифікати',
         certificateName: 'Назва сертифікату',
-        completedOn: 'Завершено dd/mm/yyyy',
+        completedOn: 'Завершено ',
         btnDownload: 'Завантажити',
         myBookmarks: 'Мої закладки',
         bookmarkName: 'Назва закладки',
@@ -115,65 +115,7 @@ const translations = {
 };
 
 
-// Основна функція для завантаження курсів
-async function loadEnrolledCourses() {
-    try {
-        const userId = localStorage.getItem('userId');
-        if (!userId) {
-            console.log('User ID not found');
-            return;
-        }
-
-        const response = await fetch(`/courses/enrolled/${userId}`);
-        if (!response.ok) throw new Error('Failed to fetch enrolled courses');
-        
-        const courses = await response.json();
-        const coursesContainer = document.getElementById('enrolled-courses');
-        
-        if (!coursesContainer) return;
-
-        if (!courses || courses.length === 0) {
-            coursesContainer.innerHTML = `<p class="no-courses">${translations[localStorage.getItem('language') || 'en'].noCourses}</p>`;
-            return;
-        }
-
-        coursesContainer.innerHTML = courses.map(course => `
-            <div class="course">
-                <p class="p-1">${course.name || 'Без назви'}</p>
-                <div class="progress-bar">
-                    <span style="width: ${course.progress || 0}%;"></span>
-                </div>
-                <p class="percent">${course.progress || 0}%</p>
-                <img src="/uploads/${course.image_url || '/images/250x100.png'}" 
-                     alt="${course.name}" 
-                     onerror="this.src='/images/250x100.png'">
-                <button class="btn-resume" data-course-id="${course.id}">
-                    ${translations[localStorage.getItem('language') || 'en'].btnResume}
-                </button>
-            </div>
-        `).join('');
-
-        document.querySelectorAll('.btn-resume').forEach(button => {
-            button.addEventListener('click', function() {
-                const courseId = this.getAttribute('data-course-id');
-                if (courseId) {
-                    window.location.href = `/course/${courseId}`;
-                }
-            });
-        });
-        toggleViewAllButton('courses-list', 'btn-view-all-1');
-        //initializeViewAllButtons();
-    } catch (error) {
-        console.error('Error loading courses:', error);
-        const coursesContainer = document.getElementById('enrolled-courses');
-        if (coursesContainer) {
-            coursesContainer.innerHTML = '<p class="error-message">Failed to load courses. Please try again later.</p>';
-        }
-    }
-}
-
-// Функція для завантаження закладок
-async function loadSavedBookmarks() {
+async function loadSavedBookmarks() { 
     try {
         const userId = localStorage.getItem('userId');
         if (!userId) {
@@ -185,38 +127,90 @@ async function loadSavedBookmarks() {
         if (!response.ok) throw new Error('Помилка завантаження збережених курсів');
         
         let courses = await response.json();
-        //Відфільтровуємо лише ті курси, які `is_saved = TRUE`
         courses = courses.filter(course => course.is_saved);
+
         const bookmarksList = document.querySelector('.bookmarks-list');
-        
         if (!bookmarksList) return;
 
+        const lang = localStorage.getItem('language') || 'en';
+        const t = translations[lang];
+
         if (courses.length === 0) {
-            bookmarksList.innerHTML = `<p class="no-courses">${translations[localStorage.getItem('language') || 'en'].noLinkedCourses}</p>`;
+            bookmarksList.innerHTML = `<p class="no-courses">${t.noLinkedCourses}</p>`;
             toggleViewAllButton('bookmarks-list', 'btn-view-all-4');
             return;
         }
 
-        bookmarksList.innerHTML = courses.map(course => `
-            <div class="bookmark">
-                <p class="p-1">${course.name}</p>
-                <img src="/uploads/${course.image_url || '/images/250x100.png'}" alt="${course.name}">
-                <button class="btn-open" onclick="window.location.href='/course/preview?id=${course.id}'">
-                    ${translations[localStorage.getItem('language') || 'en'].btnOpen}
-                </button>
-                <button class="remove-bookmark" data-course-id="${course.id}">Remove</button>
-            </div>
-        `).join('');
+        bookmarksList.innerHTML = '';
 
-        // Додаємо обробник подій для кожної кнопки "Remove"
+        const tooltipContainers = [];
+
+        courses.forEach(course => {
+            const bookmark = document.createElement('div');
+            bookmark.className = 'bookmark';
+
+            const maxNameLength = 25;
+            const truncatedName = course.name.length > maxNameLength
+                ? course.name.substring(0, maxNameLength) + '...' 
+                : course.name;
+
+            bookmark.innerHTML = `
+                <div class="course-name-container" style="position: relative;">
+                    <p class="p-1 course-name">${truncatedName}</p>
+                    ${course.name.length > maxNameLength 
+                        ? `<div class="tooltip" style="display: none;">${course.name}</div>` 
+                        : ''}
+                </div>
+                <img src="/uploads/${course.image_url || 'images/250x100.png'}" alt="${course.name}">
+                <button class="btn-open" data-course-id="${course.id}">
+                    ${t.btnOpen}
+                </button>
+                <button class="remove-bookmark" data-course-id="${course.id}">
+                    Remove
+                </button>
+            `;
+
+            const tooltipContainer = bookmark.querySelector('.course-name-container');
+            if (tooltipContainer.querySelector('.tooltip')) {
+                tooltipContainers.push(tooltipContainer);
+            }
+
+            bookmarksList.appendChild(bookmark);
+        });
+
+        // Додаємо підказки для довгих назв
+        tooltipContainers.forEach(container => {
+            const courseName = container.querySelector('.course-name');
+            const tooltip = container.querySelector('.tooltip');
+
+            courseName.addEventListener('mouseenter', () => {
+                tooltip.style.display = 'block';
+            });
+
+            courseName.addEventListener('mouseleave', () => {
+                tooltip.style.display = 'none';
+            });
+        });
+
+        // Додаємо обробник подій для кнопок "Відкрити"
+        document.querySelectorAll('.btn-open').forEach(button => {
+            button.addEventListener('click', function () {
+                const courseId = this.dataset.courseId;
+                if (courseId) {
+                    window.location.href = `/course/preview?id=${courseId}`;
+                }
+            });
+        });
+
+        // Додаємо обробник подій для кнопок "Remove"
         document.querySelectorAll('.remove-bookmark').forEach(button => {
             button.addEventListener('click', async function () {
                 const courseId = this.dataset.courseId;
-                await toggleBookmark(courseId); 
+                await toggleBookmark(courseId);
             });
         });
+
         toggleViewAllButton('bookmarks-list', 'btn-view-all-4');
-        //initializeViewAllButtons();
     } catch (error) {
         console.error('Помилка завантаження збережених курсів:', error);
         const bookmarksList = document.querySelector('.bookmarks-list');
@@ -224,9 +218,9 @@ async function loadSavedBookmarks() {
             bookmarksList.innerHTML = '<p class="error-message">Помилка завантаження збережених курсів</p>';
         }
         toggleViewAllButton('bookmarks-list', 'btn-view-all-4');
-        //initializeViewAllButtons();
     }
 }
+
 // Функція для перемикання стану закладки (Додати / Видалити)
 async function toggleBookmark(courseId) {
     const userId = localStorage.getItem('userId');
@@ -252,7 +246,50 @@ async function toggleBookmark(courseId) {
         console.error('Помилка видалення закладки:', error);
         alert('Помилка видалення закладки'); 
     }
-}
+}function toggleViewAllButton(containerClass, buttonClass, threshold = 3) {
+    const containers = document.querySelectorAll(`.${containerClass}`);
+
+    containers.forEach(container => {
+        const items = container.querySelectorAll('.course, .certificate, .bookmark');
+        const parentContainer = container.closest('.my-courses, .my-certificates, .my-bookmarks');
+        
+        if (!parentContainer) {
+            console.warn(`Батьківський контейнер для .${containerClass} не знайдено`);
+            return;
+        }
+        
+        const viewAllButton = parentContainer.querySelector(`.${buttonClass}`);
+
+        if (!viewAllButton) {
+            console.warn(`Кнопку .${buttonClass} не знайдено у`, container);
+            return;
+        }
+
+        // Скидаємо попередній стан
+        items.forEach(item => {
+            item.style.display = 'block';
+        });
+
+        // Приховуємо елементи за порогом
+        items.forEach((item, index) => {
+            if (index >= threshold) {
+                item.style.display = 'none';
+            }
+        });
+
+        if (items.length > threshold) {
+            viewAllButton.style.display = 'block';
+            // Встановлюємо початковий текст кнопки
+            const lang = localStorage.getItem('language') || 'en';
+            viewAllButton.textContent = translations[lang].btnViewAll;
+            
+            // Додаємо прапорець для початкового стану
+            container.classList.remove('expanded');
+        } else {
+            viewAllButton.style.display = 'none';
+        }
+    });
+} 
 function toggleViewAllButton(containerClass, buttonClass, threshold = 3) {
     const containers = document.querySelectorAll(`.${containerClass}`);
 
@@ -272,6 +309,11 @@ function toggleViewAllButton(containerClass, buttonClass, threshold = 3) {
             return;
         }
 
+        // Скидаємо попередній стан
+        items.forEach(item => {
+            item.style.display = 'block';
+        });
+
         // Приховуємо елементи за порогом
         items.forEach((item, index) => {
             if (index >= threshold) {
@@ -284,110 +326,513 @@ function toggleViewAllButton(containerClass, buttonClass, threshold = 3) {
             // Встановлюємо початковий текст кнопки
             const lang = localStorage.getItem('language') || 'en';
             viewAllButton.textContent = translations[lang].btnViewAll;
+            
+            // Додаємо прапорець для початкового стану
+            container.classList.remove('expanded');
         } else {
             viewAllButton.style.display = 'none';
         }
     });
+} 
+
+function toggleViewAllButton(containerClass, buttonClass, threshold = 3) {
+    const containers = document.querySelectorAll(`.${containerClass}`);
+
+    containers.forEach(container => {
+        const items = container.querySelectorAll('.course, .certificate, .bookmark');
+        const parentContainer = container.closest('.my-courses, .my-certificates, .my-bookmarks');
+        
+        if (!parentContainer) {
+            console.warn(`Батьківський контейнер для .${containerClass} не знайдено`);
+            return;
+        }
+        
+        const viewAllButton = parentContainer.querySelector(`.${buttonClass}`);
+
+        if (!viewAllButton) {
+            console.warn(`Кнопку .${buttonClass} не знайдено у`, container);
+            return;
+        }
+
+        // Скидаємо попередній стан
+        items.forEach(item => {
+            item.style.display = 'block';
+        });
+
+        // Приховуємо елементи за порогом
+        items.forEach((item, index) => {
+            if (index >= threshold) {
+                item.style.display = 'none';
+            }
+        });
+
+        if (items.length > threshold) {
+            viewAllButton.style.display = 'block';
+            // Встановлюємо початковий текст кнопки
+            const lang = localStorage.getItem('language') || 'en';
+            viewAllButton.textContent = translations[lang].btnViewAll;
+            
+            // Додаємо прапорець для початкового стану
+            container.classList.remove('expanded');
+        } else {
+            viewAllButton.style.display = 'none';
+        }
+    });
+} 
+function toggleCourseListExpansion() {
+    const coursesContainer = document.querySelector('.courses-list');
+    const viewAllButton = document.querySelector('.btn-view-all-1');
+
+    if (!coursesContainer || !viewAllButton) {
+        console.error('Courses container or view all button not found');
+        return;
+    }
+
+    // Toggle expanded state
+    const isExpanded = coursesContainer.classList.toggle('expanded');
+    
+    // Select course items to toggle (starting from 4th item)
+    const coursesToToggle = coursesContainer.querySelectorAll('.course:nth-child(n+4)');
+    
+    // Change their visibility
+    coursesToToggle.forEach(course => {
+        course.style.display = isExpanded ? 'block' : 'none';
+    });
+
+    // Get language and change button text
+    const lang = localStorage.getItem('language') || 'en';
+    viewAllButton.textContent = isExpanded ? 
+        translations[lang].btnShowLess : 
+        translations[lang].btnViewAll;
 }
 
-document.addEventListener('click', function (event) {
-    // Видаляємо попередні обробники, щоб уникнути дублювання
-    document.querySelectorAll('.btn-view-all-1, .btn-view-all-3, .btn-view-all-4').forEach(button => {
-        button.replaceWith(button.cloneNode(true));
+function toggleCertificatesExpansion() {
+    const certificatesContainer = document.querySelector('.certificates-list');
+    const viewAllButton = document.querySelector('.btn-view-all-3');
+
+    if (!certificatesContainer || !viewAllButton) {
+        console.error('Certificates container or view all button not found');
+        return;
+    }
+
+    // Toggle expanded state
+    const isExpanded = certificatesContainer.classList.toggle('expanded');
+    
+    // Select certificate items to toggle (starting from 4th item)
+    const certificatesToToggle = certificatesContainer.querySelectorAll('.certificate:nth-child(n+4)');
+    
+    // Change their visibility
+    certificatesToToggle.forEach(certificate => {
+        certificate.style.display = isExpanded ? 'block' : 'none';
     });
-    // Додаємо нові обробники кліків
-    document.body.addEventListener('click', function(event) {
+
+    // Get language and change button text
+    const lang = localStorage.getItem('language') || 'en';
+    viewAllButton.textContent = isExpanded ? 
+        translations[lang].btnShowLess : 
+        translations[lang].btnViewAll;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Attach event listeners to specific buttons to ensure they work independently
+    const btnViewAllCourses = document.querySelector('.btn-view-all-1');
+    const btnViewAllCertificates = document.querySelector('.btn-view-all-3').addEventListener('click', () => {});
+
+
+    if (btnViewAllCourses) {
+        btnViewAllCourses.addEventListener('click', toggleCourseListExpansion);
+    }
+
+    if (btnViewAllCertificates) {
+        btnViewAllCertificates.addEventListener('click', toggleCertificatesExpansion);
+    }
+    
+    // This listener can be removed or kept as a fallback
+    document.addEventListener('click', function (event) {
         const button = event.target;
-        if (event.target.classList.contains('btn-view-all-1') || 
-        event.target.classList.contains('btn-view-all-3') || 
-        event.target.classList.contains('btn-view-all-4')) {
 
-           
-        let containerSelector;
+        const viewAllButtons = [
+            { buttonClass: 'btn-view-all-1', containerSelector: '.courses-list', itemSelector: '.course', toggleFunction: toggleCourseListExpansion },
+            { buttonClass: 'btn-view-all-3', containerSelector: '.certificates-list', itemSelector: '.certificate', toggleFunction: toggleCertificatesExpansion },
+            { buttonClass: 'btn-view-all-4', containerSelector: '.bookmarks-list', itemSelector: '.bookmark' }
+        ];
 
-        // Визначаємо, який список потрібно розгорнути
-        if (button.classList.contains('btn-view-all-1')) {
-            containerSelector = '.courses-list';
-        } else if (button.classList.contains('btn-view-all-3')) {
-            containerSelector = '.certificates-list';
-        } else if (button.classList.contains('btn-view-all-4')) {
-            containerSelector = '.bookmarks-list';
+        const buttonConfig = viewAllButtons.find(config => 
+            button.classList.contains(config.buttonClass)
+        );
+
+        if (!buttonConfig) return;
+
+        // Check if there's a specific toggle function for this button
+        if (buttonConfig.toggleFunction) {
+            buttonConfig.toggleFunction();
+            return;
         }
-        
-        // Знаходимо батьківський контейнер і список
+
+        // Fallback generic expansion logic
         const parentContainer = button.closest('.my-courses, .my-certificates, .my-bookmarks');
         if (!parentContainer) {
-            console.error(' Не знайдено батьківський контейнер для кнопки');
+            console.error('Parent container for button not found');
             return;
         }
         
-        const container = parentContainer.querySelector(containerSelector);
+        const container = parentContainer.querySelector(buttonConfig.containerSelector);
         if (!container) {
-            console.error(`Не знайдено контейнер ${containerSelector} в`, parentContainer);
+            console.error(`Container ${buttonConfig.containerSelector} not found in`, parentContainer);
             return;
         }
         
-        // Перемикаємо стан розгорнутості
-        container.classList.toggle('expanded');
-        const isExpanded = container.classList.contains('expanded');
+        // Toggle expanded state
+        const isExpanded = container.classList.toggle('expanded');
         
-        // Вибираємо елементи для показу/приховування
-        const itemsToToggle = container.querySelectorAll('.course:nth-child(n+4), .certificate:nth-child(n+4), .bookmark:nth-child(n+4)');
+        // Select items to toggle (starting from 4th item)
+        const itemsToToggle = container.querySelectorAll(`${buttonConfig.itemSelector}:nth-child(n+4)`);
         
-        // Змінюємо їх видимість
+        // Change their visibility
         itemsToToggle.forEach(item => {
             item.style.display = isExpanded ? 'block' : 'none';
         });
-        
-        // Змінюємо текст кнопки
+
+        // Get language and change button text
         const lang = localStorage.getItem('language') || 'en';
         button.textContent = isExpanded ? 
             translations[lang].btnShowLess : 
             translations[lang].btnViewAll;
+    });
+});
+async function generateAndDownloadCertificate(courseId) { 
+    try { 
+        const userId = localStorage.getItem('userId');
+        if (!userId || !courseId) { 
+            alert('Помилка: неможливо отримати дані користувача або курсу'); 
+            return; 
+        }  
+
+        const userResponse = await fetch(`/api/user/${userId}`); 
+        if (!userResponse.ok) throw new Error('Помилка отримання даних користувача'); 
+        const userData = await userResponse.json(); 
+        const userName = userData.name;  
+
+        const courseResponse = await fetch(`/api/courses/${courseId}`); 
+        if (!courseResponse.ok) throw new Error('Помилка отримання даних курсу'); 
+        const courseData = await courseResponse.json(); 
+        const courseName = courseData.name;  
+
+        const response = await fetch('/api/certificate/generate', { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ userId, courseId }) 
+        });  
+
+        if (!response.ok) { 
+            const errorData = await response.json(); 
+            throw new Error(errorData.details || 'Помилка генерації сертифікату'); 
+        }  
+
+        const pdfBlob = await response.blob();  
+        const blobUrl = URL.createObjectURL(pdfBlob);  
+
+        const downloadLink = document.createElement('a'); 
+        downloadLink.href = blobUrl; 
+        downloadLink.download = `Certificate_${courseId}.pdf`;  
+
+        document.body.appendChild(downloadLink); 
+        downloadLink.click(); 
+        document.body.removeChild(downloadLink);  
+
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 100);  
+    } catch (error) { 
+        console.error('Помилка генерації сертифікату:', error); 
+        alert('Помилка при створенні сертифікату: ' + error.message); 
+    } 
+}
+
+
+function createCertificateTemplate(userName, courseName) {
+    const currentDate = new Date();
+    const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}.${(currentDate.getMonth() + 1).toString().padStart(2, '0')}.${currentDate.getFullYear()}`;
+    
+    const certNumber = `CERT-${currentDate.getFullYear()}-${Math.floor(Math.random() * 100000).toString().padStart(5, '0')}`;
+    
+    return `
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../certificates/certificate1.css">
+</head>
+
+<style>
+body {
+    background-color: #cecece;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.certificate {
+    padding: 20px;
+    position: relative;
+    width: 2000px;
+    height: auto;
+}
+
+.certificate-image {
+    width: 100%;
+    display: block;
+}
+
+.content {
+    position: absolute;
+    top: 55%;
+    left: 45%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    text-align: left;
+}
+
+.logo {
+    width: 36px;
+    height: 36px;
+    vertical-align: middle;
+}
+
+h2 {
+    font-size: 36px;
+    font-weight: 500;
+    display: flex;
+    align-items: left;
+    justify-content: left;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 68px;
+    font-weight: bold;
+    margin-bottom: 40px;
+}
+
+p {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+h3 {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+.p1{
+    margin-top: 30px;
+}
+.cert-number {
+    font-size: 20px;
+    margin-top: 90px;
+}
+
+.signature {
+    position: absolute;
+    bottom: 50px;
+    left: 30%;
+    transform: translateX(-50%);
+    width: 200px;
+}
+</style>
+
+<body>
+    <div class="certificate">
+        <img class="certificate-image" src="../images/certificate1.png" alt="certificate">
+        <div class="content">
+            <h2><img class="logo" src="../images/menu-logo.png" alt="logo"> StudyWith</h2>
+            <h1>CERTIFICATE</h1>
+            <p>This certifies that</p>
+            <h3>${userName.toUpperCase()}</h3>
+            <p>Has successfully completed the course</p>
+            <h3>${courseName}</h3>
+            <p >Date of issue:${formattedDate}</p>
+            <p>2020-01-01</p>
+            <p class="cert-number">${certNumber}</p>
+            <img class="signature" src="../images/signature1.png" alt="signature">
+        </div>
+    </div>
+</body>
+
+</html>
+    `;
+}
+
+async function convertHTMLToPDF(htmlContent) {
+    try {
+        const container = document.createElement('div');
+        container.innerHTML = htmlContent;
+        document.body.appendChild(container);
         
-        console.log(`${isExpanded ? ' Розгорнуто' : 'Згорнуто'} елементи в ${containerSelector}, змінено ${itemsToToggle.length} елементів`);
+        const options = {
+            margin: 0,
+            filename: 'certificate.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+        };
+        
+        const pdf = await html2pdf().from(container).set(options).outputPdf('blob');
+        
+        document.body.removeChild(container);
+        
+        return pdf;
+    } catch (error) {
+        console.error('Помилка при конвертації HTML в PDF:', error);
+        throw new Error('Не вдалося створити сертифікат: ' + error.message);
     }
-});
+}
 
-console.log('Обробник подій для кнопок "View all" встановлено');
-});
+async function loadEnrolledCourses() {
+    try {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            console.log('User ID not found');
+            return;
+        }
 
-// Функція для ініціалізації всіх кнопок
-/*function initializeViewAllButtons() {
-    const buttonConfigs = [
-        { buttonClass: '.btn-view-all-1', containerClass: '.my-courses', listClass: '.courses-list' },
-        { buttonClass: '.btn-view-all-3', containerClass: '.my-certificates', listClass: '.certificates-list' },
-        { buttonClass: '.btn-view-all-4', containerClass: '.my-bookmarks', listClass: '.bookmarks-list' }
-    ];
+        const response = await fetch(`/courses/enrolled/${userId}`);
+        if (!response.ok) throw new Error('Failed to fetch enrolled courses');
+        
+        const courses = await response.json();
+        const coursesContainer = document.getElementById('enrolled-courses');
+        const certificatesContainer = document.querySelector('.certificates-list');
+        
+        if (!coursesContainer || !certificatesContainer) return;
 
-    buttonConfigs.forEach(config => {
-        document.querySelectorAll(config.buttonClass).forEach(button => {
-            // Set initial button text
-            const lang = localStorage.getItem('language') || 'en';
-            button.textContent = translations[lang].btnViewAll;
+        if (!courses || courses.length === 0) {
+            coursesContainer.innerHTML = `<p class="no-courses">${translations[localStorage.getItem('language') || 'en'].noCourses}</p>`;
+            return;
+        }
+
+        coursesContainer.innerHTML = '';
+        certificatesContainer.innerHTML = '';
+
+        // Prepare all tooltip containers
+        const tooltipContainers = [];
+
+        courses.forEach(course => {
+            const courseElement = document.createElement('div');
+            courseElement.className = 'course';
             
-            button.addEventListener('click', function() {
-                const section = button.closest(config.containerClass);
-                const list = section.querySelector(config.listClass);
-                
-                if (list) {
-                    list.classList.toggle('expanded');
-                    const isExpanded = list.classList.contains('expanded');
-                    const lang = localStorage.getItem('language') || 'en';
-                    button.textContent = isExpanded ? 
-                        translations[lang].btnShowLess : 
-                        translations[lang].btnViewAll;
+            // Truncate course name if it's too long
+            const maxNameLength = 25;
+            const truncatedName = course.name.length > maxNameLength 
+                ? course.name.substring(0, maxNameLength) + '...' 
+                : course.name;
 
-                    // Показати/приховати елементи
-                    const items = list.querySelectorAll('.course:nth-child(n+4), .certificate:nth-child(n+4), .bookmark:nth-child(n+4)');
-                    items.forEach(item => {
-                        item.style.display = isExpanded ? 'block' : 'none';
-                    });
+            courseElement.innerHTML = `
+                <div class="course-name-container" style="position: relative;">
+                    <p class="p-1 course-name">${truncatedName}</p>
+                    ${course.name.length > maxNameLength 
+                        ? `<div class="tooltip" style="display: none;">${course.name}</div>` 
+                        : ''}
+                </div>
+                <div class="bottom-block">
+                    <div class="progress-bar">
+                        <span style="width: ${course.progress || 0}%;"></span>
+                    </div>
+                    <p class="percent">${course.progress || 0}%</p>
+                    <img src="/uploads/${course.image_url || '/images/250x100.png'}" 
+                        alt="${course.name}" 
+                        onerror="this.src='/images/250x100.png'">
+                    <button class="btn-resume" data-course-id="${course.id}">
+                        ${translations[localStorage.getItem('language') || 'en'].btnResume}
+                    </button>
+                </div>
+            `;
+
+            // Store reference to tooltip container if it exists
+            const tooltipContainer = courseElement.querySelector('.course-name-container');
+            if (tooltipContainer.querySelector('.tooltip')) {
+                tooltipContainers.push(tooltipContainer);
+            }
+
+            coursesContainer.appendChild(courseElement);
+
+            if (course.progress === 100) {
+                const certificateElement = document.createElement('div');
+                certificateElement.className = 'certificate';
+                certificateElement.innerHTML = `
+                    <div class="course-name-container" style="position: relative;">
+                        <p class="p-1 course-name">🏆  ${truncatedName}</p>
+                        ${course.name.length > maxNameLength 
+                            ? `<div class="tooltip" style="display: none;">${course.name}</div>` 
+                            : ''}
+                    </div> 
+                    <p class="p-2">${translations[localStorage.getItem('language') || 'en'].completedOn} ${new Date().toLocaleDateString()}</p>
+                    <button class="btn-download" data-course-id="${course.id}">
+                        <img src="/images/download-certificate.png">
+                    </button>
+
+                `;
+                certificatesContainer.appendChild(certificateElement);
+            }
+            
+        });
+
+        // Add tooltip event listeners
+        tooltipContainers.forEach(container => {
+            const courseName = container.querySelector('.course-name');
+            const tooltip = container.querySelector('.tooltip');
+
+            courseName.addEventListener('mouseenter', () => {
+                tooltip.style.display = 'block';
+            });
+
+            courseName.addEventListener('mouseleave', () => {
+                tooltip.style.display = 'none';
+            });
+        });
+
+        document.querySelectorAll('.btn-resume').forEach(button => {
+            button.addEventListener('click', function() {
+                const courseId = this.getAttribute('data-course-id');
+                if (courseId) {
+                    window.location.href = `/course/${courseId}`;
                 }
             });
         });
-    });
-}*/
+
+        // Apply view all toggle functionality
+        toggleViewAllButton('courses-list', 'btn-view-all-1');
+        toggleViewAllButton('certificates-list', 'btn-view-all-3');
+    } catch (error) {
+        console.error('Error loading courses:', error);
+        const coursesContainer = document.getElementById('enrolled-courses');
+        if (coursesContainer) {
+            coursesContainer.innerHTML = '<p class="error-message">Failed to load courses. Please try again later.</p>';
+        }
+    }
+}
+document.addEventListener('click', function(event) {
+    if (event.target.closest('.btn-download')) {
+        const button = event.target.closest('.btn-download');
+        const courseId = button.getAttribute('data-course-id');
+        if (courseId) {
+            generateAndDownloadCertificate(courseId);
+        } else {
+            console.error("Course ID не знайдено!");
+        }
+    }
+});
+
+
 // 🔹 Викликаємо функції при завантаженні сторінки
 window.addEventListener('DOMContentLoaded', async () => {
     await loadSavedBookmarks();
@@ -495,33 +940,27 @@ const tabContents = {
 
 // Єдиний слухач DOMContentLoaded
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Сторінка завантажена, починаємо ініціалізацію...');
-    
-    //loadEnrolledCourses();
-    //loadSavedBookmarks();
-    
     const userLang = localStorage.getItem('language') || 'en';
     applyLanguage(userLang);
 
     initializeTabs();
 
-// Обробники для кнопок "View all"
-document.querySelectorAll('.btn-view-all-1').forEach(button => {
-    button.addEventListener('click', function() {
-        const section = button.closest('.container-my');
-        const list = section.querySelector('.courses-list');
-        
-        if (list) {
-            if (list.classList.contains('expanded')) {
-                list.classList.remove('expanded');
-                button.textContent = translations[localStorage.getItem('language') || 'en'].btnViewAll;
-            } else {
-                list.classList.add('expanded');
-                button.textContent = translations[localStorage.getItem('language') || 'en'].btnViewAll;
+    document.querySelectorAll('.btn-view-all-1, .btn-view-all-3').forEach(button => {
+        button.addEventListener('click', function() {
+            const section = button.closest('.container-my');
+            const list = section.querySelector('.courses-list, .certificates-list');
+            
+            if (list) {
+                if (list.classList.contains('expanded')) {
+                    list.classList.remove('expanded');
+                    button.textContent = translations[localStorage.getItem('language') || 'en'].btnViewAll;
+                } else {
+                    list.classList.add('expanded');
+                    button.textContent = translations[localStorage.getItem('language') || 'en'].btnHide;
+                }
             }
-        }
+        });
     });
-});
 
 // Обробник мовного перемикача
 document.getElementById('lang-switcher')?.addEventListener('change', (e) => {
