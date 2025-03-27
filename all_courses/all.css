@@ -44,9 +44,10 @@ body {
   width: 100%;
   margin: 0;
   font-size: 16px;
-  flex-direction: row; 
-  
+  flex-direction: row;
+
 }
+
 .page {
   animation: fadeIn 0.9s ease-in-out;
   padding-bottom: 15px;
@@ -54,29 +55,30 @@ body {
 
 @keyframes fadeIn {
   from {
-      opacity: 0;
+    opacity: 0;
   }
 
   to {
-      opacity: 1;
+    opacity: 1;
   }
 }
 
-.h1-courses, .h2-find {
+.h1-courses,
+.h2-find {
   font-family: 'Inter', Regular;
   color: #000;
 }
 
 .h1-courses {
-  font-size: 5rem; 
-  margin-left: 4rem; 
+  font-size: 5rem;
+  margin-left: 4rem;
 }
 
 .h2-find {
   font-weight: 200;
-  font-size: 2.125rem; 
+  font-size: 2.125rem;
   margin-left: 4rem;
-  margin-top: 2rem; 
+  margin-top: 2rem;
 }
 
 .search-container {
@@ -110,7 +112,8 @@ body {
   background: #DCECFC;
   color: #000;
   font-weight: 400;
-  font-size: 20px; /* 18px */
+  font-size: 20px;
+  /* 18px */
   position: absolute;
   top: 0;
   right: 0;
@@ -121,17 +124,20 @@ body {
 }
 
 .search-btnn:hover {
-  background: #c7e5fd; /* Змінюємо фон */
+  background: #c7e5fd;
+  /* Змінюємо фон */
 }
 
 .filters {
   padding-bottom: 18px;
   position: relative;
   width: 400px;
-  height: auto; /* Автоматична висота */
+  height: auto;
+  /* Автоматична висота */
   background: #E8F2Fd;
   border-radius: 24px;
-  margin-left: 80px; /* Відступ від правого краю фільтрів */
+  margin-left: 80px;
+  /* Відступ від правого краю фільтрів */
   font-family: 'Inter', Regular;
 }
 
@@ -141,7 +147,8 @@ h4.filters-clear {
   text-decoration: underline;
   text-decoration-skip-ink: none;
   color: #000;
-  margin-left: 2rem; /* 32px */
+  margin-left: 2rem;
+  /* 32px */
   cursor: pointer;
   margin-top: 2rem;
   padding-top: 22px;
@@ -154,7 +161,8 @@ h4.filters-apply {
   text-decoration: underline;
   text-decoration-skip-ink: none;
   color: #000;
-  margin-left: 2rem; /* 32px */
+  margin-left: 2rem;
+  /* 32px */
   cursor: pointer;
   margin-top: 2rem;
   padding-top: 22px;
@@ -165,7 +173,8 @@ h4.filters-apply {
   font-weight: 400;
   font-size: 22px;
   color: #000;
-  margin-left: 2rem; /* 32px */
+  margin-left: 2rem;
+  /* 32px */
   font-family: 'Inter';
 }
 
@@ -183,7 +192,8 @@ h4.filters-apply {
   left: 50%;
   transform: translateX(-50%);
   border-radius: 5px;
-  font-size: 1.125rem; /* 18px */
+  font-size: 1.125rem;
+  /* 18px */
 }
 
 .container-text {
@@ -191,47 +201,63 @@ h4.filters-apply {
   margin-top: 60px;
   align-items: center;
   position: relative;
-  margin-bottom: 12px;  
-  gap:440px;
+  width: 95%;
+  margin-bottom: 12px;
   font-family: 'Inter';
 }
+
 .container {
-  display: flex; /* Розташування елементів у рядок */
-  flex-direction: row; /* Елементи будуть в один рядок */
-  justify-content: flex-start;  /* Простір між елементами */
-  align-items: flex-start; /* Вирівнювання по верхньому краю */
-  width: 100%; /* Контейнер займає всю ширину */
-  margin: 0 auto; /* Центруємо контейнер */
-  gap: 300px; /* Проміжок між колонками */
-  padding: 0 16px; /* Відступи з боків */
-  box-sizing: border-box; /* Урахування padding у ширину */
+  display: flex;
+  /* Розташування елементів у рядок */
+  flex-direction: row;
+  /* Елементи будуть в один рядок */
+  justify-content: flex-start;
+  /* Простір між елементами */
+  align-items: flex-start;
+  /* Вирівнювання по верхньому краю */
+  width: 100%;
+  /* Контейнер займає всю ширину */
+  margin: 0 auto;
+  /* Центруємо контейнер */
+  gap: 300px;
+  /* Проміжок між колонками */
+  padding: 0 16px;
+  /* Відступи з боків */
+  box-sizing: border-box;
+  /* Урахування padding у ширину */
 }
 
 .left-container {
   position: sticky;
-  align-self: flex-start; /* Не дає контейнеру змінювати своє положення */
+  align-self: flex-start;
+  /* Не дає контейнеру змінювати своє положення */
   margin-top: 60px;
- 
-  min-width: 300px; /* Мінімальна ширина, щоб виглядало коректно */
+
+  min-width: 300px;
+  /* Мінімальна ширина, щоб виглядало коректно */
 }
+
 .right-container {
-  align-self: flex-start; 
+  align-self: flex-start;
   align-items: flex-start;
   position: relative;
   margin-bottom: 32px;
   width: 100%;
   margin-right: 64px;
   display: flex;
-  flex-direction: column; /* Щоб елементи розташовувалися один під одним */
-  align-items: center; 
+  flex-direction: column;
+  /* Щоб елементи розташовувалися один під одним */
+  align-items: center;
 }
-.Result, .Sort {
+
+.Result,
+.Sort {
   font-weight: 600;
-  font-size: 22px; 
+  font-size: 22px;
   color: #000;
   display: flex;
   flex-direction: block;
-  gap:20px;
+  gap: 20px;
   font-family: 'Inter';
 }
 
@@ -242,7 +268,7 @@ h4.filters-apply {
 }
 
 .dropdown {
-  font-size: 1rem; 
+  font-size: 1rem;
   border-radius: 6px;
   border: 1px solid #ccc;
   background-color: #fff;
@@ -261,18 +287,18 @@ h4.filters-apply {
 }
 
 .course_group {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
-    height: 380px;
-    position: relative;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    box-sizing: border-box;
-  }
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  height: 380px;
+  position: relative;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+}
 
 .rectangle-1 {
   width: 100%;
@@ -362,13 +388,13 @@ h4.filters-apply {
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease-in-out;
   margin-top: 40px;
-  display: block; 
+  display: block;
   margin: 40px auto;
 
 }
 
 .more-btn:hover {
-  background-color: #0c101a; 
+  background-color: #0c101a;
 }
 
 .search-container {
@@ -379,10 +405,11 @@ h4.filters-apply {
   position: absolute;
   top: 100%;
   left: 0;
-  width: calc(100% - 157px); /* Віднімаємо ширину кнопки */
+  width: calc(100% - 157px);
+  /* Віднімаємо ширину кнопки */
   background: white;
   border-radius: 0 0 12px 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   max-height: 300px;
   overflow-y: auto;
   z-index: 1000;
@@ -414,18 +441,25 @@ h4.filters-apply {
 
 @media (max-width: 768px) {
   .container {
-    flex-direction: column; /* Елементи в колонку */
-    gap: 16px; /* Зменшуємо відстань між елементами */
+    flex-direction: column;
+    /* Елементи в колонку */
+    gap: 16px;
+    /* Зменшуємо відстань між елементами */
   }
 
-  .left-container, .right-container {
-    width: 100%; /* Контейнери займають всю ширину */
-    min-width: auto; /* Прибираємо обмеження */
+  .left-container,
+  .right-container {
+    width: 100%;
+    /* Контейнери займають всю ширину */
+    min-width: auto;
+    /* Прибираємо обмеження */
   }
 
   .search-container {
-    width: 100%; /* Пошук теж адаптується */
-    margin-left: 0; /* Скидаємо відступи */
+    width: 100%;
+    /* Пошук теж адаптується */
+    margin-left: 0;
+    /* Скидаємо відступи */
   }
 }
 
@@ -449,14 +483,16 @@ h4.filters-apply {
   font-weight: 350;
   font-size: 18px;
   color: #000;
-  margin-right: 1.25rem; /* 20px */
-  margin-bottom: 0.625rem; /* 10px */
+  margin-right: 1.25rem;
+  /* 20px */
+  margin-bottom: 0.625rem;
+  /* 10px */
   margin-left: 32px;
   font-family: 'Inter', Regular;
 }
 
 .checkbox input {
-display: none;
+  display: none;
 }
 
 .checkbox-label {
@@ -467,7 +503,7 @@ display: none;
   color: #333;
   transition: color 0.3s ease;
   font-family: 'Inter', sans-serif;
- 
+
 }
 
 .checkbox-label::before {
@@ -496,15 +532,15 @@ display: none;
   transition: transform 0.3s ease;
 }
 
-.checkbox-input:checked + .checkbox-label {
+.checkbox-input:checked+.checkbox-label {
   color: #283044;
 }
 
-.checkbox-input:checked + .checkbox-label::before {
+.checkbox-input:checked+.checkbox-label::before {
   background-color: #283044;
 }
 
-.checkbox-input:checked + .checkbox-label::after {
+.checkbox-input:checked+.checkbox-label::after {
   transform: translateY(-50%) scale(1);
 }
 
@@ -596,10 +632,10 @@ display: none;
   z-index: 1000;
   font-size: 14px;
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
-  top: 100%; 
+  top: 100%;
   left: 0;
-  margin-top: 5px; 
-  overflow-y: auto; 
+  margin-top: 5px;
+  overflow-y: auto;
 }
 
 .description {

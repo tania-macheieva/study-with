@@ -523,7 +523,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const items = container.querySelectorAll(
       ".course, .certificate, .bookmark"
-    ); 
+    );
 
     if (items.length <= threshold) {
       viewAllButton.style.display = "none";
@@ -588,153 +588,192 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function toggleCertificatesExpansion() {
-    const certificatesContainer = document.querySelector('.certificates-list');
-    const viewAllButton = document.querySelector('.btn-view-all-3');
+    const certificatesContainer = document.querySelector(".certificates-list");
+    const viewAllButton = document.querySelector(".btn-view-all-3");
 
     if (!certificatesContainer || !viewAllButton) {
-        console.error('Certificates container or view all button not found');
-        return;
+      console.error("Certificates container or view all button not found");
+      return;
     }
 
     // Toggle expanded state
-    const isExpanded = certificatesContainer.classList.toggle('expanded');
-    
+    const isExpanded = certificatesContainer.classList.toggle("expanded");
+
     // Select certificate items to toggle (starting from 4th item)
-    const certificatesToToggle = certificatesContainer.querySelectorAll('.certificate:nth-child(n+4)');
-    
+    const certificatesToToggle = certificatesContainer.querySelectorAll(
+      ".certificate:nth-child(n+4)"
+    );
+
     // Change their visibility
-    certificatesToToggle.forEach(certificate => {
-        certificate.style.display = isExpanded ? 'block' : 'none';
+    certificatesToToggle.forEach((certificate) => {
+      certificate.style.display = isExpanded ? "block" : "none";
     });
 
     // Get language and change button text
-    const lang = localStorage.getItem('language') || 'en';
-    viewAllButton.textContent = isExpanded ? 
-        translations[lang].btnShowLess : 
-        translations[lang].btnViewAll;
-}
+    const lang = localStorage.getItem("language") || "en";
+    viewAllButton.textContent = isExpanded
+      ? translations[lang].btnShowLess
+      : translations[lang].btnViewAll;
+  }
 
-document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener("DOMContentLoaded", function () {
     // Attach event listeners to specific buttons to ensure they work independently
-    const btnViewAllCourses = document.querySelector('.btn-view-all-1');
-    const btnViewAllCertificates = document.querySelector('.btn-view-all-3').addEventListener('click', () => {});
-
+    const btnViewAllCourses = document.querySelector(".btn-view-all-1");
+    const btnViewAllCertificates = document
+      .querySelector(".btn-view-all-3")
+      .addEventListener("click", () => {});
 
     if (btnViewAllCourses) {
-        btnViewAllCourses.addEventListener('click', toggleCourseListExpansion);
+      btnViewAllCourses.addEventListener("click", toggleCourseListExpansion);
     }
 
     if (btnViewAllCertificates) {
-        btnViewAllCertificates.addEventListener('click', toggleCertificatesExpansion);
+      btnViewAllCertificates.addEventListener(
+        "click",
+        toggleCertificatesExpansion
+      );
     }
-    
+
     // This listener can be removed or kept as a fallback
-    document.addEventListener('click', function (event) {
-        const button = event.target;
+    document.addEventListener("click", function (event) {
+      const button = event.target;
 
-        const viewAllButtons = [
-            { buttonClass: 'btn-view-all-1', containerSelector: '.courses-list', itemSelector: '.course', toggleFunction: toggleCourseListExpansion },
-            { buttonClass: 'btn-view-all-3', containerSelector: '.certificates-list', itemSelector: '.certificate', toggleFunction: toggleCertificatesExpansion },
-            { buttonClass: 'btn-view-all-4', containerSelector: '.bookmarks-list', itemSelector: '.bookmark' }
-        ];
+      const viewAllButtons = [
+        {
+          buttonClass: "btn-view-all-1",
+          containerSelector: ".courses-list",
+          itemSelector: ".course",
+          toggleFunction: toggleCourseListExpansion,
+        },
+        {
+          buttonClass: "btn-view-all-3",
+          containerSelector: ".certificates-list",
+          itemSelector: ".certificate",
+          toggleFunction: toggleCertificatesExpansion,
+        },
+        {
+          buttonClass: "btn-view-all-4",
+          containerSelector: ".bookmarks-list",
+          itemSelector: ".bookmark",
+        },
+      ];
 
-        const buttonConfig = viewAllButtons.find(config => 
-            button.classList.contains(config.buttonClass)
+      const buttonConfig = viewAllButtons.find((config) =>
+        button.classList.contains(config.buttonClass)
+      );
+
+      if (!buttonConfig) return;
+
+      // Check if there's a specific toggle function for this button
+      if (buttonConfig.toggleFunction) {
+        buttonConfig.toggleFunction();
+        return;
+      }
+
+      // Fallback generic expansion logic
+      const parentContainer = button.closest(
+        ".my-courses, .my-certificates, .my-bookmarks"
+      );
+      if (!parentContainer) {
+        console.error("Parent container for button not found");
+        return;
+      }
+
+      const container = parentContainer.querySelector(
+        buttonConfig.containerSelector
+      );
+      if (!container) {
+        console.error(
+          `Container ${buttonConfig.containerSelector} not found in`,
+          parentContainer
         );
+        return;
+      }
 
-        if (!buttonConfig) return;
+      // Toggle expanded state
+      const isExpanded = container.classList.toggle("expanded");
 
-        // Check if there's a specific toggle function for this button
-        if (buttonConfig.toggleFunction) {
-            buttonConfig.toggleFunction();
-            return;
-        }
+      // Select items to toggle (starting from 4th item)
+      const itemsToToggle = container.querySelectorAll(
+        `${buttonConfig.itemSelector}:nth-child(n+4)`
+      );
 
-        // Fallback generic expansion logic
-        const parentContainer = button.closest('.my-courses, .my-certificates, .my-bookmarks');
-        if (!parentContainer) {
-            console.error('Parent container for button not found');
-            return;
-        }
-        
-        const container = parentContainer.querySelector(buttonConfig.containerSelector);
-        if (!container) {
-            console.error(`Container ${buttonConfig.containerSelector} not found in`, parentContainer);
-            return;
-        }
-        
-        // Toggle expanded state
-        const isExpanded = container.classList.toggle('expanded');
-        
-        // Select items to toggle (starting from 4th item)
-        const itemsToToggle = container.querySelectorAll(`${buttonConfig.itemSelector}:nth-child(n+4)`);
-        
-        // Change their visibility
-        itemsToToggle.forEach(item => {
-            item.style.display = isExpanded ? 'block' : 'none';
-        });
+      // Change their visibility
+      itemsToToggle.forEach((item) => {
+        item.style.display = isExpanded ? "block" : "none";
+      });
 
-        // Get language and change button text
-        const lang = localStorage.getItem('language') || 'en';
-        button.textContent = isExpanded ? 
-            translations[lang].btnShowLess : 
-            translations[lang].btnViewAll;
+      // Get language and change button text
+      const lang = localStorage.getItem("language") || "en";
+      button.textContent = isExpanded
+        ? translations[lang].btnShowLess
+        : translations[lang].btnViewAll;
     });
-});
+  });
 
-async function generateAndDownloadCertificate(courseId) { 
-    try { 
-        const userId = localStorage.getItem('userId');
-        if (!userId || !courseId) { 
-            alert('Помилка: неможливо отримати дані користувача або курсу'); 
-            return; 
-        }  
+  async function generateAndDownloadCertificate(courseId) {
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId || !courseId) {
+        alert("Помилка: неможливо отримати дані користувача або курсу");
+        return;
+      }
 
-        const userResponse = await fetch(`/api/user/${userId}`); 
-        if (!userResponse.ok) throw new Error('Помилка отримання даних користувача'); 
-        const userData = await userResponse.json(); 
-        const userName = userData.name;  
+      const userResponse = await fetch(`/api/user/${userId}`);
+      if (!userResponse.ok)
+        throw new Error("Помилка отримання даних користувача");
+      const userData = await userResponse.json();
+      const userName = userData.name;
 
-        const courseResponse = await fetch(`/api/courses/${courseId}`); 
-        if (!courseResponse.ok) throw new Error('Помилка отримання даних курсу'); 
-        const courseData = await courseResponse.json(); 
-        const courseName = courseData.name;  
+      const courseResponse = await fetch(`/api/courses/${courseId}`);
+      if (!courseResponse.ok) throw new Error("Помилка отримання даних курсу");
+      const courseData = await courseResponse.json();
+      const courseName = courseData.name;
 
-        const response = await fetch('/api/certificate/generate', { 
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify({ userId, courseId }) 
-        });  
+      const response = await fetch("/api/certificate/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, courseId }),
+      });
 
-        if (!response.ok) { 
-            const errorData = await response.json(); 
-            throw new Error(errorData.details || 'Помилка генерації сертифікату'); 
-        }  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.details || "Помилка генерації сертифікату");
+      }
 
-        const pdfBlob = await response.blob();  
-        const blobUrl = URL.createObjectURL(pdfBlob);  
+      const pdfBlob = await response.blob();
+      const blobUrl = URL.createObjectURL(pdfBlob);
 
-        const downloadLink = document.createElement('a'); 
-        downloadLink.href = blobUrl; 
-        downloadLink.download = `Certificate_${courseId}.pdf`;  
+      const downloadLink = document.createElement("a");
+      downloadLink.href = blobUrl;
+      downloadLink.download = `Certificate_${courseId}.pdf`;
 
-        document.body.appendChild(downloadLink); 
-        downloadLink.click(); 
-        document.body.removeChild(downloadLink);  
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
 
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 100);  
-    } catch (error) { 
-        console.error('Помилка генерації сертифікату:', error); 
-        alert('Помилка при створенні сертифікату: ' + error.message); 
-    } 
-}
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+    } catch (error) {
+      console.error("Помилка генерації сертифікату:", error);
+      alert("Помилка при створенні сертифікату: " + error.message);
+    }
+  }
 
-function createCertificateTemplate(userName, courseName) {
+  function createCertificateTemplate(userName, courseName) {
     const currentDate = new Date();
-    const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}.${(currentDate.getMonth() + 1).toString().padStart(2, '0')}.${currentDate.getFullYear()}`;
-    
-    const certNumber = `CERT-${currentDate.getFullYear()}-${Math.floor(Math.random() * 100000).toString().padStart(5, '0')}`;
-    
+    const formattedDate = `${currentDate
+      .getDate()
+      .toString()
+      .padStart(2, "0")}.${(currentDate.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}.${currentDate.getFullYear()}`;
+
+    const certNumber = `CERT-${currentDate.getFullYear()}-${Math.floor(
+      Math.random() * 100000
+    )
+      .toString()
+      .padStart(5, "0")}`;
+
     return `
 <!DOCTYPE html>
 <html lang="en">
@@ -852,175 +891,194 @@ h3 {
 
 </html>
     `;
-}
+  }
 
-async function convertHTMLToPDF(htmlContent) {
+  async function convertHTMLToPDF(htmlContent) {
     try {
-        const container = document.createElement('div');
-        container.innerHTML = htmlContent;
-        document.body.appendChild(container);
-        
-        const options = {
-            margin: 0,
-            filename: 'certificate.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-        };
-        
-        const pdf = await html2pdf().from(container).set(options).outputPdf('blob');
-        
-        document.body.removeChild(container);
-        
-        return pdf;
+      const container = document.createElement("div");
+      container.innerHTML = htmlContent;
+      document.body.appendChild(container);
+
+      const options = {
+        margin: 0,
+        filename: "certificate.pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: "mm", format: "a4", orientation: "landscape" },
+      };
+
+      const pdf = await html2pdf()
+        .from(container)
+        .set(options)
+        .outputPdf("blob");
+
+      document.body.removeChild(container);
+
+      return pdf;
     } catch (error) {
-        console.error('Помилка при конвертації HTML в PDF:', error);
-        throw new Error('Не вдалося створити сертифікат: ' + error.message);
+      console.error("Помилка при конвертації HTML в PDF:", error);
+      throw new Error("Не вдалося створити сертифікат: " + error.message);
     }
-}
+  }
 
-async function loadEnrolledCourses() {
+  async function loadEnrolledCourses() {
     try {
-        const userId = localStorage.getItem('userId');
-        if (!userId) {
-            console.log('User ID not found');
-            return;
-        }
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        console.log("User ID not found");
+        return;
+      }
 
-        const response = await fetch(`/courses/enrolled/${userId}`);
-        if (!response.ok) throw new Error('Failed to fetch enrolled courses');
-        
-        const courses = await response.json();
-        const coursesContainer = document.getElementById('enrolled-courses');
-        const certificatesContainer = document.querySelector('.certificates-list');
-        
-        if (!coursesContainer || !certificatesContainer) return;
+      const response = await fetch(`/courses/enrolled/${userId}`);
+      if (!response.ok) throw new Error("Failed to fetch enrolled courses");
 
-        if (!courses || courses.length === 0) {
-            coursesContainer.innerHTML = `<p class="no-courses">${translations[localStorage.getItem('language') || 'en'].noCourses}</p>`;
-            return;
-        }
+      const courses = await response.json();
+      const coursesContainer = document.getElementById("enrolled-courses");
+      const certificatesContainer =
+        document.querySelector(".certificates-list");
 
-        coursesContainer.innerHTML = '';
-        certificatesContainer.innerHTML = '';
+      if (!coursesContainer || !certificatesContainer) return;
 
-        // Prepare all tooltip containers
-        const tooltipContainers = [];
+      if (!courses || courses.length === 0) {
+        coursesContainer.innerHTML = `<p class="no-courses">${
+          translations[localStorage.getItem("language") || "en"].noCourses
+        }</p>`;
+        return;
+      }
 
-        courses.forEach(course => {
-            const courseElement = document.createElement('div');
-            courseElement.className = 'course';
-            
-            // Truncate course name if it's too long
-            const maxNameLength = 25;
-            const truncatedName = course.name.length > maxNameLength 
-                ? course.name.substring(0, maxNameLength) + '...' 
-                : course.name;
+      coursesContainer.innerHTML = "";
+      certificatesContainer.innerHTML = "";
 
-            courseElement.innerHTML = `
+      // Prepare all tooltip containers
+      const tooltipContainers = [];
+
+      courses.forEach((course) => {
+        const courseElement = document.createElement("div");
+        courseElement.className = "course";
+
+        // Truncate course name if it's too long
+        const maxNameLength = 25;
+        const truncatedName =
+          course.name.length > maxNameLength
+            ? course.name.substring(0, maxNameLength) + "..."
+            : course.name;
+
+        courseElement.innerHTML = `
                 <div class="course-name-container" style="position: relative;">
                     <p class="p-1 course-name">${truncatedName}</p>
-                    ${course.name.length > maxNameLength 
-                        ? `<div class="tooltip" style="display: none;">${course.name}</div>` 
-                        : ''}
+                    ${
+                      course.name.length > maxNameLength
+                        ? `<div class="tooltip" style="display: none;">${course.name}</div>`
+                        : ""
+                    }
                 </div>
                 <div class="bottom-block">
                     <div class="progress-bar">
                         <span style="width: ${course.progress || 0}%;"></span>
                     </div>
                     <p class="percent">${course.progress || 0}%</p>
-                    <img src="/uploads/${course.image_url || '/images/250x100.png'}" 
+                    <img src="/uploads/${
+                      course.image_url || "/images/250x100.png"
+                    }" 
                         alt="${course.name}" 
                         onerror="this.src='/images/250x100.png'">
                     <button class="btn-resume" data-course-id="${course.id}">
-                        ${translations[localStorage.getItem('language') || 'en'].btnResume}
+                        ${
+                          translations[localStorage.getItem("language") || "en"]
+                            .btnResume
+                        }
                     </button>
                 </div>
             `;
 
-            // Store reference to tooltip container if it exists
-            const tooltipContainer = courseElement.querySelector('.course-name-container');
-            if (tooltipContainer.querySelector('.tooltip')) {
-                tooltipContainers.push(tooltipContainer);
-            }
+        // Store reference to tooltip container if it exists
+        const tooltipContainer = courseElement.querySelector(
+          ".course-name-container"
+        );
+        if (tooltipContainer.querySelector(".tooltip")) {
+          tooltipContainers.push(tooltipContainer);
+        }
 
-            coursesContainer.appendChild(courseElement);
+        coursesContainer.appendChild(courseElement);
 
-            if (course.progress === 100) {
-                const certificateElement = document.createElement('div');
-                certificateElement.className = 'certificate';
-                certificateElement.innerHTML = `
+        if (course.progress === 100) {
+          const certificateElement = document.createElement("div");
+          certificateElement.className = "certificate";
+          certificateElement.innerHTML = `
                     <div class="course-name-container" style="position: relative;">
                         <p class="p-1 course-name">🏆  ${truncatedName}</p>
-                        ${course.name.length > maxNameLength 
-                            ? `<div class="tooltip" style="display: none;">${course.name}</div>` 
-                            : ''}
+                        ${
+                          course.name.length > maxNameLength
+                            ? `<div class="tooltip" style="display: none;">${course.name}</div>`
+                            : ""
+                        }
                     </div> 
-                    <p class="p-2">${translations[localStorage.getItem('language') || 'en'].completedOn} ${new Date().toLocaleDateString()}</p>
+                    <p class="p-2">${
+                      translations[localStorage.getItem("language") || "en"]
+                        .completedOn
+                    } ${new Date().toLocaleDateString()}</p>
                     <button class="btn-download" data-course-id="${course.id}">
                         <img src="/images/download-certificate.png">
                     </button>
 
                 `;
-                certificatesContainer.appendChild(certificateElement);
-            }
-            
+          certificatesContainer.appendChild(certificateElement);
+        }
+      });
+
+      // Add tooltip event listeners
+      tooltipContainers.forEach((container) => {
+        const courseName = container.querySelector(".course-name");
+        const tooltip = container.querySelector(".tooltip");
+
+        courseName.addEventListener("mouseenter", () => {
+          tooltip.style.display = "block";
         });
 
-        // Add tooltip event listeners
-        tooltipContainers.forEach(container => {
-            const courseName = container.querySelector('.course-name');
-            const tooltip = container.querySelector('.tooltip');
-
-            courseName.addEventListener('mouseenter', () => {
-                tooltip.style.display = 'block';
-            });
-
-            courseName.addEventListener('mouseleave', () => {
-                tooltip.style.display = 'none';
-            });
+        courseName.addEventListener("mouseleave", () => {
+          tooltip.style.display = "none";
         });
+      });
 
-        document.querySelectorAll('.btn-resume').forEach(button => {
-            button.addEventListener('click', function() {
-                const courseId = this.getAttribute('data-course-id');
-                if (courseId) {
-                    window.location.href = `/course/${courseId}`;
-                }
-            });
+      document.querySelectorAll(".btn-resume").forEach((button) => {
+        button.addEventListener("click", function () {
+          const courseId = this.getAttribute("data-course-id");
+          if (courseId) {
+            window.location.href = `/course/${courseId}`;
+          }
         });
+      });
 
-        // Apply view all toggle functionality
-        toggleViewAllButton('courses-list', 'btn-view-all-1');
-        toggleViewAllButton('certificates-list', 'btn-view-all-3');
+      // Apply view all toggle functionality
+      toggleViewAllButton("courses-list", "btn-view-all-1");
+      toggleViewAllButton("certificates-list", "btn-view-all-3");
     } catch (error) {
-        console.error('Error loading courses:', error);
-        const coursesContainer = document.getElementById('enrolled-courses');
-        if (coursesContainer) {
-            coursesContainer.innerHTML = '<p class="error-message">Failed to load courses. Please try again later.</p>';
-        }
+      console.error("Error loading courses:", error);
+      const coursesContainer = document.getElementById("enrolled-courses");
+      if (coursesContainer) {
+        coursesContainer.innerHTML =
+          '<p class="error-message">Failed to load courses. Please try again later.</p>';
+      }
     }
-}
-document.addEventListener('click', function(event) {
-    if (event.target.closest('.btn-download')) {
-        const button = event.target.closest('.btn-download');
-        const courseId = button.getAttribute('data-course-id');
-        if (courseId) {
-            generateAndDownloadCertificate(courseId);
-        } else {
-            console.error("Course ID не знайдено!");
-        }
+  }
+  document.addEventListener("click", function (event) {
+    if (event.target.closest(".btn-download")) {
+      const button = event.target.closest(".btn-download");
+      const courseId = button.getAttribute("data-course-id");
+      if (courseId) {
+        generateAndDownloadCertificate(courseId);
+      } else {
+        console.error("Course ID не знайдено!");
+      }
     }
-});
+  });
 
-
-// 🔹 Викликаємо функції при завантаженні сторінки
-window.addEventListener('DOMContentLoaded', async () => {
+  // 🔹 Викликаємо функції при завантаженні сторінки
+  window.addEventListener("DOMContentLoaded", async () => {
     await loadSavedBookmarks();
     await loadEnrolledCourses();
     //initializeViewAllButtons();
-});
-
+  });
 
   document.addEventListener("click", function (event) {
     if (
