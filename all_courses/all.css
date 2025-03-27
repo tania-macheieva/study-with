@@ -191,7 +191,7 @@ h4.filters-apply {
   margin-top: 60px;
   align-items: center;
   position: relative;
-  margin-bottom: 12px;
+  margin-bottom: 12px;  
   gap:440px;
   font-family: 'Inter';
 }
@@ -215,8 +215,8 @@ h4.filters-apply {
   min-width: 300px; /* Мінімальна ширина, щоб виглядало коректно */
 }
 .right-container {
-  /*align-self: flex-start; 
-  align-items: flex-start;*/
+  align-self: flex-start; 
+  align-items: flex-start;
   position: relative;
   margin-bottom: 32px;
   width: 100%;

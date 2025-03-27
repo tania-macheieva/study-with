@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             `;
             
             courseElement.addEventListener('click', () => {
-                window.location.href = `/course-preview?id=${course.id}`;
+                window.location.href = `/course/${course.id}`;
             });
             
             coursesContainer.appendChild(courseElement);

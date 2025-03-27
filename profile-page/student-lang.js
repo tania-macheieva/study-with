@@ -114,7 +114,6 @@ const translations = {
     }
 };
 
-
 async function loadSavedBookmarks() { 
     try {
         const userId = localStorage.getItem('userId');
@@ -178,7 +177,6 @@ async function loadSavedBookmarks() {
             bookmarksList.appendChild(bookmark);
         });
 
-        // Додаємо підказки для довгих назв
         tooltipContainers.forEach(container => {
             const courseName = container.querySelector('.course-name');
             const tooltip = container.querySelector('.tooltip');
@@ -192,17 +190,15 @@ async function loadSavedBookmarks() {
             });
         });
 
-        // Додаємо обробник подій для кнопок "Відкрити"
         document.querySelectorAll('.btn-open').forEach(button => {
             button.addEventListener('click', function () {
                 const courseId = this.dataset.courseId;
                 if (courseId) {
-                    window.location.href = `/course/preview?id=${courseId}`;
+                    window.location.href = `/course/${courseId}`;
                 }
             });
         });
 
-        // Додаємо обробник подій для кнопок "Remove"
         document.querySelectorAll('.remove-bookmark').forEach(button => {
             button.addEventListener('click', async function () {
                 const courseId = this.dataset.courseId;
@@ -221,7 +217,6 @@ async function loadSavedBookmarks() {
     }
 }
 
-// Функція для перемикання стану закладки (Додати / Видалити)
 async function toggleBookmark(courseId) {
     const userId = localStorage.getItem('userId');
 
@@ -240,145 +235,64 @@ async function toggleBookmark(courseId) {
         if (!response.ok) throw new Error('Помилка зміни стану закладки');
 
         console.log('Закладка оновлена успішно');
-        await loadSavedBookmarks(); // Оновлюємо список закладок після видалення
+        await loadSavedBookmarks(); 
 
     } catch (error) {
         console.error('Помилка видалення закладки:', error);
         alert('Помилка видалення закладки'); 
     }
-}function toggleViewAllButton(containerClass, buttonClass, threshold = 3) {
-    const containers = document.querySelectorAll(`.${containerClass}`);
-
-    containers.forEach(container => {
-        const items = container.querySelectorAll('.course, .certificate, .bookmark');
-        const parentContainer = container.closest('.my-courses, .my-certificates, .my-bookmarks');
-        
-        if (!parentContainer) {
-            console.warn(`Батьківський контейнер для .${containerClass} не знайдено`);
-            return;
-        }
-        
-        const viewAllButton = parentContainer.querySelector(`.${buttonClass}`);
-
-        if (!viewAllButton) {
-            console.warn(`Кнопку .${buttonClass} не знайдено у`, container);
-            return;
-        }
-
-        // Скидаємо попередній стан
-        items.forEach(item => {
-            item.style.display = 'block';
-        });
-
-        // Приховуємо елементи за порогом
-        items.forEach((item, index) => {
-            if (index >= threshold) {
-                item.style.display = 'none';
-            }
-        });
-
-        if (items.length > threshold) {
-            viewAllButton.style.display = 'block';
-            // Встановлюємо початковий текст кнопки
-            const lang = localStorage.getItem('language') || 'en';
-            viewAllButton.textContent = translations[lang].btnViewAll;
-            
-            // Додаємо прапорець для початкового стану
-            container.classList.remove('expanded');
-        } else {
-            viewAllButton.style.display = 'none';
-        }
-    });
-} 
+}
 function toggleViewAllButton(containerClass, buttonClass, threshold = 3) {
-    const containers = document.querySelectorAll(`.${containerClass}`);
+    const container = document.querySelector(`.${containerClass}`);
+    const viewAllButton = document.querySelector(`.${buttonClass}`);
 
-    containers.forEach(container => {
-        const items = container.querySelectorAll('.course, .certificate, .bookmark');
-        const parentContainer = container.closest('.my-courses, .my-certificates, .my-bookmarks');
-        
-        if (!parentContainer) {
-            console.warn(`Батьківський контейнер для .${containerClass} не знайдено`);
-            return;
-        }
-        
-        const viewAllButton = parentContainer.querySelector(`.${buttonClass}`);
+    if (!container) {
+        console.error(`Контейнер .${containerClass} не знайдено`);
+        return;
+    }
 
-        if (!viewAllButton) {
-            console.warn(`Кнопку .${buttonClass} не знайдено у`, container);
-            return;
-        }
+    if (!viewAllButton) {
+        console.error(`Кнопка .${buttonClass} не знайдено`);
+        return;
+    }
 
-        // Скидаємо попередній стан
-        items.forEach(item => {
-            item.style.display = 'block';
-        });
+    const items = container.querySelectorAll('.course, .certificate, .bookmark');
+    
+    console.log(`Debug: знайдено ${items.length} елементів у ${containerClass}`);
 
-        // Приховуємо елементи за порогом
-        items.forEach((item, index) => {
-            if (index >= threshold) {
-                item.style.display = 'none';
-            }
-        });
+    if (items.length <= threshold) {
+        viewAllButton.style.display = 'none';
+        return;
+    }
 
-        if (items.length > threshold) {
-            viewAllButton.style.display = 'block';
-            // Встановлюємо початковий текст кнопки
-            const lang = localStorage.getItem('language') || 'en';
-            viewAllButton.textContent = translations[lang].btnViewAll;
-            
-            // Додаємо прапорець для початкового стану
-            container.classList.remove('expanded');
-        } else {
-            viewAllButton.style.display = 'none';
+    viewAllButton.style.display = 'block';
+
+    const lang = localStorage.getItem('language') || 'en';
+    viewAllButton.textContent = translations[lang].btnViewAll;
+
+    items.forEach((item, index) => {
+        if (index >= threshold) {
+            item.style.display = 'none';
         }
     });
-} 
 
-function toggleViewAllButton(containerClass, buttonClass, threshold = 3) {
-    const containers = document.querySelectorAll(`.${containerClass}`);
-
-    containers.forEach(container => {
-        const items = container.querySelectorAll('.course, .certificate, .bookmark');
-        const parentContainer = container.closest('.my-courses, .my-certificates, .my-bookmarks');
+    viewAllButton.onclick = function() {
+        const isExpanded = this.classList.toggle('expanded');
         
-        if (!parentContainer) {
-            console.warn(`Батьківський контейнер для .${containerClass} не знайдено`);
-            return;
-        }
-        
-        const viewAllButton = parentContainer.querySelector(`.${buttonClass}`);
-
-        if (!viewAllButton) {
-            console.warn(`Кнопку .${buttonClass} не знайдено у`, container);
-            return;
-        }
-
-        // Скидаємо попередній стан
-        items.forEach(item => {
-            item.style.display = 'block';
-        });
-
-        // Приховуємо елементи за порогом
         items.forEach((item, index) => {
-            if (index >= threshold) {
-                item.style.display = 'none';
+            if (isExpanded) {
+                item.style.display = 'block';
+                this.textContent = translations[lang].btnViewLess || 'View Less';
+            } else { 
+                if (index >= threshold) {
+                    item.style.display = 'none';
+                }
+                this.textContent = translations[lang].btnViewAll || 'View All';
             }
         });
+    };
+}
 
-        if (items.length > threshold) {
-            viewAllButton.style.display = 'block';
-            // Встановлюємо початковий текст кнопки
-            const lang = localStorage.getItem('language') || 'en';
-            viewAllButton.textContent = translations[lang].btnViewAll;
-            
-            // Додаємо прапорець для початкового стану
-            container.classList.remove('expanded');
-        } else {
-            viewAllButton.style.display = 'none';
-        }
-    });
-} 
 function toggleCourseListExpansion() {
     const coursesContainer = document.querySelector('.courses-list');
     const viewAllButton = document.querySelector('.btn-view-all-1');
@@ -500,6 +414,7 @@ document.addEventListener('DOMContentLoaded', function() {
             translations[lang].btnViewAll;
     });
 });
+
 async function generateAndDownloadCertificate(courseId) { 
     try { 
         const userId = localStorage.getItem('userId');
@@ -546,7 +461,6 @@ async function generateAndDownloadCertificate(courseId) {
         alert('Помилка при створенні сертифікату: ' + error.message); 
     } 
 }
-
 
 function createCertificateTemplate(userName, courseName) {
     const currentDate = new Date();

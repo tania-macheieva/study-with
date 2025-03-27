@@ -318,95 +318,20 @@
                 alert('An error occurred while uploading the profile image.');
             }
         });
- /*       function toggleViewAllButton(containerClass, buttonClass, threshold = 3) {
-    const containers = document.querySelectorAll(`.${containerClass}`);
-
-    containers.forEach(container => {
-        const items = container.querySelectorAll('.course'); // Шукаємо конкретно `.course`
-        const viewAllButton = container.closest('.my-courses').querySelector(`.${buttonClass}`);
-
-        if (!viewAllButton) {
-            console.warn(`❌ Кнопку ${buttonClass} не знайдено у`, container);
-            return;
-        }
-
-        if (items.length > threshold) {
-            viewAllButton.style.display = 'block';
-        } else {
-            viewAllButton.style.display = 'none';
-        }
-    });
-}
-    document.addEventListener('click', function (event) {
-    if (event.target.classList.contains('btn-view-all-1')) {
-        const button = event.target;
-        const section = button.closest('.my-courses');
-        const list = section.querySelector('.courses-list');
-
-        if (!list) {
-            console.error("❌ Список курсів не знайдено!");
-            return;
-        }
-
-        list.classList.toggle('expanded');
-
-        // Логіка відображення карток
-        const courses = list.querySelectorAll('.course:nth-child(n+4)');
-        if (list.classList.contains('expanded')) {
-            courses.forEach(course => course.style.display = 'block');
-            button.textContent = 'View less';
-        } else {
-            courses.forEach(course => course.style.display = 'none');
-            button.textContent = 'View all';
-        }
-    }
-});*/
-
-
-function addCertificateToList(courseName, completionDate) {
-    const certificatesList = document.querySelector('.certificates-list');
-    if (!certificatesList) return;
-
-    const certificateDiv = document.createElement('div');
-    certificateDiv.className = 'certificate';
-    certificateDiv.innerHTML = `
-        <p class="p-1" data-lang="certificateName">${courseName}</p>
-        <p class="p-2" data-lang="completedOn">Completed on ${completionDate}</p>
-        <button class="btn-download">
-            <img src="/images/download-certificate.png" alt="Download Certificate">
-        </button>
-    `;
-
-    certificatesList.appendChild(certificateDiv);
-}
-
-function updateCourseProgress(courseId, progress) {
-    if (progress >= 100) {
-        const currentDate = new Date();
-        const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getFullYear()}`;
         
-        fetch(`/api/courses/${courseId}`)
-            .then(response => response.json())
-            .then(courseData => {
-                addCertificateToList(courseData.name, formattedDate);
-            })
-            .catch(error => console.error('Помилка отримання даних курсу:', error));
-    }
-}
+        function updateCourseProgress(courseId, progress) {
+            if (progress >= 100) {
+                const currentDate = new Date();
+                const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getFullYear()}`;
 
-        document.querySelectorAll('.btn-download').forEach(function (button) {
-            button.addEventListener('click', function () {
-                const certificateName = this.closest('.certificate').querySelector('.p-1').textContent;
-                const certificateUrl = `/certificates/${encodeURIComponent(certificateName)}.pdf`;
-                const downloadLink = document.createElement('a');
-
-                downloadLink.href = certificateUrl;
-                downloadLink.download = `${certificateName}.pdf`;
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
-            });
-        });
+                fetch(`/api/courses/${courseId}`)
+                    .then(response => response.json())
+                    .then(courseData => {
+                        addCertificateToList(courseData.name, formattedDate);
+                    })
+                    .catch(error => console.error('Помилка отримання даних курсу:', error));
+            }
+        }
 
         const tabLinks = document.querySelectorAll('.tab-link');
         const modal = document.getElementById('modal');
@@ -1107,9 +1032,9 @@ function updateCourseProgress(courseId, progress) {
             fetchTeacherProfile();
             //loadEnrolledCourses();
         });
-       /* toggleViewAllButton('courses-list', 'btn-view-all-1');
-        toggleViewAllButton('certificates-list', 'btn-view-all-3');
-        toggleViewAllButton('bookmarks-list', 'btn-view-all-4');*/
+        /* toggleViewAllButton('courses-list', 'btn-view-all-1');
+         toggleViewAllButton('certificates-list', 'btn-view-all-3');
+         toggleViewAllButton('bookmarks-list', 'btn-view-all-4');*/
     });
 
 </script>
@@ -1117,4 +1042,5 @@ function updateCourseProgress(courseId, progress) {
 <script src="../footer/footer.js"></script>
 <script src="../profile-page/teacher-lang.js"></script>
 <script src="/preloader/preloader.js"></script>
+
 </html>
