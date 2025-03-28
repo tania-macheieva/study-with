@@ -194,7 +194,7 @@ async function loadSavedBookmarks() {
             button.addEventListener('click', function () {
                 const courseId = this.dataset.courseId;
                 if (courseId) {
-                    window.location.href = `/course/${courseId}`;
+                    window.location.href = `/course-preview/?id=${courseId}`;
                 }
             });
         });

@@ -248,7 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
         button.addEventListener("click", function () {
           const courseId = this.getAttribute("data-course-id");
           if (courseId) {
-            window.location.href = `/course/${courseId}`;
+            window.location.href = `/course-preview/?id=${courseId}`;
           }
         });
       });
