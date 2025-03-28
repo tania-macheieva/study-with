@@ -1,0 +1,93 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8f9fa;
+}
+
+.all {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+}
+
+.img_Cert {
+    width: 45vw;
+    display: flex;
+    justify-content: center;
+}
+
+.img_Cert img {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-height: 90vh;
+}
+
+.Check_cert_div {
+    width: 50%;
+    max-width: 450px;
+    background: #fff;
+    padding: 50px;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    margin-left: 220px;
+    margin-right: auto;
+}
+
+.Check_cert_div h1 {
+    font-weight: 700;
+    color: #0c101a;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.Check_cert_div input {
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    padding: 12px;
+    color: #313131;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.Check_cert_div input:focus {
+    border-color: #283044;
+}
+
+.P_valid {
+    margin-top: 12px;
+    color: #23C552;
+    /* display: none; */
+}
+
+.P_not_valid {
+    margin-top: 12px;
+    color: #F84F31;
+    /* display: none; */
+}
+
+.Check_cert_div button {
+    background-color: #283044;
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 12px;
+    width: 100%;
+}
+
+.Check_cert_div button:hover {
+    background-color: #0c101a;
+}
