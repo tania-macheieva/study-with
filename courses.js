@@ -905,6 +905,70 @@ router.get('/enrolled/:userId', async (req, res) => {
   }
 });
 
+router.post('/unenroll/:userId', async (req, res) => {
+  const { courseId } = req.body;
+  const { userId } = req.params;
+
+  // Validate input
+  if (!courseId) {
+      return res.status(400).json({ 
+          error: 'Missing course ID' 
+      });
+  } 
+  
+  if (!userId) {
+      return res.status(401).json({ 
+          error: 'User not authenticated' 
+      });
+  }
+
+  try {
+      // Begin transaction
+      await pool.query('BEGIN');
+
+      // Update enrollment status
+      const unenrollQuery = `
+          UPDATE enrollments 
+          SET 
+              status = 'archived', 
+              last_accessed = CURRENT_TIMESTAMP 
+          WHERE 
+              user_id = $1 
+              AND course_id = $2 
+              AND status = 'active'
+          RETURNING *
+      `;
+      
+      const result = await pool.query(unenrollQuery, [userId, courseId]);
+
+      // Check if any rows were updated
+      if (result.rows.length === 0) {
+          await pool.query('ROLLBACK');
+          return res.status(404).json({ 
+              error: 'No active enrollment found' 
+          });
+      }
+
+      // Commit transaction
+      await pool.query('COMMIT');
+
+      res.status(200).json({ 
+          message: 'Successfully unenrolled from the course',
+          details: result.rows[0]
+      });
+
+  } catch (error) {
+      // Rollback transaction
+      await pool.query('ROLLBACK');
+      
+      console.error('Unenroll error:', error);
+      res.status(500).json({ 
+          error: 'Internal server error', 
+          details: error.message 
+      });
+  }
+});
+
 // Маршрут для збереження курсу
 router.post('/save', async (req, res) => {
   const { userId, courseId } = req.body;

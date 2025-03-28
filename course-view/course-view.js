@@ -1951,8 +1951,8 @@ function calculateTotalProgress(modules) {
 async function loadCourseHeader() {
   try {
     const response = await fetch("/header/course-header.html");
-    const html = await response.text();
-    document.getElementById("courseHeader").innerHTML = html;
+      const html = await response.text();
+      document.getElementById("courseHeader").innerHTML = html;
 
     initializeCourseHeader();
   } catch (error) {
@@ -2558,7 +2558,7 @@ window.handleModuleTestClick = function (moduleId, testLink) {
       }
     })
     .catch((error) => {
-      console.error("Помилка отримання оновленого посилання:", error);
+      console.error("Помилка отримання оно  вленого посилання:", error);
       openModuleTest(testLink, moduleId);
     });
 };

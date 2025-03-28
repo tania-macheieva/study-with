@@ -46,9 +46,16 @@ header {
     font-size: 18px;
     font-weight: normal;
     display: flex;
+    align-items: center; /* Ensures vertical alignment of icon and text */
     cursor: pointer;
+    margin-left: 200px;
 }
 
+.home img {
+    margin-right: 8px; /* Adds some space between the icon and text */
+    width: 24px; /* Ensure the image has a defined size */
+    height: 24px;
+}
 .course-n {
     font-size: 18px;
     font-weight: 600;
@@ -61,8 +68,7 @@ img {
     width: 20px;
     height: 20px;
     margin-right: 10px;
-}
-
+} 
 
 /*#endregion */
 
