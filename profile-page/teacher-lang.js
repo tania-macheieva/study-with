@@ -1,154 +1,118 @@
 const translations = {
   en: {
-    pageTitle: "Study With | Teacher Profile",
-    myCourses: "My courses",
-    courseName: "Course name",
-    courseProgress: "Progress",
-    btnResume: "Resume",
-    btnViewAll1: "View all",
-    myCertificates: "My certificates",
-    certificateName: "Certificate name",
-    completedOn: "Completed on dd/mm/yyyy",
-    btnDownload: "Download",
-    myBookmarks: "My bookmarks",
-    bookmarkName: "Bookmark name",
-    btnOpen: "Open",
-    btnViewAll: "View all",
-    publicProf: "Public profile",
-    profile: "Profile",
-    security: "Security",
-    closeAccount: "Closing an account",
-    infPublicProf:
-      "This is your public profile. You can see how it looks to other users.",
-    editProf: "Editing your profile",
-    name: "Name:",
-    entername: "Enter your real name",
-    nickname: "Nickname:",
-    enterNickname: "Enter your nickname",
-    dob: "Date of birth:",
-    enterDOB: "Enter your date of birth",
-    phone: "Phone:",
-    enterPhone: 'Enter your phone number"',
-    gender: "Gender:",
-    enterGender: "Enter your gender",
-    description: "Description:",
-    writeDescription: "Write some information about yourself",
-    country: "Country:",
-    enterCountry: "Enter your country",
-    city: "City:",
-    enterCity: "Enter your city",
-    zipCode: "Zip code:",
-    enterzipCode: "Enter your zip code",
-    specialty: "Specialty:",
-    enterSpecialty: "Enter your specialty",
-    DOPE: "Beginning of professional experience:",
-    enterDOPE: "Enter the start date of your professional experience",
-    enterExperience: "Experience:",
-    enterExperience: "Write about your teaching experience",
-    education: "Education:",
-    writeEducation: "Write about your education",
-    hobby: "Hobbies:",
-    writeHobby: "Write about your hobbies and interests.",
-    language: "Language:",
-    writeLanguage: "Write what languages ​​you speak",
-    saveChanges: "Save changes",
-    securitySettings: "Security settings",
-    currentPassword: "Current Password:",
-    enterCurrentPassword: "Enter current password",
-    newPassword: "New Password:",
-    enterNewPassword: "Enter new password",
-    confirmNewPassword: "Confirm New Password:",
-    confirmEnterNewPassword: "Confirm new password",
-    updatePassword: "Update password",
-    messages: "Notifications",
-    noMessages: "You have no new notifications yet.",
-    manageAccount: "Manage Account Visibility",
-    privatePublic:
-      "You can make your account private or public using the buttons below.",
-    closeAccount: "Close Account",
-    openAccount: "Open Account",
-    noCourses: "You haven't enrolled in any courses yet.",
-    btnResume: "Resume",
-    contentNotFound: "Content not found.",
-    noReplies: "There are no notifications.",
-    responseTo: "Response to: ",
-    goToCourse: "Go to the course",
+      pageTitle: 'Study With | Profile',
+      // username: 'Username',
+      btnTeacher: 'Become a teacher',
+      myCourses: 'My courses',
+      courseName: 'Course name',
+      courseProgress: 'Progress',
+      btnResume: 'Resume',
+      myCertificates: 'My certificates',
+      certificateName: 'Certificate name', 
+      completedOn: 'Completed on',
+      btnDownload: 'Download',
+      myBookmarks: 'My bookmarks',
+      bookmarkName: 'Bookmark name',
+      btnOpen: 'Open',
+      btnViewAll: 'View all',
+      publicProf: 'Public profile',
+      profile: 'Profile',
+      security: 'Security',
+      messages: 'Notifications',
+      closeAccount: 'Closing an account',
+      infPublicProf: 'This is your public profile. You can see how it looks to other users.',
+      editProf: 'Editing your profile',
+      name: 'Name:',
+      entername:'Enter your real name',
+      nickname: 'Nickname:',
+      enterNickname: 'Enter your nickname',
+      dob: 'Date of birth:',
+      enterDOB: 'Enter your date of birth',
+      phone: 'Phone:',
+      enterPhone: 'Enter your phone number',
+      description: 'Description:',
+      writeDescription: 'Write some information about yourself',
+      saveChanges: 'Save changes',
+      securitySettings: 'Security settings',
+      currentPassword: 'Current Password:',
+      enterCurrentPassword: 'Enter current password',
+      newPassword: 'New Password:',
+      enterNewPassword: 'Enter new password',
+      confirmNewPassword: 'Confirm New Password:',
+      confirmEnterNewPassword:'Confirm new password',
+      updatePassword: 'Update password',
+      noMessages: 'You have no new notifications yet.',
+      manageAccount: 'Manage Account Visibility',
+      privatePublic: 'You can make your account private or public using the buttons below.',
+      closeAccount: 'Close Account',
+      openAccount: 'Open Account',
+      noCourses: 'You haven\'t enrolled in any courses yet.',
+      noCertificates: 'You do not have any certificates yet',
+      btnShowLess: 'Show less',
+      noLinkedCourses: "You have no saved courses yet",
+      contentNotFound: "Content not found.",
+      noReplies: "There are no notifications.",
+      responseTo: "Response to: ",
+      goToCourse: "Go to the course",
   },
   ua: {
-    pageTitle: "Study With | Профіль Вчителя",
-    myCourses: "Мої курси",
-    courseName: "Назва курсу",
-    courseProgress: "Прогрес",
-    btnResume: "Продовжити",
-    btnViewAll1: "Показати все",
-    myCertificates: "Мої сертифікати",
-    certificateName: "Назва сертифікату",
-    completedOn: "Завершено dd/mm/yyyy",
-    btnDownload: "Завантажити",
-    myBookmarks: "Мої закладки",
-    bookmarkName: "Назва закладки",
-    btnOpen: "Відкрити",
-    btnViewAll: "Показати все",
-    publicProf: "Публічний профіль",
-    profile: "Профіль",
-    security: "Безпека",
-    closeAccount: "Закриття акаунту",
-    infPublicProf:
-      "Це ваш публічний профіль. Ви можете побачити, як це виглядає для інших користувачів.",
-    editProf: "Редагування профілю",
-    name: "Ім`я:",
-    entername: "Введіть своє справжнє ім`я",
-    nickname: "Нік:",
-    enterNickname: "Введіть ваш нік",
-    dob: "Дата народження:",
-    enterDOB: "Введіть вашу дату народження",
-    phone: "Телефон:",
-    enterPhone: "Введіть ваш номер телефону",
-    gender: "Стать:",
-    enterGender: "Введіть вашу стать",
-    description: "Опис:",
-    writeDescription: "Напишіть трохи інформації про себе",
-    country: "Країна:",
-    enterCountry: "Введіть вашу країну",
-    city: "Місто:",
-    enterCity: "Введіть ваше місто",
-    zipCode: "Поштовий індекс:",
-    enterzipCode: "Введіть ваш поштовий індекс",
-    specialty: "Спеціалізація:",
-    enterSpecialty: "Введіть вашу спеціалізацію",
-    DOPE: "Початок професійного досвіду:",
-    enterDOPE: "Введіть дату початку вашого професійного досвіду",
-    enterExperience: "Досвід:",
-    enterExperience: "Напишіть про свій педагогічний досвід",
-    education: "Освіта:",
-    writeEducation: "Напишіть про вашу освіту",
-    hobby: "Хобі:",
-    writeHobby: "Напишіть про свої захоплення та інтереси.",
-    language: "Мова:",
-    writeLanguage: "Напишіть якими мовами ви володієте",
-    saveChanges: "Зберегти зміни",
-    securitySettings: "Налаштування безпеки",
-    currentPassword: "Поточний пароль:",
-    enterCurrentPassword: "Введіть поточний пароль",
-    newPassword: "Новий пароль:",
-    enterNewPassword: "Введіть новий пароль",
-    confirmNewPassword: "Підтвердження нового паролю:",
-    confirmEnterNewPassword: "Підтвердіть новий пароль",
-    updatePassword: "Оновити пароль",
-    messages: "Сповіщення",
-    noMessages: "У вас ще немає нових сповіщень.",
-    manageAccount: "Управління видимістю акаунту",
-    privatePublic:
-      "Ви можете зробити свій акаунт приватним або публічним за допомогою кнопок нижче.",
-    closeAccount: "Закрити акаунт",
-    openAccount: "Відкрити акаунт",
-    noCourses: "Ви ще не записались на жодний курс.",
-    btnResume: "Продовжити",
-    contentNotFound: "Вміст не знайдено.",
-    noReplies: "Сповіщень немає.",
-    responseTo: "Відповідь на: ",
-    goToCourse: "Перейти до курсу",
-  },
+      pageTitle: 'Study With | Профіль',
+      // username: 'Ім`я користувача',
+      btnTeacher: 'Стати вчителем',
+      myCourses: 'Мої курси',
+      courseName: 'Назва курсу',
+      courseProgress: 'Прогрес',
+      btnResume: 'Продовжити', 
+      myCertificates: 'Мої сертифікати',
+      certificateName: 'Назва сертифікату',
+      completedOn: 'Завершено ',
+      btnDownload: 'Завантажити',
+      myBookmarks: 'Мої закладки',
+      bookmarkName: 'Назва закладки',
+      btnOpen: 'Відкрити',
+      btnViewAll: 'Показати все',
+      btnViewLess: "Показати менше",
+      publicProf: 'Публічний профіль',
+      profile: 'Профіль',
+      security: 'Безпека',
+      closeAccount: 'Закриття акаунту',
+      infPublicProf: 'Це ваш публічний профіль. Ви можете побачити, як це виглядає для інших користувачів.',
+      editProf: 'Редагування профілю',
+      name: 'Ім`я:',
+      entername:'Введіть своє справжнє ім`я',
+      nickname: 'Нік:',
+      enterNickname: 'Введіть ваш нік',
+      dob: 'Дата народження:',
+      enterDOB: 'Введіть вашу дату народження',
+      phone: 'Телефон:',
+      enterPhone: 'Введіть ваш номер телефону',
+      description: 'Опис:',
+      writeDescription: 'Напишіть трохи інформації про себе',
+      saveChanges: 'Зберегти зміни',
+      securitySettings: 'Налаштування безпеки',
+      currentPassword: 'Поточний пароль:',
+      enterCurrentPassword: 'Введіть поточний пароль',
+      newPassword: 'Новий пароль:',
+      enterNewPassword: 'Введіть новий пароль',
+      confirmNewPassword: 'Підтвердження нового паролю:',
+      confirmEnterNewPassword:'Підтвердіть новий пароль',
+      updatePassword: 'Оновити пароль',
+      messages: 'Сповіщення',
+      noMessages: 'У вас ще немає нових сповіщень.',
+      manageAccount: 'Управління видимістю акаунту',
+      privatePublic: 'Ви можете зробити свій акаунт приватним або публічним за допомогою кнопок нижче.',
+      closeAccount: 'Закрити акаунт',
+      openAccount: 'Відкрити акаунт',
+      noCourses: 'Ви ще не записались на жодний курс.',
+      noCertificates: 'У вас ще немає сертифікатів',
+      btnShowLess: 'Показати менше',
+      noLinkedCourses: 'У вас ще немає збережених курсів',
+      contentNotFound: "Вміст не знайдено.",
+      noReplies: "Сповіщень немає.",
+      responseTo: "Відповідь на: ",
+      goToCourse: "Перейти до курсу",
+
+  }
 };
 document.addEventListener("DOMContentLoaded", () => {
   const tabLinks = document.querySelectorAll(".tab-link");
@@ -248,7 +212,7 @@ document.addEventListener("DOMContentLoaded", () => {
         button.addEventListener("click", function () {
           const courseId = this.getAttribute("data-course-id");
           if (courseId) {
-            window.location.href = `/course-preview/?id=${courseId}`;
+            window.location.href = `/course/${courseId}`;
           }
         });
       });
@@ -923,144 +887,101 @@ h3 {
 
   async function loadEnrolledCourses() {
     try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        console.log("User ID not found");
-        return;
-      }
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            console.log('User ID not found');
+            return;
+        }
 
-      const response = await fetch(`/courses/enrolled/${userId}`);
-      if (!response.ok) throw new Error("Failed to fetch enrolled courses");
+        const response = await fetch(`/courses/enrolled/${userId}`);
+        if (!response.ok) throw new Error('Failed to fetch enrolled courses');
+        
+        const courses = await response.json();
+        const coursesContainer = document.getElementById('enrolled-courses');
+        const certificatesContainer = document.querySelector('.certificates-list');
+        
+        if (!coursesContainer || !certificatesContainer) return;
 
-      const courses = await response.json();
-      const coursesContainer = document.getElementById("enrolled-courses");
-      const certificatesContainer =
-        document.querySelector(".certificates-list");
+        // Check and handle no courses for both courses and certificates
+        if (!courses || courses.length === 0) {
+            coursesContainer.innerHTML = `<p class="no-courses">${translations[localStorage.getItem('language') || 'en'].noCourses}</p>`;
+            certificatesContainer.innerHTML = `<p class="no-courses">${translations[localStorage.getItem('language') || 'en'].noCertificates}</p>`;
+            return;
+        }
 
-      if (!coursesContainer || !certificatesContainer) return;
+        coursesContainer.innerHTML = '';
+        certificatesContainer.innerHTML = '';
 
-      if (!courses || courses.length === 0) {
-        coursesContainer.innerHTML = `<p class="no-courses">${
-          translations[localStorage.getItem("language") || "en"].noCourses
-        }</p>`;
-        return;
-      }
+        // Prepare all tooltip containers
+        const tooltipContainers = [];
 
-      coursesContainer.innerHTML = "";
-      certificatesContainer.innerHTML = "";
+        courses.forEach(course => {
+            const courseElement = document.createElement('div');
+            courseElement.className = 'course';
+            
+            // Truncate course name if it's too long
+            const maxNameLength = 25;
+            const truncatedName = course.name.length > maxNameLength 
+                ? course.name.substring(0, maxNameLength) + '...' 
+                : course.name;
 
-      // Prepare all tooltip containers
-      const tooltipContainers = [];
-
-      courses.forEach((course) => {
-        const courseElement = document.createElement("div");
-        courseElement.className = "course";
-
-        // Truncate course name if it's too long
-        const maxNameLength = 25;
-        const truncatedName =
-          course.name.length > maxNameLength
-            ? course.name.substring(0, maxNameLength) + "..."
-            : course.name;
-
-        courseElement.innerHTML = `
+            courseElement.innerHTML = `
                 <div class="course-name-container" style="position: relative;">
                     <p class="p-1 course-name">${truncatedName}</p>
-                    ${
-                      course.name.length > maxNameLength
-                        ? `<div class="tooltip" style="display: none;">${course.name}</div>`
-                        : ""
-                    }
+                    ${course.name.length > maxNameLength 
+                        ? `<div class="tooltip" style="display: none;">${course.name}</div>` 
+                        : ''}
                 </div>
                 <div class="bottom-block">
                     <div class="progress-bar">
                         <span style="width: ${course.progress || 0}%;"></span>
                     </div>
                     <p class="percent">${course.progress || 0}%</p>
-                    <img src="/uploads/${
-                      course.image_url || "/images/250x100.png"
-                    }" 
+                    <img src="/uploads/${course.image_url || '/images/250x100.png'}" 
                         alt="${course.name}" 
                         onerror="this.src='/images/250x100.png'">
                     <button class="btn-resume" data-course-id="${course.id}">
-                        ${
-                          translations[localStorage.getItem("language") || "en"]
-                            .btnResume
-                        }
+                        ${translations[localStorage.getItem('language') || 'en'].btnResume}
                     </button>
                 </div>
             `;
 
-        // Store reference to tooltip container if it exists
-        const tooltipContainer = courseElement.querySelector(
-          ".course-name-container"
-        );
-        if (tooltipContainer.querySelector(".tooltip")) {
-          tooltipContainers.push(tooltipContainer);
-        }
+            // Store reference to tooltip container if it exists
+            const tooltipContainer = courseElement.querySelector('.course-name-container');
+            if (tooltipContainer.querySelector('.tooltip')) {
+                tooltipContainers.push(tooltipContainer);
+            }
 
-        coursesContainer.appendChild(courseElement);
+            coursesContainer.appendChild(courseElement);
 
-        if (course.progress === 100) {
-          const certificateElement = document.createElement("div");
-          certificateElement.className = "certificate";
-          certificateElement.innerHTML = `
+            // Add certificates for completed courses
+            if (course.progress === 100) {
+                const certificateElement = document.createElement('div');
+                certificateElement.className = 'certificate';
+                certificateElement.innerHTML = `
                     <div class="course-name-container" style="position: relative;">
                         <p class="p-1 course-name">🏆  ${truncatedName}</p>
-                        ${
-                          course.name.length > maxNameLength
-                            ? `<div class="tooltip" style="display: none;">${course.name}</div>`
-                            : ""
-                        }
+                        ${course.name.length > maxNameLength 
+                            ? `<div class="tooltip" style="display: none;">${course.name}</div>` 
+                            : ''}
                     </div> 
-                    <p class="p-2">${
-                      translations[localStorage.getItem("language") || "en"]
-                        .completedOn
-                    } ${new Date().toLocaleDateString()}</p>
+                    <p class="p-2">${translations[localStorage.getItem('language') || 'en'].completedOn} ${new Date().toLocaleDateString()}</p>
                     <button class="btn-download" data-course-id="${course.id}">
                         <img src="/images/download-certificate.png">
                     </button>
-
                 `;
-          certificatesContainer.appendChild(certificateElement);
+                certificatesContainer.appendChild(certificateElement);
+            }
+        });
+
+        // If no certificates were added, show no courses message
+        if (certificatesContainer.children.length === 0) {
+            certificatesContainer.innerHTML = `<p class="no-courses">${translations[localStorage.getItem('language') || 'en'].noCourses}</p>`;
         }
-      });
-
-      // Add tooltip event listeners
-      tooltipContainers.forEach((container) => {
-        const courseName = container.querySelector(".course-name");
-        const tooltip = container.querySelector(".tooltip");
-
-        courseName.addEventListener("mouseenter", () => {
-          tooltip.style.display = "block";
-        });
-
-        courseName.addEventListener("mouseleave", () => {
-          tooltip.style.display = "none";
-        });
-      });
-
-      document.querySelectorAll(".btn-resume").forEach((button) => {
-        button.addEventListener("click", function () {
-          const courseId = this.getAttribute("data-course-id");
-          if (courseId) {
-            window.location.href = `/course/${courseId}`;
-          }
-        });
-      });
-
-      // Apply view all toggle functionality
-      toggleViewAllButton("courses-list", "btn-view-all-1");
-      toggleViewAllButton("certificates-list", "btn-view-all-3");
     } catch (error) {
-      console.error("Error loading courses:", error);
-      const coursesContainer = document.getElementById("enrolled-courses");
-      if (coursesContainer) {
-        coursesContainer.innerHTML =
-          '<p class="error-message">Failed to load courses. Please try again later.</p>';
-      }
+        console.error('Error loading enrolled courses:', error);
     }
-  }
+}
   document.addEventListener("click", function (event) {
     if (event.target.closest(".btn-download")) {
       const button = event.target.closest(".btn-download");

@@ -7,7 +7,6 @@ const translations = {
         courseName: 'Course name',
         courseProgress: 'Progress',
         btnResume: 'Resume',
-        btnViewAll1: 'View all',
         myCertificates: 'My certificates',
         certificateName: 'Certificate name', 
         completedOn: 'Completed on',
@@ -48,6 +47,7 @@ const translations = {
         closeAccount: 'Close Account',
         openAccount: 'Open Account',
         noCourses: 'You haven\'t enrolled in any courses yet.',
+        noCertificates: 'You do not have any certificates yet',
         btnShowLess: 'Show less',
         noLinkedCourses: "You have no saved courses yet",
         contentNotFound: "Content not found.",
@@ -62,8 +62,7 @@ const translations = {
         myCourses: 'Мої курси',
         courseName: 'Назва курсу',
         courseProgress: 'Прогрес',
-        btnResume: 'Продовжити',
-        btnViewAll1: 'Показати все',
+        btnResume: 'Продовжити', 
         myCertificates: 'Мої сертифікати',
         certificateName: 'Назва сертифікату',
         completedOn: 'Завершено ',
@@ -72,6 +71,7 @@ const translations = {
         bookmarkName: 'Назва закладки',
         btnOpen: 'Відкрити',
         btnViewAll: 'Показати все',
+        btnViewLess: "Показати менше",
         publicProf: 'Публічний профіль',
         profile: 'Профіль',
         security: 'Безпека',
@@ -104,6 +104,7 @@ const translations = {
         closeAccount: 'Закрити акаунт',
         openAccount: 'Відкрити акаунт',
         noCourses: 'Ви ще не записались на жодний курс.',
+        noCertificates: 'У вас ще немає сертифікатів',
         btnShowLess: 'Показати менше',
         noLinkedCourses: 'У вас ще немає збережених курсів',
         contentNotFound: "Вміст не знайдено.",
@@ -629,8 +630,10 @@ async function loadEnrolledCourses() {
         
         if (!coursesContainer || !certificatesContainer) return;
 
+        // Check and handle no courses for both courses and certificates
         if (!courses || courses.length === 0) {
             coursesContainer.innerHTML = `<p class="no-courses">${translations[localStorage.getItem('language') || 'en'].noCourses}</p>`;
+            certificatesContainer.innerHTML = `<p class="no-courses">${translations[localStorage.getItem('language') || 'en'].noCertificates}</p>`;
             return;
         }
 
@@ -679,6 +682,7 @@ async function loadEnrolledCourses() {
 
             coursesContainer.appendChild(courseElement);
 
+            // Add certificates for completed courses
             if (course.progress === 100) {
                 const certificateElement = document.createElement('div');
                 certificateElement.className = 'certificate';
@@ -693,47 +697,20 @@ async function loadEnrolledCourses() {
                     <button class="btn-download" data-course-id="${course.id}">
                         <img src="/images/download-certificate.png">
                     </button>
-
                 `;
                 certificatesContainer.appendChild(certificateElement);
             }
-            
         });
 
-        // Add tooltip event listeners
-        tooltipContainers.forEach(container => {
-            const courseName = container.querySelector('.course-name');
-            const tooltip = container.querySelector('.tooltip');
-
-            courseName.addEventListener('mouseenter', () => {
-                tooltip.style.display = 'block';
-            });
-
-            courseName.addEventListener('mouseleave', () => {
-                tooltip.style.display = 'none';
-            });
-        });
-
-        document.querySelectorAll('.btn-resume').forEach(button => {
-            button.addEventListener('click', function() {
-                const courseId = this.getAttribute('data-course-id');
-                if (courseId) {
-                    window.location.href = `/course/${courseId}`;
-                }
-            });
-        });
-
-        // Apply view all toggle functionality
-        toggleViewAllButton('courses-list', 'btn-view-all-1');
-        toggleViewAllButton('certificates-list', 'btn-view-all-3');
-    } catch (error) {
-        console.error('Error loading courses:', error);
-        const coursesContainer = document.getElementById('enrolled-courses');
-        if (coursesContainer) {
-            coursesContainer.innerHTML = '<p class="error-message">Failed to load courses. Please try again later.</p>';
+        // If no certificates were added, show no courses message
+        if (certificatesContainer.children.length === 0) {
+            certificatesContainer.innerHTML = `<p class="no-courses">${translations[localStorage.getItem('language') || 'en'].noCourses}</p>`;
         }
+    } catch (error) {
+        console.error('Error loading enrolled courses:', error);
     }
 }
+
 document.addEventListener('click', function(event) {
     if (event.target.closest('.btn-download')) {
         const button = event.target.closest('.btn-download');
