@@ -324,6 +324,7 @@ body {
 .module.collapsed .topics {
     display: none;
 }
+
 .collapsed .module-content {
     display: none;
 }

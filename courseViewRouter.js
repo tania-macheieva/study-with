@@ -133,6 +133,19 @@ router.get('/course/:courseId/progress', async (req, res) => {
             return res.status(400).json({ error: 'User ID is required' });
         }
 
+        // Спочатку перевіряємо, чи має курс фінальний тест
+        const courseQuery = `SELECT test_link FROM all_courses WHERE id = $1`;
+        const courseResult = await db.query(courseQuery, [courseId]);
+        
+        if (courseResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Course not found' });
+        }
+        
+        // ВИПРАВЛЕННЯ: Правильно визначаємо наявність фінального тесту
+        const hasFinalTest = courseResult.rows[0].test_link !== null && 
+                            courseResult.rows[0].test_link !== '' && 
+                            courseResult.rows[0].test_link !== undefined;
+
         // Оновлений запит для підрахунку прогресу з урахуванням тестів
         const progressQuery = `
             WITH course_stats AS (
@@ -141,11 +154,11 @@ router.get('/course/:courseId/progress', async (req, res) => {
                     COUNT(DISTINCT l.id) as total_lectures,
                     COUNT(DISTINCT CASE WHEN lp.completed = true THEN l.id END) as completed_lectures,
                     -- Підрахунок кількості модулів з тестами
-                    COUNT(DISTINCT CASE WHEN m.test_link IS NOT NULL THEN m.id END) as total_module_tests,
+                    COUNT(DISTINCT CASE WHEN m.test_link IS NOT NULL AND m.test_link != '' THEN m.id END) as total_module_tests,
                     -- Підрахунок кількості пройдених тестів модулів
                     COUNT(DISTINCT CASE WHEN tp_module.completed = true THEN m.id END) as completed_module_tests,
                     -- Перевірка наявності фінального тесту
-                    MAX(CASE WHEN c.test_link IS NOT NULL THEN 1 ELSE 0 END) as has_final_test,
+                    ${hasFinalTest ? "1" : "0"} as has_final_test,
                     -- Перевірка пройденості фінального тесту
                     MAX(CASE WHEN tp_course.completed = true THEN 1 ELSE 0 END) as completed_final_test
                 FROM all_courses c
@@ -169,7 +182,7 @@ router.get('/course/:courseId/progress', async (req, res) => {
                 cs.completed_module_tests,
                 cs.has_final_test,
                 cs.completed_final_test,
-                -- Загальна кількість "елементів" курсу: лекції + тести модулів + фінальний тест
+                -- Загальна кількість "елементів" курсу: лекції + тести модулів + фінальний тест (якщо є)
                 (cs.total_lectures + cs.total_module_tests + cs.has_final_test) as total_items,
                 -- Загальна кількість завершених "елементів"
                 (cs.completed_lectures + cs.completed_module_tests + cs.completed_final_test) as completed_items,
@@ -228,6 +241,24 @@ router.post('/lecture/:lectureId/complete', async (req, res) => {
             return res.status(400).json({ error: 'User ID is required' });
         }
 
+        // Перевірка, чи існує лекція з таким ID
+        const lectureCheckQuery = 'SELECT id FROM lectures WHERE id = $1';
+        const lectureCheckResult = await db.query(lectureCheckQuery, [lectureId]);
+        
+        if (lectureCheckResult.rows.length === 0) {
+            console.error(`Лекція з ID=${lectureId} не знайдена в базі даних`);
+            return res.status(404).json({ error: 'Lecture not found' });
+        }
+
+        // Також перевіряємо, чи існує вказаний користувач
+        const userCheckQuery = 'SELECT id FROM users WHERE id = $1';
+        const userCheckResult = await db.query(userCheckQuery, [userId]);
+        
+        if (userCheckResult.rows.length === 0) {
+            console.error(`Користувач з ID=${userId} не знайдений в базі даних`);
+            return res.status(404).json({ error: 'User not found' });
+        }
+
         const query = `
             INSERT INTO lecture_progress (user_id, lecture_id, completed, completed_at)
             VALUES ($1, $2, true, CURRENT_TIMESTAMP)
@@ -240,7 +271,25 @@ router.post('/lecture/:lectureId/complete', async (req, res) => {
 
         const result = await db.query(query, [userId, lectureId]);
         
-        await updateCourseProgress(userId, lectureId);
+        // Отримуємо ID курсу через модуль для цієї лекції
+        const courseIdQuery = `
+            SELECT m.course_id
+            FROM lectures l
+            JOIN modules m ON l.module_id = m.id
+            WHERE l.id = $1
+        `;
+        
+        const courseIdResult = await db.query(courseIdQuery, [lectureId]);
+        
+        if (courseIdResult.rows.length > 0) {
+            const courseId = courseIdResult.rows[0].course_id;
+            console.log(`Знайдено курс з ID=${courseId} для лекції з ID=${lectureId}`);
+            
+            // Оновлюємо прогрес курсу
+            await updateCourseProgress(userId, courseId);
+        } else {
+            console.error(`Не знайдено курс для лекції з ID=${lectureId}`);
+        }
 
         res.json(result.rows[0]);
     } catch (error) {
@@ -249,19 +298,71 @@ router.post('/lecture/:lectureId/complete', async (req, res) => {
     }
 });
 
+// Знаходимо і виправляємо функцію updateCourseProgress в courseViewRouter.js
+
 async function updateCourseProgress(userId, courseId) {
-    console.log(`Оновлення загального прогресу курсу: userId=${userId}, courseId=${courseId}`);
-    
     try {
-        // Запит враховує як лекції, так і тести в загальному прогресі
-        const query = `
+        console.log(`Оновлення прогресу курсу для userId=${userId}, courseId=${courseId}`);
+        
+        // Визначаємо тип параметра courseId та корегуємо якщо потрібно
+        let actualCourseId = courseId;
+        
+        // Якщо courseId - це ID лекції, отримуємо ID курсу через модуль
+        if (isNaN(parseInt(courseId))) {
+            console.log('courseId не є числом, намагаємося визначити ID курсу через лекцію');
+            const lectureResult = await db.query(
+                `SELECT m.course_id 
+                 FROM lectures l
+                 JOIN modules m ON l.module_id = m.id
+                 WHERE l.id = $1`,
+                [courseId]
+            );
+            
+            if (lectureResult.rows.length > 0) {
+                actualCourseId = lectureResult.rows[0].course_id;
+                console.log(`Визначено courseId=${actualCourseId} через лекцію з ID=${courseId}`);
+            } else {
+                console.error(`Не вдалося визначити courseId через лекцію з ID=${courseId}`);
+                return;
+            }
+        }
+        
+        // ВАЖЛИВО: Перевіряємо, чи існує вказаний курс у базі даних перед продовженням
+        const courseCheckQuery = `SELECT id, test_link FROM all_courses WHERE id = $1`;
+        const courseCheckResult = await db.query(courseCheckQuery, [actualCourseId]);
+        
+        if (courseCheckResult.rows.length === 0) {
+            console.error(`Курс з ID=${actualCourseId} не знайдено в базі даних. Оновлення прогресу неможливе.`);
+            return; // Виходимо з функції, щоб уникнути помилок FK
+        }
+        
+        // Перевіряємо, чи є фінальний тест для цього курсу
+        // ВИПРАВЛЕННЯ: правильно перевіряємо наявність фінального тесту
+        const hasFinalTest = courseCheckResult.rows[0].test_link !== null && 
+                            courseCheckResult.rows[0].test_link !== '' && 
+                            courseCheckResult.rows[0].test_link !== undefined;
+        
+        console.log(`Фінальний тест для курсу ${actualCourseId}: ${hasFinalTest ? 'є' : 'відсутній'}`);
+        
+        // Перевіряємо чи є якісь модулі для цього курсу
+        const moduleCheckQuery = `SELECT COUNT(*) as modules_count FROM modules WHERE course_id = $1`;
+        const moduleCheckResult = await db.query(moduleCheckQuery, [actualCourseId]);
+        
+        if (moduleCheckResult.rows[0].modules_count === 0) {
+            console.error(`Курс з ID=${actualCourseId} не має жодного модуля. Оновлення прогресу неможливе.`);
+            return; // Виходимо з функції, оскільки у курсу немає модулів
+        }
+        
+        // Отримуємо дані про завершені лекції, модульні тести і фінальний тест
+        // ВИПРАВЛЕННЯ: використовуємо hasFinalTest для правильного розрахунку прогресу
+        const progressQuery = `
             WITH course_stats AS (
                 SELECT 
                     COUNT(DISTINCT l.id) as total_lectures,
                     COUNT(DISTINCT CASE WHEN lp.completed = true THEN l.id END) as completed_lectures,
-                    COUNT(DISTINCT CASE WHEN m.test_link IS NOT NULL THEN m.id END) as total_module_tests,
+                    COUNT(DISTINCT CASE WHEN m.test_link IS NOT NULL AND m.test_link != '' THEN m.id END) as total_module_tests,
                     COUNT(DISTINCT CASE WHEN tp_module.completed = true THEN m.id END) as completed_module_tests,
-                    MAX(CASE WHEN c.test_link IS NOT NULL THEN 1 ELSE 0 END) as has_final_test,
+                    ${hasFinalTest ? "1" : "0"} as has_final_test,
                     MAX(CASE WHEN tp_course.completed = true THEN 1 ELSE 0 END) as completed_final_test
                 FROM all_courses c
                 JOIN modules m ON c.id = m.course_id
@@ -282,11 +383,8 @@ async function updateCourseProgress(userId, courseId) {
                 cs.completed_module_tests,
                 cs.has_final_test,
                 cs.completed_final_test,
-                -- Загальна кількість "елементів" курсу: лекції + тести модулів + фінальний тест
                 (cs.total_lectures + cs.total_module_tests + cs.has_final_test) as total_items,
-                -- Загальна кількість завершених "елементів"
                 (cs.completed_lectures + cs.completed_module_tests + cs.completed_final_test) as completed_items,
-                -- Розрахунок відсотка прогресу
                 CASE 
                     WHEN (cs.total_lectures + cs.total_module_tests + cs.has_final_test) > 0 
                     THEN ROUND(((cs.completed_lectures + cs.completed_module_tests + cs.completed_final_test)::float / 
@@ -296,33 +394,55 @@ async function updateCourseProgress(userId, courseId) {
             FROM course_stats cs
         `;
 
-        const result = await db.query(query, [userId, courseId]);
-        const progressData = result.rows[0];
+        console.log(`Виконуємо запит для отримання прогресу: userId=${userId}, courseId=${actualCourseId}`);
+        const result = await db.query(progressQuery, [userId, actualCourseId]);
         
-        if (progressData) {
-            console.log(`Статистика курсу:`, progressData);
-
-            // Оновлюємо загальний прогрес в таблиці enrollments
-            // Важливо: конвертуємо progress_percentage в ціле число
-            const progressInt = Math.round(parseFloat(progressData.progress_percentage));
+        if (result.rows.length > 0) {
+            const progressData = result.rows[0];
+            console.log('Отримано дані прогресу:', progressData);
             
-            console.log(`Конвертований прогрес: ${progressInt}%`);
+            // Значення прогресу у відсотках (округлене)
+            let progressPercentage = Math.round(parseFloat(progressData.progress_percentage || 0));
+            console.log(`Розрахований прогрес: ${progressPercentage}%`);
             
-            const updateQuery = `
-                UPDATE enrollments 
-                SET progress = $1, last_accessed = CURRENT_TIMESTAMP
-                WHERE course_id = $2 AND user_id = $3
+            // Перевіряємо, чи є запис в таблиці enrollments
+            const checkEnrollmentQuery = `
+                SELECT id FROM enrollments 
+                WHERE user_id = $1 AND course_id = $2
             `;
+            const enrollmentResult = await db.query(checkEnrollmentQuery, [userId, actualCourseId]);
             
-            await db.query(updateQuery, [
-                progressInt, 
-                courseId, 
-                userId
-            ]);
+            if (enrollmentResult.rows.length === 0) {
+                console.log(`Створюємо новий запис в enrollments: userId=${userId}, courseId=${actualCourseId}`);
+                // Створюємо запис, якщо його немає
+                const insertQuery = `
+                    INSERT INTO enrollments (user_id, course_id, enrollment_date, status, progress, last_accessed)
+                    VALUES ($1, $2, CURRENT_TIMESTAMP, 'active', $3, CURRENT_TIMESTAMP)
+                `;
+                await db.query(insertQuery, [
+                    userId, 
+                    actualCourseId, 
+                    progressPercentage
+                ]);
+            } else {
+                console.log(`Оновлюємо існуючий запис в enrollments: userId=${userId}, courseId=${actualCourseId}`);
+                // Оновлюємо існуючий запис
+                const updateQuery = `
+                    UPDATE enrollments 
+                    SET progress = $1, last_accessed = CURRENT_TIMESTAMP
+                    WHERE user_id = $2 AND course_id = $3
+                `;
+                
+                await db.query(updateQuery, [
+                    progressPercentage, 
+                    userId, 
+                    actualCourseId
+                ]);
+            }
             
-            console.log(`Прогрес курсу оновлено до ${progressInt}%`);
+            console.log(`Прогрес успішно оновлено: ${progressPercentage}%`);
         } else {
-            console.warn(`Не вдалося отримати статистику курсу`);
+            console.error(`Не знайдено даних про прогрес: userId=${userId}, courseId=${actualCourseId}`);
         }
     } catch (error) {
         console.error('Помилка оновлення прогресу курсу:', error);
@@ -1054,75 +1174,120 @@ router.post('/module/:moduleId/test/complete', async (req, res) => {
     }
 });
 
-// Маршрут для позначення фінального тесту курсу як завершеного
 router.post('/course/:courseId/test/complete', async (req, res) => {
     try {
         const { courseId } = req.params;
         const { userId, score = 0 } = req.body;
 
+        console.log(`Отримано запит на завершення фінального тесту: courseId=${courseId}, userId=${userId}, score=${score}`);
+
         if (!userId) {
+            console.error('Не вказано userId');
             return res.status(400).json({ error: 'User ID is required' });
         }
 
-        // Зберігаємо результат проходження тесту
-        const query = `
-            INSERT INTO test_progress (user_id, course_id, test_type, completed, completed_at, score)
-            VALUES ($1, $2, 'course', true, CURRENT_TIMESTAMP, $4)
-            ON CONFLICT (user_id, course_id, test_type)
-            DO UPDATE SET 
-                completed = true,
-                completed_at = CURRENT_TIMESTAMP,
-                score = $4
-            RETURNING *
-        `;
+        // Перевіряємо, чи існує курс і чи має він фінальний тест
+        const courseCheck = await db.query(
+            'SELECT id, test_link FROM all_courses WHERE id = $1',
+            [courseId]
+        );
 
-        const result = await db.query(query, [userId, courseId, score]);
+        if (courseCheck.rows.length === 0) {
+            console.error(`Курс з ID=${courseId} не знайдено`);
+            return res.status(404).json({ error: 'Course not found' });
+        }
         
-        // Оновлюємо загальний прогрес курсу
-        await updateCourseProgress(userId, courseId);
+        // Перевіряємо, чи є фінальний тест для курсу
+        if (!courseCheck.rows[0].test_link) {
+            console.error(`Для курсу з ID=${courseId} немає фінального тесту`);
+            return res.status(404).json({ error: 'No final test for this course' });
+        }
 
-        res.json(result.rows[0]);
+        console.log(`Зберігаємо результат тесту: courseId=${courseId}, userId=${userId}, score=${score}`);
+
+        try {
+            // Спочатку видаляємо існуючий запис, якщо такий є
+            await db.query(
+                'DELETE FROM test_progress WHERE user_id = $1 AND course_id = $2 AND test_type = $3',
+                [userId, courseId, 'course']
+            );
+            console.log('Успішно видалено попередні записи про проходження тесту (якщо вони були)');
+        } catch (deleteError) {
+            console.error('Помилка при видаленні попереднього запису:', deleteError);
+            // Продовжуємо виконання, навіть якщо видалення не вдалося
+        }
+
+        try {
+            // Додаємо новий запис
+            const insertQuery = `
+                INSERT INTO test_progress (user_id, course_id, test_type, completed, completed_at, score)
+                VALUES ($1, $2, 'course', true, CURRENT_TIMESTAMP, $3)
+                RETURNING *
+            `;
+            const result = await db.query(insertQuery, [userId, courseId, score]);
+            
+            if (result.rows.length === 0) {
+                console.error('Не вдалося зберегти результат тесту');
+                return res.status(500).json({ error: 'Failed to save test result' });
+            }
+            
+            console.log('Результат тесту збережено:', result.rows[0]);
+
+            // Явно оновлюємо загальний прогрес курсу
+            await updateCourseProgress(userId, courseId);
+            
+            // Додатково перевіряємо, що прогрес був оновлений
+            const progressCheck = await db.query(
+                'SELECT progress FROM enrollments WHERE user_id = $1 AND course_id = $2',
+                [userId, courseId]
+            );
+            
+            if (progressCheck.rows.length > 0) {
+                console.log(`Поточний прогрес курсу: ${progressCheck.rows[0].progress}%`);
+            } else {
+                console.warn(`Запис про проходження курсу не знайдено: userId=${userId}, courseId=${courseId}`);
+            }
+
+            res.json(result.rows[0]);
+        } catch (insertError) {
+            console.error('Помилка при додаванні нового запису:', insertError);
+            
+            // Якщо не вдалося додати новий запис через UNIQUE обмеження або інші помилки,
+            // спробуємо оновити існуючий запис через UPDATE
+            try {
+                const updateQuery = `
+                    UPDATE test_progress 
+                    SET completed = true, 
+                        completed_at = CURRENT_TIMESTAMP, 
+                        score = $3
+                    WHERE user_id = $1 
+                      AND course_id = $2 
+                      AND test_type = 'course'
+                    RETURNING *
+                `;
+                const updateResult = await db.query(updateQuery, [userId, courseId, score]);
+                
+                if (updateResult.rows.length > 0) {
+                    console.log('Запис про тест оновлено через UPDATE:', updateResult.rows[0]);
+                    
+                    // Оновлюємо прогрес курсу
+                    await updateCourseProgress(userId, courseId);
+                    
+                    res.json(updateResult.rows[0]);
+                } else {
+                    throw new Error('Не вдалося оновити існуючий запис');
+                }
+            } catch (updateError) {
+                console.error('Помилка при оновленні існуючого запису:', updateError);
+                throw updateError; // Прокидаємо помилку далі для обробки в основному catch
+            }
+        }
     } catch (error) {
         console.error('Помилка оновлення прогресу фінального тесту:', error);
         res.status(500).json({ error: 'Внутрішня помилка сервера' });
     }
 });
 
-
-//         if (!userId || !rating || !review) {
-//             return res.status(400).json({ error: 'Missing required fields' });
-//         }
-//         const checkQuery = `
-//             SELECT id FROM reviews 
-//             WHERE course_id = $1 AND user_id = $2
-//         `;
-//         const checkResult = await db.query(checkQuery, [courseId, userId]);
-        
-//         let result;
-//         if (checkResult.rows.length > 0) {
-//             // Update existing review
-//             const existingReviewId = checkResult.rows[0].id;
-//             const updateQuery = `
-//                 UPDATE reviews 
-//                 SET rating = $1, review_text = $2, updated_at = NOW() 
-//                 WHERE id = $3
-//                 RETURNING *;
-//             `;
-//             result = await db.query(updateQuery, [rating, review, existingReviewId]);
-//             res.status(200).json({ message: 'Review updated successfully', review: result.rows[0] });
-//         } else {
-//             const insertQuery = `
-//                 INSERT INTO reviews (course_id, user_id, rating, review_text, created_at, updated_at)
-//                 VALUES ($1, $2, $3, $4, NOW(), NOW()) RETURNING *;
-//             `;
-//             result = await db.query(insertQuery, [courseId, userId, rating, review]);
-//             res.status(201).json({ message: 'Review submitted successfully', review: result.rows[0] });
-//         }
-//     } catch (error) {
-//         console.error('Error submitting review:', error);
-//         res.status(500).json({ error: 'Internal server error' });
-//     }
-// });
 router.post('/course/:courseId/review', async (req, res) => {
     try {
         const { courseId } = req.params;

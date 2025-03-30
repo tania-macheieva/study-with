@@ -1,63 +1,64 @@
-body { 
+body {
     margin: 0;
     padding: 0;
-    background-color: #fff; 
+    background-color: #fff;
     font-family: "Inter", sans-serif;
     box-sizing: border-box;
 }
+
 .page-container {
     display: flex;
-    flex-direction:column;
-    min-height: 100vh; 
-}  
+    flex-direction: column;
+    min-height: 100vh;
+}
 
 ::-webkit-scrollbar {
     width: 10px;
-  }
-  
-  ::-webkit-scrollbar-track {
+}
+
+::-webkit-scrollbar-track {
     background: #FFFFFF;
     margin: 5px 2px;
     margin-top: 60px;
     border-radius: 2px;
-  }
-  
-  ::-webkit-scrollbar-thumb {
+}
+
+::-webkit-scrollbar-thumb {
     background: #283044;
     border-radius: 12px;
     min-height: 40px;
-  }
-  
-  ::-webkit-scrollbar-thumb:hover {
+}
+
+::-webkit-scrollbar-thumb:hover {
     background: #506088;
-  }
-  
-  ::-webkit-scrollbar:horizontal {
+}
+
+::-webkit-scrollbar:horizontal {
     height: 10px;
-  }
-  
-  ::-webkit-scrollbar-track-horizontal {
+}
+
+::-webkit-scrollbar-track-horizontal {
     background: #FFFFFF;
     margin: 2px 5px;
     border-radius: 2px;
-  }
-  
-  ::-webkit-scrollbar-thumb-horizontal {
+}
+
+::-webkit-scrollbar-thumb-horizontal {
     background: #283044;
     border-radius: 12px;
     min-width: 40px;
-  }
-  
-  ::-webkit-scrollbar-thumb-horizontal:hover {
+}
+
+::-webkit-scrollbar-thumb-horizontal:hover {
     background: #506088;
-  }
+}
 
 /* Profile Container */
 .profile-container {
-    display: flex;  
-    flex-direction: row; 
-    justify-content: space-between; 
-    align-items: flex-start; 
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
     margin-top: 50px;
     font-family: "Inter", sans-serif;
 }
@@ -65,30 +66,25 @@ body {
 /* User Info Section */
 .profile-container .user-info {
     display: flex;
-    flex-direction: column; 
-    align-items: center; 
-    width: 20%;    
-    padding-left: 100px;  
+    flex-direction: column;
+    align-items: center;
+    width: 20%;
+    padding-left: 100px;
 }
 
 /* Container My Section */
 .profile-container .container-my {
-    display: flex;  
+    display: flex;
     flex-direction: column;
-    width: 80%;    
+    width: 80%;
     padding-left: 50px;
-    justify-content: flex-start;  
+    justify-content: flex-start;
     align-items: flex-start;
     padding-right: 200px;
     overflow-x: hidden;
     font-family: "Inter", sans-serif;
     font-weight: 100;
 }
-
-
-.profile-container .container-my div {
-    margin-bottom: 3px;
-} 
 
 .chapters {
     display: flex;
@@ -99,37 +95,37 @@ body {
 .profile-image {
     width: 130px;
     height: 130px;
-    height: auto; 
-    border-radius: 50%;  
-    object-fit: cover;  
+    height: auto;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 #profile-image {
     cursor: pointer;
-    width: 120px;  
+    width: 120px;
     height: 120px;
-    object-fit: cover;  
-    border-radius: 50%; 
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .action-buttons {
     display: flex;
     gap: 8px;
-    margin-top: 2px; 
-    justify-content: center;  
+    margin-top: 2px;
+    justify-content: center;
 }
 
 .action-buttons button {
     background-color: transparent;
     border: none;
-    cursor: pointer; 
-    color: #4caf50;  
+    cursor: pointer;
+    color: #4caf50;
     font-size: 14px;
-    
+
 }
 
 .action-buttons button#remove-image {
-    color: #ff4d4f; 
+    color: #ff4d4f;
 }
 
 .action-buttons button:hover {
@@ -148,11 +144,11 @@ p {
     font-weight: 500;
     margin-top: 5px;
     font-size: 18px;
-    color: #283044;               
-    margin-bottom: 8px;    
-} 
+    color: #283044;
+    margin-bottom: 8px;
+}
 
-.profile-container .user-info  .btn-teacher {
+.profile-container .user-info .btn-teacher {
     width: 70%;
     max-width: 200px;
     font-family: "Inter";
@@ -181,43 +177,43 @@ p {
     width: 30px;
     background-color: #283044;
     border-radius: 50%;
-    transition: all 0.6s ease;  
-  }
-  
-  .btn-teacher span:nth-child(6) {
+    transition: all 0.6s ease;
+}
+
+.btn-teacher span:nth-child(6) {
     position: relative;
-    
-  }
-  
-  .btn-teacher span:nth-child(1) {
+
+}
+
+.btn-teacher span:nth-child(1) {
     transform: translate(-3.3em, -4em);
-    
-  }
-  
-  .btn-teacher span:nth-child(2) {
+
+}
+
+.btn-teacher span:nth-child(2) {
     transform: translate(-6em, 1.3em);
-  }
-  
-  .btn-teacher span:nth-child(3) {
+}
+
+.btn-teacher span:nth-child(3) {
     transform: translate(-.2em, 1.8em);
-  }
-  
-  .btn-teacher span:nth-child(4) {
+}
+
+.btn-teacher span:nth-child(4) {
     transform: translate(3.5em, 1.4em);
-  }
-  
-  .btn-teacher span:nth-child(5) {
+}
+
+.btn-teacher span:nth-child(5) {
     transform: translate(3.5em, -3.8em);
-  }
-  
-  .btn-teacher:hover span:not(:nth-child(6)) {
+}
+
+.btn-teacher:hover span:not(:nth-child(6)) {
     transform: translate(-50%, -50%) scale(9);
     transition: 1.5s ease;
-  }
+}
 
-  .profile-container .user-info  .btn-teacher:hover {
+.profile-container .user-info .btn-teacher:hover {
     color: #fff;
-  }
+}
 
 .tab-container {
     margin: 20px;
@@ -238,7 +234,7 @@ p {
     font-size: 20px;
     font-weight: 500;
     font-family: "Inter", sans-serif;
-    text-align: left; 
+    text-align: left;
     color: #283044;
     transition: color 0.3s ease-in-out;
     margin-top: 12px;
@@ -254,19 +250,22 @@ p {
 }
 
 .tab-link:hover {
-    color: #747474; /* Зміна кольору тексту при наведенні */
+    color: #747474;
+    /* Зміна кольору тексту при наведенні */
 }
 
 .tab-content {
     margin-top: 20px;
-   
+
 }
-.tab-content h2{
+
+.tab-content h2 {
     font-size: 30px;
     font-weight: 700;
     font-family: "Inter", sans-serif;
 }
-.tab-content p{
+
+.tab-content p {
     font-size: 20px;
     font-weight: 400;
     font-family: "Inter", sans-serif;
@@ -277,19 +276,23 @@ p {
     opacity: 0;
     transition: opacity 0.3s ease;
     padding: 20px;
-    text-align: center; /* Центрування тексту */
+    text-align: center;
+    /* Центрування тексту */
 }
 
 .tab-panel.active {
     display: block;
     opacity: 1;
 }
+
 /* Вміст вкладки */
 .input-group {
     margin: 15px auto;
     width: 100%;
-    max-width: 400px; /* Ширина для полів вводу */
-    text-align: left; /* Для вирівнювання підписів */
+    max-width: 400px;
+    /* Ширина для полів вводу */
+    text-align: left;
+    /* Для вирівнювання підписів */
 }
 
 .input-group label {
@@ -304,8 +307,10 @@ p {
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 8px; /* Заокруглення полів */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Легка тінь */
+    border-radius: 8px;
+    /* Заокруглення полів */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* Легка тінь */
     font-size: 16px;
     font-family: "Inter", sans-serif;
     transition: all 0.3s ease;
@@ -313,9 +318,11 @@ p {
 
 .input-group input:focus {
     border-color: #283044;
-    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2); /* Синя підсвітка при фокусі */
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+    /* Синя підсвітка при фокусі */
     outline: none;
 }
+
 /* Кнопки */
 .modal button {
     padding: 10px 20px;
@@ -325,14 +332,17 @@ p {
     color: #fff;
     background-color: #283044;
     border: none;
-    border-radius: 12px; /* Заокруглення кнопки */
+    border-radius: 12px;
+    /* Заокруглення кнопки */
     cursor: pointer;
     transition: all 0.3s ease;
 }
+
 .modal button:hover {
     background-color: #0c101a;
-  
+
 }
+
 .password-container {
     display: flex;
     align-items: center;
@@ -344,18 +354,20 @@ p {
     padding-right: 60px;
 }
 
-.password-container .toggle-password  {
+.password-container .toggle-password {
     position: absolute;
     right: 10px;
     background: none;
     border: none;
     cursor: pointer;
-    color: #6c757d; /* Колір іконки */
+    color: #6c757d;
+    /* Колір іконки */
 }
 
-.password-container .toggle-password:hover  {
-    color: #495057; 
+.password-container .toggle-password:hover {
+    color: #495057;
 }
+
 .password-container .toggle-password i {
     font-size: 1rem;
 }
@@ -381,10 +393,11 @@ p {
     padding: 20px;
     border-radius: 12px;
     width: 600px;
-    max-height: 80vh; 
+    max-height: 80vh;
     overflow-y: auto;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    animation: fadeIn 0.3s ease; /* Анімація */
+    animation: fadeIn 0.3s ease;
+    /* Анімація */
 }
 
 /* Public profile specific modal styles */
@@ -405,12 +418,14 @@ p {
     height: 100%;
     border: none;
 }
+
 /* Анімація для модального вікна */
 @keyframes fadeIn {
     from {
         opacity: 0;
         transform: scale(0.9);
     }
+
     to {
         opacity: 1;
         transform: scale(1);
@@ -437,31 +452,43 @@ p {
     padding-left: 10%;
     justify-content: flex-end;
 }
-
-.my-courses { 
-    padding: 0px 15px 15px 15px; 
-    
+.my-courses {
+    padding: 0px 15px 15px 15px;
 }
-.my-courses h2 { 
-    text-align: left; 
+
+.my-courses h2 {
+    text-align: left;
     margin-top: 0px;
-    
 }
 
 .course {
-    background-color: #e0e0e0; 
-    padding: 2px 15px;
-    border-radius: 12px; 
-    text-align: center; 
+    background-color: #fff;
+    padding: 2px 15px; 
+    border-radius: 12px;
+    text-align: center;
     margin-bottom: 10px;
-    width: 250px;
+    width: 250px; 
+    border: 1px #283044 solid;
+    display: flex; 
+    flex-direction: column; 
 }
+
+.course p.p-1 {
+    margin-bottom: 10px;
+}
+
+.bottom-block {
+    margin-top: auto;  
+    margin-bottom: 10px;
+    position: static;
+}
+
 .course .percent {
-    font-size: 12px; 
+    font-size: 12px;
     margin-bottom: 10px;
     margin-top: 0;
     padding-top: 0;
-    text-align: right; 
+    text-align: right;
     font-weight: 560;
 }
 
@@ -469,35 +496,27 @@ p {
     width: 250px;
     height: 180px;
     border-radius: 12px;
+    border: 1px #283044 solid;
+    object-fit: cover;
 }
+
 .courses-list {
-    display: grid;  
-    grid-template-columns: repeat(3, 1fr); 
-    gap: 40px; 
-    overflow: hidden;
-    transition: height 0.5s ease-in-out;
-    
-}
-.courses-list .course:nth-child(n+4) {
-    display: none; /* Ховаємо зайві картки */
-}
-
-.courses-list.expanded .course:nth-child(n+4) {
-    display: block; /* Показуємо всі картки після натискання */
-}
-
-/*.courses-list {
-    /*display: grid;
-    grid-template-columns: repeat(3, 1fr); 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 40px;
     overflow: hidden;
     transition: height 0.5s ease-in-out;
-}*/
-.btn-resume { 
+}
+
+.courses-list .course:nth-child(n+4) {
+    display: none;
+}
+
+.courses-list.expanded .course:nth-child(n+4) {
+    display: block;
+}
+
+.btn-resume {
     width: 100%;
     font-family: "Inter", sans-serif;
     padding: 8px 10px;
@@ -509,16 +528,18 @@ p {
     font-weight: 640;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
-    margin-top: 10px;
+    margin-top: 10px; 
+    border: 1px #283044 solid;
     margin-bottom: 15px;
 }
-    
-.course h3 { 
+
+.course h3 {
     margin-bottom: 5px;
 }
 
 .progress-bar {
     background-color: #ffffff;
+    border: 1px #283044 solid;
     border-radius: 12px;
     height: 8px;
     width: 100%;
@@ -537,14 +558,13 @@ p {
     border-radius: 5px;
 }
 
+/* 545F7A */
 .btn-resume:hover {
-    background-color: #545F7A;
-    color: #ffffff;
-    transform: translateY(-2px);
+    background-color: #dcecfc;
 }
 
 .courses-list.expanded {
-    height: auto; 
+    height: auto;
 }
 
 .courses-list .course:nth-child(n+4) {
@@ -554,51 +574,55 @@ p {
 .courses-list.expanded .course:nth-child(n+4) {
     display: block;
 }
+
 .my-courses .p-1 {
     font-weight: 580;
     font-size: 18px;
     margin-bottom: 8px;
     text-align: left;
+
 }
+
 .btn-container {
     display: flex;
     justify-content: center;
     width: 100%;
-    margin-top: 20px;
+    margin-top: 5px;
+} 
+
+.course-name-container:hover {
+    cursor: help;
 }
 
-.btn-view-all-1,
-.btn-view-all-2,
-.btn-view-all-3,
-.btn-view-all-4{
-    text-align: center; 
-    padding: 8px 20px;
-    font-size: 18px;
-    font-family: "Inter", sans-serif;
-    font-weight: 640;
-    background: #283044;
-    color: #ffffff;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
-  
+.course-name-container {
+    position: relative; 
+    text-align: left;
 }
 
-.btn-view-all-1:hover,
-.btn-view-all-2:hover,
-.btn-view-all-3:hover,
-.btn-view-all-4:hover{
-    background-color: #545F7A;
-    color: #ffffff;
-    transform: translateY(-2px);
+.course-name-container .tooltip {
+    display: none;
+    position: absolute;
+    top: 100%; /* Розташування під назвою */
+    left: 0;
+    background-color: #DCECFC;
+    color: black;
+    padding: 10px;
+    border-radius: 5px;
+    width: 93%; 
+    max-height: 180px;
+    white-space: normal; 
+    z-index: 1000;
+    font-size: 14px;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+    text-align: left;
+    font-weight: 390;
 }
 
 @media (max-width: 1360px) {
     .courses-list {
-        grid-template-columns: repeat(2, 1fr); 
+        grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .courses-list .course:nth-child(n+3) {
         display: none;
         justify-content: center;
@@ -607,41 +631,43 @@ p {
 
     .courses-list.expanded .course:nth-child(n+3) {
         display: block;
-    } 
+    }
 }
 
 
 @media (max-width: 1010px) {
     .courses-list {
-        grid-template-columns: 2fr; 
-        height: 275px;  
+        grid-template-columns: 2fr;
+        height: 275px;
     }
 
     .course {
         max-width: 100%;
     }
-    
+
     .courses-list .course:nth-child(n+2) {
         display: none;
     }
-    
+
     .courses-list.expanded .course:nth-child(n+2) {
         display: block;
     }
 }
 
-.my-certificates { 
-    padding: 0px 15px 15px 15px; 
-    
+.my-certificates {
+    padding: 0px 15px 15px 15px;
+
 }
-.my-certificates h2 { 
-    text-align: left; 
-    
+
+.my-certificates h2 {
+    text-align: left;
+
 }
 
 .certificate {
-    background-color: #e0e0e0;
+    background-color: #fff;
     border-radius: 12px;
+    border: 1px #283044 solid;
     padding: 2px 15px;
     margin-bottom: 10px;
     width: 250px;
@@ -663,47 +689,42 @@ p {
 }
 
 .certificates-list {
-    display: grid;  
-    grid-template-columns: repeat(3, 1fr); 
-    gap: 40px; 
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
     overflow: hidden;
-    transition: height 0.5s ease-in-out; 
+    transition: height 0.5s ease-in-out;
 }
 
-.certificate h3 { 
+.certificate h3 {
     margin-bottom: 5px;
 }
 
-.btn-download { 
+.btn-download {
     width: 60px;
-    height: 60px;  
+    height: 60px;
     background: #ffffff;
     color: #000000;
     border: none;
-    border-radius: 100px;    
+    border-radius: 100px;
     font-weight: 640;
     cursor: pointer;
     transition: background 0.2s ease-in-out;
+    border: 1px #283044 solid;
     margin-top: 10px;
     margin-bottom: 15px;
     margin-left: 70%;
 }
 
-.btn-download img { 
+.btn-download img {
     width: 60%;
-    height: 50%;  
+    height: 50%;
     margin-top: 2px;
 }
 
 .btn-download:hover {
-    background-color: #a5a5a5;
-
-} 
-
-.btn-download:hover img { 
-    color: #ffffff; 
-} 
-
+    background-color: #dcecfc;
+}
 
 .certificates-list.expanded {
     height: auto;
@@ -715,13 +736,13 @@ p {
 
 .certificates-list.expanded .certificate:nth-child(n+4) {
     display: block;
-} 
+}
 
 @media (max-width: 1360px) {
     .certificates-list {
-        grid-template-columns: repeat(2, 1fr);   
+        grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .certificates-list .certificate:nth-child(n+3) {
         display: none;
         justify-content: center;
@@ -730,44 +751,46 @@ p {
 
     .certificates-list.expanded .certificate:nth-child(n+3) {
         display: block;
-    } 
+    }
 }
 
 @media (max-width: 1010px) {
     .certificates-list {
-        grid-template-columns: 2fr; 
-        height: 190px;  
+        grid-template-columns: 2fr;
+        height: 190px;
     }
 
     .certificate {
         max-width: 100%;
     }
-    
+
     .certificates-list .certificate:nth-child(n+2) {
         display: none
     }
-    
+
     .certificates-list.expanded .certificate:nth-child(n+2) {
         display: block;
     }
 }
 
 
-.my-bookmarks { 
-    padding: 0px 15px 15px 15px; 
-    
+.my-bookmarks {
+    padding: 0px 15px 15px 15px;
+
 }
-.my-bookmarks h2 { 
-    text-align: left; 
+
+.my-bookmarks h2 {
+    text-align: left;
     margin-top: 0px;
-    
+
 }
 
 .bookmark {
-    background-color: #e0e0e0; 
+    background-color: #fff;
+    border: 1px #283044 solid;
     padding: 2px 15px;
-    border-radius: 12px; 
-    text-align: center; 
+    border-radius: 12px;
+    text-align: center;
     margin-bottom: 10px;
     width: 250px;
 }
@@ -776,17 +799,18 @@ p {
     width: 250px;
     height: 180px;
     border-radius: 12px;
+    border: 1px #283044 solid;
 }
 
 .bookmarks-list {
-    display: grid;  
-    grid-template-columns: repeat(3, 1fr); 
-    gap: 40px; 
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
     overflow: hidden;
-    transition: height 0.5s ease-in-out; 
+    transition: height 0.5s ease-in-out;
 }
 
-.btn-open { 
+.btn-open {
     width: 100%;
     font-family: "Inter", sans-serif;
     padding: 8px 10px;
@@ -799,9 +823,11 @@ p {
     cursor: pointer;
     transition: background 0.3s ease;
     margin-top: 10px;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
+    border: 1px #283044 solid;
 }
-.remove-bookmark{
+
+.remove-bookmark {
     width: 100%;
     font-family: "Inter", sans-serif;
     padding: 8px 10px;
@@ -813,25 +839,25 @@ p {
     font-weight: 640;
     cursor: pointer;
     transition: background 0.3s ease;
-    margin-top: 10px;
     margin-bottom: 15px;
+    border: 1px #283044 solid;
 }
-.remove-bookmark:hover{
+
+.remove-bookmark:hover {
     background-color: #0c101a;
     color: #ffffff;
 }
-    
-.bookmark h3 { 
+
+.bookmark h3 {
     margin-bottom: 5px;
 }
 
 .btn-open:hover {
-    background-color: #a5a5a5;
-    color: #ffffff;
+    background-color: #dcecfc;
 }
 
 .bookmarks-list.expanded {
-    height: auto; 
+    height: auto;
 }
 
 .bookmarks-list .bookmark:nth-child(n+4) {
@@ -841,6 +867,7 @@ p {
 .bookmarks-list.expanded .bookmark:nth-child(n+4) {
     display: block;
 }
+
 .my-bookmarks .p-1 {
     font-weight: 580;
     font-size: 18px;
@@ -850,9 +877,9 @@ p {
 
 @media (max-width: 1360px) {
     .bookmarks-list {
-        grid-template-columns: repeat(2, 1fr); 
+        grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .bookmarks-list .bookmark:nth-child(n+3) {
         display: none;
         justify-content: center;
@@ -861,40 +888,59 @@ p {
 
     .bookmarks-list.expanded .bookmark:nth-child(n+3) {
         display: block;
-    } 
+    }
 }
 
 
 @media (max-width: 1010px) {
     .bookmarks-list {
-        grid-template-columns: 2fr; 
-        height: 235px;  
+        grid-template-columns: 2fr;
+        height: 235px;
     }
 
     .bookmarks {
         max-width: 100%;
     }
-    
+
     .bookmarks-list .bookmark:nth-child(n+2) {
         display: none;
     }
-    
+
     .bookmarks-list.expanded .bookmark:nth-child(n+2) {
         display: block;
     }
 }
-
-.btn-view-all-1 { 
-    width: 150px;
+.btn-view-all-1,
+.btn-view-all-2,
+.btn-view-all-3,
+.btn-view-all-4 {
+    text-align: center;
     padding: 8px 10px;
-    font-size: 17px;
-    font-weight: 400;
+    font-size: 18px;
     font-family: "Inter", sans-serif;
+    font-weight: 640;
     background: #283044;
     color: #ffffff;
     border: none;
     border-radius: 12px;
     cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+
+}
+
+.btn-view-all-1:hover,
+.btn-view-all-2:hover,
+.btn-view-all-3:hover,
+.btn-view-all-4:hover {
+    background-color: #545F7A;
+    color: #ffffff;
+}
+
+.btn-view-all-1 {
+    width: 150px;
+    padding: 8px 10px;
+    border: none;
+    border-radius: 12px;
     transition: background 0.3s ease;
     margin-top: 10px;
     margin-bottom: 12px;
@@ -904,19 +950,12 @@ p {
 
 .btn-view-all-1:hover {
     background-color: #0c101a;
-}  
+}
 
-.btn-view-all-2 { 
+.btn-view-all-2 {
     width: 150px;
     padding: 8px 10px;
-    font-size: 17px;
-    font-weight: 400;
-    font-family: "Inter", sans-serif; 
-    background: #283044;
-    color: #ffffff;
     border: none;
-    border-radius: 12px; 
-    cursor: pointer;
     transition: background 0.3s ease;
     margin-top: 10px;
     margin-bottom: 12px;
@@ -926,19 +965,13 @@ p {
 
 .btn-view-all-2:hover {
     background-color: #0c101a;
-}  
+}
 
-.btn-view-all-3 { 
+.btn-view-all-3 {
     width: 150px;
     padding: 8px 10px;
-    font-size: 17px;
-    font-weight: 400;
-    font-family: "Inter", sans-serif; 
-    background: #283044;
-    color: #ffffff;
+    font-size: 18px;
     border: none;
-    border-radius: 12px; 
-    cursor: pointer;
     transition: background 0.3s ease;
     margin-top: 10px;
     margin-bottom: 12px;
@@ -948,19 +981,11 @@ p {
 
 .btn-view-all-3:hover {
     background-color: #0c101a;
-}  
+}
 
-.btn-view-all-4 { 
+.btn-view-all-4 {
     width: 150px;
-    padding: 8px 10px;
-    font-size: 17px;
-    font-weight: 400;;
-    font-family: "Inter", sans-serif; 
-    background: #283044;
-    color: #ffffff;
     border: none;
-    border-radius: 12px; 
-    cursor: pointer;
     transition: background 0.3s ease;
     margin-top: 10px;
     margin-bottom: 12px;
@@ -970,7 +995,8 @@ p {
 
 .btn-view-all-4:hover {
     background-color: #0c101a;
-}  
+}
+
 /* Стиль для контейнера з коментарями */
 #messages-container {
     max-width: 800px;
@@ -989,15 +1015,15 @@ p {
     margin-bottom: 20px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     display: flex;
-    flex-direction: column; 
+    flex-direction: column;
 }
- 
+
 
 .message-header {
     display: flex;
     align-items: center;
     margin-bottom: 15px;
-} 
+}
 
 .user-avatar,
 .default-avatar {
@@ -1011,10 +1037,11 @@ p {
     justify-content: center;
     margin-right: 15px;
     transition: background-color 0.3s ease;
-    object-fit: cover;  /* Додаємо властивість для кращої обробки зображень */
+    object-fit: cover;
+    /* Додаємо властивість для кращої обробки зображень */
 }
 
-.user-name { 
+.user-name {
     font-size: 18px;
     margin-bottom: 5px;
 }
@@ -1030,10 +1057,10 @@ p {
     align-items: center;
     margin-top: 15px;
     padding: 10px;
-    border-radius: 8px; 
+    border-radius: 8px;
     /* border: 1px solid #545f7a;  */
     width: 85%;
-    margin-left: 3%; 
+    margin-left: 3%;
 }
 
 .course-thumbnail {
@@ -1041,28 +1068,33 @@ p {
     height: 50px;
     border-radius: 8px;
     object-fit: cover;
-    margin-right: 15px; 
-} 
+    margin-right: 15px;
+}
 
 .course-name {
-    font-size: 16px !important;;
-    font-weight: bold;
-    color: #545f7a; 
+    font-size: 16px !important; 
+    font-weight: bold; 
     transition: color 0.3s ease;
+    font-weight: 580;
+    font-size: 18px !important; 
+    margin-bottom: 8px;
+    text-align: left;
+    font-family: 'Jost' serif;
 }
- 
+
 /* Контент коментаря */
 .comment-content {
     font-size: 16px !important;
     margin: 12px 0;
-    line-height: 1.5; 
+    line-height: 1.5;
     color: #333;
     padding: 12px;
     border-radius: 6px;
-    background: linear-gradient(145deg, #f6f5f5, #ededed); /* Легкий градієнт */
+    background: linear-gradient(145deg, #f6f5f5, #ededed);
+    /* Легкий градієнт */
     position: relative;
-    overflow: hidden; 
-}    
+    overflow: hidden;
+}
 
 /* Стиль для кнопки переходу до курсу */
 .go-to-comment {
@@ -1076,7 +1108,7 @@ p {
     text-decoration: none;
     font-size: 14px;
     transition: background-color 0.3s ease;
-    display: inline-block; 
+    display: inline-block;
 }
 
 .go-to-comment:hover {
@@ -1094,12 +1126,13 @@ p {
     border-left: 3px solid #545f7a;
     margin-bottom: 15px;
     font-style: italic;
-    color: #555; 
+    color: #555;
 }
 
 .reply-to {
     font-size: 16px !important;
 }
+
 /* Стилі для повідомлення, якщо немає відповідей */
 .error-message {
     color: red;
@@ -1117,19 +1150,24 @@ p {
 .message-item.main-comment {
     background-color: #f1f8ff;
 }
- 
-.message-item.reply {
-    background-color: #ffff; 
-  }
 
-.message-item.main-comment .comment-content {  
-    font-size: 16px; /* Трохи менший розмір шрифта */
-    margin: 12px 0; /* Менший вертикальний відступ */
-    line-height: 1.5; /* Стиснута висота рядка */
-    color: #333; /* Темно-сірий колір для тексту */
-    padding: 12px; /* Внутрішні відступи */
-    background: linear-gradient(145deg, #e4ebf2, #e3e9ef); 
+.message-item.reply {
+    background-color: #ffff;
+}
+
+.message-item.main-comment .comment-content {
+    font-size: 16px;
+    /* Трохи менший розмір шрифта */
+    margin: 12px 0;
+    /* Менший вертикальний відступ */
+    line-height: 1.5;
+    /* Стиснута висота рядка */
+    color: #333;
+    /* Темно-сірий колір для тексту */
+    padding: 12px;
+    /* Внутрішні відступи */
+    background: linear-gradient(145deg, #e4ebf2, #e3e9ef);
     position: relative;
     overflow: hidden;
-    border-radius: 6px; 
+    border-radius: 6px;
 }
