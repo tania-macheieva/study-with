@@ -1,18 +1,26 @@
 document.addEventListener('DOMContentLoaded', async () => {
+
+    if (typeof translations === 'undefined') {
+        console.error('Translation object not found, waiting for it to load...');
+        // Wait a bit for translations to load
+        await new Promise(resolve => setTimeout(resolve, 100));
+        if (typeof translations === 'undefined') {
+            console.error('Translations failed to load');
+        }
+    }
+    
     try {
         const teacherId = window.location.pathname.split('/').pop();
         
         function getTranslation(key) {
-            const translations = {
-                'free': 'Безкоштовно',
-                'showMore': 'Показати більше',
-                'showLess': 'Показати менше',
-                'viewAll': 'Переглянути все',
-                'viewLess': 'Показати менше',
-                'learnMore': 'Дізнатися більше',
-                'noCourses': 'Курсів поки немає'
-            };
-            return translations[key] || key;
+            const userLang = localStorage.getItem('language') || 'en';
+
+            if (!translations || !translations[userLang]) {
+                console.warn(`No translations found for language: ${userLang}`);
+                return key; // Fallback to the original key
+            }
+
+            return translations[userLang][key] || key;
         }
         
         function formatPrice(price) {
@@ -122,7 +130,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Basic information
             const userNicknameElement = document.querySelector('#user-nickname');
             if (userNicknameElement) {
-                userNicknameElement.textContent = teacher.nickname || 'Username';
+                userNicknameElement.textContent = teacher.nickname || '';
             }
             
             const realNameElement = document.querySelector('#real-name');
@@ -134,10 +142,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     realNameElement.style.display = 'none';
                 }
             }
-            
+             
             const aboutMeElement = document.querySelector('#about-me');
             if (aboutMeElement) {
-                aboutMeElement.textContent = teacher.about || 'No information available';
+                aboutMeElement.textContent = teacher.about || getTranslation('noInfo');
             }
             
             // Hobbies
@@ -157,10 +165,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 </li>
                             `).join('');
                     } else {
-                        hobbiesList.innerHTML = '<li>No hobbies listed</li>';
+                        hobbiesList.innerHTML = '<li>' + getTranslation('noHobbies') + '</li>';
                     }
                 } else {
-                    hobbiesList.innerHTML = '<li>No hobbies listed</li>';
+                    hobbiesList.innerHTML = '<li>' + getTranslation('noHobbies') + '</li>';
                 }
             }
             
@@ -181,10 +189,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 </li>
                             `).join('');
                     } else {
-                        languagesList.innerHTML = '<li>Languages not specified</li>';
+                        languagesList.innerHTML = '<li>' + getTranslation('noLanguages') + '</li>';
                     }
                 } else {
-                    languagesList.innerHTML = '<li>Languages not specified</li>';
+                    languagesList.innerHTML = '<li>' + getTranslation('noLanguages') + '</li>';
                 }
             }
             
@@ -205,10 +213,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 </li>
                             `).join('');
                     } else {
-                        educationList.innerHTML = '<li>Education not specified</li>';
+                        educationList.innerHTML = '<li>' + getTranslation('noEducation') + '</li>';
                     }
                 } else {
-                    educationList.innerHTML = '<li>Education not specified</li>';
+                    educationList.innerHTML = '<li>' + getTranslation('noEducation') + '</li>';
                 }
             }
             
@@ -229,10 +237,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 </li>
                             `).join('');
                     } else {
-                        experienceList.innerHTML = '<li>No experience specified</li>';
+                        experienceList.innerHTML = '<li>' + getTranslation('noExperience') + '</li>';
                     }
                 } else {
-                    experienceList.innerHTML = '<li>No experience specified</li>';
+                    experienceList.innerHTML = '<li>' + getTranslation('noExperience') + '</li>';
                 }
             }
             
@@ -255,23 +263,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                             return `
                                 <div class="course" data-course-id="${course.id || ''}">
                                     <p class="p-1">${course.name || 'Untitled Course'}</p>
-                                    <p class="p-2">${course.description || 'No description available'}</p>
-                                    <img 
-                                        src="${imageUrl}"
-                                        alt="${course.name}"
-                                        onerror="this.onerror=null; this.src='/images/250x100.png';"
-                                        class="course-image"
-                                    >
-                                    <div class="course-details">
-                                        <span class="course-price">${formatPrice(course.price)}</span>
+                                    <div class="description-container">
+                                        <p class="p-2 short-description">${course.description ? (course.description.length > 200 ? course.description.substring(0, 100) + '...' : course.description) : 'No description available'}</p>
+                                        <div class="full-description">
+                                            <p>${course.description || 'No description available'}</p>
+                                        </div>
                                     </div>
+                                    <img src="/uploads/${course.image_url || '/images/250x100.png'}"
+                                        alt="${course.name}"
+                                        onerror="this.src='/images/250x100.png'">
+                                    <!--<div class="course-details">
+                                        <span class="course-price">${formatPrice(course.price)}</span>
+                                    </div>-->
                                     <button class="btn-resume" onclick="window.location.href='/course/${course.id}'">
-                                        ${getTranslation('learnMore')}
+                                        ${getTranslation('btnResume')}
                                     </button>
                                 </div>
                             `;
                         }).join('');
-                    
+                        
                     const courseCards = document.querySelectorAll('.course');
                     courseCards.forEach(card => {
                         card.addEventListener('click', (e) => {
@@ -287,21 +297,35 @@ document.addEventListener('DOMContentLoaded', async () => {
                     coursesList.innerHTML = `<p>${getTranslation('noCourses')}</p>`;
                 }
             }
-            
+
             // Reviews
             const reviewsList = document.querySelector('#reviews-list');
             if (reviewsList) {
                 const reviews = teacher.reviews || [];
                 reviewsList.innerHTML = reviews.length > 0
-                    ? reviews.map(review => `
-                        <div class="review">
-                            <p class="p-1">${review.student_name || 'Anonymous'}</p>
-                            <p class="p-2">${review.comment || 'No comment'}</p>
-                            <div class="rating">Rating: ${'★'.repeat(Math.min(5, Math.max(0, review.rating)))}${'☆'.repeat(5-Math.min(5, Math.max(0, review.rating)))}</div>
-                            <p class="date">${new Date(review.created_at).toLocaleDateString()}</p>
-                        </div>
-                    `).join('')
-                    : '<p>No reviews available</p>';
+                    ? reviews.map(review => {
+                        const comment = review.comment || 'No comment';
+                        const isLongComment = comment.length > 100;
+                        
+                        return `
+                            <div class="review">
+                                <div class="review-header">
+                                    <p class="p-1">${review.student_name || 'Anonymous'}</p>
+                                    <p class="date">${new Date(review.created_at).toLocaleDateString()}</p>
+                                </div>
+                                <div class="comment-container">
+                                    <p class="p-2 short-comment">${comment}</p>
+                                    ${isLongComment ? `
+                                        <div class="full-comment">
+                                            <p>${comment}</p>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                                <div class="rating">${'<span class="star">★</span>'.repeat(Math.min(5, Math.max(0, review.rating)))}${'<span class="empty-star">☆</span>'.repeat(5-Math.min(5, Math.max(0, review.rating)))}</div>
+                            </div>
+                        `;
+                    }).join('')
+                    : reviewsList.innerHTML = '<p>' + getTranslation('noReviews') + '</p>';;
             }
         }
         
@@ -324,8 +348,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (profileElement) {
             profileElement.innerHTML = `
                 <div class="error-message">
-                    <p>Unable to load profile. Please try again later.</p>
-                    <p>Error details: ${error.message}</p>
+                    <p>${getTranslation('loadError')}</p>
+                    <p>${getTranslation('errorDetails')} ${error.message}</p>
                 </div>
             `;
         }

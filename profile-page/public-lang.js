@@ -12,7 +12,16 @@ const translations = {
         viewLess: 'View less',  
         btnResume: 'Learn more',
         showMore: 'Show more...',
-        showLess: 'Show less'  
+        showLess: 'Show less',
+        noHobbies: 'No hobbies listed',
+        noLanguages: 'Languages not specified',
+        noEducation: 'Education not specified',
+        noExperience: 'No experience specified',
+        noCourses: 'No courses available',
+        noReviews: 'No reviews available',
+        noInfo: 'No information available',
+        loadError: 'Unable to load profile. Please try again later.',
+        errorDetails: 'Error details:'  
     },
     ua: {
         title: 'StudyWith | Профіль',
@@ -27,7 +36,16 @@ const translations = {
         viewLess: 'Згорнути',   
         btnResume: 'Дізнатися більше',
         showMore: 'Більше...',
-        showLess: 'Сховати'  
+        showLess: 'Сховати',
+        noHobbies: 'Хобі не вказані',
+        noLanguages: 'Мови не вказані',
+        noEducation: 'Освіта не вказана',
+        noExperience: 'Досвід не вказаний',
+        noCourses: 'Курсів поки немає',
+        noReviews: 'Відгуків немає',
+        noInfo: 'Інформація відсутня',
+        loadError: 'Не вдалося завантажити профіль. Спробуйте пізніше.',
+        errorDetails: 'Деталі помилки:'
     }
 };
 

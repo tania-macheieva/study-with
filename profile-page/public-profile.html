@@ -11,42 +11,6 @@
         rel="stylesheet" />
     <link rel="icon" href="../images/menu-logo.ico">
 
-    <style>
-        .truncate {
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            line-clamp: 3;
-            box-orient: vertical;
-        }
-
-        .show-more {
-            display: inline-block;
-            text-align: right;
-            padding: 6px 20px;
-            font-size: 16px;
-            font-family: "Inter", sans-serif;
-            font-weight: 640;
-            background: #283044;
-            color: #ffffff;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: background 0.3s ease, transform 0.2s ease;
-            margin-top: 8px;
-            margin-left: auto;
-        }
-
-        .container {
-            display: flex;
-            justify-content: flex-end;
-        }
-
-        .hidden-items {
-            display: none;
-        }
-    </style>
 </head>
 
 <body>
@@ -57,9 +21,9 @@
                     <div class="info">
                         <img class="profile-image" id="profile-image" src="/images/user-avatar.png" alt="user image"
                             width="150px" height="150px">
-                        <p class="user-n" id="user-nickname">UserName</p>
-                        <p class="user-n" id="real-name">RealName</p>
-                    </div>
+                        <p class="user-n" id="user-nickname"></p>
+                        <p class="user-n" id="real-name"></p>
+                    </div> 
 
                     <div class="hobbies">
                         <h2 data-lang="hobbies"><img src="/images/hobbies.png" alt="hobbies-ico" width="27px " height="27px">Hobbies</h2>
@@ -123,16 +87,7 @@
             }
         });
 
-        function getTranslation(key) {
-            const userLang = localStorage.getItem('language') || 'en';
-
-            if (!translations || !translations[userLang]) {
-                console.warn(`No translations found for language: ${userLang}`);
-                return key; // Fallback to the original key
-            }
-
-            return translations[userLang][key] || key;
-        }
+       
     </script>
     <script src="../header/auth-header.js"></script>
     <script src="../footer/footer.js"></script>
