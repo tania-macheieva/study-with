@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
-    <link rel="stylesheet" href="cert_check.css">
+    <title data-lang="pageTitle">Перевірка сертифікату</title>
+    <link rel="stylesheet" href="/certificate_check/cert_check.css">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -14,19 +14,32 @@
 </head>
 <body>
     <div class="all">
-    <aside class="img_Cert">
-    <img src="/images/cert_img.jpg" alt="Check your certificate">
-    </aside>
-    
-    <div class="Check_cert_div">
-        <h1>Check your certificate here!</h1>
-        <input type="text" placeholder="Example: CERT-2025-12345">
-        <p class="P_valid">Your certificate is valid</p>
-        <p class="P_not_valid">Your certificate is not valid</p>
-        <button>Check certificate</button>
+        <aside class="img_Cert">
+            <img src="/images/cert_img.jpg" alt="Перевірка сертифікату">
+        </aside>
+        
+        <div class="Check_cert_div">
+            <h1 data-lang="checkCertHeader">Перевірте свій сертифікат тут!</h1>
+            <input type="text" id="certificateNumber" data-lang="certInputPlaceholder" placeholder="Приклад: CERT-2025-12345">
+            <div class="loading" id="loading" data-lang="verifying">Перевірка</div>
+            <p class="P_valid" id="validMessage" data-lang="validCertMessage">Ваш сертифікат дійсний</p>
+            <p class="P_not_valid" id="notValidMessage" data-lang="invalidCertMessage">Ваш сертифікат недійсний</p>
+            
+            <div class="cert-details" id="certDetails">
+                <h3 data-lang="certDetailsHeader">Деталі сертифікату</h3>
+                <p><strong data-lang="certOwnerName">Ім'я власника:</strong> <span id="certUserName"></span></p>
+                <p><strong data-lang="certCourseName">Назва курсу:</strong> <span id="certCourseName"></span></p>
+                <p><strong data-lang="certIssueDate">Дата видачі:</strong> <span id="certIssuedDate"></span></p>
+                <p><strong data-lang="certNumber">Номер сертифікату:</strong> <span id="certNumber"></span></p>
+            </div>
+            
+            <button id="checkCertBtn" data-lang="checkCertButton">Перевірити сертифікат</button>
+        </div>
     </div>
-</div>
+
+    <script src="/header/auth-header.js"></script>
+    <script src="/footer/footer.js"></script>
+    <script src="/certificate_check/cert_checl_translations.js"></script>
+    <script src="/certificate_check/cert_check.js"></script>
 </body>
-<script src="/header/auth-header.js"></script>
-<script src="/footer/footer.js"></script>
 </html>

@@ -395,4 +395,62 @@ router.post('/certificate/generate', async (req, res) => {
         }
     }
 });
+
+router.get('/certificate/verify/:certificateNumber', async (req, res) => {
+    try {
+        const { certificateNumber } = req.params;
+        
+        if (!certificateNumber) {
+            return res.status(400).json({ 
+                error: 'Номер сертифікату не вказано',
+                details: 'Необхідно вказати номер сертифікату'
+            });
+        }
+        
+        const query = `
+            SELECT 
+                c.id as certificate_id,
+                c.certificate_number,
+                c.issued_at,
+                crs.id as course_id,
+                crs.name as course_name,
+                u.id as user_id,
+                u.name as user_name
+            FROM certificates c
+            JOIN all_courses crs ON c.course_id = crs.id
+            JOIN users u ON c.user_id = u.id
+            WHERE c.certificate_number = $1
+        `;
+        
+        const result = await db.query(query, [certificateNumber]);
+        
+        if (result.rows.length === 0) {
+            return res.json({ 
+                isValid: false,
+                message: 'Сертифікат не знайдено'
+            });
+        }
+        
+        const certificate = result.rows[0];
+        
+        res.json({ 
+            isValid: true,
+            certificate: {
+                id: certificate.certificate_id,
+                number: certificate.certificate_number,
+                issuedAt: certificate.issued_at,
+                courseId: certificate.course_id,
+                courseName: certificate.course_name,
+                userId: certificate.user_id,
+                userName: certificate.user_name
+            }
+        });
+    } catch (error) {
+        console.error('Помилка перевірки сертифікату:', error);
+        res.status(500).json({ 
+            error: 'Внутрішня помилка сервера',
+            details: error.message
+        });
+    }
+});
 module.exports = router;

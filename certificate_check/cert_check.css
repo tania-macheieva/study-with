@@ -91,3 +91,73 @@ body {
 .Check_cert_div button:hover {
     background-color: #0c101a;
 }
+
+.loading {
+    display: none;
+    text-align: center;
+    margin: 12px 0;
+    color: #283044;
+}
+
+.cert-details {
+    display: none;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    text-align: left;
+    border-left: 3px solid #23C552;
+}
+
+.cert-details h3 {
+    color: #0c101a;
+    margin-bottom: 12px;
+    font-size: 18px;
+}
+
+.cert-details p {
+    margin-bottom: 8px;
+    color: #313131;
+    font-size: 14px;
+}
+
+.P_valid, .P_not_valid {
+    display: none;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading::after {
+    content: '';
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(40, 48, 68, 0.3);
+    border-radius: 50%;
+    border-top-color: #283044;
+    animation: spin 1s ease-in-out infinite;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+@media (max-width: 992px) {
+    .all {
+        flex-direction: column;
+    }
+    
+    .img_Cert, .Check_cert_div {
+        width: 90%;
+        max-width: 450px;
+        margin: 0 auto;
+    }
+    
+    .img_Cert {
+        margin-bottom: 30px;
+    }
+    
+    .Check_cert_div {
+        margin-left: auto;
+    }
+}

@@ -11,7 +11,8 @@ const headerTranslations = {
         headerUser: "username",
         headerCreate: "Create course",
         dropdownProfile: "Profile",
-        dropdownLogout: "Logout"
+        dropdownLogout: "Logout",
+        headerCheckingTheCertificate: "Checking the certificate"
     },
     ua: {
         headerAll: "Всi курси",
@@ -24,7 +25,8 @@ const headerTranslations = {
         headerUser: "Ім'я користувача",
         headerCreate: "Створити курс",
         dropdownProfile: "Профіль",
-        dropdownLogout: "Вийти"
+        dropdownLogout: "Вийти",
+        headerCheckingTheCertificate: "Перевірка сертифікату"
     }
 };
 

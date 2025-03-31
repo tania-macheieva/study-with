@@ -128,7 +128,9 @@ app.get('/test-creation', (req, res) => {
 app.get('/test-page', (req, res) => {
     res.sendFile(path.join(__dirname, './tests/test-page.html')); 
 });
-
+app.get('/certificate-check', (req, res) => {
+    res.sendFile(path.join(__dirname, './certificate_check/cert_check.html')); 
+});
 app.get('/public-profile/:id', (req, res) => {
     res.sendFile(path.join(__dirname, 'profile-page/public-profile.html')); 
 });
