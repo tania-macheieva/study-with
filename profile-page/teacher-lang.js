@@ -160,73 +160,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  async function loadEnrolledCourses() {
-    try {
-      const userId = localStorage.getItem("userId");
-      console.log("Loading courses for user:", userId);
-
-      if (!userId) {
-        console.log("No userId found");
-        return;
-      }
-
-      const response = await fetch(`/courses/enrolled/${userId}`);
-      const courses = await response.json();
-      console.log("Received courses:", courses);
-
-      const coursesContainer = document.getElementById("enrolled-courses");
-      if (!coursesContainer) return;
-
-      if (!courses || courses.length === 0) {
-        coursesContainer.innerHTML =
-          '<p class="no-courses" data-lang="noCourses">You haven\'t enrolled in any courses yet.</p>';
-        return;
-      }
-
-      coursesContainer.innerHTML = courses
-        .map(
-          (course) => `
-            <div class="course">
-                <p class="p-1">${course.name || "Без назви"}</p>
-                <div class="progress-bar">
-                    <span style="width: ${course.progress || 0}%;"></span>
-                </div>
-                <p class="percent">${course.progress || 0}%</p>
-                <img src="/uploads/${
-                  course.image_url || "/images/250x100.png"
-                }" 
-                     alt="${course.name}" 
-                     onerror="this.src='/images/250x100.png'">
-                <button class="btn-resume" data-course-id="${course.id}">
-                    ${
-                      translations[localStorage.getItem("language") || "en"]
-                        .btnResume
-                    }
-                </button>
-            </div>
-        `
-        )
-        .join("");
-
-      document.querySelectorAll(".btn-resume").forEach((button) => {
-        button.addEventListener("click", function () {
-          const courseId = this.getAttribute("data-course-id");
-          if (courseId) {
-            window.location.href = `/course/${courseId}`;
-          }
-        });
-      });
-
-      toggleViewAllButton("courses-list", "btn-view-all-1");
-    } catch (error) {
-      console.error("Error loading courses:", error);
-      const coursesContainer = document.getElementById("enrolled-courses");
-      if (coursesContainer) {
-        coursesContainer.innerHTML =
-          '<p class="error-message">Failed to load courses. Please try again later.</p>';
-      }
-    }
-  }
 
   async function updateProgress() {
     try {
@@ -954,6 +887,17 @@ h3 {
 
             coursesContainer.appendChild(courseElement);
 
+            // Add event listener to the resume button
+            const resumeButton = courseElement.querySelector(".btn-resume");
+            if (resumeButton) {
+                resumeButton.addEventListener("click", function() {
+                    const courseId = this.getAttribute("data-course-id");
+                    if (courseId) {
+                        window.location.href = `/course/${courseId}`;
+                    }
+                });
+            }
+            
             // Add certificates for completed courses
             if (course.progress === 100) {
                 const certificateElement = document.createElement('div');

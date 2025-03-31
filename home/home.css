@@ -61,10 +61,12 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: 100%;
 }
 
 .text {
   max-width: 50%;
+  margin-top: 50px;
 }
 
 body h1 {
@@ -151,9 +153,10 @@ body h3 {
 
 
 .img_home {
-  width: 45%;
+  width: 60%;
   height: auto;
-  margin-top: 22px;
+  margin-top: 42px;
+  margin-bottom: 100px;
 }
 
 /*Footer*/

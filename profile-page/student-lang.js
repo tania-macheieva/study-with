@@ -673,7 +673,14 @@ async function loadEnrolledCourses() {
                     </button>
                 </div>
             `;
-
+            document.querySelectorAll(".btn-resume").forEach((button) => {
+                button.addEventListener("click", function () {
+                  const courseId = this.getAttribute("data-course-id");
+                  if (courseId) {
+                    window.location.href = `/course/${courseId}`;
+                  }
+                });
+              });
             // Store reference to tooltip container if it exists
             const tooltipContainer = courseElement.querySelector('.course-name-container');
             if (tooltipContainer.querySelector('.tooltip')) {

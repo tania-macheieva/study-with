@@ -344,3 +344,36 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  const startButton = document.querySelector(".home_button");
+  
+  if (startButton) {
+    startButton.addEventListener("click", async (e) => {
+      e.preventDefault(); 
+      
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          window.location.href = '/register';
+          return;
+        }
+
+        const response = await fetch('/auth/auth-check', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          window.location.href = '/all-courses';
+        } else {
+          window.location.href = '/register';
+        }
+      } catch (error) {
+        console.error('Error checking authentication:', error);
+        window.location.href = '/register';
+      }
+    });
+  }
+});

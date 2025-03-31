@@ -103,34 +103,33 @@ a.lang-btn {
     color: #283044;
 }
 
-.search {
-    position: relative; /* Дозволяє позиціювати іконку відносно контейнера */
+/* .search {
+    position: relative;
     display: inline-block; 
     color: rgba(225, 223, 223, 0.2); 
 }
-  /* Поле для вводу */
+    
 .search input[type="text"]  { 
-    padding: 5px; /* Відступ справа для іконки + текст зліва */
+    padding: 5px; 
     border-radius: 4px;
     font-family: 'Inter', sans-serif;
     border: 2px solid #c7c7c7;
     font-size: 16px;
-    box-sizing: border-box; /* Увімкнення врахування padding */
+    box-sizing: border-box;
     border-radius: 10px;
     width: 15vw;
     color: #000000;
 }
 
-/* Іконка пошуку */
 .search .search-btn {
-    position: absolute; /* Позиціонування всередині контейнера */
-    top: 50%; /* Центрування по вертикалі */
-    right: 10px; /* Відступ від правого краю */
-    transform: translateY(-50%); /* Вирівнювання по центру */
-    width: 20px; /* Розмір іконки */
-    height: 20px; /* Висота іконки */
-    cursor: pointer; /* Курсор у вигляді руки при наведенні */
-}
+    position: absolute;
+    top: 50%; 
+    right: 10px; 
+    transform: translateY(-50%); 
+    width: 20px; 
+    height: 20px; 
+    cursor: pointer;
+} */
 
 .lang-switcher {
     user-select: none;
